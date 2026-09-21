@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">astro-mobile</string>
+    <string name="app_name">astro</string>
     <string name="astro_logo_content_description">Logo Astro</string>
     <string name="mock_destination_title">Destino mock</string>
     <string name="mock_destination_message">Navegação pós-splash concluída.</string>
