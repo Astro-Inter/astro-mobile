@@ -11,8 +11,10 @@
         <action
             android:id="@+id/action_splash_to_mock_destination"
             app:destination="@id/mockDestinationFragment"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit"
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
     </fragment>
@@ -20,6 +22,19 @@
     <fragment
         android:id="@+id/mockDestinationFragment"
         android:name="com.example.astro_mobile.navigation.MockDestinationFragment"
-        android:label="Destino mock" />
+        android:label="Destino mock">
+        <action
+            android:id="@+id/action_mock_destination_to_access_key_information"
+            app:destination="@id/accessKeyInformationFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/accessKeyInformationFragment"
+        android:name="com.example.astro_mobile.navigation.AccessKeyInformationFragment"
+        android:label="Chave de acesso" />
 
 </navigation>
