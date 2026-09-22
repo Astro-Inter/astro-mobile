@@ -5,5 +5,8 @@
     <color name="astro_dark_background">#1C1839</color>
     <color name="purple_gray">#272445</color>
     <color name="astro_light_background">#F7F6FF</color>
-    <color name="astro_mock_text_secondary">#C8C4DC</color>
+    <color name="astro_light_text">#F6F6F6</color>
+    <color name="astro_input_background">#373451</color>
+    <color name="astro_input_hint">#B3B1C1</color>
+    <color name="astro_primary_purple">#8F00C4</color>
 </resources>
