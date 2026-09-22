@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:showIn="@layout/activity_main">
+
+    <ImageView
+        android:id="@+id/image_email_identification_planet"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        android:src="@drawable/splash_planet"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scroll_email_identification"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="ifContentScrolls"
+        app:layout_constraintWidth_max="430dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="30dp"
+            android:paddingTop="100dp"
+            android:paddingEnd="30dp"
+            android:paddingBottom="180dp">
+
+            <ImageView
+                android:id="@+id/image_email_identification_logo"
+                android:layout_width="180dp"
+                android:layout_height="144dp"
+                android:contentDescription="@string/astro_logo_content_description"
+                android:scaleType="fitCenter"
+                android:src="@drawable/astro_logo" />
+
+            <TextView
+                android:id="@+id/text_email_identification_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/montserrat_family"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/email_identification_title"
+                android:textColor="@color/astro_light_text"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/text_email_identification_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/montserrat_family"
+                android:includeFontPadding="false"
+                android:text="@string/email_identification_label"
+                android:textColor="@color/astro_light_background"
+                android:textSize="16sp" />
+
+            <FrameLayout
+                android:id="@+id/container_email_identification_input"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_email_identification_input">
+
+                <EditText
+                    android:id="@+id/input_email_identification"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autofillHints="emailAddress"
+                    android:background="@null"
+                    android:fontFamily="@font/montserrat_family"
+                    android:gravity="center_vertical"
+                    android:hint="@string/email_identification_hint"
+                    android:importantForAutofill="yes"
+                    android:includeFontPadding="false"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:paddingStart="16dp"
+                    android:paddingTop="0dp"
+                    android:paddingEnd="52dp"
+                    android:paddingBottom="0dp"
+                    android:singleLine="true"
+                    android:textColor="@color/astro_light_background"
+                    android:textColorHint="@color/astro_input_hint"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/image_email_identification_email"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="@string/email_identification_email_icon_description"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_email_closed" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/button_email_identification_continue"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_email_identification_button"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/montserrat_family"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="@string/email_identification_action"
+                    android:textColor="@color/astro_light_background"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="17dp"
+                    android:contentDescription="@string/email_identification_continue_icon_description"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_arrow_right" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/text_email_identification_help"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/montserrat_family"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:lineSpacingExtra="1dp"
+                android:text="@string/email_identification_access_key_help"
+                android:textColor="@color/astro_light_background"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">astro</string>
     <string name="astro_logo_content_description">Logo Astro</string>
-    <string name="mock_destination_title">Destino mock</string>
-    <string name="mock_destination_message">Navegação pós-splash concluída.</string>
-    <string name="mock_destination_hint">A autenticação definirá esta rota futuramente.</string>
+    <string name="email_identification_title">Entre com sua conta <b>Astro</b></string>
+    <string name="email_identification_label">E-mail</string>
+    <string name="email_identification_hint">Insira seu e-mail</string>
+    <string name="email_identification_action">Prosseguir</string>
+    <string name="email_identification_access_key_help">Você precisa de uma chave de acesso para entrar. <u><font color="#0099FF">Saiba mais</font></u></string>
+    <string name="email_identification_email_icon_description">Ícone de e-mail</string>
+    <string name="email_identification_continue_icon_description">Prosseguir</string>
 </resources>

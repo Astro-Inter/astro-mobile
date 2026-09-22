@@ -8,3 +8,4 @@ Estados: `NÃO INICIADO`, `EM ANDAMENTO`, `CONCLUÍDO`, `BLOQUEADO` e `NÃO SE A
 |---|---|---|---|---|---|---|---|
 | Splash | Inicialização | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | NÃO INICIADO | Emblema com área segura no splash nativo e na tela animada; movimento com overshoot e escala bouncy validado em telefone e tablet. | 2026-09-20 |
 | Destino mock pós-splash | Temporário | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | NÃO SE APLICA | Tela temporária implementada e alcançada após a animação, sem manter a splash no back stack. | 2026-09-20 |
+| Identificação de e-mail | Autenticação | CONCLUÍDO | NÃO INICIADO | NÃO INICIADO | NÃO INICIADO | Layout XML fiel ao frame vigente do App V2, validado em telefone e tablet; sem comportamento nesta etapa. | 2026-09-21 |
