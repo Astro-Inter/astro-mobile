@@ -30,11 +30,23 @@
             app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter"
             app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_mock_destination_to_first_login_access_key"
+            app:destination="@id/firstLoginAccessKeyFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/accessKeyInformationFragment"
         android:name="com.example.astro_mobile.navigation.AccessKeyInformationFragment"
         android:label="Chave de acesso" />
+
+    <fragment
+        android:id="@+id/firstLoginAccessKeyFragment"
+        android:name="com.example.astro_mobile.navigation.FirstLoginAccessKeyFragment"
+        android:label="Chave do primeiro acesso" />
 
 </navigation>
