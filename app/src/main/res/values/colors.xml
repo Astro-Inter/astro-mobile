@@ -9,4 +9,5 @@
     <color name="astro_input_background">#373451</color>
     <color name="astro_input_hint">#B3B1C1</color>
     <color name="astro_primary_purple">#8F00C4</color>
+    <color name="access_key_help_ripple">#338F00C4</color>
 </resources>

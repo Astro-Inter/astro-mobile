@@ -9,19 +9,6 @@
     android:clipToPadding="false"
     tools:showIn="@layout/activity_main">
 
-    <ImageView
-        android:id="@+id/image_email_identification_planet"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:contentDescription="@null"
-        android:importantForAccessibility="no"
-        android:scaleType="fitCenter"
-        android:src="@drawable/splash_planet"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <ScrollView
         android:id="@+id/scroll_email_identification"
         android:layout_width="0dp"
@@ -152,7 +139,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:fontFamily="@font/montserrat_family"
+                android:textColorHighlight="@color/access_key_help_ripple"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:lineSpacingExtra="1dp"

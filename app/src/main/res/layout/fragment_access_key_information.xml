@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:showIn="@layout/activity_main">
+
+    <LinearLayout
+        android:id="@+id/container_access_key_information_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="30dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/container_access_key_information_nav">
+
+        <TextView
+            android:id="@+id/text_access_key_information_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_family"
+            android:text="@string/access_key_information_title"
+            android:textColor="@color/astro_light_background"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/text_access_key_information_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/montserrat_family"
+            android:lineSpacingExtra="0dp"
+            android:text="@string/access_key_information_body"
+            android:textColor="@color/astro_input_hint"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/image_access_key_information_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="7dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            android:scaleType="fitXY"
+            android:src="@drawable/access_key_divider" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_access_key_information_acknowledge"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/montserrat_family"
+            android:insetBottom="0dp"
+            android:insetTop="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="@string/access_key_information_action"
+            android:textAllCaps="false"
+            android:textColor="@color/astro_light_background"
+            android:textSize="16sp"
+            app:backgroundTint="@color/astro_primary_purple"
+            app:cornerRadius="10dp"
+            app:strokeWidth="0dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/container_access_key_information_nav"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/button_access_key_information_back"
+            android:layout_width="38dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="20dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/access_key_information_back_description"
+            android:padding="0dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/access_key_back" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
