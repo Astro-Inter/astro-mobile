@@ -44,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 int destinationId = destination.getId();
                 boolean isAuthenticationScreen = destinationId == R.id.mockDestinationFragment
-                        || destinationId == R.id.accessKeyInformationFragment;
+                        || destinationId == R.id.accessKeyInformationFragment
+                        || destinationId == R.id.loginPasswordFragment
+                        || destinationId == R.id.firstLoginAccessKeyFragment;
                 authenticationPlanetOverlay.setVisibility(
                         isAuthenticationScreen ? View.VISIBLE : View.GONE
                 );
