@@ -26,6 +26,10 @@ public class MockDestinationFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        view.findViewById(R.id.button_email_identification_continue)
+                .setOnClickListener(clickedView -> Navigation.findNavController(clickedView)
+                        .navigate(R.id.action_mock_destination_to_first_login_access_key));
+
         TextView help = view.findViewById(R.id.text_email_identification_help);
         String helpText = help.getText().toString();
         String linkText = "Saiba mais";
