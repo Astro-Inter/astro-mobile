@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
                 boolean isAuthenticationScreen = destinationId == R.id.mockDestinationFragment
                         || destinationId == R.id.accessKeyInformationFragment
                         || destinationId == R.id.loginPasswordFragment
-                        || destinationId == R.id.firstLoginAccessKeyFragment;
+                        || destinationId == R.id.firstLoginAccessKeyFragment
+                        || destinationId == R.id.firstLoginPasswordFragment;
                 authenticationPlanetOverlay.setVisibility(
                         isAuthenticationScreen ? View.VISIBLE : View.GONE
                 );

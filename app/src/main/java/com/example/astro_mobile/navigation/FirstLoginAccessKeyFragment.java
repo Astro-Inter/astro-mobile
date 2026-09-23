@@ -42,7 +42,18 @@ public class FirstLoginAccessKeyFragment extends Fragment {
         configureDigitInputs();
 
         View continueButton = view.findViewById(R.id.button_first_login_access_key_continue);
-        continueButton.setOnClickListener(clickedView -> showInvalidKeyMock());
+        continueButton.setOnClickListener(clickedView -> {
+            StringBuilder accessKey = new StringBuilder(digitInputs.length);
+            for (EditText input : digitInputs) {
+                accessKey.append(input.getText());
+            }
+            if ("111111".contentEquals(accessKey)) {
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_first_login_access_key_to_first_login_password);
+            } else {
+                showInvalidKeyMock();
+            }
+        });
         digitInputs[digitInputs.length - 1].setOnEditorActionListener(
                 (textView, actionId, event) -> {
                     if (actionId != EditorInfo.IME_ACTION_DONE) {
