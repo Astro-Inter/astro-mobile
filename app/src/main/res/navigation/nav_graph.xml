@@ -59,6 +59,19 @@
     <fragment
         android:id="@+id/firstLoginAccessKeyFragment"
         android:name="com.example.astro_mobile.navigation.FirstLoginAccessKeyFragment"
-        android:label="Chave do primeiro acesso" />
+        android:label="Chave do primeiro acesso">
+        <action
+            android:id="@+id/action_first_login_access_key_to_first_login_password"
+            app:destination="@id/firstLoginPasswordFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/firstLoginPasswordFragment"
+        android:name="com.example.astro_mobile.navigation.FirstLoginPasswordFragment"
+        android:label="Definição da senha inicial" />
 
 </navigation>
