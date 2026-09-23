@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
@@ -35,10 +36,17 @@ public class FirstLoginPasswordFragment extends Fragment {
         enterButton.setOnClickListener(clickedView -> {
             String password = passwordInput.getText().toString();
             String confirmation = confirmationInput.getText().toString();
-            if (!password.equals(confirmation)) {
+            if (password.isEmpty()) {
+                passwordInput.requestFocus();
+            } else if (confirmation.isEmpty()) {
+                confirmationInput.requestFocus();
+            } else if (!password.equals(confirmation)) {
                 passwordContainer.setBackgroundResource(R.drawable.bg_login_password_input_error);
                 confirmationContainer.setBackgroundResource(R.drawable.bg_login_password_input_error);
                 mismatchError.setVisibility(View.VISIBLE);
+            } else {
+                Navigation.findNavController(clickedView)
+                        .navigate(R.id.action_first_login_password_to_flow_choice);
             }
         });
 

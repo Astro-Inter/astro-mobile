@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
@@ -50,8 +51,13 @@ public class LoginPasswordFragment extends Fragment {
         });
 
         enterButton.setOnClickListener(clickedView -> {
-            inputContainer.setBackgroundResource(R.drawable.bg_login_password_input_error);
-            error.setVisibility(View.VISIBLE);
+            if (passwordInput.length() > 0) {
+                Navigation.findNavController(clickedView)
+                        .navigate(R.id.action_login_password_to_flow_choice);
+            } else {
+                inputContainer.setBackgroundResource(R.drawable.bg_login_password_input_error);
+                error.setVisibility(View.VISIBLE);
+            }
         });
         passwordInput.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId != EditorInfo.IME_ACTION_DONE) {

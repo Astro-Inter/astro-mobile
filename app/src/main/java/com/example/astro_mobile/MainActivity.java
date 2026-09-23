@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
                         || destinationId == R.id.accessKeyInformationFragment
                         || destinationId == R.id.loginPasswordFragment
                         || destinationId == R.id.firstLoginAccessKeyFragment
-                        || destinationId == R.id.firstLoginPasswordFragment;
+                        || destinationId == R.id.firstLoginPasswordFragment
+                        || destinationId == R.id.flowChoiceFragment;
                 authenticationPlanetOverlay.setVisibility(
                         isAuthenticationScreen ? View.VISIBLE : View.GONE
                 );
