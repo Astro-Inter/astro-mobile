@@ -97,6 +97,21 @@
     <fragment
         android:id="@+id/flowChoiceFragment"
         android:name="com.example.astro_mobile.navigation.FlowChoiceFragment"
-        android:label="Escolha de fluxo" />
+        android:label="Escolha de fluxo">
+        <action
+            android:id="@+id/action_flow_choice_to_employee_home"
+            app:destination="@id/employeeHomeFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit"
+            app:popUpTo="@id/flowChoiceFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/employeeHomeFragment"
+        android:name="com.example.astro_mobile.employee.home.EmployeeHomeFragment"
+        android:label="Home do Colaborador" />
 
 </navigation>

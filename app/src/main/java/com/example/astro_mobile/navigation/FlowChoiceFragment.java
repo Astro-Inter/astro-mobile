@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 
@@ -29,7 +30,7 @@ public class FlowChoiceFragment extends Fragment {
                 Toast.makeText(requireContext(), R.string.flow_choice_manager_mock,
                         Toast.LENGTH_SHORT).show());
         view.findViewById(R.id.button_flow_choice_employee).setOnClickListener(clickedView ->
-                Toast.makeText(requireContext(), R.string.flow_choice_employee_mock,
-                        Toast.LENGTH_SHORT).show());
+                Navigation.findNavController(clickedView)
+                        .navigate(R.id.action_flow_choice_to_employee_home));
     }
 }

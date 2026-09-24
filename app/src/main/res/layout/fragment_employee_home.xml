@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:showIn="@layout/activity_main">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="430dp">
+
+        <LinearLayout
+            android:id="@+id/container_employee_home_header"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="30dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="122dp"
+                android:layout_height="30dp"
+                android:contentDescription="@string/astro_logo_content_description"
+                android:scaleType="fitCenter"
+                android:src="@drawable/home_logo" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <FrameLayout
+                android:id="@+id/button_employee_home_notifications"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_home_icon_ripple"
+                android:clickable="true"
+                android:contentDescription="@string/employee_home_notification_button"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/home_notification" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/scroll_employee_home"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:overScrollMode="ifContentScrolls"
+            app:layout_constraintBottom_toTopOf="@id/container_employee_home_bottom_nav"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/container_employee_home_header">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="30dp"
+                    android:paddingBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/text_employee_home_greeting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_family"
+                        android:includeFontPadding="false"
+                        android:text="@string/employee_home_greeting"
+                        android:textColor="@color/astro_light_background"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/text_employee_home_subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/montserrat_family"
+                        android:includeFontPadding="false"
+                        android:text="@string/employee_home_subtitle_filled"
+                        android:textColor="@color/astro_input_hint"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/container_employee_home_workspace"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="75dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="30dp"
+                        android:paddingEnd="30dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/montserrat_family"
+                            android:includeFontPadding="false"
+                            android:text="@string/employee_home_workspace"
+                            android:textColor="@color/astro_light_background"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@null"
+                            android:importantForAccessibility="no"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/home_building" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="21dp"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/home_divider" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="78dp"
+                    android:paddingStart="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="30dp"
+                    android:paddingBottom="10dp">
+
+                    <FrameLayout
+                        android:id="@+id/button_employee_home_events"
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_login_password_button"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="30dp"
+                            android:paddingEnd="30dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/montserrat_family"
+                                android:includeFontPadding="false"
+                                android:text="@string/employee_home_events"
+                                android:textColor="@color/astro_light_background"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginStart="10dp"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/home_chevron" />
+
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/home_calendar" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="137dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp">
+
+                    <LinearLayout
+                        android:id="@+id/button_employee_home_pending_card"
+                        android:layout_width="0dp"
+                        android:layout_height="117dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_home_card_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/montserrat_family"
+                                android:includeFontPadding="false"
+                                android:text="@string/employee_home_pending_count"
+                                android:textColor="@color/astro_light_background"
+                                android:textSize="24sp" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/home_clock" />
+                        </LinearLayout>
+
+                        <Space
+                            android:layout_width="1dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserrat_family"
+                            android:includeFontPadding="false"
+                            android:text="@string/employee_home_pending_label"
+                            android:textColor="@color/astro_light_background"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/button_employee_home_review_card"
+                        android:layout_width="0dp"
+                        android:layout_height="117dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_home_card_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/montserrat_family"
+                                android:includeFontPadding="false"
+                                android:text="@string/employee_home_review_count"
+                                android:textColor="@color/astro_light_background"
+                                android:textSize="24sp" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/home_eye" />
+                        </LinearLayout>
+
+                        <Space
+                            android:layout_width="1dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserrat_family"
+                            android:includeFontPadding="false"
+                            android:text="@string/employee_home_review_label"
+                            android:textColor="@color/astro_light_background"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/button_employee_home_completed_card"
+                        android:layout_width="0dp"
+                        android:layout_height="117dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_home_card_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/montserrat_family"
+                                android:includeFontPadding="false"
+                                android:text="@string/employee_home_completed_count"
+                                android:textColor="@color/astro_light_background"
+                                android:textSize="24sp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/home_check" />
+                        </LinearLayout>
+
+                        <Space
+                            android:layout_width="1dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserrat_family"
+                            android:includeFontPadding="false"
+                            android:text="@string/employee_home_completed_label"
+                            android:textColor="@color/astro_light_background"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:paddingStart="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="30dp"
+                    android:paddingBottom="10dp">
+
+                    <LinearLayout
+                        android:id="@+id/container_employee_home_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_home_positive_message"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="30dp"
+                        android:paddingEnd="20dp">
+
+                        <ImageView
+                            android:id="@+id/image_employee_home_message"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@null"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/home_check" />
+
+                        <TextView
+                            android:id="@+id/text_employee_home_message"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/montserrat_family"
+                            android:includeFontPadding="false"
+                            android:text="@string/employee_home_no_pending"
+                            android:textColor="@color/astro_light_background"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="21dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/home_divider" />
+
+                <LinearLayout
+                    android:id="@+id/list_employee_home_events"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <LinearLayout
+                    android:id="@+id/container_employee_home_events_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/button_employee_home_events_more"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:background="@drawable/bg_home_row_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/montserrat_family"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/employee_home_more"
+                        android:textColor="@color/astro_light_background"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="21dp"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/home_divider" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/container_employee_home_events_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:fontFamily="@font/montserrat_family"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/employee_home_no_events"
+                        android:textColor="@color/astro_light_background"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="21dp"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/home_divider" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="78dp"
+                    android:paddingStart="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="30dp"
+                    android:paddingBottom="10dp">
+
+                    <FrameLayout
+                        android:id="@+id/button_employee_home_notifications_section"
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_login_password_button"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="30dp"
+                            android:paddingEnd="30dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/montserrat_family"
+                                android:includeFontPadding="false"
+                                android:text="@string/employee_home_notifications"
+                                android:textColor="@color/astro_light_background"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginStart="10dp"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/home_chevron" />
+
+                            <Space
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/home_notification_section" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </FrameLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="21dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/home_divider" />
+
+                <LinearLayout
+                    android:id="@+id/list_employee_home_notifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <LinearLayout
+                    android:id="@+id/container_employee_home_notifications_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/button_employee_home_notifications_more"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:background="@drawable/bg_home_row_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/montserrat_family"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/employee_home_more"
+                        android:textColor="@color/astro_light_background"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="21dp"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/home_divider" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/container_employee_home_notifications_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:fontFamily="@font/montserrat_family"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="@string/employee_home_no_notifications"
+                        android:textColor="@color/astro_light_background"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="21dp"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/home_divider" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/container_employee_home_bottom_nav"
+            android:layout_width="0dp"
+            android:layout_height="82dp"
+            android:background="@drawable/bg_home_bottom_nav"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/home_nav_selected" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/home_home" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/montserrat_family"
+                        android:includeFontPadding="false"
+                        android:text="@string/employee_home_nav_home"
+                        android:textColor="@color/astro_primary_purple"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/button_employee_home_nav_events"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_home_row_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/home_nav_calendar" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/montserrat_family"
+                    android:includeFontPadding="false"
+                    android:text="@string/employee_home_nav_events"
+                    android:textColor="@color/astro_light_background"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/button_employee_home_nav_chat"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_home_row_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/home_chat" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/montserrat_family"
+                    android:includeFontPadding="false"
+                    android:text="@string/employee_home_nav_chat"
+                    android:textColor="@color/astro_light_background"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/button_employee_home_nav_profile"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_home_row_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/home_user" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/montserrat_family"
+                    android:includeFontPadding="false"
+                    android:text="@string/employee_home_nav_profile"
+                    android:textColor="@color/astro_light_background"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/button_employee_home_ai"
+            android:layout_width="89dp"
+            android:layout_height="89dp"
+            android:layout_marginEnd="11dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:contentDescription="@string/employee_home_ai_button"
+            android:focusable="true"
+            android:foreground="@drawable/bg_home_icon_ripple"
+            app:layout_constraintBottom_toTopOf="@id/container_employee_home_bottom_nav"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:layout_width="86dp"
+                android:layout_height="86dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:src="@drawable/home_ai_glow" />
+
+            <ImageView
+                android:layout_width="89dp"
+                android:layout_height="89dp"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter"
+                android:src="@drawable/home_mascot" />
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
