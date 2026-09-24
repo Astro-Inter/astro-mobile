@@ -2,9 +2,13 @@ package com.example.astro_mobile.employee.home;
 
 import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewConfiguration;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
@@ -21,8 +25,10 @@ import com.example.astro_mobile.R;
 public class EmployeeHomeFragment extends Fragment {
 
     private static final String STATE_EMPTY_PREVIEW = "empty_preview";
+    private static final long HOME_MOCK_LOAD_MS = 2_000L;
     private static final long AI_BUBBLE_VISIBLE_MS = 3_000L;
     private static final long AI_BUBBLE_FADE_MS = 350L;
+    private static final long SKELETON_PULSE_MS = 900L;
 
     private static final MockRow[] EVENT_ROWS = {
             new MockRow(R.string.employee_home_training, R.string.employee_home_due_tomorrow,
@@ -43,9 +49,19 @@ public class EmployeeHomeFragment extends Fragment {
     };
 
     private boolean emptyPreview;
+    private boolean homeReady;
     private View aiBubble;
+    private View aiButton;
+    private View aiGlow;
+    private View homeContent;
+    private View homeSkeleton;
     private AiDragTouchListener aiDragTouchListener;
     private Runnable hideAiBubble;
+    private Runnable finishHomeLoading;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private ValueAnimator skeletonPulseAnimator;
+    private long homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
+    private long homeLoadingStartedAtMs;
 
     public EmployeeHomeFragment() {
         super(R.layout.fragment_employee_home);
@@ -61,7 +77,22 @@ public class EmployeeHomeFragment extends Fragment {
         addRows(view.findViewById(R.id.list_employee_home_events), EVENT_ROWS);
         addRows(view.findViewById(R.id.list_employee_home_notifications), NOTIFICATION_ROWS);
         showPreview(view);
+
+        homeContent = view.findViewById(R.id.scroll_employee_home);
+        homeSkeleton = view.findViewById(R.id.container_employee_home_skeleton);
+        homeReady = false;
+        homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
+        homeContent.setAlpha(0f);
+        homeContent.setVisibility(View.INVISIBLE);
+        homeSkeleton.setAlpha(1f);
+        homeSkeleton.setVisibility(View.VISIBLE);
+
         aiBubble = view.findViewById(R.id.button_employee_home_ai_bubble);
+        aiButton = view.findViewById(R.id.button_employee_home_ai);
+        aiGlow = view.findViewById(R.id.glow_employee_home_ai);
+        aiBubble.setVisibility(View.GONE);
+        aiButton.setVisibility(View.GONE);
+        aiGlow.setVisibility(View.GONE);
 
         view.findViewById(R.id.text_employee_home_greeting).setOnLongClickListener(pressed -> {
             emptyPreview = !emptyPreview;
@@ -89,7 +120,6 @@ public class EmployeeHomeFragment extends Fragment {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
         }
 
-        View aiButton = view.findViewById(R.id.button_employee_home_ai);
         aiDragTouchListener = new AiDragTouchListener(
                 aiButton,
                 view.findViewById(R.id.glow_employee_home_ai),
@@ -103,11 +133,23 @@ public class EmployeeHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        showAiBubbleTemporarily();
+        if (homeReady) {
+            showAiBubbleTemporarily();
+        } else {
+            startMockHomeLoad();
+        }
     }
 
     @Override
     public void onPause() {
+        if (!homeReady && finishHomeLoading != null) {
+            mainHandler.removeCallbacks(finishHomeLoading);
+            homeLoadingRemainingMs = Math.max(0L, homeLoadingRemainingMs
+                    - (SystemClock.uptimeMillis() - homeLoadingStartedAtMs));
+            finishHomeLoading = null;
+        }
+        stopSkeletonPulse();
+        finishHomeRevealIfNeeded();
         if (aiBubble != null) {
             if (hideAiBubble != null) {
                 aiBubble.removeCallbacks(hideAiBubble);
@@ -120,10 +162,134 @@ public class EmployeeHomeFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (finishHomeLoading != null) {
+            mainHandler.removeCallbacks(finishHomeLoading);
+            finishHomeLoading = null;
+        }
+        stopSkeletonPulse();
+        if (homeContent != null) {
+            homeContent.animate().cancel();
+        }
+        if (homeSkeleton != null) {
+            homeSkeleton.animate().cancel();
+        }
         aiBubble = null;
+        aiButton = null;
+        aiGlow = null;
+        homeContent = null;
+        homeSkeleton = null;
         aiDragTouchListener = null;
         hideAiBubble = null;
+        homeReady = false;
+        homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
         super.onDestroyView();
+    }
+
+    private void startMockHomeLoad() {
+        if (homeReady || homeSkeleton == null || finishHomeLoading != null) {
+            return;
+        }
+        startSkeletonPulse();
+        homeLoadingStartedAtMs = SystemClock.uptimeMillis();
+        finishHomeLoading = () -> {
+            finishHomeLoading = null;
+            homeLoadingRemainingMs = 0L;
+            revealHome();
+        };
+        mainHandler.postDelayed(finishHomeLoading, homeLoadingRemainingMs);
+    }
+
+    private void revealHome() {
+        if (homeContent == null || homeSkeleton == null) {
+            return;
+        }
+        homeReady = true;
+        stopSkeletonPulse();
+        homeContent.setAlpha(0f);
+        homeContent.setVisibility(View.VISIBLE);
+        if (aiButton != null) {
+            aiButton.setVisibility(View.VISIBLE);
+        }
+        if (aiGlow != null) {
+            aiGlow.setVisibility(View.VISIBLE);
+        }
+
+        if (!ValueAnimator.areAnimatorsEnabled()) {
+            homeContent.setAlpha(1f);
+            homeSkeleton.setVisibility(View.GONE);
+            showAiBubbleTemporarily();
+            return;
+        }
+
+        int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        homeContent.animate()
+                .alpha(1f)
+                .setDuration(duration)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .start();
+        View skeleton = homeSkeleton;
+        skeleton.animate()
+                .alpha(0f)
+                .setDuration(duration)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withEndAction(() -> {
+                    if (homeSkeleton == skeleton) {
+                        skeleton.setVisibility(View.GONE);
+                        if (isResumed()) {
+                            showAiBubbleTemporarily();
+                        }
+                    }
+                })
+                .start();
+    }
+
+    private void startSkeletonPulse() {
+        if (homeSkeleton == null || !ValueAnimator.areAnimatorsEnabled()
+                || skeletonPulseAnimator != null) {
+            return;
+        }
+        skeletonPulseAnimator = ValueAnimator.ofFloat(0.84f, 1f);
+        skeletonPulseAnimator.setDuration(SKELETON_PULSE_MS);
+        skeletonPulseAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        skeletonPulseAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        skeletonPulseAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        skeletonPulseAnimator.addUpdateListener(animation ->
+                setSkeletonPlaceholderAlpha(homeSkeleton,
+                        (float) animation.getAnimatedValue()));
+        skeletonPulseAnimator.start();
+    }
+
+    private void stopSkeletonPulse() {
+        if (skeletonPulseAnimator != null) {
+            skeletonPulseAnimator.cancel();
+            skeletonPulseAnimator = null;
+        }
+        if (homeSkeleton != null) {
+            setSkeletonPlaceholderAlpha(homeSkeleton, 1f);
+        }
+    }
+
+    private void setSkeletonPlaceholderAlpha(View view, float alpha) {
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int index = 0; index < group.getChildCount(); index++) {
+                setSkeletonPlaceholderAlpha(group.getChildAt(index), alpha);
+            }
+        } else if (view.getBackground() != null) {
+            view.setAlpha(alpha);
+        }
+    }
+
+    private void finishHomeRevealIfNeeded() {
+        if (!homeReady || homeSkeleton == null || homeContent == null
+                || homeSkeleton.getVisibility() != View.VISIBLE) {
+            return;
+        }
+        homeSkeleton.animate().cancel();
+        homeContent.animate().cancel();
+        homeSkeleton.setVisibility(View.GONE);
+        homeContent.setAlpha(1f);
+        homeContent.setVisibility(View.VISIBLE);
     }
 
     private void showAiBubbleTemporarily() {
