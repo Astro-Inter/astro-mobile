@@ -67,6 +67,7 @@
             android:clipToPadding="false"
             android:fillViewport="true"
             android:overScrollMode="ifContentScrolls"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/container_employee_home_bottom_nav"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -627,6 +628,16 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
+
+        <include
+            android:id="@+id/container_employee_home_skeleton"
+            layout="@layout/view_employee_home_skeleton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/container_employee_home_bottom_nav"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/container_employee_home_header" />
 
         <LinearLayout
             android:id="@+id/container_employee_home_bottom_nav"
