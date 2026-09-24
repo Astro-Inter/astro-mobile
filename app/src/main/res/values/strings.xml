@@ -34,4 +34,10 @@
     <string name="first_login_password_mismatch">As senhas não conferem.</string>
     <string name="first_login_password_action">Entrar</string>
     <string name="first_login_password_back_description">Voltar</string>
+    <string name="flow_choice_title">Como Você deseja entrar?</string>
+    <string name="flow_choice_subtitle">Escolha o perfil que deseja utilizar agora.</string>
+    <string name="flow_choice_manager">Entrar como Gestor</string>
+    <string name="flow_choice_employee">Entrar como Colaborador</string>
+    <string name="flow_choice_manager_mock">Fluxo de Gestor selecionado (mock)</string>
+    <string name="flow_choice_employee_mock">Fluxo de Colaborador selecionado (mock)</string>
 </resources>
