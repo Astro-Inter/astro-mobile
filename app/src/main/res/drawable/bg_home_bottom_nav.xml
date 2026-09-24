@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <corners android:topLeftRadius="30dp" android:topRightRadius="30dp" />
-    <solid android:color="@color/astro_dark_background" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:topLeftRadius="30dp" android:topRightRadius="30dp" />
+            <solid android:color="@color/astro_dark_background" />
+            <stroke android:width="1dp" android:color="@color/home_nav_stroke" />
+        </shape>
+    </item>
+    <item
+        android:height="1dp"
+        android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/astro_dark_background" />
+        </shape>
+    </item>
+</layer-list>

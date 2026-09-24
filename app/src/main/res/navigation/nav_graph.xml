@@ -11,10 +11,8 @@
         <action
             android:id="@+id/action_splash_to_mock_destination"
             app:destination="@id/mockDestinationFragment"
-            app:enterAnim="@anim/push_enter"
-            app:exitAnim="@anim/push_exit"
-            app:popEnterAnim="@anim/push_pop_enter"
-            app:popExitAnim="@anim/push_pop_exit"
+            app:enterAnim="@anim/splash_dissolve_in"
+            app:exitAnim="@anim/splash_dissolve_out"
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
     </fragment>
