@@ -14,4 +14,7 @@
     <color name="astro_error">#EB6264</color>
     <color name="astro_button_ripple">#33FFFFFF</color>
     <color name="astro_back_button_ripple">#66FFFFFF</color>
+    <color name="home_positive_background">#3351BF1E</color>
+    <color name="home_warning_background">#338F00C4</color>
+    <color name="home_ai_bubble_background">#3A2B6B</color>
 </resources>
