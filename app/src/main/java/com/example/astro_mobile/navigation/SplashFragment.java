@@ -68,7 +68,7 @@ public class SplashFragment extends Fragment {
                 logo,
                 View.Y,
                 logo.getY(),
-                dpToPx(100)
+                getResources().getDimension(R.dimen.auth_logo_top_spacing)
         );
         logoMovement.setDuration(MAIN_ANIMATION_MS);
         logoMovement.setInterpolator(logoBounceInterpolator);
