@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="employee_home_content_max_width">430dp</dimen>
+    <dimen name="employee_home_header_height">90dp</dimen>
+    <dimen name="employee_home_logo_width">122dp</dimen>
+    <dimen name="employee_home_logo_height">30dp</dimen>
+    <dimen name="employee_home_body_text_size">16sp</dimen>
+    <dimen name="employee_home_heading_text_size">24sp</dimen>
+    <dimen name="employee_home_caption_text_size">12sp</dimen>
+    <dimen name="employee_home_nav_height">82dp</dimen>
+    <dimen name="employee_home_nav_icon_size">20dp</dimen>
+    <dimen name="employee_home_nav_selected_size">72dp</dimen>
+    <dimen name="employee_home_ai_size">70dp</dimen>
+    <dimen name="employee_home_ai_glow_size">80dp</dimen>
+    <dimen name="employee_home_ai_mascot_width">55dp</dimen>
+    <dimen name="employee_home_ai_mascot_height">49dp</dimen>
+    <dimen name="employee_home_ai_bottom_margin">92dp</dimen>
+    <dimen name="employee_home_ai_side_margin">11dp</dimen>
+    <dimen name="employee_home_ai_bubble_height">70dp</dimen>
+    <dimen name="employee_home_ai_bubble_max_width">330dp</dimen>
+    <dimen name="employee_home_ai_bubble_min_text_size">12sp</dimen>
+    <dimen name="employee_home_ai_bubble_text_size">15sp</dimen>
+</resources>

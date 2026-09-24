@@ -71,5 +71,6 @@
     <string name="employee_home_nav_profile">Perfil</string>
     <string name="employee_home_notification_button">Abrir notificações</string>
     <string name="employee_home_ai_button">Falar com a IA do Astro</string>
+    <string name="employee_home_ai_prompt">Fale com a IA do <b>Astro!</b></string>
     <string name="employee_home_mock_unavailable">Esta área ainda está em desenvolvimento.</string>
 </resources>

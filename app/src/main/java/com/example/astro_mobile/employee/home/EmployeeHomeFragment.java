@@ -1,8 +1,12 @@
 package com.example.astro_mobile.employee.home;
 
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +21,8 @@ import com.example.astro_mobile.R;
 public class EmployeeHomeFragment extends Fragment {
 
     private static final String STATE_EMPTY_PREVIEW = "empty_preview";
+    private static final long AI_BUBBLE_VISIBLE_MS = 3_000L;
+    private static final long AI_BUBBLE_FADE_MS = 350L;
 
     private static final MockRow[] EVENT_ROWS = {
             new MockRow(R.string.employee_home_training, R.string.employee_home_due_tomorrow,
@@ -37,6 +43,9 @@ public class EmployeeHomeFragment extends Fragment {
     };
 
     private boolean emptyPreview;
+    private View aiBubble;
+    private AiDragTouchListener aiDragTouchListener;
+    private Runnable hideAiBubble;
 
     public EmployeeHomeFragment() {
         super(R.layout.fragment_employee_home);
@@ -52,6 +61,7 @@ public class EmployeeHomeFragment extends Fragment {
         addRows(view.findViewById(R.id.list_employee_home_events), EVENT_ROWS);
         addRows(view.findViewById(R.id.list_employee_home_notifications), NOTIFICATION_ROWS);
         showPreview(view);
+        aiBubble = view.findViewById(R.id.button_employee_home_ai_bubble);
 
         view.findViewById(R.id.text_employee_home_greeting).setOnLongClickListener(pressed -> {
             emptyPreview = !emptyPreview;
@@ -72,11 +82,80 @@ public class EmployeeHomeFragment extends Fragment {
                 R.id.button_employee_home_nav_events,
                 R.id.button_employee_home_nav_chat,
                 R.id.button_employee_home_nav_profile,
-                R.id.button_employee_home_ai
+                R.id.button_employee_home_ai,
+                R.id.button_employee_home_ai_bubble
         };
         for (int id : mockActions) {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
         }
+
+        View aiButton = view.findViewById(R.id.button_employee_home_ai);
+        aiDragTouchListener = new AiDragTouchListener(
+                aiButton,
+                view.findViewById(R.id.glow_employee_home_ai),
+                view.findViewById(R.id.container_employee_home_content),
+                view.findViewById(R.id.container_employee_home_header),
+                view.findViewById(R.id.container_employee_home_bottom_nav));
+        aiButton.setOnTouchListener(aiDragTouchListener);
+        aiBubble.setOnTouchListener(aiDragTouchListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showAiBubbleTemporarily();
+    }
+
+    @Override
+    public void onPause() {
+        if (aiBubble != null) {
+            if (hideAiBubble != null) {
+                aiBubble.removeCallbacks(hideAiBubble);
+            }
+            aiBubble.animate().cancel();
+            aiBubble.setVisibility(View.GONE);
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        aiBubble = null;
+        aiDragTouchListener = null;
+        hideAiBubble = null;
+        super.onDestroyView();
+    }
+
+    private void showAiBubbleTemporarily() {
+        if (aiBubble == null) {
+            return;
+        }
+        if (hideAiBubble != null) {
+            aiBubble.removeCallbacks(hideAiBubble);
+        }
+        aiBubble.animate().cancel();
+        aiBubble.setAlpha(1f);
+        aiBubble.setVisibility(View.VISIBLE);
+        View bubble = aiBubble;
+        bubble.post(() -> {
+            if (aiBubble == bubble && aiDragTouchListener != null
+                    && bubble.getVisibility() == View.VISIBLE) {
+                aiDragTouchListener.positionBubble();
+            }
+        });
+        hideAiBubble = () -> {
+            if (!ValueAnimator.areAnimatorsEnabled()) {
+                bubble.setVisibility(View.GONE);
+                return;
+            }
+            bubble.animate()
+                    .alpha(0f)
+                    .setDuration(AI_BUBBLE_FADE_MS)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .withEndAction(() -> bubble.setVisibility(View.GONE))
+                    .start();
+        };
+        aiBubble.postDelayed(hideAiBubble, AI_BUBBLE_VISIBLE_MS);
     }
 
     @Override
@@ -147,6 +226,144 @@ public class EmployeeHomeFragment extends Fragment {
     private void showMockMessage() {
         Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
                 Toast.LENGTH_SHORT).show();
+    }
+
+    private class AiDragTouchListener implements View.OnTouchListener {
+        private final View button;
+        private final View glow;
+        private final View content;
+        private final View header;
+        private final View bottomNav;
+        private final int touchSlop;
+        private final float gap;
+        private final float edge;
+        private float downX;
+        private float downY;
+        private float buttonStartX;
+        private float buttonStartY;
+        private boolean dragging;
+
+        AiDragTouchListener(View button, View glow, View content, View header,
+                View bottomNav) {
+            this.button = button;
+            this.glow = glow;
+            this.content = content;
+            this.header = header;
+            this.bottomNav = bottomNav;
+            touchSlop = ViewConfiguration.get(requireContext()).getScaledTouchSlop();
+            float density = getResources().getDisplayMetrics().density;
+            gap = 10f * density;
+            edge = 8f * density;
+        }
+
+        @Override
+        public boolean onTouch(View touched, MotionEvent event) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    downX = event.getRawX();
+                    downY = event.getRawY();
+                    buttonStartX = button.getX();
+                    buttonStartY = button.getY();
+                    dragging = false;
+                    touched.setPressed(true);
+                    if (touched == button && ValueAnimator.areAnimatorsEnabled()) {
+                        button.animate().cancel();
+                        button.animate().scaleX(0.94f).scaleY(0.94f)
+                                .setDuration(100).start();
+                    }
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    float dx = event.getRawX() - downX;
+                    float dy = event.getRawY() - downY;
+                    if (!dragging && Math.hypot(dx, dy) > touchSlop) {
+                        dragging = true;
+                        touched.setPressed(false);
+                        button.animate().cancel();
+                        button.setScaleX(1f);
+                        button.setScaleY(1f);
+                        if (hideAiBubble != null) {
+                            aiBubble.removeCallbacks(hideAiBubble);
+                        }
+                        aiBubble.animate().cancel();
+                        aiBubble.setAlpha(1f);
+                    }
+                    if (dragging) {
+                        float left = content.getLeft() + edge;
+                        float right = content.getRight() - edge - button.getWidth();
+                        float top = content.getTop() + header.getBottom() + edge;
+                        float bottom = content.getTop() + bottomNav.getTop()
+                                - edge - button.getHeight();
+                        button.setX(clamp(buttonStartX + dx, left, right));
+                        button.setY(clamp(buttonStartY + dy, top, bottom));
+                        glow.setX(button.getX() + (button.getWidth() - glow.getWidth()) / 2f);
+                        glow.setY(button.getY() + (button.getHeight() - glow.getHeight()) / 2f);
+                        positionBubble();
+                    }
+                    return true;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    touched.setPressed(false);
+                    button.animate().cancel();
+                    if (ValueAnimator.areAnimatorsEnabled()) {
+                        button.animate().scaleX(1f).scaleY(1f)
+                                .setDuration(150).start();
+                    } else {
+                        button.setScaleX(1f);
+                        button.setScaleY(1f);
+                    }
+                    if (dragging) {
+                        if (aiBubble.getVisibility() == View.VISIBLE && hideAiBubble != null) {
+                            aiBubble.postDelayed(hideAiBubble, AI_BUBBLE_VISIBLE_MS);
+                        }
+                    } else if (event.getActionMasked() == MotionEvent.ACTION_UP
+                            && event.getX() >= 0 && event.getX() < touched.getWidth()
+                            && event.getY() >= 0 && event.getY() < touched.getHeight()) {
+                        touched.performClick();
+                    }
+                    return true;
+                default:
+                    return true;
+            }
+        }
+
+        private void positionBubble() {
+            if (aiBubble.getVisibility() != View.VISIBLE) {
+                return;
+            }
+            float bubbleWidth = aiBubble.getWidth();
+            float bubbleHeight = aiBubble.getHeight();
+            float buttonX = button.getX();
+            float buttonY = button.getY();
+            float left = content.getLeft() + edge;
+            float right = content.getRight() - edge;
+            float leftX = buttonX - gap - bubbleWidth;
+            float rightX = buttonX + button.getWidth() + gap;
+            boolean fitsLeft = leftX >= left;
+            boolean fitsRight = rightX + bubbleWidth <= right;
+
+            if (fitsLeft || fitsRight) {
+                boolean useLeft = fitsLeft && (!fitsRight
+                        || buttonX + button.getWidth() / 2f >= (left + right) / 2f);
+                aiBubble.setX(useLeft ? leftX : rightX);
+                float minY = content.getTop() + header.getBottom() + edge;
+                float maxY = content.getTop() + bottomNav.getTop() - edge - bubbleHeight;
+                aiBubble.setY(clamp(buttonY + (button.getHeight() - bubbleHeight) / 2f,
+                        minY, maxY));
+                return;
+            }
+
+            aiBubble.setX(clamp(buttonX + (button.getWidth() - bubbleWidth) / 2f,
+                    left, right - bubbleWidth));
+            float above = buttonY - gap - bubbleHeight;
+            float below = buttonY + button.getHeight() + gap;
+            float minY = content.getTop() + header.getBottom() + edge;
+            float maxY = content.getTop() + bottomNav.getTop() - edge - bubbleHeight;
+            aiBubble.setY(above >= minY ? above : clamp(below, minY, maxY));
+        }
+
+        private float clamp(float value, float min, float max) {
+            return Math.max(min, Math.min(value, Math.max(min, max)));
+        }
     }
 
     private static class MockRow {

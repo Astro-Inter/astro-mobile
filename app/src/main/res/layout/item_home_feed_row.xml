@@ -7,14 +7,17 @@
     <LinearLayout
         android:id="@+id/button_home_feed_row"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
+        android:minHeight="60dp"
         android:background="@drawable/bg_home_row_ripple"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="30dp"
-        android:paddingEnd="20dp">
+        android:paddingTop="8dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -28,9 +31,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_family"
                 android:includeFontPadding="false"
-                android:maxLines="2"
                 android:textColor="@color/astro_light_background"
-                android:textSize="16sp" />
+                android:textSize="@dimen/employee_home_body_text_size" />
 
             <TextView
                 android:id="@+id/text_home_feed_subtitle"
@@ -39,7 +41,7 @@
                 android:fontFamily="@font/montserrat_family"
                 android:includeFontPadding="false"
                 android:textColor="@color/astro_input_hint"
-                android:textSize="12sp" />
+                android:textSize="@dimen/employee_home_caption_text_size" />
         </LinearLayout>
 
         <TextView
@@ -51,7 +53,7 @@
             android:includeFontPadding="false"
             android:maxLines="1"
             android:textColor="@color/astro_input_hint"
-            android:textSize="12sp" />
+            android:textSize="@dimen/employee_home_caption_text_size" />
 
         <ImageView
             android:id="@+id/image_home_feed_status"
@@ -68,6 +70,5 @@
         android:layout_height="21dp"
         android:contentDescription="@null"
         android:importantForAccessibility="no"
-        android:scaleType="fitXY"
-        android:src="@drawable/home_divider" />
+        android:background="@drawable/bg_home_divider" />
 </LinearLayout>
