@@ -39,7 +39,6 @@
     <string name="flow_choice_manager">Entrar como Gestor</string>
     <string name="flow_choice_employee">Entrar como Colaborador</string>
     <string name="flow_choice_manager_mock">Fluxo de Gestor selecionado (mock)</string>
-    <string name="flow_choice_employee_mock">Fluxo de Colaborador selecionado (mock)</string>
     <string name="employee_home_greeting">Olá, <b>Kevin Parker</b></string>
     <string name="employee_home_subtitle_filled">Confira aqui tudo sobre suas obrigações de colaborador.</string>
     <string name="employee_home_subtitle_empty">Confira aqui tudo sobre suas obrigações.</string>
