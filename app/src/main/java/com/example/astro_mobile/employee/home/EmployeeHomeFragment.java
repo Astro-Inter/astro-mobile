@@ -1,5 +1,7 @@
 package com.example.astro_mobile.employee.home;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewConfiguration;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,7 +30,7 @@ public class EmployeeHomeFragment extends Fragment {
     private static final String STATE_EMPTY_PREVIEW = "empty_preview";
     private static final long HOME_MOCK_LOAD_MS = 2_000L;
     private static final long AI_BUBBLE_VISIBLE_MS = 3_000L;
-    private static final long AI_BUBBLE_FADE_MS = 350L;
+    private static final long AI_BUBBLE_COLLAPSE_MS = 500L;
     private static final long SKELETON_PULSE_MS = 900L;
 
     private static final MockRow[] EVENT_ROWS = {
@@ -51,8 +54,7 @@ public class EmployeeHomeFragment extends Fragment {
     private boolean emptyPreview;
     private boolean homeReady;
     private View aiBubble;
-    private View aiButton;
-    private View aiGlow;
+    private TextView aiBubbleText;
     private View homeContent;
     private View homeSkeleton;
     private AiDragTouchListener aiDragTouchListener;
@@ -60,6 +62,7 @@ public class EmployeeHomeFragment extends Fragment {
     private Runnable finishHomeLoading;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private ValueAnimator skeletonPulseAnimator;
+    private ValueAnimator aiBubbleWidthAnimator;
     private long homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
     private long homeLoadingStartedAtMs;
 
@@ -88,11 +91,8 @@ public class EmployeeHomeFragment extends Fragment {
         homeSkeleton.setVisibility(View.VISIBLE);
 
         aiBubble = view.findViewById(R.id.button_employee_home_ai_bubble);
-        aiButton = view.findViewById(R.id.button_employee_home_ai);
-        aiGlow = view.findViewById(R.id.glow_employee_home_ai);
+        aiBubbleText = view.findViewById(R.id.text_employee_home_ai_bubble);
         aiBubble.setVisibility(View.GONE);
-        aiButton.setVisibility(View.GONE);
-        aiGlow.setVisibility(View.GONE);
 
         view.findViewById(R.id.text_employee_home_greeting).setOnLongClickListener(pressed -> {
             emptyPreview = !emptyPreview;
@@ -113,7 +113,6 @@ public class EmployeeHomeFragment extends Fragment {
                 R.id.button_employee_home_nav_events,
                 R.id.button_employee_home_nav_chat,
                 R.id.button_employee_home_nav_profile,
-                R.id.button_employee_home_ai,
                 R.id.button_employee_home_ai_bubble
         };
         for (int id : mockActions) {
@@ -121,12 +120,10 @@ public class EmployeeHomeFragment extends Fragment {
         }
 
         aiDragTouchListener = new AiDragTouchListener(
-                aiButton,
-                view.findViewById(R.id.glow_employee_home_ai),
+                aiBubble,
                 view.findViewById(R.id.container_employee_home_content),
                 view.findViewById(R.id.container_employee_home_header),
                 view.findViewById(R.id.container_employee_home_bottom_nav));
-        aiButton.setOnTouchListener(aiDragTouchListener);
         aiBubble.setOnTouchListener(aiDragTouchListener);
     }
 
@@ -154,8 +151,15 @@ public class EmployeeHomeFragment extends Fragment {
             if (hideAiBubble != null) {
                 aiBubble.removeCallbacks(hideAiBubble);
             }
-            aiBubble.animate().cancel();
+            if (aiBubbleWidthAnimator != null) {
+                aiBubbleWidthAnimator.cancel();
+                aiBubbleWidthAnimator = null;
+            }
             aiBubble.setVisibility(View.GONE);
+            aiBubble.setAlpha(1f);
+            if (aiBubbleText != null) {
+                aiBubbleText.setAlpha(1f);
+            }
         }
         super.onPause();
     }
@@ -173,9 +177,12 @@ public class EmployeeHomeFragment extends Fragment {
         if (homeSkeleton != null) {
             homeSkeleton.animate().cancel();
         }
+        if (aiBubbleWidthAnimator != null) {
+            aiBubbleWidthAnimator.cancel();
+            aiBubbleWidthAnimator = null;
+        }
         aiBubble = null;
-        aiButton = null;
-        aiGlow = null;
+        aiBubbleText = null;
         homeContent = null;
         homeSkeleton = null;
         aiDragTouchListener = null;
@@ -207,13 +214,6 @@ public class EmployeeHomeFragment extends Fragment {
         stopSkeletonPulse();
         homeContent.setAlpha(0f);
         homeContent.setVisibility(View.VISIBLE);
-        if (aiButton != null) {
-            aiButton.setVisibility(View.VISIBLE);
-        }
-        if (aiGlow != null) {
-            aiGlow.setVisibility(View.VISIBLE);
-        }
-
         if (!ValueAnimator.areAnimatorsEnabled()) {
             homeContent.setAlpha(1f);
             homeSkeleton.setVisibility(View.GONE);
@@ -293,35 +293,79 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void showAiBubbleTemporarily() {
-        if (aiBubble == null) {
+        if (aiBubble == null || aiBubbleText == null) {
             return;
         }
         if (hideAiBubble != null) {
             aiBubble.removeCallbacks(hideAiBubble);
         }
-        aiBubble.animate().cancel();
+        if (aiBubbleWidthAnimator != null) {
+            aiBubbleWidthAnimator.cancel();
+            aiBubbleWidthAnimator = null;
+        }
+        ViewGroup.LayoutParams layoutParams = aiBubble.getLayoutParams();
+        layoutParams.width = 0;
+        aiBubble.setLayoutParams(layoutParams);
         aiBubble.setAlpha(1f);
+        aiBubbleText.setAlpha(1f);
         aiBubble.setVisibility(View.VISIBLE);
         View bubble = aiBubble;
-        bubble.post(() -> {
-            if (aiBubble == bubble && aiDragTouchListener != null
-                    && bubble.getVisibility() == View.VISIBLE) {
-                aiDragTouchListener.positionBubble();
-            }
-        });
         hideAiBubble = () -> {
             if (!ValueAnimator.areAnimatorsEnabled()) {
-                bubble.setVisibility(View.GONE);
+                setAiBubbleWidth(bubble,
+                        getResources().getDimensionPixelSize(R.dimen.employee_home_ai_size));
+                bubble.setAlpha(1f);
+                aiBubbleText.setAlpha(0f);
                 return;
             }
-            bubble.animate()
-                    .alpha(0f)
-                    .setDuration(AI_BUBBLE_FADE_MS)
-                    .setInterpolator(new AccelerateDecelerateInterpolator())
-                    .withEndAction(() -> bubble.setVisibility(View.GONE))
-                    .start();
+            animateAiBubbleClosed(bubble);
         };
         aiBubble.postDelayed(hideAiBubble, AI_BUBBLE_VISIBLE_MS);
+    }
+
+    private void animateAiBubbleClosed(View bubble) {
+        int startWidth = bubble.getWidth();
+        int collapsedWidth = getResources().getDimensionPixelSize(R.dimen.employee_home_ai_size);
+        if (startWidth <= collapsedWidth) {
+            setAiBubbleWidth(bubble, collapsedWidth);
+            bubble.setAlpha(1f);
+            aiBubbleText.setAlpha(0f);
+            return;
+        }
+
+        float startTextAlpha = aiBubbleText.getAlpha();
+        float startBubbleAlpha = bubble.getAlpha();
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+        aiBubbleWidthAnimator = animator;
+        animator.setDuration(AI_BUBBLE_COLLAPSE_MS);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.addUpdateListener(animation -> {
+            float fraction = (float) animation.getAnimatedValue();
+            int width = startWidth + Math.round((collapsedWidth - startWidth) * fraction);
+            setAiBubbleWidth(bubble, width);
+            aiBubbleText.setAlpha(startTextAlpha * (1f - fraction));
+            bubble.setAlpha(startBubbleAlpha + (1f - startBubbleAlpha) * fraction);
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (aiBubbleWidthAnimator == animator) {
+                    aiBubbleWidthAnimator = null;
+                    setAiBubbleWidth(bubble, collapsedWidth);
+                    aiBubbleText.setAlpha(0f);
+                    bubble.setAlpha(1f);
+                }
+            }
+        });
+        animator.start();
+    }
+
+    private void setAiBubbleWidth(View bubble, int width) {
+        ViewGroup.LayoutParams layoutParams = bubble.getLayoutParams();
+        if (layoutParams.width != width) {
+            layoutParams.width = width;
+            bubble.setLayoutParams(layoutParams);
+        }
     }
 
     @Override
@@ -396,12 +440,10 @@ public class EmployeeHomeFragment extends Fragment {
 
     private class AiDragTouchListener implements View.OnTouchListener {
         private final View button;
-        private final View glow;
         private final View content;
         private final View header;
         private final View bottomNav;
         private final int touchSlop;
-        private final float gap;
         private final float edge;
         private float downX;
         private float downY;
@@ -409,16 +451,13 @@ public class EmployeeHomeFragment extends Fragment {
         private float buttonStartY;
         private boolean dragging;
 
-        AiDragTouchListener(View button, View glow, View content, View header,
-                View bottomNav) {
+        AiDragTouchListener(View button, View content, View header, View bottomNav) {
             this.button = button;
-            this.glow = glow;
             this.content = content;
             this.header = header;
             this.bottomNav = bottomNav;
             touchSlop = ViewConfiguration.get(requireContext()).getScaledTouchSlop();
             float density = getResources().getDisplayMetrics().density;
-            gap = 10f * density;
             edge = 8f * density;
         }
 
@@ -450,8 +489,10 @@ public class EmployeeHomeFragment extends Fragment {
                         if (hideAiBubble != null) {
                             aiBubble.removeCallbacks(hideAiBubble);
                         }
-                        aiBubble.animate().cancel();
-                        aiBubble.setAlpha(1f);
+                        if (aiBubbleWidthAnimator != null) {
+                            aiBubbleWidthAnimator.cancel();
+                            aiBubbleWidthAnimator = null;
+                        }
                     }
                     if (dragging) {
                         float left = content.getLeft() + edge;
@@ -461,9 +502,6 @@ public class EmployeeHomeFragment extends Fragment {
                                 - edge - button.getHeight();
                         button.setX(clamp(buttonStartX + dx, left, right));
                         button.setY(clamp(buttonStartY + dy, top, bottom));
-                        glow.setX(button.getX() + (button.getWidth() - glow.getWidth()) / 2f);
-                        glow.setY(button.getY() + (button.getHeight() - glow.getHeight()) / 2f);
-                        positionBubble();
                     }
                     return true;
                 case MotionEvent.ACTION_UP:
@@ -490,41 +528,6 @@ public class EmployeeHomeFragment extends Fragment {
                 default:
                     return true;
             }
-        }
-
-        private void positionBubble() {
-            if (aiBubble.getVisibility() != View.VISIBLE) {
-                return;
-            }
-            float bubbleWidth = aiBubble.getWidth();
-            float bubbleHeight = aiBubble.getHeight();
-            float buttonX = button.getX();
-            float buttonY = button.getY();
-            float left = content.getLeft() + edge;
-            float right = content.getRight() - edge;
-            float leftX = buttonX - gap - bubbleWidth;
-            float rightX = buttonX + button.getWidth() + gap;
-            boolean fitsLeft = leftX >= left;
-            boolean fitsRight = rightX + bubbleWidth <= right;
-
-            if (fitsLeft || fitsRight) {
-                boolean useLeft = fitsLeft && (!fitsRight
-                        || buttonX + button.getWidth() / 2f >= (left + right) / 2f);
-                aiBubble.setX(useLeft ? leftX : rightX);
-                float minY = content.getTop() + header.getBottom() + edge;
-                float maxY = content.getTop() + bottomNav.getTop() - edge - bubbleHeight;
-                aiBubble.setY(clamp(buttonY + (button.getHeight() - bubbleHeight) / 2f,
-                        minY, maxY));
-                return;
-            }
-
-            aiBubble.setX(clamp(buttonX + (button.getWidth() - bubbleWidth) / 2f,
-                    left, right - bubbleWidth));
-            float above = buttonY - gap - bubbleHeight;
-            float below = buttonY + button.getHeight() + gap;
-            float minY = content.getTop() + header.getBottom() + edge;
-            float maxY = content.getTop() + bottomNav.getTop() - edge - bubbleHeight;
-            aiBubble.setY(above >= minY ? above : clamp(below, minY, maxY));
         }
 
         private float clamp(float value, float min, float max) {

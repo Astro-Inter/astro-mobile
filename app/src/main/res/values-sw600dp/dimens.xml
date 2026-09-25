@@ -10,14 +10,10 @@
     <dimen name="employee_home_nav_height">100dp</dimen>
     <dimen name="employee_home_nav_icon_size">28dp</dimen>
     <dimen name="employee_home_nav_selected_size">90dp</dimen>
-    <dimen name="employee_home_ai_size">82dp</dimen>
-    <dimen name="employee_home_ai_glow_size">92dp</dimen>
-    <dimen name="employee_home_ai_mascot_width">65dp</dimen>
-    <dimen name="employee_home_ai_mascot_height">58dp</dimen>
+    <dimen name="employee_home_ai_size">60dp</dimen>
+    <dimen name="employee_home_ai_mascot_width">45dp</dimen>
+    <dimen name="employee_home_ai_mascot_height">45dp</dimen>
     <dimen name="employee_home_ai_bottom_margin">118dp</dimen>
-    <dimen name="employee_home_ai_side_margin">24dp</dimen>
-    <dimen name="employee_home_ai_bubble_height">82dp</dimen>
-    <dimen name="employee_home_ai_bubble_max_width">420dp</dimen>
-    <dimen name="employee_home_ai_bubble_min_text_size">14sp</dimen>
-    <dimen name="employee_home_ai_bubble_text_size">18sp</dimen>
+    <dimen name="employee_home_ai_bubble_max_width">430dp</dimen>
+    <dimen name="employee_home_ai_bubble_text_size">19sp</dimen>
 </resources>
