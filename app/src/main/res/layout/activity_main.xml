@@ -22,7 +22,7 @@
         android:contentDescription="@null"
         android:importantForAccessibility="no"
         android:scaleType="fitXY"
-        android:src="@drawable/access_key_planet"
+        android:src="@drawable/astro_planet"
         android:visibility="gone" />
 
     <View
