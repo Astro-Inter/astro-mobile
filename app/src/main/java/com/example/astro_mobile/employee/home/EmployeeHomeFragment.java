@@ -22,8 +22,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.MockSession;
+import com.example.astro_mobile.auth.EmailVerificationViewModel;
 
 public class EmployeeHomeFragment extends Fragment {
 
@@ -93,6 +97,16 @@ public class EmployeeHomeFragment extends Fragment {
         aiBubble = view.findViewById(R.id.button_employee_home_ai_bubble);
         aiBubbleText = view.findViewById(R.id.text_employee_home_ai_bubble);
         aiBubble.setVisibility(View.GONE);
+
+        view.findViewById(R.id.button_employee_home_logout).setOnClickListener(clickedView -> {
+            if (MockSession.clear(requireContext())) {
+                new ViewModelProvider(requireActivity(),
+                        EmailVerificationViewModel.Factory.createDefault())
+                        .get(EmailVerificationViewModel.class).clearForLogout();
+                Navigation.findNavController(clickedView)
+                        .navigate(R.id.action_employee_home_to_mock_destination);
+            }
+        });
 
         view.findViewById(R.id.text_employee_home_greeting).setOnLongClickListener(pressed -> {
             emptyPreview = !emptyPreview;

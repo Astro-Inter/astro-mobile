@@ -21,6 +21,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.MockSession;
 
 public class SplashFragment extends Fragment {
 
@@ -171,7 +173,15 @@ public class SplashFragment extends Fragment {
         NavController navController = NavHostFragment.findNavController(this);
         if (navController.getCurrentDestination() != null
                 && navController.getCurrentDestination().getId() == R.id.splashFragment) {
-            navController.navigate(R.id.action_splash_to_mock_destination);
+            MockSession.State session = MockSession.read(requireContext());
+            if (session == null) {
+                navController.navigate(R.id.action_splash_to_mock_destination);
+            } else {
+                navController.navigate(session.destination == MockSession.Destination.FLOW_CHOICE
+                                ? R.id.action_splash_to_flow_choice
+                                : R.id.action_splash_to_employee_home,
+                        AuthArgs.of(session.email, session.userType));
+            }
         }
     }
 

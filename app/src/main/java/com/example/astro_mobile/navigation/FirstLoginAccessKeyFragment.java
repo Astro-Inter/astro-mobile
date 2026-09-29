@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 
 public class FirstLoginAccessKeyFragment extends Fragment {
 
@@ -49,7 +50,8 @@ public class FirstLoginAccessKeyFragment extends Fragment {
             }
             if ("111111".contentEquals(accessKey)) {
                 NavHostFragment.findNavController(this)
-                        .navigate(R.id.action_first_login_access_key_to_first_login_password);
+                        .navigate(R.id.action_first_login_access_key_to_first_login_password,
+                                AuthArgs.copy(getArguments()));
             } else {
                 showInvalidKeyMock();
             }

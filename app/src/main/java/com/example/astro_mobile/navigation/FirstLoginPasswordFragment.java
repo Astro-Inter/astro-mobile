@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.MockSession;
 
 public class FirstLoginPasswordFragment extends Fragment {
 
@@ -45,8 +48,27 @@ public class FirstLoginPasswordFragment extends Fragment {
                 confirmationContainer.setBackgroundResource(R.drawable.bg_login_password_input_error);
                 mismatchError.setVisibility(View.VISIBLE);
             } else {
+                String userType = getArguments() == null ? null
+                        : getArguments().getString(AuthArgs.USER_TYPE);
+                String email = getArguments() == null ? null
+                        : getArguments().getString(AuthArgs.EMAIL);
+                if (!MockSession.isKnownUserType(userType) || email == null) {
+                    return;
+                }
+                if (userType != null) {
+                    Toast.makeText(requireContext(),
+                            getString(R.string.auth_user_type_toast, userType),
+                            Toast.LENGTH_LONG).show();
+                }
+                MockSession.save(requireContext(), email, userType,
+                        "COLABORADOR".equals(userType)
+                                ? MockSession.Destination.EMPLOYEE_HOME
+                                : MockSession.Destination.FLOW_CHOICE);
                 Navigation.findNavController(clickedView)
-                        .navigate(R.id.action_first_login_password_to_flow_choice);
+                        .navigate("COLABORADOR".equals(userType)
+                                        ? R.id.action_first_login_password_to_employee_home
+                                        : R.id.action_first_login_password_to_flow_choice,
+                                AuthArgs.copy(getArguments()));
             }
         });
 
