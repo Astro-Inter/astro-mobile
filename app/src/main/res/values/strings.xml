@@ -9,6 +9,16 @@
     <string name="email_identification_email_icon_description">Ícone de e-mail</string>
     <string name="email_identification_continue_icon_description">Prosseguir</string>
     <string name="email_identification_error">Este e-mail não está cadastrado no Astro.</string>
+    <string name="email_identification_disabled_error">Sua conta do Astro está desativada.</string>
+    <string name="email_identification_empty_error">O e-mail é obrigatório.</string>
+    <string name="email_identification_invalid_error">Este não é um e-mail válido.</string>
+    <string name="email_connection_error_title">Sem conexão com a internet</string>
+    <string name="email_connection_error_body">Parece que você está desconectado. Verifique o Wi-Fi ou os dados móveis do seu aparelho e tente novamente.</string>
+    <string name="email_generic_error_title">Algo deu errado</string>
+    <string name="email_generic_error_body">Não foi possível concluir esta ação. Tente novamente em instantes.</string>
+    <string name="email_error_retry">Tentar novamente</string>
+    <string name="email_error_start">Voltar para o início</string>
+    <string name="auth_user_type_toast">Tipo retornado: %1$s</string>
     <string name="access_key_information_title">Chave de acesso</string>
     <string name="access_key_information_body">A chave de acesso é um código fornecido pela sua empresa para permitir seu primeiro acesso ao aplicativo <b>Astro</b>.\n\nDigite a chave recebida no campo indicado. Após a validação, você poderá cadastrar sua senha e acessar sua conta.\n\nA chave é individual e deve ser utilizada somente por você. Caso não tenha recebido a chave ou ela não esteja funcionando, entre em contato com o responsável pelo <b>Astro</b> na sua empresa.</string>
     <string name="access_key_information_action">Entendi</string>
@@ -72,4 +82,5 @@
     <string name="employee_home_ai_button">Falar com a IA do Astro</string>
     <string name="employee_home_ai_prompt">Fale com a IA do <b>Astro!</b></string>
     <string name="employee_home_mock_unavailable">Esta área ainda está em desenvolvimento.</string>
+    <string name="employee_home_logout">Sair</string>
 </resources>

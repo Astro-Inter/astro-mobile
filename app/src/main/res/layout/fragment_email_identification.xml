@@ -127,6 +127,7 @@
                 android:focusable="true">
 
                 <TextView
+                    android:id="@+id/text_email_identification_continue"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/montserrat_family"
@@ -137,6 +138,7 @@
                     android:textSize="16sp" />
 
                 <ImageView
+                    android:id="@+id/image_email_identification_continue"
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_gravity="end|center_vertical"
@@ -144,6 +146,15 @@
                     android:contentDescription="@string/email_identification_continue_icon_description"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_arrow_right" />
+
+                <ProgressBar
+                    android:id="@+id/progress_email_identification"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/astro_light_background"
+                    android:visibility="gone" />
 
             </FrameLayout>
 

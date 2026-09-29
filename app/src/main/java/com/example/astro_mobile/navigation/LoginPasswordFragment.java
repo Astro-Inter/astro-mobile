@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.MockSession;
 
 public class LoginPasswordFragment extends Fragment {
 
@@ -52,8 +55,27 @@ public class LoginPasswordFragment extends Fragment {
 
         enterButton.setOnClickListener(clickedView -> {
             if (passwordInput.length() > 0) {
+                String userType = getArguments() == null ? null
+                        : getArguments().getString(AuthArgs.USER_TYPE);
+                String email = getArguments() == null ? null
+                        : getArguments().getString(AuthArgs.EMAIL);
+                if (!MockSession.isKnownUserType(userType) || email == null) {
+                    return;
+                }
+                if (userType != null) {
+                    Toast.makeText(requireContext(),
+                            getString(R.string.auth_user_type_toast, userType),
+                            Toast.LENGTH_LONG).show();
+                }
+                MockSession.save(requireContext(), email, userType,
+                        "COLABORADOR".equals(userType)
+                                ? MockSession.Destination.EMPLOYEE_HOME
+                                : MockSession.Destination.FLOW_CHOICE);
                 Navigation.findNavController(clickedView)
-                        .navigate(R.id.action_login_password_to_flow_choice);
+                        .navigate("COLABORADOR".equals(userType)
+                                        ? R.id.action_login_password_to_employee_home
+                                        : R.id.action_login_password_to_flow_choice,
+                                AuthArgs.copy(getArguments()));
             } else {
                 inputContainer.setBackgroundResource(R.drawable.bg_login_password_input_error);
                 error.setVisibility(View.VISIBLE);

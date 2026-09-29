@@ -15,6 +15,16 @@
             app:exitAnim="@anim/splash_dissolve_out"
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splash_to_flow_choice"
+            app:destination="@id/flowChoiceFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splash_to_employee_home"
+            app:destination="@id/employeeHomeFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -42,7 +52,31 @@
             app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter"
             app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_mock_destination_to_connection_error"
+            app:destination="@id/connectionErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_mock_destination_to_generic_error"
+            app:destination="@id/genericErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/connectionErrorFragment"
+        android:name="com.example.astro_mobile.navigation.EmailErrorMockFragment"
+        android:label="Erro de conexão (mock)" />
+
+    <fragment
+        android:id="@+id/genericErrorFragment"
+        android:name="com.example.astro_mobile.navigation.EmailErrorMockFragment"
+        android:label="Erro interno (mock)" />
 
     <fragment
         android:id="@+id/accessKeyInformationFragment"
@@ -56,6 +90,15 @@
         <action
             android:id="@+id/action_login_password_to_flow_choice"
             app:destination="@id/flowChoiceFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit"
+            app:popUpTo="@id/mockDestinationFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_login_password_to_employee_home"
+            app:destination="@id/employeeHomeFragment"
             app:enterAnim="@anim/push_enter"
             app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter"
@@ -90,6 +133,15 @@
             app:popExitAnim="@anim/push_pop_exit"
             app:popUpTo="@id/mockDestinationFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_first_login_password_to_employee_home"
+            app:destination="@id/employeeHomeFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit"
+            app:popUpTo="@id/mockDestinationFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -110,6 +162,12 @@
     <fragment
         android:id="@+id/employeeHomeFragment"
         android:name="com.example.astro_mobile.employee.home.EmployeeHomeFragment"
-        android:label="Home do Colaborador" />
+        android:label="Home do Colaborador">
+        <action
+            android:id="@+id/action_employee_home_to_mock_destination"
+            app:destination="@id/mockDestinationFragment"
+            app:popUpTo="@id/employeeHomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

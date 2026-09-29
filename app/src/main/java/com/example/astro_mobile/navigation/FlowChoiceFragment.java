@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.MockSession;
 
 public class FlowChoiceFragment extends Fragment {
 
@@ -29,8 +31,16 @@ public class FlowChoiceFragment extends Fragment {
         view.findViewById(R.id.button_flow_choice_manager).setOnClickListener(clickedView ->
                 Toast.makeText(requireContext(), R.string.flow_choice_manager_mock,
                         Toast.LENGTH_SHORT).show());
-        view.findViewById(R.id.button_flow_choice_employee).setOnClickListener(clickedView ->
-                Navigation.findNavController(clickedView)
-                        .navigate(R.id.action_flow_choice_to_employee_home));
+        view.findViewById(R.id.button_flow_choice_employee).setOnClickListener(clickedView -> {
+            Bundle args = getArguments();
+            if (args != null) {
+                MockSession.save(requireContext(), args.getString(AuthArgs.EMAIL),
+                        args.getString(AuthArgs.USER_TYPE),
+                        MockSession.Destination.EMPLOYEE_HOME);
+            }
+            Navigation.findNavController(clickedView)
+                    .navigate(R.id.action_flow_choice_to_employee_home,
+                            AuthArgs.copy(args));
+        });
     }
 }
