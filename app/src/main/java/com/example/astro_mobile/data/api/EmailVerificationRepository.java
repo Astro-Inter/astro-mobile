@@ -35,11 +35,13 @@ public class EmailVerificationRepository {
     }
 
     public Call<ApiResponse<VerifyEmailData>> verifyEmail(String email, ResultCallback callback) {
+        // Envia o e-mail e devolve ao ViewModel um resultado ou uma falha classificada.
         Call<ApiResponse<VerifyEmailData>> call = api.verifyEmail(new VerifyEmailRequest(email));
         call.enqueue(new Callback<ApiResponse<VerifyEmailData>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<VerifyEmailData>> call,
                                    @NonNull Response<ApiResponse<VerifyEmailData>> response) {
+                // Respostas HTTP chegaram à API; 5xx e corpos inválidos são falhas internas.
                 if (response.code() >= 500) {
                     callback.onFailure(FailureKind.INTERNAL, null);
                     return;
@@ -67,6 +69,7 @@ public class EmailVerificationRepository {
             @Override
             public void onFailure(@NonNull Call<ApiResponse<VerifyEmailData>> call,
                                   @NonNull Throwable error) {
+                // Sem resposta HTTP, separa falha de comunicação de falha inesperada.
                 if (!call.isCanceled()) {
                     callback.onFailure(error instanceof IOException
                             ? FailureKind.CONNECTION : FailureKind.INTERNAL, null);
@@ -77,6 +80,7 @@ public class EmailVerificationRepository {
     }
 
     private ApiResponse<VerifyEmailData> parseError(ResponseBody body) {
+        // Lê a mesma estrutura de resposta também quando o HTTP indica erro.
         if (body == null) {
             return null;
         }
@@ -88,6 +92,7 @@ public class EmailVerificationRepository {
     }
 
     private static String firstErrorOrMessage(ApiResponse<?> envelope) {
+        // Prioriza a primeira mensagem específica e usa a mensagem geral como reserva.
         List<String> errors = envelope.getErrors();
         if (errors != null && !errors.isEmpty() && errors.get(0) != null
                 && !errors.get(0).trim().isEmpty()) {

@@ -40,12 +40,14 @@ public class EmailVerificationViewModel extends ViewModel {
     }
 
     public String consumeInlineError() {
+        // Entrega o erro uma vez ao voltar para o campo de e-mail.
         String error = pendingInlineError;
         pendingInlineError = null;
         return error;
     }
 
     public void verifyEmail(String email, ResultCallback callback) {
+        // Evita consultas simultâneas e guarda o e-mail para uma possível tentativa posterior.
         if (loading) {
             return;
         }
@@ -55,6 +57,7 @@ public class EmailVerificationViewModel extends ViewModel {
         currentCall = repository.verifyEmail(email, new EmailVerificationRepository.ResultCallback() {
             @Override
             public void onSuccess(VerifyEmailData data) {
+                // Ignora respostas antigas e escolhe a próxima tela pelo estado da conta.
                 if (id != requestId) {
                     return;
                 }
@@ -77,6 +80,7 @@ public class EmailVerificationViewModel extends ViewModel {
 
             @Override
             public void onFailure(FailureKind kind, String message) {
+                // Decide se a falha aparece no campo ou em uma tela de erro.
                 if (id != requestId) {
                     return;
                 }
@@ -98,12 +102,14 @@ public class EmailVerificationViewModel extends ViewModel {
     }
 
     public void clearForLogout() {
+        // Apaga os dados temporários da identificação ao sair da conta mock.
         cancelCurrentRequest();
         lastEmail = null;
         pendingInlineError = null;
     }
 
     public void cancelCurrentRequest() {
+        // Invalida a resposta pendente para ela não alterar uma tela já fechada.
         ++requestId;
         if (currentCall != null) {
             currentCall.cancel();

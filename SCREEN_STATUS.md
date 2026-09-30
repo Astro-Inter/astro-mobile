@@ -7,7 +7,6 @@ Estados: `NÃO INICIADO`, `EM ANDAMENTO`, `CONCLUÍDO`, `BLOQUEADO` e `NÃO SE A
 | Tela | Fluxo | XML | Lógica/mock | Navegação | Integração | Resumo atual | Atualizado em |
 |---|---|---|---|---|---|---|---|
 | Splash | Inicialização | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | NÃO INICIADO | Splash animada e dissolve preservados; ao abrir o app, a sessão local mock direciona para a escolha de perfil (Gestor) ou Home (Colaborador). Sem sessão, segue para identificação de e-mail; Splash sai do back stack. | 2026-09-28 |
-| Destino mock pós-splash | Temporário | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | NÃO SE APLICA | Tela temporária implementada e alcançada após a animação, sem manter a splash no back stack. | 2026-09-20 |
 | Identificação de e-mail | Autenticação | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | POST /verify-email via Retrofit; vazio/inválido bloqueado no front, não cadastrado e DESATIVADO com mensagens vermelhas distintas sob o input, conexão e erro interno em destinos mock. E-mail e tipo propagados. | 2026-09-28 |
 | Erro de conexão (mock) | Autenticação | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | NÃO SE APLICA | Destino mock reutilizável: tentar novamente repete o POST e voltar preserva o e-mail. Sem tela final do Figma por decisão do usuário. | 2026-09-25 |
 | Erro interno (mock) | Autenticação | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | NÃO SE APLICA | Destino mock reutilizável: tentar novamente repete o POST e voltar preserva o e-mail. Sem tela final do Figma por decisão do usuário. | 2026-09-25 |

@@ -19,6 +19,7 @@ public final class MockSession {
 
     public static void save(Context context, String email, String userType,
                             Destination destination) {
+        // Guarda somente uma combinação válida de e-mail, perfil e tela inicial mock.
         if (email == null || email.isEmpty() || !isKnownUserType(userType)
                 || destination == null) {
             return;
@@ -32,6 +33,7 @@ public final class MockSession {
 
     @Nullable
     public static State read(Context context) {
+        // Recupera a sessão local para decidir o destino após a splash.
         SharedPreferences preferences = preferences(context);
         String email = preferences.getString(KEY_EMAIL, null);
         String userType = preferences.getString(KEY_USER_TYPE, null);
@@ -52,6 +54,7 @@ public final class MockSession {
     }
 
     public static boolean clear(Context context) {
+        // Remove a sessão mock usada para pular o login na próxima abertura.
         return preferences(context).edit().clear().commit();
     }
 

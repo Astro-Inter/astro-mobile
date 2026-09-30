@@ -1,14 +1,14 @@
 package com.example.astro_mobile.navigation;
 
-import android.os.Bundle;
 import android.graphics.Color;
-import android.util.Patterns;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Patterns;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -27,11 +27,11 @@ import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 
-public class MockDestinationFragment extends Fragment {
+public class EmailIdentificationFragment extends Fragment {
     private EmailVerificationViewModel verificationViewModel;
 
-    public MockDestinationFragment() {
-        super(R.layout.fragment_mock_destination);
+    public EmailIdentificationFragment() {
+        super(R.layout.fragment_email_identification);
     }
 
     @Override
@@ -47,6 +47,7 @@ public class MockDestinationFragment extends Fragment {
         verificationViewModel = new ViewModelProvider(requireActivity(),
                 EmailVerificationViewModel.Factory.createDefault())
                 .get(EmailVerificationViewModel.class);
+        // Recupera o e-mail e um possível erro ao voltar da tela de falha.
         if (emailInput.length() == 0 && verificationViewModel.getLastEmail() != null) {
             emailInput.setText(verificationViewModel.getLastEmail());
         }
@@ -55,6 +56,7 @@ public class MockDestinationFragment extends Fragment {
             showError(emailInputContainer, emailError, pendingError);
         }
 
+        // Valida o e-mail antes de consultar a API.
         continueButton.setOnClickListener(clickedView -> {
             if (verificationViewModel.isLoading()) {
                 return;
@@ -71,6 +73,7 @@ public class MockDestinationFragment extends Fragment {
                 return;
             }
             setLoading(continueButton, continueText, continueIcon, progress, true);
+            // Mostra o erro no campo ou abre a próxima tela indicada pela resposta.
             verificationViewModel.verifyEmail(email, (destination, message, userType) -> {
                 if (getView() != view || !isAdded()) {
                     return;
@@ -89,20 +92,21 @@ public class MockDestinationFragment extends Fragment {
                 int action;
                 Bundle args = null;
                 if (destination == EmailVerificationViewModel.Destination.FIRST_ACCESS_KEY) {
-                    action = R.id.action_mock_destination_to_first_login_access_key;
+                    action = R.id.action_email_identification_to_first_login_access_key;
                     args = AuthArgs.of(email, userType);
                 } else if (destination == EmailVerificationViewModel.Destination.PASSWORD) {
-                    action = R.id.action_mock_destination_to_login_password;
+                    action = R.id.action_email_identification_to_login_password;
                     args = AuthArgs.of(email, userType);
                 } else if (destination == EmailVerificationViewModel.Destination.CONNECTION_ERROR) {
-                    action = R.id.action_mock_destination_to_connection_error;
+                    action = R.id.action_email_identification_to_connection_error;
                 } else {
-                    action = R.id.action_mock_destination_to_generic_error;
+                    action = R.id.action_email_identification_to_generic_error;
                 }
                 Navigation.findNavController(view).navigate(action, args);
             });
         });
 
+        // Envia o formulário também pelo botão de ação do teclado.
         emailInput.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId != EditorInfo.IME_ACTION_GO
                     && actionId != EditorInfo.IME_ACTION_DONE
@@ -112,6 +116,7 @@ public class MockDestinationFragment extends Fragment {
             continueButton.performClick();
             return true;
         });
+        // Limpa o aviso de erro quando o usuário altera o e-mail.
         emailInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence text, int start, int count, int after) {
@@ -132,6 +137,7 @@ public class MockDestinationFragment extends Fragment {
             }
         });
 
+        // Deixa apenas o trecho "Saiba mais" clicável para abrir a explicação.
         TextView help = view.findViewById(R.id.text_email_identification_help);
         String helpText = help.getText().toString();
         String linkText = "Saiba mais";
@@ -145,7 +151,7 @@ public class MockDestinationFragment extends Fragment {
             @Override
             public void onClick(@NonNull View widget) {
                 Navigation.findNavController(widget)
-                        .navigate(R.id.action_mock_destination_to_access_key_information);
+                        .navigate(R.id.action_email_identification_to_access_key_information);
             }
 
             @Override
@@ -176,6 +182,7 @@ public class MockDestinationFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        // Interrompe a consulta se o usuário sair desta tela.
         if (verificationViewModel != null && verificationViewModel.isLoading()) {
             verificationViewModel.cancelCurrentRequest();
         }

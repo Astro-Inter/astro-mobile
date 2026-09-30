@@ -81,10 +81,12 @@ public class EmployeeHomeFragment extends Fragment {
         emptyPreview = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_EMPTY_PREVIEW);
 
+        // Preenche eventos e notificações com dados de demonstração.
         addRows(view.findViewById(R.id.list_employee_home_events), EVENT_ROWS);
         addRows(view.findViewById(R.id.list_employee_home_notifications), NOTIFICATION_ROWS);
         showPreview(view);
 
+        // Mostra o skeleton antes do conteúdo enquanto simula o carregamento.
         homeContent = view.findViewById(R.id.scroll_employee_home);
         homeSkeleton = view.findViewById(R.id.container_employee_home_skeleton);
         homeReady = false;
@@ -98,16 +100,18 @@ public class EmployeeHomeFragment extends Fragment {
         aiBubbleText = view.findViewById(R.id.text_employee_home_ai_bubble);
         aiBubble.setVisibility(View.GONE);
 
+        // O botão provisório Sair limpa a sessão mock e volta ao e-mail.
         view.findViewById(R.id.button_employee_home_logout).setOnClickListener(clickedView -> {
             if (MockSession.clear(requireContext())) {
                 new ViewModelProvider(requireActivity(),
                         EmailVerificationViewModel.Factory.createDefault())
                         .get(EmailVerificationViewModel.class).clearForLogout();
                 Navigation.findNavController(clickedView)
-                        .navigate(R.id.action_employee_home_to_mock_destination);
+                        .navigate(R.id.action_employee_home_to_email_identification);
             }
         });
 
+        // Um toque longo no cumprimento alterna os estados de demonstração da Home.
         view.findViewById(R.id.text_employee_home_greeting).setOnLongClickListener(pressed -> {
             emptyPreview = !emptyPreview;
             showPreview(view);
@@ -115,6 +119,7 @@ public class EmployeeHomeFragment extends Fragment {
             return true;
         });
 
+        // Os destinos ainda não implementados exibem a mesma mensagem provisória.
         int[] mockActions = {
                 R.id.button_employee_home_notifications,
                 R.id.button_employee_home_events,
@@ -133,6 +138,7 @@ public class EmployeeHomeFragment extends Fragment {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
         }
 
+        // Restringe o arraste do assistente à área entre cabeçalho e navbar.
         aiDragTouchListener = new AiDragTouchListener(
                 aiBubble,
                 view.findViewById(R.id.container_employee_home_content),
@@ -144,6 +150,7 @@ public class EmployeeHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Ao retornar, continua o carregamento ou reabre o balão se a Home já estiver pronta.
         if (homeReady) {
             showAiBubbleTemporarily();
         } else {
@@ -153,6 +160,7 @@ public class EmployeeHomeFragment extends Fragment {
 
     @Override
     public void onPause() {
+        // Pausa o tempo restante do skeleton e esconde o balão ao deixar a Home.
         if (!homeReady && finishHomeLoading != null) {
             mainHandler.removeCallbacks(finishHomeLoading);
             homeLoadingRemainingMs = Math.max(0L, homeLoadingRemainingMs
@@ -180,6 +188,7 @@ public class EmployeeHomeFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        // Cancela tarefas e animações ligadas às Views antes de descartá-las.
         if (finishHomeLoading != null) {
             mainHandler.removeCallbacks(finishHomeLoading);
             finishHomeLoading = null;
@@ -207,6 +216,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void startMockHomeLoad() {
+        // Espera o tempo restante da simulação antes de revelar a Home.
         if (homeReady || homeSkeleton == null || finishHomeLoading != null) {
             return;
         }
@@ -221,6 +231,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void revealHome() {
+        // Troca o skeleton pelo conteúdo com um dissolve curto.
         if (homeContent == null || homeSkeleton == null) {
             return;
         }
@@ -258,6 +269,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void startSkeletonPulse() {
+        // Faz as áreas de preenchimento pulsarem durante a espera mock.
         if (homeSkeleton == null || !ValueAnimator.areAnimatorsEnabled()
                 || skeletonPulseAnimator != null) {
             return;
@@ -284,6 +296,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void setSkeletonPlaceholderAlpha(View view, float alpha) {
+        // Altera só os itens do skeleton que têm fundo visível.
         if (view instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) view;
             for (int index = 0; index < group.getChildCount(); index++) {
@@ -295,6 +308,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void finishHomeRevealIfNeeded() {
+        // Finaliza a troca de telas se o app pausar no meio do dissolve.
         if (!homeReady || homeSkeleton == null || homeContent == null
                 || homeSkeleton.getVisibility() != View.VISIBLE) {
             return;
@@ -307,6 +321,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void showAiBubbleTemporarily() {
+        // Abre o texto do assistente e agenda seu recolhimento após três segundos.
         if (aiBubble == null || aiBubbleText == null) {
             return;
         }
@@ -338,6 +353,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void animateAiBubbleClosed(View bubble) {
+        // Encolhe o botão para a direita até restar apenas o mascote.
         int startWidth = bubble.getWidth();
         int collapsedWidth = getResources().getDimensionPixelSize(R.dimen.employee_home_ai_size);
         if (startWidth <= collapsedWidth) {
@@ -384,11 +400,13 @@ public class EmployeeHomeFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        // Mantém o estado de demonstração vazio ou preenchido ao recriar a tela.
         outState.putBoolean(STATE_EMPTY_PREVIEW, emptyPreview);
         super.onSaveInstanceState(outState);
     }
 
     private void addRows(LinearLayout container, MockRow[] rows) {
+        // Monta as linhas dos feeds a partir dos dados locais de exemplo.
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         for (MockRow row : rows) {
             View item = inflater.inflate(R.layout.item_home_feed_row, container, false);
@@ -416,6 +434,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void showPreview(View view) {
+        // Alterna textos, ícones e listas entre Home vazia e preenchida.
         TextView subtitle = view.findViewById(R.id.text_employee_home_subtitle);
         TextView message = view.findViewById(R.id.text_employee_home_message);
         ImageView messageIcon = view.findViewById(R.id.image_employee_home_message);
@@ -452,6 +471,7 @@ public class EmployeeHomeFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
     }
 
+    // Distingue toque de arraste e mantém o assistente dentro da área útil.
     private class AiDragTouchListener implements View.OnTouchListener {
         private final View button;
         private final View content;
@@ -479,6 +499,7 @@ public class EmployeeHomeFragment extends Fragment {
         public boolean onTouch(View touched, MotionEvent event) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
+                    // Guarda a posição inicial e mostra a reação ao toque.
                     downX = event.getRawX();
                     downY = event.getRawY();
                     buttonStartX = button.getX();
@@ -492,6 +513,7 @@ public class EmployeeHomeFragment extends Fragment {
                     }
                     return true;
                 case MotionEvent.ACTION_MOVE:
+                    // Só começa a arrastar após ultrapassar a margem de movimento do toque.
                     float dx = event.getRawX() - downX;
                     float dy = event.getRawY() - downY;
                     if (!dragging && Math.hypot(dx, dy) > touchSlop) {
@@ -509,6 +531,7 @@ public class EmployeeHomeFragment extends Fragment {
                         }
                     }
                     if (dragging) {
+                        // Impede que o botão passe pelo cabeçalho ou pela navbar.
                         float left = content.getLeft() + edge;
                         float right = content.getRight() - edge - button.getWidth();
                         float top = content.getTop() + header.getBottom() + edge;
@@ -520,6 +543,7 @@ public class EmployeeHomeFragment extends Fragment {
                     return true;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
+                    // Ao soltar, mantém a posição arrastada ou executa o clique normal.
                     touched.setPressed(false);
                     button.animate().cancel();
                     if (ValueAnimator.areAnimatorsEnabled()) {
