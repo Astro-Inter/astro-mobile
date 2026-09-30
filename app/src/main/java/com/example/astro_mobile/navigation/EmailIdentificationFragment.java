@@ -47,6 +47,8 @@ public class EmailIdentificationFragment extends Fragment {
         verificationViewModel = new ViewModelProvider(requireActivity(),
                 EmailVerificationViewModel.Factory.createDefault())
                 .get(EmailVerificationViewModel.class);
+        setLoading(continueButton, continueText, continueIcon, progress,
+                verificationViewModel.isLoading());
         // Recupera o e-mail e um possível erro ao voltar da tela de falha.
         if (emailInput.length() == 0 && verificationViewModel.getLastEmail() != null) {
             emailInput.setText(verificationViewModel.getLastEmail());

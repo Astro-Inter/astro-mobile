@@ -17,12 +17,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.MockSession;
+import com.example.astro_mobile.auth.EmailVerificationViewModel;
+import com.example.astro_mobile.auth.SessionViewModel;
+import com.example.astro_mobile.data.firebase.AuthFailureKind;
+import com.example.astro_mobile.data.local.FlowPreferences;
 
 public class SplashFragment extends Fragment {
 
@@ -35,6 +40,8 @@ public class SplashFragment extends Fragment {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Runnable navigationRunnable = this::navigateAfterSplash;
     private AnimatorSet splashAnimator;
+    private SessionViewModel sessionViewModel;
+    private EmailVerificationViewModel verificationViewModel;
 
     public SplashFragment() {
         super(R.layout.fragment_splash);
@@ -43,6 +50,11 @@ public class SplashFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        sessionViewModel = new ViewModelProvider(requireActivity(),
+                SessionViewModel.Factory.createDefault()).get(SessionViewModel.class);
+        verificationViewModel = new ViewModelProvider(requireActivity(),
+                EmailVerificationViewModel.Factory.createDefault())
+                .get(EmailVerificationViewModel.class);
         // Espera o layout medir as imagens antes de iniciar o movimento.
         view.post(() -> startAnimation(view));
     }
@@ -169,26 +181,102 @@ public class SplashFragment extends Fragment {
     }
 
     private void navigateAfterSplash() {
-        // Uma sessão mock válida pula a identificação; sem ela, abre o e-mail.
-        if (!isAdded()
-                || getView() == null
-                || !getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+        // Primeiro verifica a sessão Firebase; o primeiro acesso mock segue isolado.
+        if (!isCurrentSplash()) {
             return;
         }
-
-        NavController navController = NavHostFragment.findNavController(this);
-        if (navController.getCurrentDestination() != null
-                && navController.getCurrentDestination().getId() == R.id.splashFragment) {
-            MockSession.State session = MockSession.read(requireContext());
-            if (session == null) {
-                navController.navigate(R.id.action_splash_to_email_identification);
-            } else {
-                navController.navigate(session.destination == MockSession.Destination.FLOW_CHOICE
-                                ? R.id.action_splash_to_flow_choice
-                                : R.id.action_splash_to_employee_home,
-                        AuthArgs.of(session.email, session.userType));
+        sessionViewModel.checkCurrentUser(new SessionViewModel.SessionCallback() {
+            @Override
+            public void onUser(@Nullable String email) {
+                if (!isCurrentSplash()) {
+                    return;
+                }
+                if (email == null) {
+                    navigateWithoutFirebaseSession();
+                } else {
+                    verifySignedInEmail(email);
+                }
             }
+
+            @Override
+            public void onFailure(AuthFailureKind kind) {
+                if (!isCurrentSplash()) {
+                    return;
+                }
+                if (kind == AuthFailureKind.DISABLED
+                        || kind == AuthFailureKind.INVALID_CREDENTIALS) {
+                    sessionViewModel.signOut();
+                    FlowPreferences.clear(requireContext());
+                    navigateWithoutFirebaseSession();
+                } else {
+                    showStartupError(kind == AuthFailureKind.CONNECTION);
+                }
+            }
+        });
+    }
+
+    private void verifySignedInEmail(String email) {
+        // O backend confirma o tipo e o estado atuais antes de restaurar o fluxo.
+        verificationViewModel.verifyEmail(email, (destination, message, userType) -> {
+            if (!isCurrentSplash()) {
+                return;
+            }
+            NavController navController = NavHostFragment.findNavController(this);
+            if (destination == EmailVerificationViewModel.Destination.PASSWORD) {
+                boolean employee = "COLABORADOR".equals(userType)
+                        || FlowPreferences.wasEmployeeFlow(requireContext());
+                navController.navigate(employee ? R.id.action_splash_to_employee_home
+                                : R.id.action_splash_to_flow_choice,
+                        AuthArgs.of(email, userType));
+            } else if (destination == EmailVerificationViewModel.Destination.CONNECTION_ERROR
+                    || destination == EmailVerificationViewModel.Destination.INTERNAL_ERROR) {
+                showStartupError(destination
+                        == EmailVerificationViewModel.Destination.CONNECTION_ERROR);
+            } else {
+                // Conta desativada ou sem estado ativo não conserva a sessão local.
+                sessionViewModel.signOut();
+                FlowPreferences.clear(requireContext());
+                MockSession.clear(requireContext());
+                if (destination == EmailVerificationViewModel.Destination.DISABLED) {
+                    verificationViewModel.setPendingInlineError(
+                            getString(R.string.email_identification_disabled_error));
+                } else if (destination == EmailVerificationViewModel.Destination.INLINE_ERROR
+                        && message != null) {
+                    verificationViewModel.setPendingInlineError(message);
+                }
+                navController.navigate(R.id.action_splash_to_email_identification);
+            }
+        });
+    }
+
+    private void navigateWithoutFirebaseSession() {
+        // Conserva temporariamente o primeiro acesso mock até a tarefa específica dele.
+        MockSession.State session = MockSession.read(requireContext());
+        NavController navController = NavHostFragment.findNavController(this);
+        if (session == null) {
+            navController.navigate(R.id.action_splash_to_email_identification);
+        } else {
+            navController.navigate(session.destination == MockSession.Destination.FLOW_CHOICE
+                            ? R.id.action_splash_to_flow_choice
+                            : R.id.action_splash_to_employee_home,
+                    AuthArgs.of(session.email, session.userType));
         }
+    }
+
+    private void showStartupError(boolean connection) {
+        NavHostFragment.findNavController(this).navigate(connection
+                ? R.id.action_splash_to_connection_error
+                : R.id.action_splash_to_generic_error);
+    }
+
+    private boolean isCurrentSplash() {
+        if (!isAdded() || getView() == null
+                || !getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+            return false;
+        }
+        NavController navController = NavHostFragment.findNavController(this);
+        return navController.getCurrentDestination() != null
+                && navController.getCurrentDestination().getId() == R.id.splashFragment;
     }
 
     private float dpToPx(int value) {
@@ -199,7 +287,11 @@ public class SplashFragment extends Fragment {
     public void onDestroyView() {
         // Interrompe animação e navegação pendentes ao sair da splash.
         mainHandler.removeCallbacks(navigationRunnable);
+        if (verificationViewModel != null && verificationViewModel.isLoading()) {
+            verificationViewModel.cancelCurrentRequest();
+        }
         if (splashAnimator != null) {
+            splashAnimator.removeAllListeners();
             splashAnimator.cancel();
             splashAnimator = null;
         }
