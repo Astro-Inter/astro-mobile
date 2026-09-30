@@ -36,6 +36,7 @@ public class FirstLoginPasswordFragment extends Fragment {
         TextView mismatchError = view.findViewById(R.id.text_first_login_password_mismatch);
         View enterButton = view.findViewById(R.id.button_first_login_password_enter);
 
+        // Confere preenchimento e igualdade das senhas antes de avançar no fluxo mock.
         enterButton.setOnClickListener(clickedView -> {
             String password = passwordInput.getText().toString();
             String confirmation = confirmationInput.getText().toString();
@@ -60,6 +61,7 @@ public class FirstLoginPasswordFragment extends Fragment {
                             getString(R.string.auth_user_type_toast, userType),
                             Toast.LENGTH_LONG).show();
                 }
+                // Guarda o destino local e leva cada perfil à tela correspondente.
                 MockSession.save(requireContext(), email, userType,
                         "COLABORADOR".equals(userType)
                                 ? MockSession.Destination.EMPLOYEE_HOME
@@ -72,6 +74,7 @@ public class FirstLoginPasswordFragment extends Fragment {
             }
         });
 
+        // Permite confirmar a senha pelo teclado.
         confirmationInput.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId != EditorInfo.IME_ACTION_DONE) {
                 return false;
@@ -80,6 +83,7 @@ public class FirstLoginPasswordFragment extends Fragment {
             return true;
         });
 
+        // Limpa o destaque de erro quando uma das senhas é corrigida.
         TextWatcher clearMismatch = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence text, int start, int count, int after) {

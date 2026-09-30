@@ -33,7 +33,7 @@ public class SplashFragment extends Fragment {
     private static final long NAVIGATION_DELAY_MS = 180L;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final Runnable navigationRunnable = this::navigateToMockDestination;
+    private final Runnable navigationRunnable = this::navigateAfterSplash;
     private AnimatorSet splashAnimator;
 
     public SplashFragment() {
@@ -43,6 +43,7 @@ public class SplashFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Espera o layout medir as imagens antes de iniciar o movimento.
         view.post(() -> startAnimation(view));
     }
 
@@ -55,6 +56,7 @@ public class SplashFragment extends Fragment {
         ImageView logo = root.findViewById(R.id.image_splash_logo);
         ImageView planet = root.findViewById(R.id.image_splash_planet);
 
+        // Posiciona o planeta abaixo da tela para ele entrar durante a animação.
         float planetStart = planet.getHeight() + dpToPx(24);
         planet.setTranslationY(planetStart);
         planet.setAlpha(0f);
@@ -66,6 +68,7 @@ public class SplashFragment extends Fragment {
         OvershootInterpolator planetBounceInterpolator = new OvershootInterpolator(1.1f);
         AccelerateDecelerateInterpolator scaleInterpolator = new AccelerateDecelerateInterpolator();
 
+        // Move e pulsa a logo até a posição usada na identificação de e-mail.
         ObjectAnimator logoMovement = ObjectAnimator.ofFloat(
                 logo,
                 View.Y,
@@ -97,6 +100,7 @@ public class SplashFragment extends Fragment {
         logoScaleY.setDuration(MAIN_ANIMATION_MS);
         logoScaleY.setInterpolator(scaleInterpolator);
 
+        // Desloca as estrelas e faz o planeta aparecer com movimento elástico.
         ObjectAnimator starsMovement = ObjectAnimator.ofFloat(
                 stars,
                 View.TRANSLATION_Y,
@@ -142,6 +146,7 @@ public class SplashFragment extends Fragment {
         planetScaleY.setDuration(PLANET_ANIMATION_MS);
         planetScaleY.setInterpolator(scaleInterpolator);
 
+        // Executa os movimentos juntos e navega após a animação terminar.
         splashAnimator = new AnimatorSet();
         splashAnimator.playTogether(
                 logoMovement,
@@ -163,7 +168,8 @@ public class SplashFragment extends Fragment {
         splashAnimator.start();
     }
 
-    private void navigateToMockDestination() {
+    private void navigateAfterSplash() {
+        // Uma sessão mock válida pula a identificação; sem ela, abre o e-mail.
         if (!isAdded()
                 || getView() == null
                 || !getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
@@ -175,7 +181,7 @@ public class SplashFragment extends Fragment {
                 && navController.getCurrentDestination().getId() == R.id.splashFragment) {
             MockSession.State session = MockSession.read(requireContext());
             if (session == null) {
-                navController.navigate(R.id.action_splash_to_mock_destination);
+                navController.navigate(R.id.action_splash_to_email_identification);
             } else {
                 navController.navigate(session.destination == MockSession.Destination.FLOW_CHOICE
                                 ? R.id.action_splash_to_flow_choice
@@ -191,6 +197,7 @@ public class SplashFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        // Interrompe animação e navegação pendentes ao sair da splash.
         mainHandler.removeCallbacks(navigationRunnable);
         if (splashAnimator != null) {
             splashAnimator.cancel();

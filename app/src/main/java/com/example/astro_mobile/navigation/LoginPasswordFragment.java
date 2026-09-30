@@ -38,6 +38,7 @@ public class LoginPasswordFragment extends Fragment {
         ImageButton visibilityButton = view.findViewById(R.id.button_login_password_visibility);
         View enterButton = view.findViewById(R.id.button_login_password_enter);
 
+        // Alterna a exibição da senha e o ícone do botão de visibilidade.
         visibilityButton.setOnClickListener(clickedView -> {
             boolean isPasswordHidden = passwordInput.getTransformationMethod()
                     instanceof PasswordTransformationMethod;
@@ -53,6 +54,7 @@ public class LoginPasswordFragment extends Fragment {
             passwordInput.setSelection(passwordInput.length());
         });
 
+        // No mock, qualquer senha preenchida avança conforme o perfil recebido.
         enterButton.setOnClickListener(clickedView -> {
             if (passwordInput.length() > 0) {
                 String userType = getArguments() == null ? null
@@ -67,6 +69,7 @@ public class LoginPasswordFragment extends Fragment {
                             getString(R.string.auth_user_type_toast, userType),
                             Toast.LENGTH_LONG).show();
                 }
+                // Persiste o destino temporário para reabrir o app sem repetir o fluxo.
                 MockSession.save(requireContext(), email, userType,
                         "COLABORADOR".equals(userType)
                                 ? MockSession.Destination.EMPLOYEE_HOME
@@ -81,6 +84,7 @@ public class LoginPasswordFragment extends Fragment {
                 error.setVisibility(View.VISIBLE);
             }
         });
+        // Permite acionar Entrar pelo teclado.
         passwordInput.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId != EditorInfo.IME_ACTION_DONE) {
                 return false;
@@ -88,6 +92,7 @@ public class LoginPasswordFragment extends Fragment {
             enterButton.performClick();
             return true;
         });
+        // Retira o erro visual quando o usuário volta a digitar.
         passwordInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence text, int start, int count, int after) {

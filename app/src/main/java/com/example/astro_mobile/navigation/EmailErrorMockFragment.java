@@ -38,15 +38,17 @@ public class EmailErrorMockFragment extends Fragment {
         View retryButton = view.findViewById(R.id.button_email_error_retry);
         TextView retryLabel = view.findViewById(R.id.text_email_error_retry);
         ProgressBar progress = view.findViewById(R.id.progress_email_error_retry);
+        // Usa a mesma tela mock para apresentar erro de conexão ou erro interno.
         showCopy(title, body, errorDestination == R.id.connectionErrorFragment);
 
+        // Repete a verificação com o último e-mail informado.
         retryButton.setOnClickListener(clickedView -> {
             if (verificationViewModel.isLoading()) {
                 return;
             }
             String email = verificationViewModel.getLastEmail();
             if (email == null) {
-                navController.popBackStack(R.id.mockDestinationFragment, false);
+                navController.popBackStack(R.id.emailIdentificationFragment, false);
                 return;
             }
             retryButton.setEnabled(false);
@@ -60,6 +62,7 @@ public class EmailErrorMockFragment extends Fragment {
                 retryLabel.setVisibility(View.VISIBLE);
                 progress.setVisibility(View.GONE);
 
+                // Volta ao campo para erros de negócio ou segue no fluxo após sucesso.
                 if (destination == EmailVerificationViewModel.Destination.INLINE_ERROR
                         || destination == EmailVerificationViewModel.Destination.DISABLED) {
                     verificationViewModel.setPendingInlineError(
@@ -67,7 +70,7 @@ public class EmailErrorMockFragment extends Fragment {
                                     ? getString(R.string.email_identification_disabled_error)
                                     : message != null ? message
                                             : getString(R.string.email_identification_error));
-                    navController.popBackStack(R.id.mockDestinationFragment, false);
+                    navController.popBackStack(R.id.emailIdentificationFragment, false);
                 } else if (destination == EmailVerificationViewModel.Destination.CONNECTION_ERROR
                         || destination == EmailVerificationViewModel.Destination.INTERNAL_ERROR) {
                     showCopy(title, body,
@@ -88,7 +91,7 @@ public class EmailErrorMockFragment extends Fragment {
         });
 
         view.findViewById(R.id.button_email_error_start).setOnClickListener(clickedView ->
-                navController.popBackStack(R.id.mockDestinationFragment, false));
+                navController.popBackStack(R.id.emailIdentificationFragment, false));
     }
 
     private void showCopy(TextView title, TextView body, boolean connection) {
@@ -100,6 +103,7 @@ public class EmailErrorMockFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        // Cancela a tentativa pendente quando esta tela é fechada.
         if (verificationViewModel != null && verificationViewModel.isLoading()) {
             verificationViewModel.cancelCurrentRequest();
         }

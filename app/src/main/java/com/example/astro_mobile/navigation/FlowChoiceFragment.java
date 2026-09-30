@@ -28,9 +28,11 @@ public class FlowChoiceFragment extends Fragment {
         WindowCompat.getInsetsController(requireActivity().getWindow(), view)
                 .hide(WindowInsetsCompat.Type.ime());
 
+        // O destino do Gestor ainda é mock e apenas informa que não está disponível.
         view.findViewById(R.id.button_flow_choice_manager).setOnClickListener(clickedView ->
                 Toast.makeText(requireContext(), R.string.flow_choice_manager_mock,
                         Toast.LENGTH_SHORT).show());
+        // Ao escolher Colaborador, salva a Home como destino da sessão mock.
         view.findViewById(R.id.button_flow_choice_employee).setOnClickListener(clickedView -> {
             Bundle args = getArguments();
             if (args != null) {

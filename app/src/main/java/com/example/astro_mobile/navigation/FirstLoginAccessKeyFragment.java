@@ -42,6 +42,7 @@ public class FirstLoginAccessKeyFragment extends Fragment {
 
         configureDigitInputs();
 
+        // A chave provisória 111111 avança; qualquer outra mostra o estado de erro.
         View continueButton = view.findViewById(R.id.button_first_login_access_key_continue);
         continueButton.setOnClickListener(clickedView -> {
             StringBuilder accessKey = new StringBuilder(digitInputs.length);
@@ -72,6 +73,7 @@ public class FirstLoginAccessKeyFragment extends Fragment {
     }
 
     private void configureDigitInputs() {
+        // Avança o foco ao digitar e volta ao campo anterior ao apagar.
         for (int index = 0; index < digitInputs.length; index++) {
             EditText input = digitInputs[index];
             int position = index;
@@ -115,6 +117,7 @@ public class FirstLoginAccessKeyFragment extends Fragment {
     }
 
     private void showInvalidKeyMock() {
+        // Destaca os seis campos e foca o primeiro que ainda está vazio.
         for (EditText input : digitInputs) {
             input.setBackgroundResource(R.drawable.bg_access_key_digit_error);
         }
@@ -129,6 +132,7 @@ public class FirstLoginAccessKeyFragment extends Fragment {
     }
 
     private void hideErrorState() {
+        // Retira o aviso assim que o usuário altera algum dígito.
         if (errorText.getVisibility() != View.VISIBLE) {
             return;
         }
@@ -140,6 +144,7 @@ public class FirstLoginAccessKeyFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        // Solta as referências aos campos quando a interface é destruída.
         digitInputs = null;
         errorText = null;
         super.onDestroyView();
