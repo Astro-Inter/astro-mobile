@@ -1,5 +1,8 @@
 package com.example.astro_mobile.auth;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -10,9 +13,13 @@ import com.example.astro_mobile.data.api.AstroApiClient;
 import com.example.astro_mobile.data.api.dto.ApiResponse;
 import com.example.astro_mobile.data.api.dto.VerifyEmailData;
 
+import java.util.concurrent.TimeUnit;
+
 import retrofit2.Call;
 
 public class EmailVerificationViewModel extends ViewModel {
+    private static final long REQUEST_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(15);
+
     public enum Destination { FIRST_ACCESS_KEY, PASSWORD, INLINE_ERROR, DISABLED, CONNECTION_ERROR,
         INTERNAL_ERROR }
 
@@ -21,7 +28,9 @@ public class EmailVerificationViewModel extends ViewModel {
     }
 
     private final EmailVerificationRepository repository;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private Call<ApiResponse<VerifyEmailData>> currentCall;
+    private Runnable timeoutRunnable;
     private int requestId;
     private boolean loading;
     private String lastEmail;
@@ -58,11 +67,9 @@ public class EmailVerificationViewModel extends ViewModel {
             @Override
             public void onSuccess(VerifyEmailData data) {
                 // Ignora respostas antigas e escolhe a próxima tela pelo estado da conta.
-                if (id != requestId) {
+                if (!finishRequest(id)) {
                     return;
                 }
-                loading = false;
-                currentCall = null;
                 String userType = data.getUserType();
                 String status = data.getUserStatus();
                 if ("DESATIVADO".equals(status)) {
@@ -81,11 +88,9 @@ public class EmailVerificationViewModel extends ViewModel {
             @Override
             public void onFailure(FailureKind kind, String message) {
                 // Decide se a falha aparece no campo ou em uma tela de erro.
-                if (id != requestId) {
+                if (!finishRequest(id)) {
                     return;
                 }
-                loading = false;
-                currentCall = null;
                 if (kind == FailureKind.CONNECTION) {
                     callback.onResult(Destination.CONNECTION_ERROR, null, null);
                 } else if (kind == FailureKind.INTERNAL) {
@@ -95,6 +100,44 @@ public class EmailVerificationViewModel extends ViewModel {
                 }
             }
         });
+        scheduleTimeout(id, callback);
+    }
+
+    private boolean finishRequest(int id) {
+        if (id != requestId) {
+            return false;
+        }
+        loading = false;
+        currentCall = null;
+        clearTimeout();
+        return true;
+    }
+
+    private void scheduleTimeout(int id, ResultCallback callback) {
+        clearTimeout();
+        timeoutRunnable = () -> {
+            if (id != requestId || !loading) {
+                return;
+            }
+            Call<ApiResponse<VerifyEmailData>> timedOutCall = currentCall;
+            currentCall = null;
+            loading = false;
+            ++requestId;
+            timeoutRunnable = null;
+            if (timedOutCall != null) {
+                timedOutCall.cancel();
+            }
+            // Render pode demorar para iniciar, mas a tela não fica carregando sem limite.
+            callback.onResult(Destination.INTERNAL_ERROR, null, null);
+        };
+        mainHandler.postDelayed(timeoutRunnable, REQUEST_TIMEOUT_MS);
+    }
+
+    private void clearTimeout() {
+        if (timeoutRunnable != null) {
+            mainHandler.removeCallbacks(timeoutRunnable);
+            timeoutRunnable = null;
+        }
     }
 
     public void setPendingInlineError(String message) {
@@ -102,7 +145,7 @@ public class EmailVerificationViewModel extends ViewModel {
     }
 
     public void clearForLogout() {
-        // Apaga os dados temporários da identificação ao sair da conta mock.
+        // Apaga os dados temporários da identificação ao sair da conta.
         cancelCurrentRequest();
         lastEmail = null;
         pendingInlineError = null;
@@ -111,6 +154,7 @@ public class EmailVerificationViewModel extends ViewModel {
     public void cancelCurrentRequest() {
         // Invalida a resposta pendente para ela não alterar uma tela já fechada.
         ++requestId;
+        clearTimeout();
         if (currentCall != null) {
             currentCall.cancel();
             currentCall = null;

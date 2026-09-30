@@ -20,7 +20,9 @@ public final class AstroApiClient {
 
     private static AstroApi createApi() {
         OkHttpClient httpClient = new OkHttpClient.Builder()
-                .callTimeout(90, TimeUnit.SECONDS)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .callTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
                 .build();
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_BASE_URL)

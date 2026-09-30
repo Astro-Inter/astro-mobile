@@ -9,11 +9,14 @@ import androidx.annotation.Nullable;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.MockSession;
+import com.example.astro_mobile.auth.SessionViewModel;
+import com.example.astro_mobile.data.local.FlowPreferences;
 
 public class FlowChoiceFragment extends Fragment {
 
@@ -32,10 +35,14 @@ public class FlowChoiceFragment extends Fragment {
         view.findViewById(R.id.button_flow_choice_manager).setOnClickListener(clickedView ->
                 Toast.makeText(requireContext(), R.string.flow_choice_manager_mock,
                         Toast.LENGTH_SHORT).show());
-        // Ao escolher Colaborador, salva a Home como destino da sessão mock.
+        // Guarda apenas o último fluxo na sessão Firebase; o primeiro acesso continua mock.
         view.findViewById(R.id.button_flow_choice_employee).setOnClickListener(clickedView -> {
             Bundle args = getArguments();
-            if (args != null) {
+            SessionViewModel sessionViewModel = new ViewModelProvider(requireActivity(),
+                    SessionViewModel.Factory.createDefault()).get(SessionViewModel.class);
+            if (sessionViewModel.hasCurrentUser()) {
+                FlowPreferences.saveEmployeeFlow(requireContext());
+            } else if (args != null) {
                 MockSession.save(requireContext(), args.getString(AuthArgs.EMAIL),
                         args.getString(AuthArgs.USER_TYPE),
                         MockSession.Destination.EMPLOYEE_HOME);

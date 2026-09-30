@@ -28,6 +28,8 @@ import androidx.navigation.Navigation;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
+import com.example.astro_mobile.auth.SessionViewModel;
+import com.example.astro_mobile.data.local.FlowPreferences;
 
 public class EmployeeHomeFragment extends Fragment {
 
@@ -100,15 +102,17 @@ public class EmployeeHomeFragment extends Fragment {
         aiBubbleText = view.findViewById(R.id.text_employee_home_ai_bubble);
         aiBubble.setVisibility(View.GONE);
 
-        // O botão provisório Sair limpa a sessão mock e volta ao e-mail.
+        // Sair encerra a sessão Firebase e remove qualquer estado local anterior.
         view.findViewById(R.id.button_employee_home_logout).setOnClickListener(clickedView -> {
-            if (MockSession.clear(requireContext())) {
-                new ViewModelProvider(requireActivity(),
-                        EmailVerificationViewModel.Factory.createDefault())
-                        .get(EmailVerificationViewModel.class).clearForLogout();
-                Navigation.findNavController(clickedView)
-                        .navigate(R.id.action_employee_home_to_email_identification);
-            }
+            new ViewModelProvider(requireActivity(), SessionViewModel.Factory.createDefault())
+                    .get(SessionViewModel.class).signOut();
+            FlowPreferences.clear(requireContext());
+            MockSession.clear(requireContext());
+            new ViewModelProvider(requireActivity(),
+                    EmailVerificationViewModel.Factory.createDefault())
+                    .get(EmailVerificationViewModel.class).clearForLogout();
+            Navigation.findNavController(clickedView)
+                    .navigate(R.id.action_employee_home_to_email_identification);
         });
 
         // Um toque longo no cumprimento alterna os estados de demonstração da Home.

@@ -8,8 +8,10 @@ import com.example.astro_mobile.data.api.dto.VerifyEmailRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -69,14 +71,23 @@ public class EmailVerificationRepository {
             @Override
             public void onFailure(@NonNull Call<ApiResponse<VerifyEmailData>> call,
                                   @NonNull Throwable error) {
-                // Sem resposta HTTP, separa falha de comunicação de falha inesperada.
+                // Sem resposta HTTP, só falhas claras de acesso à rede indicam sem conexão.
                 if (!call.isCanceled()) {
-                    callback.onFailure(error instanceof IOException
-                            ? FailureKind.CONNECTION : FailureKind.INTERNAL, null);
+                    callback.onFailure(classifyTransportFailure(error), null);
                 }
             }
         });
         return call;
+    }
+
+    private static FailureKind classifyTransportFailure(Throwable error) {
+        // Timeout pode ser o servidor acordando; não significa que o aparelho esteja offline.
+        if (error instanceof UnknownHostException
+                || error instanceof ConnectException
+                || error instanceof NoRouteToHostException) {
+            return FailureKind.CONNECTION;
+        }
+        return FailureKind.INTERNAL;
     }
 
     private ApiResponse<VerifyEmailData> parseError(ResponseBody body) {

@@ -25,6 +25,12 @@
             app:destination="@id/employeeHomeFragment"
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splash_to_connection_error"
+            app:destination="@id/connectionErrorFragment" />
+        <action
+            android:id="@+id/action_splash_to_generic_error"
+            app:destination="@id/genericErrorFragment" />
     </fragment>
 
     <fragment
@@ -105,7 +111,62 @@
             app:popExitAnim="@anim/push_pop_exit"
             app:popUpTo="@id/emailIdentificationFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_login_password_to_connection_error"
+            app:destination="@id/connectionErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_login_password_to_generic_error"
+            app:destination="@id/genericErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_login_password_to_reset_request"
+            app:destination="@id/passwordResetRequestFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/passwordResetRequestFragment"
+        android:name="com.example.astro_mobile.navigation.PasswordResetRequestFragment"
+        android:label="Redefinição de senha">
+        <action
+            android:id="@+id/action_password_reset_request_to_confirmation"
+            app:destination="@id/passwordResetConfirmationFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit"
+            app:popUpTo="@id/loginPasswordFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_password_reset_request_to_connection_error"
+            app:destination="@id/connectionErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_password_reset_request_to_generic_error"
+            app:destination="@id/genericErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/passwordResetConfirmationFragment"
+        android:name="com.example.astro_mobile.navigation.PasswordResetConfirmationFragment"
+        android:label="Confirmação da redefinição" />
 
     <fragment
         android:id="@+id/firstLoginAccessKeyFragment"
