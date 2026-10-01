@@ -7,20 +7,26 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.AccessKeyViewModel;
+import com.example.astro_mobile.data.api.FailureKind;
 
 public class FirstLoginAccessKeyFragment extends Fragment {
 
     private EditText[] digitInputs;
     private TextView errorText;
+    private AccessKeyViewModel viewModel;
 
     public FirstLoginAccessKeyFragment() {
         super(R.layout.fragment_first_login_access_key);
@@ -39,23 +45,68 @@ public class FirstLoginAccessKeyFragment extends Fragment {
                 view.findViewById(R.id.input_access_key_digit_6)
         };
         errorText = view.findViewById(R.id.text_first_login_access_key_error);
+        viewModel = new ViewModelProvider(requireActivity(), new AccessKeyViewModel.Factory())
+                .get(AccessKeyViewModel.class);
+        Bundle args = getArguments();
+        viewModel.setContext(args == null ? null : args.getString(AuthArgs.EMAIL),
+                args == null ? null : args.getString(AuthArgs.USER_TYPE));
 
         configureDigitInputs();
+        String previousKey = viewModel.getLastKey();
+        if (previousKey != null && previousKey.length() == digitInputs.length) {
+            for (int index = 0; index < digitInputs.length; index++) {
+                digitInputs[index].setText(String.valueOf(previousKey.charAt(index)));
+            }
+        }
+        String pendingError = viewModel.consumeInlineError();
+        if (pendingError != null) {
+            showError(pendingError);
+        }
 
-        // A chave provisória 111111 avança; qualquer outra mostra o estado de erro.
+        // Uma chave incompleta não chega à API; seis dígitos são validados pelo backend.
         View continueButton = view.findViewById(R.id.button_first_login_access_key_continue);
+        TextView continueLabel = view.findViewById(R.id.text_first_login_access_key_continue);
+        ImageView continueIcon = view.findViewById(R.id.image_first_login_access_key_continue);
+        ProgressBar progress = view.findViewById(R.id.progress_first_login_access_key);
         continueButton.setOnClickListener(clickedView -> {
+            if (viewModel.isLoading()) {
+                return;
+            }
             StringBuilder accessKey = new StringBuilder(digitInputs.length);
             for (EditText input : digitInputs) {
                 accessKey.append(input.getText());
             }
-            if ("111111".contentEquals(accessKey)) {
-                NavHostFragment.findNavController(this)
-                        .navigate(R.id.action_first_login_access_key_to_first_login_password,
-                                AuthArgs.copy(getArguments()));
-            } else {
-                showInvalidKeyMock();
+            if (!accessKey.toString().matches("[0-9]{6}")) {
+                showError(getString(R.string.first_login_access_key_incomplete_error));
+                return;
             }
+            if (viewModel.getEmail() == null || viewModel.getEmail().isEmpty()) {
+                NavHostFragment.findNavController(this)
+                        .popBackStack(R.id.emailIdentificationFragment, false);
+                return;
+            }
+            hideErrorState();
+            setLoading(continueButton, continueLabel, continueIcon, progress, true);
+            viewModel.verifyKey(accessKey.toString(), (failure, message) -> {
+                if (getView() != view || !isAdded()) {
+                    return;
+                }
+                setLoading(continueButton, continueLabel, continueIcon, progress, false);
+                if (failure == null) {
+                    Bundle nextArgs = new Bundle();
+                    nextArgs.putString(AuthArgs.EMAIL, viewModel.getEmail());
+                    NavHostFragment.findNavController(this).navigate(
+                            R.id.action_first_login_access_key_to_first_login_password, nextArgs);
+                } else if (failure == FailureKind.BUSINESS) {
+                    showError(message != null ? message
+                            : getString(R.string.first_login_access_key_error));
+                } else {
+                    NavHostFragment.findNavController(this).navigate(
+                            failure == FailureKind.CONNECTION
+                                    ? R.id.action_first_login_access_key_to_connection_error
+                                    : R.id.action_first_login_access_key_to_generic_error);
+                }
+            });
         });
         digitInputs[digitInputs.length - 1].setOnEditorActionListener(
                 (textView, actionId, event) -> {
@@ -116,11 +167,12 @@ public class FirstLoginAccessKeyFragment extends Fragment {
         }
     }
 
-    private void showInvalidKeyMock() {
+    private void showError(String message) {
         // Destaca os seis campos e foca o primeiro que ainda está vazio.
         for (EditText input : digitInputs) {
             input.setBackgroundResource(R.drawable.bg_access_key_digit_error);
         }
+        errorText.setText(message);
         errorText.setVisibility(View.VISIBLE);
 
         for (EditText input : digitInputs) {
@@ -128,6 +180,18 @@ public class FirstLoginAccessKeyFragment extends Fragment {
                 input.requestFocus();
                 break;
             }
+        }
+    }
+
+    private void setLoading(View button, TextView label, ImageView icon,
+                            ProgressBar progress, boolean loading) {
+        // Desabilita os campos e o botão para não enviar duas chaves ao mesmo tempo.
+        button.setEnabled(!loading);
+        label.setVisibility(loading ? View.INVISIBLE : View.VISIBLE);
+        icon.setVisibility(loading ? View.INVISIBLE : View.VISIBLE);
+        progress.setVisibility(loading ? View.VISIBLE : View.GONE);
+        for (EditText input : digitInputs) {
+            input.setEnabled(!loading);
         }
     }
 
@@ -144,6 +208,9 @@ public class FirstLoginAccessKeyFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (viewModel != null) {
+            viewModel.cancelCurrentRequest();
+        }
         // Solta as referências aos campos quando a interface é destruída.
         digitInputs = null;
         errorText = null;
