@@ -42,7 +42,8 @@
     <string name="password_reset_back_to_login">Voltar ao login</string>
     <string name="password_reset_back_to_email">Voltar à identificação de e-mail</string>
     <string name="first_login_access_key_title">Insira sua chave de acesso para entrar pela primeira vez.</string>
-    <string name="first_login_access_key_error">Chave de acesso inválida</string>
+    <string name="first_login_access_key_error">Chave de acesso inválida ou expirada</string>
+    <string name="first_login_access_key_incomplete_error">Preencha os seis dígitos da chave de acesso.</string>
     <string name="first_login_access_key_action">Prosseguir</string>
     <string name="first_login_access_key_back_description">Voltar</string>
     <string name="first_login_access_key_digit_description">Dígito %1$d da chave de acesso</string>

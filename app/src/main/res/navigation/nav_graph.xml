@@ -179,6 +179,20 @@
             app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter"
             app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_first_login_access_key_to_connection_error"
+            app:destination="@id/connectionErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+        <action
+            android:id="@+id/action_first_login_access_key_to_generic_error"
+            app:destination="@id/genericErrorFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
 
     <fragment

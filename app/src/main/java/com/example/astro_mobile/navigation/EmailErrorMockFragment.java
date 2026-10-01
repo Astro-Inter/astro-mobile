@@ -16,14 +16,17 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.AccessKeyViewModel;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.PasswordResetViewModel;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
+import com.example.astro_mobile.data.api.FailureKind;
 
 public class EmailErrorMockFragment extends Fragment {
     private EmailVerificationViewModel verificationViewModel;
     private PasswordResetViewModel resetViewModel;
     private PasswordResetViewModel.ResultCallback resetResultCallback;
+    private AccessKeyViewModel accessKeyViewModel;
 
     public EmailErrorMockFragment() {
         super(R.layout.fragment_email_error_mock);
@@ -40,6 +43,10 @@ public class EmailErrorMockFragment extends Fragment {
         int errorDestination = navController.getCurrentDestination().getId();
         NavBackStackEntry previous = navController.getPreviousBackStackEntry();
         int source = previous == null ? 0 : previous.getDestination().getId();
+        if (source == R.id.firstLoginAccessKeyFragment) {
+            accessKeyViewModel = new ViewModelProvider(requireActivity(),
+                    new AccessKeyViewModel.Factory()).get(AccessKeyViewModel.class);
+        }
         TextView title = view.findViewById(R.id.text_email_error_title);
         TextView body = view.findViewById(R.id.text_email_error_body);
         View retryButton = view.findViewById(R.id.button_email_error_retry);
@@ -85,6 +92,11 @@ public class EmailErrorMockFragment extends Fragment {
 
         // No login, volta ao campo sem conservar a senha; na splash, repete a sessão.
         retryButton.setOnClickListener(clickedView -> {
+            if (source == R.id.firstLoginAccessKeyFragment) {
+                retryAccessKey(view, retryButton, retryLabel, progress, title, body,
+                        navController, errorDestination);
+                return;
+            }
             if (source == R.id.passwordResetRequestFragment) {
                 retryPasswordReset(retryButton, retryLabel, progress, navController);
                 return;
@@ -147,6 +159,49 @@ public class EmailErrorMockFragment extends Fragment {
         }
     }
 
+    private void retryAccessKey(View view, View button, TextView label, ProgressBar progress,
+                                TextView title, TextView body, NavController navController,
+                                int errorDestination) {
+        // Repete a validação da chave, e não a identificação do e-mail.
+        if (accessKeyViewModel.isLoading()) {
+            return;
+        }
+        String key = accessKeyViewModel.getLastKey();
+        if (key == null || accessKeyViewModel.getEmail() == null) {
+            navController.popBackStack(R.id.firstLoginAccessKeyFragment, false);
+            return;
+        }
+        button.setEnabled(false);
+        label.setVisibility(View.INVISIBLE);
+        progress.setVisibility(View.VISIBLE);
+        accessKeyViewModel.verifyKey(key, (failure, message) -> {
+            if (getView() != view || !isAdded()) {
+                return;
+            }
+            button.setEnabled(true);
+            label.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE);
+            if (failure == FailureKind.BUSINESS) {
+                accessKeyViewModel.setPendingInlineError(message != null ? message
+                        : getString(R.string.first_login_access_key_error));
+                navController.popBackStack(R.id.firstLoginAccessKeyFragment, false);
+            } else if (failure != null) {
+                showCopy(title, body, failure == FailureKind.CONNECTION);
+            } else {
+                Bundle args = new Bundle();
+                args.putString(AuthArgs.EMAIL, accessKeyViewModel.getEmail());
+                NavOptions options = new NavOptions.Builder()
+                        .setPopUpTo(errorDestination, true)
+                        .setEnterAnim(R.anim.push_enter)
+                        .setExitAnim(R.anim.push_exit)
+                        .setPopEnterAnim(R.anim.push_pop_enter)
+                        .setPopExitAnim(R.anim.push_pop_exit)
+                        .build();
+                navController.navigate(R.id.firstLoginPasswordFragment, args, options);
+            }
+        });
+    }
+
     private void retryPasswordReset(View retryButton, TextView retryLabel, ProgressBar progress,
                                     NavController navController) {
         if (resetViewModel == null || resetViewModel.isLoading()) {
@@ -194,6 +249,9 @@ public class EmailErrorMockFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (accessKeyViewModel != null) {
+            accessKeyViewModel.cancelCurrentRequest();
+        }
         if (resetViewModel != null && resetResultCallback != null) {
             resetViewModel.detach(resetResultCallback);
             resetResultCallback = null;

@@ -12,11 +12,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.AccessKeyViewModel;
 import com.example.astro_mobile.auth.MockSession;
 
 public class FirstLoginPasswordFragment extends Fragment {
@@ -35,6 +37,8 @@ public class FirstLoginPasswordFragment extends Fragment {
         View confirmationContainer = view.findViewById(R.id.container_first_login_password_confirmation);
         TextView mismatchError = view.findViewById(R.id.text_first_login_password_mismatch);
         View enterButton = view.findViewById(R.id.button_first_login_password_enter);
+        AccessKeyViewModel accessKeyViewModel = new ViewModelProvider(requireActivity(),
+                new AccessKeyViewModel.Factory()).get(AccessKeyViewModel.class);
 
         // Confere preenchimento e igualdade das senhas antes de avançar no fluxo mock.
         enterButton.setOnClickListener(clickedView -> {
@@ -49,10 +53,10 @@ public class FirstLoginPasswordFragment extends Fragment {
                 confirmationContainer.setBackgroundResource(R.drawable.bg_login_password_input_error);
                 mismatchError.setVisibility(View.VISIBLE);
             } else {
-                String userType = getArguments() == null ? null
-                        : getArguments().getString(AuthArgs.USER_TYPE);
                 String email = getArguments() == null ? null
                         : getArguments().getString(AuthArgs.EMAIL);
+                // Recupera o perfil compartilhado, sem receber a chave no argumento da tela.
+                String userType = accessKeyViewModel.getVerifiedUserType(email);
                 if (!MockSession.isKnownUserType(userType) || email == null) {
                     return;
                 }
@@ -70,7 +74,7 @@ public class FirstLoginPasswordFragment extends Fragment {
                         .navigate("COLABORADOR".equals(userType)
                                         ? R.id.action_first_login_password_to_employee_home
                                         : R.id.action_first_login_password_to_flow_choice,
-                                AuthArgs.copy(getArguments()));
+                                AuthArgs.of(email, userType));
             }
         });
 
