@@ -18,6 +18,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_BASE_URL", "\"https://astro-api-h2hx.onrender.com/\"")
+        buildConfigField("String", "AI_API_BASE_URL", "\"https://astro-ai-api-qq6l.onrender.com/\"")
     }
 
     buildFeatures {
