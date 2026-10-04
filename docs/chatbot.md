@@ -66,5 +66,6 @@ Validação de 04/10/2026:
 - O contrato público de Google Calendar foi conferido; a autorização com conta Google real não foi executada na validação.
 - Conversa real via Firebase e API de IA validada no Samsung SM-M315F; campo de envio visível acima do teclado.
 - A suíte geral apresentou 3 falhas em testes de login não alterados: dois testes de `EmailVerificationViewModelTest` e `EmailVerificationRepositoryTest.networkFailureIsConnectionError`.
+- Essas 3 falhas foram corrigidas na atualização do CI: a suíte completa passou com 20 testes unitários. A configuração fictícia de Firebase usada no runner está documentada em `docs/ci.md`.
 
 Os commits correspondem às subtarefas `SCRUM-419` (conexão), `SCRUM-420` (envio), `SCRUM-421` (tela/Markdown) e `SCRUM-422` (carregamento/falhas).

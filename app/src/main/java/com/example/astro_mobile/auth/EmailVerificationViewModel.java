@@ -28,7 +28,7 @@ public class EmailVerificationViewModel extends ViewModel {
     }
 
     private final EmailVerificationRepository repository;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private Handler mainHandler;
     private Call<ApiResponse<VerifyEmailData>> currentCall;
     private Runnable timeoutRunnable;
     private int requestId;
@@ -114,7 +114,15 @@ public class EmailVerificationViewModel extends ViewModel {
     }
 
     private void scheduleTimeout(int id, ResultCallback callback) {
+        // Um callback síncrono já pode ter concluído a consulta.
+        // Só inicializa o scheduler Android quando há uma requisição pendente.
+        if (id != requestId || !loading) {
+            return;
+        }
         clearTimeout();
+        if (mainHandler == null) {
+            mainHandler = new Handler(Looper.getMainLooper());
+        }
         timeoutRunnable = () -> {
             if (id != requestId || !loading) {
                 return;

@@ -17,22 +17,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "11"
+          java-version: "25"
           cache: gradle
 
       - name: Make Gradle Wrapper executable
         run: chmod +x gradlew
 
-      - name: Test 
-        run: ./gradlew test
+      - name: Configure Firebase for CI
+        # Configuração fictícia: os testes unitários não acessam serviços Firebase.
+        # O APK deste workflow serve apenas para conferir a compilação.
+        run: |
+          cat > app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "123456789000",
+              "project_id": "demo-astro-mobile-ci"
+            },
+            "client": [{
+              "client_info": {
+                "mobilesdk_app_id": "1:123456789000:android:0000000000000000000000",
+                "android_client_info": {"package_name": "com.example.astro_mobile"}
+              },
+              "api_key": [{"current_key": "ci-placeholder-not-a-real-api-key"}]
+            }],
+            "configuration_version": "1"
+          }
+          JSON
 
-      - name: Build 
-        run: ./gradlew assembleDebug
+      - name: Test
+        run: ./gradlew test --console=plain
 
+      - name: Build
+        run: ./gradlew assembleDebug --console=plain
 
-
-        
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: app/build/reports/tests/
+          if-no-files-found: ignore
