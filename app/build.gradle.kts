@@ -18,6 +18,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_BASE_URL", "\"https://astro-api-h2hx.onrender.com/\"")
+        buildConfigField("String", "AI_API_BASE_URL", "\"https://astro-ai-api-qq6l.onrender.com/\"")
     }
 
     buildFeatures {
@@ -47,6 +48,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.navigation.fragment)
     implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+    implementation(libs.recyclerview)
+    implementation(libs.markwon.core)
+    implementation(libs.markwon.tables)
+    implementation(libs.markwon.strikethrough)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.gson)

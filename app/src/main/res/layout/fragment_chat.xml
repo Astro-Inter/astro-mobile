@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chat_root"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/chat_surface" android:orientation="vertical">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="72dp" android:background="@color/chat_header"
+        android:gravity="center_vertical" android:orientation="horizontal"
+        android:paddingStart="15dp" android:paddingEnd="20dp" android:paddingVertical="8dp">
+        <ImageButton android:id="@+id/button_chat_close"
+            android:layout_width="48dp" android:layout_height="48dp"
+            android:background="@drawable/bg_login_icon_button"
+            android:contentDescription="@string/chat_close" android:padding="14dp"
+            android:src="@drawable/ic_login_back" />
+        <ImageView android:layout_width="40dp" android:layout_height="40dp"
+            android:layout_marginEnd="10dp" android:src="@drawable/home_mascot"
+            android:contentDescription="@null" android:importantForAccessibility="no" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_family" android:textStyle="bold"
+                android:text="@string/chat_title" android:textColor="@android:color/white"
+                android:textSize="18sp" android:accessibilityHeading="true" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="2dp" android:fontFamily="@font/montserrat_family"
+                android:text="@string/chat_subtitle" android:textColor="@color/chat_muted"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+        android:background="@color/chat_outline" android:importantForAccessibility="no" />
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_chat_messages"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingHorizontal="20dp"
+            android:paddingVertical="20dp" android:scrollbars="vertical" />
+        <androidx.core.widget.NestedScrollView android:id="@+id/container_chat_welcome"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:fillViewport="true">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center" android:orientation="vertical"
+                android:paddingHorizontal="30dp" android:paddingVertical="20dp">
+                <ImageView android:layout_width="152dp" android:layout_height="152dp"
+                    android:src="@drawable/home_mascot" android:scaleType="fitCenter"
+                    android:contentDescription="@null" android:importantForAccessibility="no" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp" android:fontFamily="@font/montserrat_family"
+                    android:gravity="center" android:text="@string/chat_welcome_title"
+                    android:textColor="@color/chat_text" android:textSize="24sp"
+                    android:includeFontPadding="false" android:accessibilityHeading="true" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" android:layout_marginBottom="24dp"
+                    android:fontFamily="@font/montserrat_family" android:gravity="center"
+                    android:text="@string/chat_welcome_body" android:textColor="@color/chat_muted"
+                    android:textSize="14sp" android:lineSpacingExtra="4dp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/button_chat_suggestion_nrs"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="56dp" android:fontFamily="@font/montserrat_family"
+                    android:text="@string/chat_suggestion_nrs" android:textAllCaps="false"
+                    android:textColor="@color/chat_text" android:textSize="14sp"
+                    android:gravity="start|center_vertical" android:paddingHorizontal="16dp"
+                    app:backgroundTint="@color/astro_input_background" app:cornerRadius="10dp"
+                    app:strokeWidth="1dp" app:strokeColor="@color/chat_outline" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/button_chat_suggestion_dashboards"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="56dp" android:fontFamily="@font/montserrat_family"
+                    android:text="@string/chat_suggestion_dashboards" android:textAllCaps="false"
+                    android:textColor="@color/chat_text" android:textSize="14sp"
+                    android:gravity="start|center_vertical" android:paddingHorizontal="16dp"
+                    app:backgroundTint="@color/astro_input_background" app:cornerRadius="10dp"
+                    app:strokeWidth="1dp" app:strokeColor="@color/chat_outline" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
+
+    <LinearLayout android:id="@+id/container_chat_loading"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingHorizontal="24dp" android:paddingVertical="12dp" android:visibility="gone">
+        <ProgressBar style="?android:attr/progressBarStyleSmall"
+            android:layout_width="20dp" android:layout_height="20dp"
+            android:indeterminateTint="@color/chat_link" />
+        <TextView android:id="@+id/text_chat_loading"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="10dp" android:fontFamily="@font/montserrat_family"
+            android:text="@string/chat_loading" android:textColor="@color/chat_muted"
+            android:textSize="12sp" android:accessibilityLiveRegion="polite" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/container_chat_error"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingHorizontal="24dp" android:visibility="gone">
+    <TextView android:id="@+id/text_chat_error"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
+        android:fontFamily="@font/montserrat_family" android:text="@string/chat_generic_error"
+        android:textColor="@color/astro_error" android:textSize="13sp"
+        android:accessibilityLiveRegion="polite" />
+    <com.google.android.material.button.MaterialButton android:id="@+id/button_chat_retry"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:minHeight="48dp" android:fontFamily="@font/montserrat_family"
+        android:text="@string/chat_retry" android:textColor="@color/chat_link" android:textAllCaps="false" />
+    </LinearLayout>
+    <TextView android:id="@+id/text_chat_character_count"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingHorizontal="24dp" android:gravity="end" android:textSize="11sp"
+        android:textColor="@color/chat_muted" android:visibility="gone" />
+
+    <LinearLayout android:id="@+id/container_chat_composer"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="bottom"
+        android:background="@drawable/bg_home_bottom_nav" android:paddingHorizontal="20dp"
+        android:paddingTop="18dp" android:paddingBottom="20dp">
+        <EditText android:id="@+id/input_chat_message"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minHeight="48dp" android:maxLines="5" android:gravity="start|center_vertical"
+            android:background="@drawable/bg_chat_input" android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp" android:fontFamily="@font/montserrat_family"
+            android:hint="@string/chat_input_hint" android:textColor="@color/chat_text"
+            android:textColorHint="@color/astro_input_hint" android:textSize="15sp"
+            android:inputType="textCapSentences|textMultiLine" android:imeOptions="actionSend"
+            android:importantForAutofill="no" />
+        <ImageButton android:id="@+id/button_chat_send"
+            android:layout_width="48dp" android:layout_height="48dp" android:layout_marginStart="10dp"
+            android:background="@drawable/bg_chat_send" android:padding="12dp"
+            android:src="@drawable/ic_chat_send" android:contentDescription="@string/chat_send" />
+    </LinearLayout>
+</LinearLayout>

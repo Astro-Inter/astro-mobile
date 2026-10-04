@@ -7,6 +7,7 @@ import com.example.astro_mobile.data.api.dto.VerifyEmailData;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -54,6 +55,11 @@ public class EmailVerificationRepositoryTest {
     }
 
     @Test
+    public void unspecifiedIoFailureIsInternalError() {
+        assertEquals(FailureKind.INTERNAL, ApiFailures.transport(new IOException("unspecified test failure")));
+    }
+
+    @Test
     public void malformedResponseIsInternalError() throws InterruptedException {
         Result result = request(200, "{}", false);
         assertEquals(FailureKind.INTERNAL, result.kind);
@@ -69,7 +75,7 @@ public class EmailVerificationRepositoryTest {
     private Result request(int code, String body, boolean disconnect) throws InterruptedException {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(chain -> {
             if (disconnect) {
-                throw new IOException("offline test");
+                throw new UnknownHostException("offline test");
             }
             return new Response.Builder()
                     .request(chain.request())

@@ -134,13 +134,16 @@ public class EmployeeHomeFragment extends Fragment {
                 R.id.button_employee_home_notifications_section,
                 R.id.button_employee_home_notifications_more,
                 R.id.button_employee_home_nav_events,
-                R.id.button_employee_home_nav_chat,
-                R.id.button_employee_home_nav_profile,
-                R.id.button_employee_home_ai_bubble
+                R.id.button_employee_home_nav_profile
         };
         for (int id : mockActions) {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
         }
+
+        View.OnClickListener openChat = clicked -> Navigation.findNavController(clicked)
+                .navigate(R.id.action_employee_home_to_chat);
+        view.findViewById(R.id.button_employee_home_nav_chat).setOnClickListener(openChat);
+        aiBubble.setOnClickListener(openChat);
 
         // Restringe o arraste do assistente à área entre cabeçalho e navbar.
         aiDragTouchListener = new AiDragTouchListener(

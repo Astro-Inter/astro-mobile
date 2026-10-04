@@ -239,7 +239,25 @@
         android:name="com.example.astro_mobile.employee.home.EmployeeHomeFragment"
         android:label="Home do Colaborador">
         <action
+            android:id="@+id/action_employee_home_to_chat"
+            app:destination="@id/chatFragment"
+            app:enterAnim="@anim/push_enter"
+            app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter"
+            app:popExitAnim="@anim/push_pop_exit" />
+        <action
             android:id="@+id/action_employee_home_to_email_identification"
+            app:destination="@id/emailIdentificationFragment"
+            app:popUpTo="@id/employeeHomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.astro_mobile.chat.ChatFragment"
+        android:label="Assistente Astro">
+        <action
+            android:id="@+id/action_chat_to_email_identification"
             app:destination="@id/emailIdentificationFragment"
             app:popUpTo="@id/employeeHomeFragment"
             app:popUpToInclusive="true" />
