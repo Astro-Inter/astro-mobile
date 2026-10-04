@@ -255,6 +255,12 @@
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.example.astro_mobile.chat.ChatFragment"
-        android:label="Assistente Astro" />
+        android:label="Assistente Astro">
+        <action
+            android:id="@+id/action_chat_to_email_identification"
+            app:destination="@id/emailIdentificationFragment"
+            app:popUpTo="@id/employeeHomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

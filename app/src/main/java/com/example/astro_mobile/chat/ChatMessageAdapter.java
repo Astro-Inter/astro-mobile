@@ -25,7 +25,8 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
                 return old == next;
             }
             @Override public boolean areContentsTheSame(@NonNull ChatMessage old, @NonNull ChatMessage next) {
-                return old.isFromUser() == next.isFromUser() && old.getText().equals(next.getText());
+                return old.isFromUser() == next.isFromUser() && old.hasFailed() == next.hasFailed()
+                        && old.getText().equals(next.getText());
             }
         });
         this.markdown = markdown;
@@ -40,7 +41,8 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         boolean user = message.isFromUser();
         holder.avatar.setVisibility(user ? View.GONE : View.VISIBLE);
         holder.bubble.setBackgroundResource(user ? R.drawable.bg_chat_user : R.drawable.bg_chat_assistant);
-        holder.sender.setText(user ? R.string.chat_user_label : R.string.chat_assistant_label);
+        holder.sender.setText(user ? message.hasFailed() ? R.string.chat_user_failed_label
+                : R.string.chat_user_label : R.string.chat_assistant_label);
         int textColor = holder.itemView.getContext().getColor(user ? R.color.astro_light_text : R.color.chat_text);
         holder.sender.setTextColor(textColor);
         holder.text.setTextColor(textColor);

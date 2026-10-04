@@ -16,6 +16,7 @@ public final class AiApiClient {
                     .connectTimeout(20, TimeUnit.SECONDS)
                     .readTimeout(90, TimeUnit.SECONDS)
                     .callTimeout(120, TimeUnit.SECONDS)
+                    .retryOnConnectionFailure(false)
                     .followRedirects(false)
                     .followSslRedirects(false)
                     .build())

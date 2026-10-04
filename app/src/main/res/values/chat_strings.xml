@@ -13,4 +13,17 @@
     <string name="chat_assistant_label">Astro</string>
     <string name="chat_user_label">Você</string>
     <string name="chat_link_unavailable">Não foi possível abrir esse link.</string>
+    <string name="chat_user_failed_label">Você · sem resposta</string>
+    <string name="chat_loading_slow">Ainda estou preparando a resposta. Pode levar um pouco mais de tempo.</string>
+    <string name="chat_retry">Tentar novamente</string>
+    <string name="chat_sign_in">Entrar novamente</string>
+    <string name="chat_connection_error">Não conseguimos conectar. Confira sua internet e tente novamente.</string>
+    <string name="chat_timeout_error">A resposta demorou mais que o esperado. O envio pode ter sido recebido; aguarde antes de tentar novamente.</string>
+    <string name="chat_session_error">Sua sessão expirou. Entre novamente para conversar com o Astro.</string>
+    <string name="chat_forbidden_error">Sua conta não tem permissão para usar o assistente. Confira seu acesso com o responsável pelo workspace.</string>
+    <string name="chat_rate_limit_error">O limite de mensagens foi atingido. Aguarde um pouco antes de tentar novamente.</string>
+    <string name="chat_invalid_message_error">Envie uma mensagem com até 4.000 caracteres.</string>
+    <string name="chat_invalid_response_error">Não foi possível ler a resposta. O envio pode ter sido recebido; aguarde antes de tentar novamente.</string>
+    <string name="chat_server_error">O assistente está indisponível no momento. Tente novamente mais tarde.</string>
+    <string name="chat_character_count">%1$d / 4.000</string>
 </resources>

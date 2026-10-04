@@ -87,12 +87,25 @@
             android:text="@string/chat_loading" android:textColor="@color/chat_muted"
             android:textSize="12sp" android:accessibilityLiveRegion="polite" />
     </LinearLayout>
+    <LinearLayout android:id="@+id/container_chat_error"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingHorizontal="24dp" android:visibility="gone">
     <TextView android:id="@+id/text_chat_error"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:paddingHorizontal="24dp" android:paddingVertical="12dp"
+        android:paddingVertical="8dp"
         android:fontFamily="@font/montserrat_family" android:text="@string/chat_generic_error"
         android:textColor="@color/chat_user" android:textSize="13sp"
-        android:accessibilityLiveRegion="polite" android:visibility="gone" />
+        android:accessibilityLiveRegion="polite" />
+    <com.google.android.material.button.MaterialButton android:id="@+id/button_chat_retry"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:minHeight="48dp" android:fontFamily="@font/montserrat_family"
+        android:text="@string/chat_retry" android:textColor="@color/chat_user" android:textAllCaps="false" />
+    </LinearLayout>
+    <TextView android:id="@+id/text_chat_character_count"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingHorizontal="24dp" android:gravity="end" android:textSize="11sp"
+        android:textColor="@color/chat_muted" android:visibility="gone" />
 
     <LinearLayout android:id="@+id/container_chat_composer"
         android:layout_width="match_parent" android:layout_height="wrap_content"

@@ -4,6 +4,7 @@ import com.example.astro_mobile.data.ai.IdTokenProvider;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 
 /** O SDK renova tokens expirados; nenhum token é salvo ou registrado pelo app. */
@@ -36,7 +37,8 @@ public final class FirebaseIdTokenProvider implements IdTokenProvider {
                 callback.onToken(task.getResult().getToken());
             } else if (task.getException() instanceof FirebaseNetworkException) {
                 callback.onFailure(Failure.CONNECTION);
-            } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+            } else if (task.getException() instanceof FirebaseAuthInvalidUserException
+                    || task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                 callback.onFailure(Failure.SESSION);
             } else {
                 callback.onFailure(Failure.INTERNAL);

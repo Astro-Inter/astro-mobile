@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.data.ai.ChatRequest;
+import com.example.astro_mobile.data.ai.ChatFailure;
+import com.example.astro_mobile.auth.EmailVerificationViewModel;
+import com.example.astro_mobile.auth.MockSession;
+import com.example.astro_mobile.auth.SessionViewModel;
+import com.example.astro_mobile.data.local.FlowPreferences;
 
 public final class ChatFragment extends Fragment {
     public ChatFragment() { super(R.layout.fragment_chat); }
@@ -37,7 +43,7 @@ public final class ChatFragment extends Fragment {
         messages.setLayoutManager(new LinearLayoutManager(requireContext()));
         messages.setAdapter(adapter);
         messages.setItemAnimator(null);
-        input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(ChatRequest.MAX_MESSAGE_LENGTH)});
+        input.setFilters(new InputFilter[]{new CodePointLengthFilter(ChatRequest.MAX_MESSAGE_LENGTH)});
         input.setText(model.getDraft());
         input.setSelection(input.length());
         input.addTextChangedListener(new TextWatcher() {
@@ -48,6 +54,10 @@ public final class ChatFragment extends Fragment {
                 boolean enabled = state != null && !state.loading && !s.toString().trim().isEmpty();
                 sendButton.setEnabled(enabled);
                 sendButton.setAlpha(enabled ? 1f : 0.4f);
+                int length = Character.codePointCount(s, 0, s.length());
+                TextView countView = view.findViewById(R.id.text_chat_character_count);
+                countView.setVisibility(length >= 3600 ? View.VISIBLE : View.GONE);
+                countView.setText(getString(R.string.chat_character_count, length));
             }
             @Override public void afterTextChanged(Editable s) { }
         });
@@ -67,6 +77,23 @@ public final class ChatFragment extends Fragment {
             }
             navigation.navigateUp();
         });
+        view.findViewById(R.id.button_chat_retry).setOnClickListener(clicked -> {
+            ChatViewModel.State current = model.getState().getValue();
+            if (current != null && current.failure == ChatFailure.SESSION) {
+                new ViewModelProvider(requireActivity(), SessionViewModel.Factory.createDefault())
+                        .get(SessionViewModel.class).signOut();
+                MockSession.clear(requireContext());
+                FlowPreferences.clear(requireContext());
+                new ViewModelProvider(requireActivity(), EmailVerificationViewModel.Factory.createDefault())
+                        .get(EmailVerificationViewModel.class).clearForLogout();
+                if (ViewCompat.getWindowInsetsController(view) != null) {
+                    ViewCompat.getWindowInsetsController(view).hide(WindowInsetsCompat.Type.ime());
+                }
+                navigation.navigate(R.id.action_chat_to_email_identification);
+            } else {
+                model.retry();
+            }
+        });
         model.getState().observe(getViewLifecycleOwner(), state -> {
             boolean atBottom = !messages.canScrollVertically(1);
             adapter.submitList(state.messages, () -> {
@@ -74,7 +101,15 @@ public final class ChatFragment extends Fragment {
             });
             view.findViewById(R.id.container_chat_welcome).setVisibility(state.messages.isEmpty() ? View.VISIBLE : View.GONE);
             view.findViewById(R.id.container_chat_loading).setVisibility(state.loading ? View.VISIBLE : View.GONE);
-            view.findViewById(R.id.text_chat_error).setVisibility(state.failure == null ? View.GONE : View.VISIBLE);
+            ((TextView) view.findViewById(R.id.text_chat_loading)).setText(state.waitingLong
+                    ? R.string.chat_loading_slow : R.string.chat_loading);
+            view.findViewById(R.id.container_chat_error).setVisibility(state.failure == null ? View.GONE : View.VISIBLE);
+            if (state.failure != null) {
+                ((TextView) view.findViewById(R.id.text_chat_error)).setText(errorMessage(state.failure));
+            }
+            TextView retry = view.findViewById(R.id.button_chat_retry);
+            retry.setVisibility(state.canRetry() || state.failure == ChatFailure.SESSION ? View.VISIBLE : View.GONE);
+            retry.setText(state.failure == ChatFailure.SESSION ? R.string.chat_sign_in : R.string.chat_retry);
             // Não sobrescreve uma próxima mensagem digitada enquanto espera a resposta.
             if (!input.getText().toString().equals(model.getDraft())) {
                 input.setText(model.getDraft());
@@ -92,5 +127,18 @@ public final class ChatFragment extends Fragment {
             return insets;
         });
         ViewCompat.requestApplyInsets(view);
+    }
+
+    private int errorMessage(ChatFailure failure) {
+        switch (failure) {
+            case CONNECTION: return R.string.chat_connection_error;
+            case TIMEOUT: return R.string.chat_timeout_error;
+            case SESSION: return R.string.chat_session_error;
+            case FORBIDDEN: return R.string.chat_forbidden_error;
+            case RATE_LIMIT: return R.string.chat_rate_limit_error;
+            case INVALID_MESSAGE: return R.string.chat_invalid_message_error;
+            case INVALID_RESPONSE: return R.string.chat_invalid_response_error;
+            default: return R.string.chat_server_error;
+        }
     }
 }
