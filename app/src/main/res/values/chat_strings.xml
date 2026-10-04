@@ -5,7 +5,7 @@
     <string name="chat_welcome_title">Olá! Como posso ajudar?</string>
     <string name="chat_welcome_body">Tire suas dúvidas sobre a plataforma Astro e as Normas Regulamentadoras.</string>
     <string name="chat_suggestion_nrs">O que são Normas Regulamentadoras?</string>
-    <string name="chat_suggestion_dashboards">Como acesso os dashboards?</string>
+    <string name="chat_suggestion_dashboards">Quais NRs preciso cumprir?</string>
     <string name="chat_input_hint">Digite sua mensagem…</string>
     <string name="chat_send">Enviar mensagem</string>
     <string name="chat_loading">Astro está preparando a resposta…</string>
