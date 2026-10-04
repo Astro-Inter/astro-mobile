@@ -18,6 +18,7 @@ import io.noties.markwon.core.MarkwonTheme;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TableAwareMovementMethod;
 import io.noties.markwon.ext.tables.TablePlugin;
+import io.noties.markwon.ext.tables.TableTheme;
 import io.noties.markwon.movement.MovementMethodPlugin;
 
 public final class ChatMarkdown {
@@ -25,17 +26,28 @@ public final class ChatMarkdown {
 
     public static Markwon create(Context context) {
         return Markwon.builder(context)
-                .usePlugin(TablePlugin.create(context))
+                .usePlugin(TablePlugin.create(TableTheme.buildWithDefaults(context)
+                        .tableBorderColor(context.getColor(R.color.chat_outline))
+                        .tableBorderWidth(Math.max(1, Math.round(context.getResources().getDisplayMetrics().density)))
+                        .tableCellPadding(Math.round(8 * context.getResources().getDisplayMetrics().density))
+                        .tableHeaderRowBackgroundColor(context.getColor(R.color.astro_input_background))
+                        .tableEvenRowBackgroundColor(context.getColor(R.color.chat_assistant))
+                        .tableOddRowBackgroundColor(context.getColor(R.color.chat_assistant))
+                        .build()))
                 .usePlugin(StrikethroughPlugin.create())
                 .usePlugin(MovementMethodPlugin.create(TableAwareMovementMethod.create()))
                 .usePlugin(new AbstractMarkwonPlugin() {
                     @Override public void configureTheme(@NonNull MarkwonTheme.Builder builder) {
-                        builder.linkColor(context.getColor(R.color.chat_user))
+                        builder.linkColor(context.getColor(R.color.chat_link))
                                 .isLinkUnderlined(true)
                                 .codeTypeface(Typeface.MONOSPACE)
                                 .codeTextColor(context.getColor(R.color.chat_text))
                                 .codeBackgroundColor(context.getColor(R.color.chat_code))
                                 .codeBlockBackgroundColor(context.getColor(R.color.chat_code))
+                                .codeBlockTextColor(context.getColor(R.color.chat_text))
+                                .blockQuoteColor(context.getColor(R.color.chat_link))
+                                .headingBreakColor(context.getColor(R.color.chat_outline))
+                                .thematicBreakColor(context.getColor(R.color.chat_outline))
                                 .headingTextSizeMultipliers(new float[]{1.4f, 1.25f, 1.12f, 1f, 1f, 1f});
                     }
 

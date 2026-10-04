@@ -18,6 +18,6 @@
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_family" android:textSize="15sp"
             android:lineSpacingExtra="4dp" android:textColor="@color/chat_text"
-            android:textColorLink="@color/chat_user" android:textIsSelectable="true" />
+            android:textColorLink="@color/chat_link" android:textIsSelectable="true" />
     </LinearLayout>
 </LinearLayout>

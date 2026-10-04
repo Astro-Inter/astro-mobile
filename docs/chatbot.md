@@ -24,7 +24,8 @@
 ## Tela no celular
 
 - A aba de chat e o balão do assistente na Home abrem o mesmo chatbot.
-- A interface adapta a referência web: cabeçalho roxo, mascote, perguntas sugeridas e balões por autor.
+- A interface usa o padrão visual do mobile: fundo escuro, Montserrat, campos de 9–10 dp, ação no roxo principal e mascote da Home. Mantém perguntas sugeridas e balões por autor da referência web.
+- Respostas, código e tabelas usam superfícies escuras com texto claro; links em lavanda e mensagens de erro na cor de erro do aplicativo.
 - Markwon renderiza títulos, negrito, itálico, listas, citações, código, links e tabelas.
 - Mensagens do usuário são exibidas literalmente, sem interpretar Markdown.
 - Links HTTP/HTTPS abrem ao tocar; o renderer não usa WebView nem carrega imagens remotas.

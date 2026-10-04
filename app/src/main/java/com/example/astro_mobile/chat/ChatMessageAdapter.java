@@ -44,7 +44,8 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         holder.sender.setText(user ? message.hasFailed() ? R.string.chat_user_failed_label
                 : R.string.chat_user_label : R.string.chat_assistant_label);
         int textColor = holder.itemView.getContext().getColor(user ? R.color.astro_light_text : R.color.chat_text);
-        holder.sender.setTextColor(textColor);
+        holder.sender.setTextColor(holder.itemView.getContext().getColor(user
+                ? R.color.astro_light_text : R.color.chat_muted));
         holder.text.setTextColor(textColor);
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.bubble.getLayoutParams();
         float density = holder.itemView.getResources().getDisplayMetrics().density;
