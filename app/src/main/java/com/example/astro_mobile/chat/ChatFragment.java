@@ -29,6 +29,7 @@ import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
 
 public final class ChatFragment extends Fragment {
+    private ChatCalendarLinkHandler calendarLinks;
     public ChatFragment() { super(R.layout.fragment_chat); }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -39,7 +40,8 @@ public final class ChatFragment extends Fragment {
         EditText input = view.findViewById(R.id.input_chat_message);
         View sendButton = view.findViewById(R.id.button_chat_send);
         RecyclerView messages = view.findViewById(R.id.list_chat_messages);
-        ChatMessageAdapter adapter = new ChatMessageAdapter(ChatMarkdown.create(requireContext()));
+        calendarLinks = new ChatCalendarLinkHandler(requireContext());
+        ChatMessageAdapter adapter = new ChatMessageAdapter(ChatMarkdown.create(requireContext(), calendarLinks::connect));
         messages.setLayoutManager(new LinearLayoutManager(requireContext()));
         messages.setAdapter(adapter);
         messages.setItemAnimator(null);
@@ -127,6 +129,11 @@ public final class ChatFragment extends Fragment {
             return insets;
         });
         ViewCompat.requestApplyInsets(view);
+    }
+
+    @Override public void onDestroyView() {
+        if (calendarLinks != null) { calendarLinks.close(); calendarLinks = null; }
+        super.onDestroyView();
     }
 
     private int errorMessage(ChatFailure failure) {

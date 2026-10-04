@@ -131,6 +131,31 @@ public class ChatScreenTest {
         });
     }
 
+    @Test public void calendarMarkersBecomeEndpointLinksOutsideCode() {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            android.content.Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+            io.noties.markwon.Markwon markdown = ChatMarkdown.create(context);
+            org.commonmark.node.Node document = markdown.parse(
+                    "[Conectar minha agenda](google-calendar-conectar)\n\n"
+                            + "[google-calendar-conectar](Autorizar o Google Calendar)\n\n"
+                            + "`[google-calendar-conectar](Exemplo em código)`\n\n"
+                            + "[Site](https://example.com)");
+            ChatMarkdown.normalizeCalendarLinks(document);
+            java.util.List<String> destinations = new java.util.ArrayList<>();
+            java.util.List<String> labels = new java.util.ArrayList<>();
+            document.accept(new org.commonmark.node.AbstractVisitor() {
+                @Override public void visit(org.commonmark.node.Link link) {
+                    destinations.add(link.getDestination());
+                    labels.add(((org.commonmark.node.Text) link.getFirstChild()).getLiteral());
+                }
+            });
+            assertEquals(java.util.Arrays.asList(ChatMarkdown.CALENDAR_URL, ChatMarkdown.CALENDAR_URL,
+                    "https://example.com"), destinations);
+            assertEquals(java.util.Arrays.asList("Conectar minha agenda", "Autorizar o Google Calendar", "Site"), labels);
+            assertTrue(markdown.render(document).toString().contains("[google-calendar-conectar](Exemplo em código)"));
+        });
+    }
+
     @Test public void tablesPreserveAlignmentFormattingAndHorizontalScrolling() {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             android.content.Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -177,7 +202,9 @@ public class ChatScreenTest {
         scenario.onActivity(activity -> {
             NavHostFragment host = (NavHostFragment) activity.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
             NavController navigation = host.getNavController();
-            navigation.navigate(R.id.employeeHomeFragment);
+            androidx.navigation.NavGraph graph = navigation.getNavInflater().inflate(R.navigation.nav_graph);
+            graph.setStartDestination(R.id.employeeHomeFragment);
+            navigation.setGraph(graph);
             model.set(new ViewModelProvider(navigation.getBackStackEntry(R.id.employeeHomeFragment),
                     new ViewModelProvider.Factory() {
                         @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> cls) {

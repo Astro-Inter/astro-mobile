@@ -30,6 +30,7 @@
 - Tabelas na resposta têm cabeçalho destacado, bordas, alinhamento do Markdown e células com texto selecionável. Cada tabela possui rolagem horizontal independente quando excede a largura do balão; colunas longas quebram linhas. O parser distingue tabelas de pipes em blocos de código.
 - Mensagens do usuário são exibidas literalmente, sem interpretar Markdown.
 - Links HTTP/HTTPS abrem ao tocar; o renderer não usa WebView nem carrega imagens remotas.
+- O marcador `[Texto do link](google-calendar-conectar)` é convertido para `/integracoes/google-calendar/conectar`. Também aceita `[google-calendar-conectar](Texto do link)`. Ao tocar, o app faz GET com o token Firebase no header e abre a `authorization_url` HTTPS retornada no navegador. Não conecta automaticamente ao receber a resposta. Uma rejeição 401 renova o token uma vez; sair da tela cancela a operação.
 - O campo permite várias linhas e fica acima do teclado, respeitando as barras do Android.
 - A conversa e o rascunho ficam em memória no ViewModel da Home, inclusive durante recriação da tela.
 - Voltar para a Home e reabrir o chat mantém a conversa. Sair da conta remove a Home e esse estado.
@@ -61,7 +62,8 @@ Comandos de build e testes locais:
 Validação de 04/10/2026:
 
 - 9 testes do repositório da IA passaram: header, Markdown, sessão, validação, renovação, cancelamento e erros.
-- 5 testes instrumentados passaram: Unicode, Markdown/carregamento/rascunho/recriação, retry sem duplicação, sessão ausente e tabelas com rolagem, alinhamento, formatação inline e pipes escapados.
+- 6 testes instrumentados passaram: Unicode, Markdown/carregamento/rascunho/recriação, retry sem duplicação, sessão ausente, tabelas com rolagem/alinhamento/formatação inline/pipes escapados e marcadores de Google Calendar fora de código. Os testes de tela iniciam diretamente na Home para evitar disputa com a navegação da Splash.
+- O contrato público de Google Calendar foi conferido; a autorização com conta Google real não foi executada na validação.
 - Conversa real via Firebase e API de IA validada no Samsung SM-M315F; campo de envio visível acima do teclado.
 - A suíte geral apresentou 3 falhas em testes de login não alterados: dois testes de `EmailVerificationViewModelTest` e `EmailVerificationRepositoryTest.networkFailureIsConnectionError`.
 
