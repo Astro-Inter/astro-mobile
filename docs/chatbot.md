@@ -27,6 +27,7 @@
 - A interface usa o padrão visual do mobile: fundo escuro, Montserrat, campos de 9–10 dp, ação no roxo principal e mascote da Home. Mantém perguntas sugeridas e balões por autor da referência web.
 - Respostas, código e tabelas usam superfícies escuras com texto claro; links em lavanda e mensagens de erro na cor de erro do aplicativo.
 - Markwon renderiza títulos, negrito, itálico, listas, citações, código, links e tabelas.
+- Tabelas na resposta têm cabeçalho destacado, bordas, alinhamento do Markdown e células com texto selecionável. Cada tabela possui rolagem horizontal independente quando excede a largura do balão; colunas longas quebram linhas. O parser distingue tabelas de pipes em blocos de código.
 - Mensagens do usuário são exibidas literalmente, sem interpretar Markdown.
 - Links HTTP/HTTPS abrem ao tocar; o renderer não usa WebView nem carrega imagens remotas.
 - O campo permite várias linhas e fica acima do teclado, respeitando as barras do Android.
@@ -60,7 +61,7 @@ Comandos de build e testes locais:
 Validação de 04/10/2026:
 
 - 9 testes do repositório da IA passaram: header, Markdown, sessão, validação, renovação, cancelamento e erros.
-- 4 testes instrumentados passaram: Unicode, Markdown/carregamento/rascunho/recriação, retry sem duplicação e sessão ausente.
+- 5 testes instrumentados passaram: Unicode, Markdown/carregamento/rascunho/recriação, retry sem duplicação, sessão ausente e tabelas com rolagem, alinhamento, formatação inline e pipes escapados.
 - Conversa real via Firebase e API de IA validada no Samsung SM-M315F; campo de envio visível acima do teclado.
 - A suíte geral apresentou 3 falhas em testes de login não alterados: dois testes de `EmailVerificationViewModelTest` e `EmailVerificationRepositoryTest.networkFailureIsConnectionError`.
 

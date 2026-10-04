@@ -56,7 +56,8 @@ public class ChatScreenTest {
             + "As **NRs** orientam a segurança no trabalho.\n\n"
             + "- Proteção das pessoas\n- Prevenção de acidentes\n\n"
             + "> Confira as normas aplicáveis à sua atividade.\n\n"
-            + "| Norma | Tema |\n| --- | --- |\n| NR 6 | EPI |\n| NR 10 | Eletricidade |\n\n"
+            + "| Norma | Tema | Status | Responsável |\n| :--- | :---: | ---: | --- |\n"
+            + "| **NR 6** | EPI | OK | Equipe de segurança |\n| NR 10 | Eletricidade | Revisar | Manutenção |\n\n"
             + "Acesse [a plataforma](https://example.com). Use `Astro`.";
 
     @Test public void markdownLoadingDraftAndRecreation() throws Exception {
@@ -73,6 +74,7 @@ public class ChatScreenTest {
             f.gate.countDown();
             awaitFinished(model);
             screenshot("markdown");
+            onView(withText("Norma")).check(matches(isDisplayed()));
             scenario.onActivity(activity -> {
                 ChatViewModel.State state = model.get().getState().getValue();
                 assertEquals(2, state.messages.size());
@@ -129,6 +131,47 @@ public class ChatScreenTest {
         });
     }
 
+    @Test public void tablesPreserveAlignmentFormattingAndHorizontalScrolling() {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            android.content.Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+            android.widget.LinearLayout content = new android.widget.LinearLayout(context);
+            content.setOrientation(android.widget.LinearLayout.VERTICAL);
+            String source = "Antes\n\n| Norma | Tema | Status | Responsável |\n"
+                    + "| :--- | :---: | ---: | --- |\n"
+                    + "| **NR 6** | EPI | OK | Equipe de segurança do trabalho |\n\n"
+                    + "Depois\n\n| Exemplo | Valor |\n| --- | --- |\n| A\\|B | `código` |\n\n"
+                    + "```\n| literal | código |\n| --- | --- |\n```";
+            ChatMarkdownContent.render(content, ChatMarkdown.create(context), source);
+            assertEquals(5, content.getChildCount());
+            assertTrue(content.getChildAt(0) instanceof android.widget.TextView);
+            assertEquals("Antes", ((android.widget.TextView) content.getChildAt(0)).getText().toString());
+            android.widget.HorizontalScrollView scroll = (android.widget.HorizontalScrollView) content.getChildAt(1);
+            int viewport = Math.round(280 * context.getResources().getDisplayMetrics().density);
+            content.measure(android.view.View.MeasureSpec.makeMeasureSpec(viewport, android.view.View.MeasureSpec.EXACTLY),
+                    android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED));
+            content.layout(0, 0, viewport, content.getMeasuredHeight());
+            android.widget.TableLayout table = (android.widget.TableLayout) scroll.getChildAt(0);
+            assertTrue(table.getWidth() > scroll.getWidth());
+            assertTrue(table.getHeight() > 0);
+            android.widget.TableRow row = (android.widget.TableRow) table.getChildAt(1);
+            assertEquals(4, row.getChildCount());
+            android.widget.TextView bold = (android.widget.TextView) row.getChildAt(0);
+            assertEquals("NR 6", bold.getText().toString());
+            assertTrue(((android.text.Spanned) bold.getText()).getSpans(0, 4,
+                    io.noties.markwon.core.spans.StrongEmphasisSpan.class).length > 0);
+            assertEquals(android.view.Gravity.TOP | android.view.Gravity.CENTER_HORIZONTAL,
+                    ((android.widget.TextView) row.getChildAt(1)).getGravity());
+            assertEquals(android.view.Gravity.TOP | android.view.Gravity.RIGHT,
+                    ((android.widget.TextView) row.getChildAt(2)).getGravity());
+            android.widget.TableLayout second = (android.widget.TableLayout)
+                    ((android.widget.HorizontalScrollView) content.getChildAt(3)).getChildAt(0);
+            assertEquals("A|B", ((android.widget.TextView) ((android.widget.TableRow) second.getChildAt(1))
+                    .getChildAt(0)).getText().toString());
+            ChatMarkdownContent.render(content, ChatMarkdown.create(context), "Resposta sem tabela");
+            assertEquals(1, content.getChildCount());
+        });
+    }
+
     private AtomicReference<ChatViewModel> open(ActivityScenario<MainActivity> scenario, AiChatRepository repository) {
         AtomicReference<ChatViewModel> model = new AtomicReference<>();
         scenario.onActivity(activity -> {
@@ -162,6 +205,9 @@ public class ChatScreenTest {
     }
 
     private void screenshot(String name) throws Exception {
+        // O ListAdapter aplica o diff depois da emissão do estado do ViewModel.
+        SystemClock.sleep(300);
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
         assertNotNull(bitmap);
         File directory = InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir("chat-qa");

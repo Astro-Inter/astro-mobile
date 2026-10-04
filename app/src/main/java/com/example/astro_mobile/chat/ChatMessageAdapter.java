@@ -53,11 +53,14 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         params.setMarginEnd(user ? 0 : Math.round(8 * density));
         holder.bubble.setLayoutParams(params);
         // O texto enviado permanece literal; apenas respostas da IA são Markdown.
+        holder.text.setVisibility(user ? View.VISIBLE : View.GONE);
+        holder.content.setVisibility(user ? View.GONE : View.VISIBLE);
         if (user) {
+            holder.content.removeAllViews();
             holder.text.setMovementMethod(null);
             holder.text.setText(message.getText());
         } else {
-            markdown.setMarkdown(holder.text, message.getText());
+            ChatMarkdownContent.render(holder.content, markdown, message.getText());
         }
     }
 
@@ -66,12 +69,14 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         final View bubble;
         final TextView sender;
         final TextView text;
+        final LinearLayout content;
         Holder(View view) {
             super(view);
             avatar = view.findViewById(R.id.image_chat_avatar);
             bubble = view.findViewById(R.id.container_chat_message);
             sender = view.findViewById(R.id.text_chat_sender);
             text = view.findViewById(R.id.text_chat_message);
+            content = view.findViewById(R.id.container_chat_markdown);
         }
     }
 }
