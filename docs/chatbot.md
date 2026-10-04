@@ -20,3 +20,15 @@
 - Uma resposta `401` força a renovação do token e repete a chamada uma única vez.
 - Cancelamentos também invalidam callbacks de obtenção de token ainda pendentes.
 - Erros de rede, timeout, sessão, permissão, limite de uso e formato inválido são separados.
+
+## Tela no celular
+
+- A aba de chat e o balão do assistente na Home abrem o mesmo chatbot.
+- A interface adapta a referência web: cabeçalho roxo, mascote, perguntas sugeridas e balões por autor.
+- Markwon renderiza títulos, negrito, itálico, listas, citações, código, links e tabelas.
+- Mensagens do usuário são exibidas literalmente, sem interpretar Markdown.
+- Links HTTP/HTTPS abrem ao tocar; o renderer não usa WebView nem carrega imagens remotas.
+- O campo permite várias linhas e fica acima do teclado, respeitando as barras do Android.
+- A conversa e o rascunho ficam em memória no ViewModel da Home, inclusive durante recriação da tela.
+- Voltar para a Home e reabrir o chat mantém a conversa. Sair da conta remove a Home e esse estado.
+- A conversa não é restaurada depois de encerrar o processo do aplicativo.

@@ -1,0 +1,11 @@
+<resources>
+    <color name="chat_header">#59457E</color>
+    <color name="chat_user">#39245F</color>
+    <color name="chat_assistant">#EDE7F7</color>
+    <color name="chat_surface">#F7F5FC</color>
+    <color name="chat_text">#2C2142</color>
+    <color name="chat_muted">#706381</color>
+    <color name="chat_outline">#DCD3EB</color>
+    <color name="chat_accent">#AE96F4</color>
+    <color name="chat_code">#E0D7EE</color>
+</resources>
