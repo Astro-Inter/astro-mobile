@@ -1,0 +1,5 @@
+package com.example.astro_mobile.data.ai;
+
+public enum ChatFailure {
+    CONNECTION, TIMEOUT, SESSION, FORBIDDEN, RATE_LIMIT, INVALID_MESSAGE, SERVER, INVALID_RESPONSE
+}
