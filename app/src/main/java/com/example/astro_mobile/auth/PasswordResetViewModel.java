@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 import com.example.astro_mobile.data.firebase.FirebaseAuthRepository;
 
-// Mantém a solicitação de redefinição durante a navegação e a rotação da tela.
+// Guarda o e-mail para a confirmação e uma possível nova tentativa.
 public class PasswordResetViewModel extends ViewModel {
     public interface ResultCallback {
         void onSuccess();
@@ -20,8 +20,6 @@ public class PasswordResetViewModel extends ViewModel {
     private int requestId;
     private String lastEmail;
     private ResultCallback callback;
-    private boolean hasPendingResult;
-    private AuthFailureKind pendingFailure;
 
     public PasswordResetViewModel(FirebaseAuthRepository repository) {
         this.repository = repository;
@@ -35,23 +33,13 @@ public class PasswordResetViewModel extends ViewModel {
         return lastEmail;
     }
 
-    public void attach(ResultCallback callback) {
-        this.callback = callback;
-        deliverPendingResult();
-    }
-
-    public void detach(ResultCallback callback) {
-        if (this.callback == callback) {
-            this.callback = null;
-        }
-    }
-
-    public void sendPasswordResetEmail(String email) {
+    public void sendPasswordResetEmail(String email, ResultCallback callback) {
         if (loading) {
             return;
         }
         lastEmail = email;
         loading = true;
+        this.callback = callback;
         int id = ++requestId;
         repository.sendPasswordResetEmail(email, new FirebaseAuthRepository.ResultCallback() {
             @Override
@@ -71,31 +59,28 @@ public class PasswordResetViewModel extends ViewModel {
             return;
         }
         loading = false;
-        hasPendingResult = true;
-        pendingFailure = failure;
-        deliverPendingResult();
-    }
-
-    private void deliverPendingResult() {
-        if (callback == null || !hasPendingResult) {
+        ResultCallback result = callback;
+        callback = null;
+        if (result == null) {
             return;
         }
-        AuthFailureKind failure = pendingFailure;
-        hasPendingResult = false;
-        pendingFailure = null;
         if (failure == null) {
-            callback.onSuccess();
+            result.onSuccess();
         } else {
-            callback.onFailure(failure);
+            result.onFailure(failure);
         }
+    }
+
+    public void clearRequest() {
+        // O SDK pode concluir a operação, mas uma tela fechada não recebe seu retorno.
+        ++requestId;
+        callback = null;
+        loading = false;
     }
 
     @Override
     protected void onCleared() {
-        ++requestId;
-        callback = null;
-        hasPendingResult = false;
-        pendingFailure = null;
+        clearRequest();
     }
 
     public static class Factory implements ViewModelProvider.Factory {

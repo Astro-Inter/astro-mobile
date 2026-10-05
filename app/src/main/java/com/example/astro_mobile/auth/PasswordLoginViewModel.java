@@ -18,8 +18,6 @@ public class PasswordLoginViewModel extends ViewModel {
     private boolean loading;
     private int requestId;
     private ResultCallback callback;
-    private boolean hasPendingResult;
-    private AuthFailureKind pendingFailure;
 
     public PasswordLoginViewModel(FirebaseAuthRepository repository) {
         this.repository = repository;
@@ -29,23 +27,12 @@ public class PasswordLoginViewModel extends ViewModel {
         return loading;
     }
 
-    public void attach(ResultCallback callback) {
-        // Uma tela recriada recebe o resultado que chegou durante a rotação.
-        this.callback = callback;
-        deliverPendingResult();
-    }
-
-    public void detach(ResultCallback callback) {
-        if (this.callback == callback) {
-            this.callback = null;
-        }
-    }
-
-    public void signIn(String email, String password) {
+    public void signIn(String email, String password, ResultCallback callback) {
         if (loading) {
             return;
         }
         loading = true;
+        this.callback = callback;
         int id = ++requestId;
         repository.signIn(email, password, new FirebaseAuthRepository.ResultCallback() {
             @Override
@@ -66,31 +53,28 @@ public class PasswordLoginViewModel extends ViewModel {
             return;
         }
         loading = false;
-        hasPendingResult = true;
-        pendingFailure = failure;
-        deliverPendingResult();
-    }
-
-    private void deliverPendingResult() {
-        if (callback == null || !hasPendingResult) {
+        ResultCallback result = callback;
+        callback = null;
+        if (result == null) {
             return;
         }
-        AuthFailureKind failure = pendingFailure;
-        hasPendingResult = false;
-        pendingFailure = null;
         if (failure == null) {
-            callback.onSuccess();
+            result.onSuccess();
         } else {
-            callback.onFailure(failure);
+            result.onFailure(failure);
         }
+    }
+
+    public void clearRequest() {
+        // O SDK pode concluir a operação, mas uma tela fechada não recebe seu retorno.
+        ++requestId;
+        callback = null;
+        loading = false;
     }
 
     @Override
     protected void onCleared() {
-        ++requestId;
-        callback = null;
-        hasPendingResult = false;
-        pendingFailure = null;
+        clearRequest();
     }
 
     public static class Factory implements ViewModelProvider.Factory {

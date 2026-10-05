@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 import retrofit2.Call;
 
 public class EmailVerificationViewModel extends ViewModel {
-    private static final long REQUEST_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(15);
-
     public enum Destination { FIRST_ACCESS_KEY, PASSWORD, INLINE_ERROR, DISABLED, CONNECTION_ERROR,
         INTERNAL_ERROR }
 
@@ -28,10 +26,10 @@ public class EmailVerificationViewModel extends ViewModel {
     }
 
     private final EmailVerificationRepository repository;
-    private Handler mainHandler;
     private Call<ApiResponse<VerifyEmailData>> currentCall;
-    private Runnable timeoutRunnable;
     private int requestId;
+    private Handler timeoutHandler;
+    private Runnable timeoutRunnable;
     private boolean loading;
     private String lastEmail;
     private String pendingInlineError;
@@ -100,7 +98,7 @@ public class EmailVerificationViewModel extends ViewModel {
                 }
             }
         });
-        scheduleTimeout(id, callback);
+        scheduleTimeout(callback);
     }
 
     private boolean finishRequest(int id) {
@@ -113,37 +111,26 @@ public class EmailVerificationViewModel extends ViewModel {
         return true;
     }
 
-    private void scheduleTimeout(int id, ResultCallback callback) {
-        // Um callback síncrono já pode ter concluído a consulta.
-        // Só inicializa o scheduler Android quando há uma requisição pendente.
-        if (id != requestId || !loading) {
+    private void scheduleTimeout(ResultCallback callback) {
+        // Uma resposta síncrona já pode ter concluído a consulta.
+        if (!loading) {
             return;
         }
-        clearTimeout();
-        if (mainHandler == null) {
-            mainHandler = new Handler(Looper.getMainLooper());
+        if (timeoutHandler == null) {
+            timeoutHandler = new Handler(Looper.getMainLooper());
         }
+        // O cancelamento HTTP pode esperar o DNS; a interface não espera além de 15s.
         timeoutRunnable = () -> {
-            if (id != requestId || !loading) {
-                return;
-            }
-            Call<ApiResponse<VerifyEmailData>> timedOutCall = currentCall;
-            currentCall = null;
-            loading = false;
-            ++requestId;
-            timeoutRunnable = null;
-            if (timedOutCall != null) {
-                timedOutCall.cancel();
-            }
-            // Render pode demorar para iniciar, mas a tela não fica carregando sem limite.
+            cancelCurrentRequest();
             callback.onResult(Destination.INTERNAL_ERROR, null, null);
         };
-        mainHandler.postDelayed(timeoutRunnable, REQUEST_TIMEOUT_MS);
+        timeoutHandler.postDelayed(timeoutRunnable,
+                TimeUnit.SECONDS.toMillis(AstroApiClient.REQUEST_TIMEOUT_SECONDS));
     }
 
     private void clearTimeout() {
         if (timeoutRunnable != null) {
-            mainHandler.removeCallbacks(timeoutRunnable);
+            timeoutHandler.removeCallbacks(timeoutRunnable);
             timeoutRunnable = null;
         }
     }

@@ -67,7 +67,7 @@ public class PasswordResetRequestFragment extends Fragment {
             inputContainer.setBackgroundResource(R.drawable.bg_email_identification_input);
             error.setVisibility(View.GONE);
             setLoading(emailInput, sendButton, sendLabel, progress, true);
-            resetViewModel.sendPasswordResetEmail(email);
+            resetViewModel.sendPasswordResetEmail(email, resultCallback);
         });
 
         emailInput.addTextChangedListener(new TextWatcher() {
@@ -128,15 +128,14 @@ public class PasswordResetRequestFragment extends Fragment {
                         AuthArgs.of(resetViewModel.getLastEmail(), null));
             }
         };
-        resetViewModel.attach(resultCallback);
     }
 
     @Override
     public void onDestroyView() {
-        if (resetViewModel != null && resultCallback != null) {
-            resetViewModel.detach(resultCallback);
-            resultCallback = null;
+        if (resetViewModel != null) {
+            resetViewModel.clearRequest();
         }
+        resultCallback = null;
         super.onDestroyView();
     }
 

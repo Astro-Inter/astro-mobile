@@ -6,7 +6,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
@@ -20,13 +19,11 @@ public class AccessKeyInformationFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        View.OnClickListener navigateBack = clickedView -> getNavController().navigateUp();
+        // As duas ações retornam para a tela anterior.
+        View.OnClickListener navigateBack = clickedView ->
+                NavHostFragment.findNavController(this).navigateUp();
         view.findViewById(R.id.button_access_key_information_back).setOnClickListener(navigateBack);
         view.findViewById(R.id.button_access_key_information_acknowledge)
                 .setOnClickListener(navigateBack);
-    }
-
-    private NavController getNavController() {
-        return NavHostFragment.findNavController(this);
     }
 }

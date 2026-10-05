@@ -31,6 +31,9 @@ public class EmailVerificationRepository {
             public void onResponse(@NonNull Call<ApiResponse<VerifyEmailData>> call,
                                    @NonNull Response<ApiResponse<VerifyEmailData>> response) {
                 // Respostas HTTP chegaram à API; 5xx e corpos inválidos são falhas internas.
+                if (call.isCanceled()) {
+                    return;
+                }
                 if (response.code() >= 500) {
                     callback.onFailure(FailureKind.INTERNAL, null);
                     return;
@@ -42,12 +45,12 @@ public class EmailVerificationRepository {
                     callback.onFailure(FailureKind.INTERNAL, null);
                     return;
                 }
-                if (response.isSuccessful() && envelope.isSuccess() && envelope.getData() != null) {
+                if (response.isSuccessful() && envelope.isSuccess()) {
+                    if (envelope.getData() == null) {
+                        callback.onFailure(FailureKind.INTERNAL, null);
+                        return;
+                    }
                     callback.onSuccess(response.body().getData());
-                    return;
-                }
-                if ("Erro interno do servidor".equals(envelope.getMessage())) {
-                    callback.onFailure(FailureKind.INTERNAL, null);
                     return;
                 }
                 String message = ApiFailures.message(envelope);
@@ -58,10 +61,8 @@ public class EmailVerificationRepository {
             @Override
             public void onFailure(@NonNull Call<ApiResponse<VerifyEmailData>> call,
                                   @NonNull Throwable error) {
-                // Sem resposta HTTP, só falhas claras de acesso à rede indicam sem conexão.
-                if (!call.isCanceled()) {
-                    callback.onFailure(ApiFailures.transport(error), null);
-                }
+                // Timeout não é falta de internet. O ViewModel ignora o cancelamento manual.
+                callback.onFailure(ApiFailures.transport(error), null);
             }
         });
         return call;
