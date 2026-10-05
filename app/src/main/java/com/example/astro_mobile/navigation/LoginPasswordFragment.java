@@ -55,6 +55,15 @@ public class LoginPasswordFragment extends Fragment {
         setLoading(enterButton, enterText, enterIcon, progress, forgotPassword,
                 loginViewModel.isLoading());
 
+        // Confere uma vez o contexto recebido antes de configurar as ações da tela.
+        Bundle args = getArguments();
+        String email = args == null ? null : args.getString(AuthArgs.EMAIL);
+        String userType = args == null ? null : args.getString(AuthArgs.USER_TYPE);
+        if (email == null || !MockSession.isKnownUserType(userType)) {
+            Navigation.findNavController(view).navigate(R.id.action_login_password_to_generic_error);
+            return;
+        }
+
         // Alterna a exibição da senha e o ícone do botão de visibilidade.
         visibilityButton.setOnClickListener(clickedView -> {
             boolean isPasswordHidden = passwordInput.getTransformationMethod()
@@ -81,27 +90,12 @@ public class LoginPasswordFragment extends Fragment {
                 showError(inputContainer, error, R.string.login_password_empty_error);
                 return;
             }
-            Bundle args = getArguments();
-            String email = args == null ? null : args.getString(AuthArgs.EMAIL);
-            String userType = args == null ? null : args.getString(AuthArgs.USER_TYPE);
-            if (email == null || !MockSession.isKnownUserType(userType)) {
-                Navigation.findNavController(clickedView)
-                        .navigate(R.id.action_login_password_to_generic_error);
-                return;
-            }
             setLoading(enterButton, enterText, enterIcon, progress, forgotPassword, true);
-            loginViewModel.signIn(email, password);
+            loginViewModel.signIn(email, password, resultCallback);
         });
         // Abre a recuperação já preenchida com o e-mail validado anteriormente.
         forgotPassword.setOnClickListener(clickedView -> {
             if (loginViewModel.isLoading()) {
-                return;
-            }
-            Bundle args = getArguments();
-            String email = args == null ? null : args.getString(AuthArgs.EMAIL);
-            if (email == null) {
-                Navigation.findNavController(clickedView)
-                        .navigate(R.id.action_login_password_to_generic_error);
                 return;
             }
             Navigation.findNavController(clickedView).navigate(
@@ -141,7 +135,7 @@ public class LoginPasswordFragment extends Fragment {
                 .setOnClickListener(clickedView ->
                         NavHostFragment.findNavController(this).navigateUp());
 
-        // Reassocia o resultado ao layout atual após uma possível recriação da tela.
+        // Atualiza o layout e navega conforme o resultado desta tentativa.
         resultCallback = new PasswordLoginViewModel.ResultCallback() {
             @Override
             public void onSuccess() {
@@ -149,8 +143,6 @@ public class LoginPasswordFragment extends Fragment {
                     return;
                 }
                 setLoading(enterButton, enterText, enterIcon, progress, forgotPassword, false);
-                Bundle args = getArguments();
-                String userType = args == null ? null : args.getString(AuthArgs.USER_TYPE);
                 passwordInput.setText(null);
                 // O Firebase é a sessão real; remove qualquer sessão mock anterior.
                 MockSession.clear(requireContext());
@@ -189,15 +181,14 @@ public class LoginPasswordFragment extends Fragment {
             }
 
         };
-        loginViewModel.attach(resultCallback);
     }
 
     @Override
     public void onDestroyView() {
-        if (loginViewModel != null && resultCallback != null) {
-            loginViewModel.detach(resultCallback);
-            resultCallback = null;
+        if (loginViewModel != null) {
+            loginViewModel.clearRequest();
         }
+        resultCallback = null;
         super.onDestroyView();
     }
 

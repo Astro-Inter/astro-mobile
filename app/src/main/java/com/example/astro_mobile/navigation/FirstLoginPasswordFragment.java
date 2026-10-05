@@ -56,15 +56,13 @@ public class FirstLoginPasswordFragment extends Fragment {
                 String email = getArguments() == null ? null
                         : getArguments().getString(AuthArgs.EMAIL);
                 // Recupera o perfil compartilhado, sem receber a chave no argumento da tela.
-                String userType = accessKeyViewModel.getVerifiedUserType(email);
+                String userType = accessKeyViewModel.getUserType();
                 if (!MockSession.isKnownUserType(userType) || email == null) {
                     return;
                 }
-                if (userType != null) {
-                    Toast.makeText(requireContext(),
-                            getString(R.string.auth_user_type_toast, userType),
-                            Toast.LENGTH_LONG).show();
-                }
+                Toast.makeText(requireContext(),
+                        getString(R.string.auth_user_type_toast, userType),
+                        Toast.LENGTH_LONG).show();
                 // Guarda o destino local e leva cada perfil à tela correspondente.
                 MockSession.save(requireContext(), email, userType,
                         "COLABORADOR".equals(userType)

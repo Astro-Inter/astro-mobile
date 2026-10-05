@@ -83,7 +83,6 @@ public class EmailErrorMockFragment extends Fragment {
                     }
                 }
             };
-            resetViewModel.attach(resetResultCallback);
             ((TextView) view.findViewById(R.id.button_email_error_start))
                     .setText(R.string.password_reset_back_to_login);
             view.findViewById(R.id.button_email_error_start)
@@ -141,14 +140,8 @@ public class EmailErrorMockFragment extends Fragment {
                 } else {
                     int target = destination == EmailVerificationViewModel.Destination.FIRST_ACCESS_KEY
                             ? R.id.firstLoginAccessKeyFragment : R.id.loginPasswordFragment;
-                    NavOptions options = new NavOptions.Builder()
-                            .setPopUpTo(errorDestination, true)
-                            .setEnterAnim(R.anim.push_enter)
-                            .setExitAnim(R.anim.push_exit)
-                            .setPopEnterAnim(R.anim.push_pop_enter)
-                            .setPopExitAnim(R.anim.push_pop_exit)
-                            .build();
-                    navController.navigate(target, AuthArgs.of(email, userType), options);
+                    navController.navigate(target, AuthArgs.of(email, userType),
+                            pushReplacing(errorDestination));
                 }
             });
         });
@@ -190,21 +183,15 @@ public class EmailErrorMockFragment extends Fragment {
             } else {
                 Bundle args = new Bundle();
                 args.putString(AuthArgs.EMAIL, accessKeyViewModel.getEmail());
-                NavOptions options = new NavOptions.Builder()
-                        .setPopUpTo(errorDestination, true)
-                        .setEnterAnim(R.anim.push_enter)
-                        .setExitAnim(R.anim.push_exit)
-                        .setPopEnterAnim(R.anim.push_pop_enter)
-                        .setPopExitAnim(R.anim.push_pop_exit)
-                        .build();
-                navController.navigate(R.id.firstLoginPasswordFragment, args, options);
+                navController.navigate(R.id.firstLoginPasswordFragment, args,
+                        pushReplacing(errorDestination));
             }
         });
     }
 
     private void retryPasswordReset(View retryButton, TextView retryLabel, ProgressBar progress,
                                     NavController navController) {
-        if (resetViewModel == null || resetViewModel.isLoading()) {
+        if (resetViewModel.isLoading()) {
             return;
         }
         String email = resetViewModel.getLastEmail();
@@ -215,23 +202,27 @@ public class EmailErrorMockFragment extends Fragment {
         retryButton.setEnabled(false);
         retryLabel.setVisibility(View.INVISIBLE);
         progress.setVisibility(View.VISIBLE);
-        resetViewModel.sendPasswordResetEmail(email);
+        resetViewModel.sendPasswordResetEmail(email, resetResultCallback);
     }
 
     private void showResetConfirmation(View view, NavController navController) {
         if (getView() != view || !isAdded()) {
             return;
         }
-        String email = resetViewModel == null ? null : resetViewModel.getLastEmail();
-        NavOptions options = new NavOptions.Builder()
-                .setPopUpTo(R.id.loginPasswordFragment, true)
+        navController.navigate(R.id.passwordResetConfirmationFragment,
+                AuthArgs.of(resetViewModel.getLastEmail(), null),
+                pushReplacing(R.id.loginPasswordFragment));
+    }
+
+    private NavOptions pushReplacing(int destination) {
+        // Mantém o mesmo push e remove da pilha a tela substituída após a nova tentativa.
+        return new NavOptions.Builder()
+                .setPopUpTo(destination, true)
                 .setEnterAnim(R.anim.push_enter)
                 .setExitAnim(R.anim.push_exit)
                 .setPopEnterAnim(R.anim.push_pop_enter)
                 .setPopExitAnim(R.anim.push_pop_exit)
                 .build();
-        navController.navigate(R.id.passwordResetConfirmationFragment,
-                AuthArgs.of(email, null), options);
     }
 
     private void returnToPasswordLogin(NavController navController) {
@@ -252,10 +243,10 @@ public class EmailErrorMockFragment extends Fragment {
         if (accessKeyViewModel != null) {
             accessKeyViewModel.cancelCurrentRequest();
         }
-        if (resetViewModel != null && resetResultCallback != null) {
-            resetViewModel.detach(resetResultCallback);
-            resetResultCallback = null;
+        if (resetViewModel != null) {
+            resetViewModel.clearRequest();
         }
+        resetResultCallback = null;
         // Cancela a tentativa pendente quando esta tela é fechada.
         if (verificationViewModel != null && verificationViewModel.isLoading()) {
             verificationViewModel.cancelCurrentRequest();

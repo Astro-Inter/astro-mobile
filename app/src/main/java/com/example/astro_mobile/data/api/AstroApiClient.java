@@ -9,6 +9,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class AstroApiClient {
+    public static final long REQUEST_TIMEOUT_SECONDS = 15;
     private static final AstroApi API = createApi();
 
     private AstroApiClient() {
@@ -19,10 +20,11 @@ public final class AstroApiClient {
     }
 
     private static AstroApi createApi() {
+        // O limite total de 15s evita espera indefinida enquanto o Render inicia.
         OkHttpClient httpClient = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .callTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
+                .connectTimeout(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .callTimeout(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .readTimeout(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .build();
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_BASE_URL)

@@ -4,16 +4,14 @@ import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.SavedStateHandleSupport;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.viewmodel.CreationExtras;
 
 import com.example.astro_mobile.data.api.AccessKeyRepository;
 import com.example.astro_mobile.data.api.AstroApiClient;
 import com.example.astro_mobile.data.api.FailureKind;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -24,46 +22,38 @@ public class AccessKeyViewModel extends ViewModel {
         void onResult(FailureKind failure, String message);
     }
 
-    private static final long REQUEST_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(15);
-    private static final String EMAIL = "access_key_email";
-    private static final String USER_TYPE = "access_key_user_type";
-    private static final String VERIFIED = "access_key_verified";
-
     private final AccessKeyRepository repository;
-    private final SavedStateHandle state;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private Call<Void> currentCall;
-    private Runnable timeoutRunnable;
     private int requestId;
+    private Handler timeoutHandler;
+    private Runnable timeoutRunnable;
     private boolean loading;
+    private String email;
+    private String userType;
     private String lastKey;
     private String pendingInlineError;
 
-    public AccessKeyViewModel(AccessKeyRepository repository, SavedStateHandle state) {
+    public AccessKeyViewModel(AccessKeyRepository repository) {
         this.repository = repository;
-        this.state = state;
     }
 
     public void setContext(String email, String userType) {
         // O perfil permanece no estado compartilhado; só o e-mail vai no Bundle seguinte.
-        String previousEmail = getEmail();
-        if (email == null || !email.equals(previousEmail)) {
+        if (!Objects.equals(email, this.email)) {
             cancelCurrentRequest();
             lastKey = null;
             pendingInlineError = null;
-            state.set(VERIFIED, false);
         }
-        state.set(EMAIL, email);
-        state.set(USER_TYPE, userType);
+        this.email = email;
+        this.userType = userType;
     }
 
     public String getEmail() {
-        return state.get(EMAIL);
+        return email;
     }
 
-    public String getVerifiedUserType(String email) {
-        return email != null && email.equals(getEmail())
-                && Boolean.TRUE.equals(state.get(VERIFIED)) ? state.get(USER_TYPE) : null;
+    public String getUserType() {
+        return userType;
     }
 
     public String getLastKey() {
@@ -80,14 +70,12 @@ public class AccessKeyViewModel extends ViewModel {
         }
         lastKey = accessKey;
         loading = true;
-        state.set(VERIFIED, false);
         int id = ++requestId;
         currentCall = repository.verifyKey(getEmail(), accessKey,
                 new AccessKeyRepository.ResultCallback() {
                     @Override
                     public void onSuccess() {
                         if (finishRequest(id)) {
-                            state.set(VERIFIED, true);
                             lastKey = null;
                             callback.onResult(null, null);
                         }
@@ -100,14 +88,7 @@ public class AccessKeyViewModel extends ViewModel {
                         }
                     }
                 });
-        // Cancela o POST após 15 segundos, sem deixar o botão travado.
-        timeoutRunnable = () -> {
-            if (id == requestId && loading) {
-                cancelCurrentRequest();
-                callback.onResult(FailureKind.INTERNAL, null);
-            }
-        };
-        mainHandler.postDelayed(timeoutRunnable, REQUEST_TIMEOUT_MS);
+        scheduleTimeout(callback);
     }
 
     private boolean finishRequest(int id) {
@@ -118,6 +99,29 @@ public class AccessKeyViewModel extends ViewModel {
         currentCall = null;
         clearTimeout();
         return true;
+    }
+
+    private void scheduleTimeout(ResultCallback callback) {
+        if (!loading) {
+            return;
+        }
+        if (timeoutHandler == null) {
+            timeoutHandler = new Handler(Looper.getMainLooper());
+        }
+        // O cancelamento HTTP pode esperar o DNS; a interface não espera além de 15s.
+        timeoutRunnable = () -> {
+            cancelCurrentRequest();
+            callback.onResult(FailureKind.INTERNAL, null);
+        };
+        timeoutHandler.postDelayed(timeoutRunnable,
+                TimeUnit.SECONDS.toMillis(AstroApiClient.REQUEST_TIMEOUT_SECONDS));
+    }
+
+    private void clearTimeout() {
+        if (timeoutRunnable != null) {
+            timeoutHandler.removeCallbacks(timeoutRunnable);
+            timeoutRunnable = null;
+        }
     }
 
     public void setPendingInlineError(String message) {
@@ -141,11 +145,13 @@ public class AccessKeyViewModel extends ViewModel {
         loading = false;
     }
 
-    private void clearTimeout() {
-        if (timeoutRunnable != null) {
-            mainHandler.removeCallbacks(timeoutRunnable);
-            timeoutRunnable = null;
-        }
+    public void clearForLogout() {
+        // Não deixa dados do primeiro acesso disponíveis para a próxima conta.
+        cancelCurrentRequest();
+        email = null;
+        userType = null;
+        lastKey = null;
+        pendingInlineError = null;
     }
 
     @Override
@@ -157,14 +163,12 @@ public class AccessKeyViewModel extends ViewModel {
     public static class Factory implements ViewModelProvider.Factory {
         @NonNull
         @Override
-        public <T extends ViewModel> T create(@NonNull Class<T> modelClass,
-                                            @NonNull CreationExtras extras) {
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
             if (!modelClass.isAssignableFrom(AccessKeyViewModel.class)) {
                 throw new IllegalArgumentException("Unknown ViewModel: " + modelClass.getName());
             }
             return modelClass.cast(new AccessKeyViewModel(
-                    new AccessKeyRepository(AstroApiClient.getApi()),
-                    SavedStateHandleSupport.createSavedStateHandle(extras)));
+                    new AccessKeyRepository(AstroApiClient.getApi())));
         }
     }
 }

@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AccessKeyViewModel;
 import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.SessionViewModel;
@@ -63,7 +64,6 @@ public class EmployeeHomeFragment extends Fragment {
     private TextView aiBubbleText;
     private View homeContent;
     private View homeSkeleton;
-    private AiDragTouchListener aiDragTouchListener;
     private Runnable hideAiBubble;
     private Runnable finishHomeLoading;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -111,6 +111,8 @@ public class EmployeeHomeFragment extends Fragment {
             new ViewModelProvider(requireActivity(),
                     EmailVerificationViewModel.Factory.createDefault())
                     .get(EmailVerificationViewModel.class).clearForLogout();
+            new ViewModelProvider(requireActivity(), new AccessKeyViewModel.Factory())
+                    .get(AccessKeyViewModel.class).clearForLogout();
             Navigation.findNavController(clickedView)
                     .navigate(R.id.action_employee_home_to_email_identification);
         });
@@ -146,12 +148,11 @@ public class EmployeeHomeFragment extends Fragment {
         aiBubble.setOnClickListener(openChat);
 
         // Restringe o arraste do assistente à área entre cabeçalho e navbar.
-        aiDragTouchListener = new AiDragTouchListener(
+        aiBubble.setOnTouchListener(new AiDragTouchListener(
                 aiBubble,
                 view.findViewById(R.id.container_employee_home_content),
                 view.findViewById(R.id.container_employee_home_header),
-                view.findViewById(R.id.container_employee_home_bottom_nav));
-        aiBubble.setOnTouchListener(aiDragTouchListener);
+                view.findViewById(R.id.container_employee_home_bottom_nav)));
     }
 
     @Override
@@ -215,7 +216,6 @@ public class EmployeeHomeFragment extends Fragment {
         aiBubbleText = null;
         homeContent = null;
         homeSkeleton = null;
-        aiDragTouchListener = null;
         hideAiBubble = null;
         homeReady = false;
         homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
@@ -371,7 +371,6 @@ public class EmployeeHomeFragment extends Fragment {
         }
 
         float startTextAlpha = aiBubbleText.getAlpha();
-        float startBubbleAlpha = bubble.getAlpha();
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
         aiBubbleWidthAnimator = animator;
         animator.setDuration(AI_BUBBLE_COLLAPSE_MS);
@@ -381,7 +380,6 @@ public class EmployeeHomeFragment extends Fragment {
             int width = startWidth + Math.round((collapsedWidth - startWidth) * fraction);
             setAiBubbleWidth(bubble, width);
             aiBubbleText.setAlpha(startTextAlpha * (1f - fraction));
-            bubble.setAlpha(startBubbleAlpha + (1f - startBubbleAlpha) * fraction);
         });
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -513,7 +511,7 @@ public class EmployeeHomeFragment extends Fragment {
                     buttonStartY = button.getY();
                     dragging = false;
                     touched.setPressed(true);
-                    if (touched == button && ValueAnimator.areAnimatorsEnabled()) {
+                    if (ValueAnimator.areAnimatorsEnabled()) {
                         button.animate().cancel();
                         button.animate().scaleX(0.94f).scaleY(0.94f)
                                 .setDuration(100).start();
