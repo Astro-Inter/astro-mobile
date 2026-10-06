@@ -80,7 +80,7 @@ public final class ChatViewModel extends ViewModel {
         State current = state.getValue();
         if (loading || current == null || !current.canRetry() || pendingMessageIndex < 0) return;
         ChatMessage failed = messages.get(pendingMessageIndex);
-        messages.set(pendingMessageIndex, new ChatMessage(failed.getText(), true));
+        messages.set(pendingMessageIndex, failed.withFailure(false));
         request(failed.getText());
     }
 
@@ -132,7 +132,7 @@ public final class ChatViewModel extends ViewModel {
         currentOperation = null;
         if (pendingMessageIndex >= 0) {
             ChatMessage pending = messages.get(pendingMessageIndex);
-            messages.set(pendingMessageIndex, new ChatMessage(pending.getText(), true, true));
+            messages.set(pendingMessageIndex, pending.withFailure(true));
         }
         publish(failure);
     }

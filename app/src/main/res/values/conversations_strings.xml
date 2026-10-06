@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="conversations_title">Conversas</string>
+    <string name="conversations_heading">Suas conversas</string>
+    <string name="conversations_subtitle">Acesse aqui as suas conversas com os gestores</string>
+    <string name="conversations_search_hint">Pesquisar em participantes</string>
+    <string name="conversations_filter_all">Todos</string>
+    <string name="conversations_filter_employees">Colaboradores</string>
+    <string name="conversations_filter_managers">Gestores</string>
+    <string name="conversations_ai_title">SATH - IA do Astro</string>
+    <string name="conversations_ai_subtitle">Encontre facilidades com o SATH!</string>
+    <string name="conversations_back">Voltar para a Home</string>
+    <string name="conversations_close">Fechar lista de conversas</string>
+</resources>

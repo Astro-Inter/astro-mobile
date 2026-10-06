@@ -142,10 +142,11 @@ public class EmployeeHomeFragment extends Fragment {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
         }
 
-        View.OnClickListener openChat = clicked -> Navigation.findNavController(clicked)
-                .navigate(R.id.action_employee_home_to_chat);
-        view.findViewById(R.id.button_employee_home_nav_chat).setOnClickListener(openChat);
-        aiBubble.setOnClickListener(openChat);
+        // A aba Chat abre a lista; o mascote continua sendo um atalho direto para a IA.
+        view.findViewById(R.id.button_employee_home_nav_chat).setOnClickListener(clicked ->
+                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_conversations));
+        aiBubble.setOnClickListener(clicked ->
+                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_chat));
 
         // Restringe o arraste do assistente à área entre cabeçalho e navbar.
         aiBubble.setOnTouchListener(new AiDragTouchListener(

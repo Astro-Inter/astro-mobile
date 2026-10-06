@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -69,10 +70,30 @@ public final class ChatFragment extends Fragment {
             sendButton.performClick();
             return true;
         });
+        // As perguntas sugeridas enviam o mesmo texto exibido no botão.
         view.findViewById(R.id.button_chat_suggestion_nrs).setOnClickListener(clicked ->
                 model.send(getString(R.string.chat_suggestion_nrs)));
         view.findViewById(R.id.button_chat_suggestion_dashboards).setOnClickListener(clicked ->
                 model.send(getString(R.string.chat_suggestion_dashboards)));
+        // O Figma mostra anexos, mas seu envio ainda não foi implementado.
+        view.findViewById(R.id.button_chat_add).setOnClickListener(clicked ->
+                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
+                        Toast.LENGTH_SHORT).show());
+        view.findViewById(R.id.button_conversations_nav_events).setOnClickListener(clicked ->
+                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
+                        Toast.LENGTH_SHORT).show());
+        view.findViewById(R.id.button_conversations_nav_profile).setOnClickListener(clicked ->
+                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
+                        Toast.LENGTH_SHORT).show());
+        // A navbar volta à Home ou à lista sem duplicar o chat na pilha.
+        view.findViewById(R.id.button_conversations_nav_home).setOnClickListener(clicked ->
+                navigation.popBackStack(R.id.employeeHomeFragment, false));
+        view.findViewById(R.id.button_conversations_nav_chat).setOnClickListener(clicked -> {
+            navigation.popBackStack();
+            if (navigation.getCurrentDestination().getId() == R.id.employeeHomeFragment) {
+                navigation.navigate(R.id.action_employee_home_to_conversations);
+            }
+        });
         view.findViewById(R.id.button_chat_close).setOnClickListener(clicked -> {
             if (ViewCompat.getWindowInsetsController(view) != null) {
                 ViewCompat.getWindowInsetsController(view).hide(WindowInsetsCompat.Type.ime());
@@ -125,6 +146,9 @@ public final class ChatFragment extends Fragment {
         ViewCompat.setOnApplyWindowInsetsListener(view, (target, insets) -> {
             int keyboard = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
             int navigationBar = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
+            // Deixa o espaço do teclado para o campo; a navbar reaparece ao fechar.
+            view.findViewById(R.id.container_chat_bottom_nav)
+                    .setVisibility(keyboard > navigationBar ? View.GONE : View.VISIBLE);
             target.setPadding(0, 0, 0, Math.max(0, keyboard - navigationBar));
             return insets;
         });

@@ -23,8 +23,9 @@
 
 ## Tela no celular
 
-- A aba de chat e o balão do assistente na Home abrem o mesmo chatbot.
-- A interface usa o padrão visual do mobile: fundo escuro, Montserrat, campos de 9–10 dp, ação no roxo principal e mascote da Home. Mantém perguntas sugeridas e balões por autor da referência web.
+- A interface segue App V2 do Figma, frame 3326:5641: cabeçalho SATH / IA do Astro, avatar, balões arredondados, campo Mensagem com seta interna e navbar com Chat selecionado. Por pedido do usuário, as duas perguntas sugeridas da implementação anterior aparecem nas boas-vindas e enviam seu texto ao tocar; o robô grande da referência web foi removido. A margem inferior do composer é de 8dp.
+- Os horários mostram criação/recebimento local das mensagens, não um timestamp do servidor. Falha e retry preservam o horário original. O botão de anexos é apenas visual e informa que a funcionalidade está pendente.
+- A navbar Chat da Home abre a lista de conversas; o mascote e a IA fixada na lista abrem o mesmo assistente. Na conversa, a navbar permite retornar à Home ou à lista. Com o teclado aberto, ela fica oculta para liberar espaço.
 - Respostas, código e tabelas usam superfícies escuras com texto claro; links em lavanda e mensagens de erro na cor de erro do aplicativo.
 - Markwon renderiza títulos, negrito, itálico, listas, citações, código, links e tabelas.
 - Tabelas na resposta têm cabeçalho destacado, bordas, alinhamento do Markdown e células com texto selecionável. Cada tabela possui rolagem horizontal independente quando excede a largura do balão; colunas longas quebram linhas. O parser distingue tabelas de pipes em blocos de código.
@@ -68,4 +69,18 @@ Validação de 04/10/2026:
 - A suíte geral apresentou 3 falhas em testes de login não alterados: dois testes de `EmailVerificationViewModelTest` e `EmailVerificationRepositoryTest.networkFailureIsConnectionError`.
 - Essas 3 falhas foram corrigidas na atualização do CI: a suíte completa passou com 20 testes unitários. A configuração fictícia de Firebase usada no runner está documentada em `docs/ci.md`.
 
+Correção visual de 05/10/2026:
+
+- Balões da IA usam a largura disponível; os do usuário se ajustam ao texto dentro do limite da tela. O modo de medição é atualizado ao reutilizar os itens da lista.
+- Build debug aprovado e instalado no Samsung SM-A566E. O teste existente `markdownLoadingDraftAndRecreation` passou com resposta local; capturas de boas-vindas, Markdown e tabela conferidas no aparelho, sem envio à API real de IA.
+
 Os commits correspondem às subtarefas `SCRUM-419` (conexão), `SCRUM-420` (envio), `SCRUM-421` (tela/Markdown) e `SCRUM-422` (carregamento/falhas).
+
+## Revisão arquitetural — 05/10/2026
+
+- O envio principal segue `ChatFragment → ChatViewModel → AiChatRepository → API/Firebase`, com criação manual das dependências. Java, XML, Activity, NavHost e grafo únicos foram preservados. A listagem estática não precisa de Repository ou ViewModel vazio enquanto não houver requisição.
+- O pacote funcional `chat` reúne apresentação, modelo local de mensagem e renderização; os recursos estão nos diretórios oficiais de `res`. Não há necessidade de duplicar o chatbot por perfil. Os DTOs HTTP (`ChatRequest`, `ChatResponse`, `GoogleCalendarConnectResponse`) estão em `data/ai`, enquanto a skill orienta `data/api/dto`; essa organização ainda precisa ser padronizada, sem misturar os contratos da IA e da API de contas.
+- Há desvios existentes: `ChatViewModel` usa LiveData em vez dos callbacks do padrão Astro; `ChatCalendarLinkHandler` faz HTTP e obtém token diretamente na apresentação, sem Repository/ViewModel. São pendências de refatoração, não corrigidas nesta revisão visual.
+- O estado e a navbar do chat estão vinculados a `employeeHomeFragment`; o logout também usa esse destino no `popUpTo`. O fluxo do Gestor ainda é mock em `FlowChoiceFragment`, portanto o chat não está pronto para ser aberto pela futura Home do Gestor sem ajustar esse vínculo.
+- No Figma, as listagens de Gestor (`3272:11270`) e Colaborador (`3326:5570`) compartilham estrutura e filtros, mas dizem, respectivamente, “Acesse aqui as suas conversas com os colaboradores” e “Acesse aqui as suas conversas com os gestores”. A implementação atual tem apenas o texto do Colaborador. A escolha deve seguir o fluxo ativo, não somente o tipo da conta, pois um Gestor pode atuar como Colaborador.
+- `ConversationsFragment` ainda é apenas UI: nenhuma conversa humana fictícia, requisição, busca ou filtro real foi implementado. A integração de conversas humanas deve permanecer separada do contrato da IA. Não há razão para adicionar um loading artificial ao chatbot; o skeleton da listagem está preparado para a futura requisição.

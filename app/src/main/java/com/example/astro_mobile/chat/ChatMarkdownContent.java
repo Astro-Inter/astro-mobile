@@ -143,10 +143,10 @@ final class ChatMarkdownContent {
     private static TextView textView(Context context) {
         TextView view = new TextView(context);
         view.setTypeface(ResourcesCompat.getFont(context, R.font.montserrat_family));
-        view.setTextSize(15);
+        view.setTextSize(17);
         view.setTextColor(context.getColor(R.color.chat_text));
         view.setLinkTextColor(context.getColor(R.color.chat_link));
-        view.setLineSpacing(dp(context, 4), 1);
+        view.setIncludeFontPadding(false);
         view.setTextIsSelectable(true);
         return view;
     }

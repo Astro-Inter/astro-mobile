@@ -1,12 +1,10 @@
 <resources>
-    <color name="chat_header">@color/astro_dark_background</color>
-    <color name="chat_user">@color/home_ai_bubble_background</color>
-    <color name="chat_assistant">@color/purple_gray</color>
+    <color name="chat_user">#362361</color>
+    <color name="chat_assistant">#5B4A82</color>
     <color name="chat_surface">@color/astro_dark_background</color>
     <color name="chat_text">@color/astro_light_text</color>
     <color name="chat_muted">@color/astro_tertiary_light_text</color>
     <color name="chat_outline">@color/home_nav_stroke</color>
-    <color name="chat_accent">@color/astro_primary_purple</color>
     <color name="chat_code">@color/astro_input_background</color>
     <color name="chat_link">#D8C4FF</color>
 </resources>
