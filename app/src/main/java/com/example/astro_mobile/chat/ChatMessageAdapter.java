@@ -3,11 +3,13 @@ package com.example.astro_mobile.chat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.text.format.DateFormat;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,17 +43,31 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         boolean user = message.isFromUser();
         holder.avatar.setVisibility(user ? View.GONE : View.VISIBLE);
         holder.bubble.setBackgroundResource(user ? R.drawable.bg_chat_user : R.drawable.bg_chat_assistant);
-        holder.sender.setText(user ? message.hasFailed() ? R.string.chat_user_failed_label
-                : R.string.chat_user_label : R.string.chat_assistant_label);
+        // O autor é identificado pela posição e pelo avatar; só falhas recebem legenda.
+        holder.sender.setVisibility(message.hasFailed() ? View.VISIBLE : View.GONE);
+        holder.sender.setText(R.string.chat_user_failed_label);
         int textColor = holder.itemView.getContext().getColor(user ? R.color.astro_light_text : R.color.chat_text);
         holder.sender.setTextColor(holder.itemView.getContext().getColor(user
                 ? R.color.astro_light_text : R.color.chat_muted));
         holder.text.setTextColor(textColor);
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.bubble.getLayoutParams();
+        ConstraintLayout.LayoutParams params =
+                (ConstraintLayout.LayoutParams) holder.bubble.getLayoutParams();
         float density = holder.itemView.getResources().getDisplayMetrics().density;
-        params.setMarginStart(user ? Math.round(52 * density) : 0);
-        params.setMarginEnd(user ? 0 : Math.round(8 * density));
+        params.width = user ? ViewGroup.LayoutParams.WRAP_CONTENT : 0;
+        // A resposta ocupa a largura disponível; só a mensagem do usuário acompanha o texto.
+        params.constrainedWidth = user;
+        params.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_SPREAD;
+        params.horizontalBias = user ? 1f : 0f;
+        params.setMarginStart(Math.round((user ? 52 : 53) * density));
+        params.setMarginEnd(user ? 0 : Math.round(12 * density));
         holder.bubble.setLayoutParams(params);
+        // Horário local da mensagem, preservado ao tentar enviar novamente.
+        holder.time.setText(DateFormat.format("HH:mm", message.getCreatedAt()));
+        ConstraintLayout.LayoutParams timeParams =
+                (ConstraintLayout.LayoutParams) holder.time.getLayoutParams();
+        timeParams.topToBottom = user ? ConstraintLayout.LayoutParams.UNSET : R.id.container_chat_markdown;
+        timeParams.topMargin = user ? 0 : Math.round(4 * density);
+        holder.time.setLayoutParams(timeParams);
         // O texto enviado permanece literal; apenas respostas da IA são Markdown.
         holder.text.setVisibility(user ? View.VISIBLE : View.GONE);
         holder.content.setVisibility(user ? View.GONE : View.VISIBLE);
@@ -69,6 +85,7 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         final View bubble;
         final TextView sender;
         final TextView text;
+        final TextView time;
         final LinearLayout content;
         Holder(View view) {
             super(view);
@@ -76,6 +93,7 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
             bubble = view.findViewById(R.id.container_chat_message);
             sender = view.findViewById(R.id.text_chat_sender);
             text = view.findViewById(R.id.text_chat_message);
+            time = view.findViewById(R.id.text_chat_time);
             content = view.findViewById(R.id.container_chat_markdown);
         }
     }

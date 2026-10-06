@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    android:paddingHorizontal="30dp"
+    android:paddingVertical="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            android:src="@drawable/chat_mascot" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_chat_assistant"
+            android:fontFamily="@font/montserrat_family"
+            android:includeFontPadding="false"
+            android:paddingHorizontal="21dp"
+            android:paddingVertical="18dp"
+            android:text="@string/chat_welcome_title"
+            android:textColor="@color/chat_text"
+            android:textSize="17sp" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_chat_suggestion_nrs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:minHeight="56dp"
+        android:fontFamily="@font/montserrat_family"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="@string/chat_suggestion_nrs"
+        android:textAllCaps="false"
+        android:textColor="@color/chat_text"
+        android:textSize="14sp"
+        app:backgroundTint="@color/astro_input_background"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/chat_outline"
+        app:strokeWidth="1dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_chat_suggestion_dashboards"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:fontFamily="@font/montserrat_family"
+        android:gravity="start|center_vertical"
+        android:paddingHorizontal="16dp"
+        android:text="@string/chat_suggestion_dashboards"
+        android:textAllCaps="false"
+        android:textColor="@color/chat_text"
+        android:textSize="14sp"
+        app:backgroundTint="@color/astro_input_background"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/chat_outline"
+        app:strokeWidth="1dp" />
+</LinearLayout>

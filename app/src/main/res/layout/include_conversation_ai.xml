@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="85dp"
+    android:background="@drawable/bg_home_row_ripple"
+    android:baselineAligned="false"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="30dp"
+    android:paddingVertical="20dp">
+
+    <ImageView
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_conversations_ai_avatar"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no"
+        android:padding="7dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/home_mascot" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_family"
+            android:includeFontPadding="false"
+            android:text="@string/conversations_ai_title"
+            android:textColor="@color/astro_light_background"
+            android:textSize="@dimen/employee_home_body_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/montserrat_family"
+            android:includeFontPadding="false"
+            android:text="@string/conversations_ai_subtitle"
+            android:textColor="@color/astro_input_hint"
+            android:textSize="@dimen/employee_home_caption_text_size" />
+    </LinearLayout>
+</LinearLayout>

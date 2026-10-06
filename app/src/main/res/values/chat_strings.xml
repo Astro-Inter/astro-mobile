@@ -1,17 +1,15 @@
 <resources>
-    <string name="chat_title">Assistente Astro</string>
-    <string name="chat_subtitle">Vamos conversar?</string>
+    <string name="chat_title">SATH</string>
+    <string name="chat_subtitle">IA do Astro</string>
     <string name="chat_close">Fechar conversa</string>
-    <string name="chat_welcome_title">Olá! Como posso ajudar?</string>
-    <string name="chat_welcome_body">Tire suas dúvidas sobre a plataforma Astro e as Normas Regulamentadoras.</string>
+    <string name="chat_welcome_title">Olá, sou o SATH, a IA do Astro, o que vamos fazer hoje?</string>
     <string name="chat_suggestion_nrs">O que são Normas Regulamentadoras?</string>
     <string name="chat_suggestion_dashboards">Quais NRs preciso cumprir?</string>
-    <string name="chat_input_hint">Digite sua mensagem…</string>
+    <string name="chat_input_hint">Mensagem</string>
+    <string name="chat_add_attachment">Adicionar anexo</string>
     <string name="chat_send">Enviar mensagem</string>
     <string name="chat_loading">Astro está preparando a resposta…</string>
     <string name="chat_generic_error">Não foi possível receber a resposta. Tente novamente.</string>
-    <string name="chat_assistant_label">Astro</string>
-    <string name="chat_user_label">Você</string>
     <string name="chat_link_unavailable">Não foi possível abrir esse link.</string>
     <string name="chat_calendar_loading">Preparando a conexão com o Google Calendar…</string>
     <string name="chat_calendar_error">Não foi possível iniciar a conexão com o Google Calendar. Toque no link para tentar novamente.</string>

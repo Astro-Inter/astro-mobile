@@ -92,8 +92,7 @@ public class ChatScreenTest {
         f.gate.countDown();
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             AtomicReference<ChatViewModel> model = open(scenario, f.repository());
-            onView(withId(R.id.input_chat_message)).perform(replaceText("Olá"), closeSoftKeyboard());
-            onView(withId(R.id.button_chat_send)).perform(click());
+            onView(withId(R.id.button_chat_suggestion_nrs)).perform(click());
             awaitFinished(model);
             onView(withId(R.id.text_chat_error)).check(matches(withText(R.string.chat_server_error)));
             screenshot("error");
@@ -114,7 +113,8 @@ public class ChatScreenTest {
                 (force, callback) -> callback.onFailure(com.example.astro_mobile.data.ai.IdTokenProvider.Failure.SESSION));
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             AtomicReference<ChatViewModel> model = open(scenario, repository);
-            onView(withId(R.id.button_chat_suggestion_nrs)).perform(click());
+            onView(withId(R.id.input_chat_message)).perform(replaceText("Olá"));
+            onView(withId(R.id.button_chat_send)).perform(click());
             awaitFinished(model);
             onView(withId(R.id.button_chat_retry)).check(matches(withText(R.string.chat_sign_in)));
             scenario.onActivity(activity -> assertEquals(ChatFailure.SESSION, model.get().getState().getValue().failure));
