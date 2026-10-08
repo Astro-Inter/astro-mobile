@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Medidas compartilhadas com mobileInput/mobileButton e as telas de acesso. -->
+    <dimen name="astro_control_height">60dp</dimen>
+    <dimen name="astro_content_margin">30dp</dimen>
+    <dimen name="astro_control_icon_size">18dp</dimen>
+    <dimen name="astro_control_icon_inset">16dp</dimen>
+
+    <style name="AstroInputSurface">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/astro_control_height</item>
+        <item name="android:background">@drawable/bg_email_identification_input</item>
+    </style>
+    <style name="AstroSearchInput">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/astro_control_height</item>
+        <item name="android:background">@null</item>
+        <item name="android:fontFamily">@font/montserrat_family</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">52dp</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:textColor">@color/astro_light_background</item>
+        <item name="android:textColorHint">@color/astro_input_hint</item>
+        <item name="android:textSize">@dimen/employee_home_body_text_size</item>
+        <item name="android:inputType">text</item>
+        <item name="android:imeOptions">actionSearch</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:importantForAutofill">no</item>
+    </style>
+    <style name="AstroPrimaryAction">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/astro_control_height</item>
+        <item name="android:background">@drawable/bg_login_password_button</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="AstroPrimaryActionLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/astro_control_height</item>
+        <item name="android:fontFamily">@font/montserrat_family</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingHorizontal">48dp</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:textColor">@color/astro_light_background</item>
+        <item name="android:textSize">@dimen/employee_home_body_text_size</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <!-- O filtro mantém a altura visual de ConversationsFilter, com área de toque ampliada. -->
+    <style name="AstroFilterTouchTarget">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">55dp</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="AstroFilterLabel" parent="ConversationsFilter">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_weight">0</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:clickable">false</item>
+        <item name="android:focusable">false</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+</resources>

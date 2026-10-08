@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:fillViewport="false" android:overScrollMode="ifContentScrolls">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingTop="16dp" android:paddingBottom="30dp">
+        <ImageButton android:id="@+id/button_chat_end_close" android:layout_width="48dp" android:layout_height="48dp"
+            android:layout_gravity="end" android:layout_marginEnd="16dp" android:background="@drawable/bg_login_icon_button"
+            android:src="@drawable/conversations_close" android:padding="14dp" android:scaleType="fitCenter"
+            android:contentDescription="@string/ai_sessions_cancel" android:tooltipText="@string/ai_sessions_cancel" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp" android:layout_marginTop="4dp" android:orientation="vertical"
+            android:background="@drawable/bg_chat_end_message" android:paddingHorizontal="30dp" android:paddingVertical="20dp">
+            <TextView android:id="@+id/text_chat_end_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/ai_sessions_end_title" android:fontFamily="@font/montserrat_family"
+                android:textSize="18sp" android:textStyle="bold" android:textColor="@color/astro_light_background"
+                android:includeFontPadding="false" android:accessibilityHeading="true" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:text="@string/ai_sessions_end_body" android:fontFamily="@font/montserrat_family"
+                android:textSize="14sp" android:textColor="@color/astro_tertiary_light_text" android:lineSpacingExtra="3dp"
+                android:includeFontPadding="false" />
+        </LinearLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/button_chat_end_confirm"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp"
+            android:layout_marginHorizontal="30dp" android:layout_marginTop="20dp" android:paddingVertical="16dp"
+            android:insetTop="0dp" android:insetBottom="0dp" android:text="@string/ai_sessions_end"
+            android:fontFamily="@font/montserrat_family" android:textSize="16sp" android:textAllCaps="false"
+            android:letterSpacing="0" android:textColor="@color/astro_light_background"
+            app:backgroundTint="@color/astro_primary_purple" app:cornerRadius="10dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/button_chat_end_cancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="60dp"
+            android:layout_marginHorizontal="30dp" android:layout_marginTop="20dp" android:paddingVertical="16dp"
+            android:insetTop="0dp" android:insetBottom="0dp" android:text="@string/ai_sessions_cancel"
+            android:fontFamily="@font/montserrat_family" android:textSize="16sp" android:textAllCaps="false"
+            android:letterSpacing="0" android:textColor="@color/astro_light_background"
+            app:backgroundTint="@android:color/transparent" app:strokeColor="@color/astro_light_background"
+            app:strokeWidth="1dp" app:cornerRadius="10dp" />
+    </LinearLayout>
+</ScrollView>

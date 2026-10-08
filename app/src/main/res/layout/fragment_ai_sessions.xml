@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/astro_dark_background">
+    <LinearLayout android:layout_width="0dp" android:layout_height="0dp" android:orientation="vertical"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="64dp"
+            android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:baselineAligned="false">
+            <ImageButton android:id="@+id/button_ai_sessions_back" android:layout_width="48dp" android:layout_height="48dp"
+                android:background="@drawable/bg_login_icon_button" android:src="@drawable/ic_login_back"
+                android:paddingHorizontal="14dp" android:paddingVertical="16dp" android:scaleType="fitCenter"
+                android:contentDescription="@string/conversations_back" />
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:layout_marginEnd="48dp"
+                android:fontFamily="@font/montserrat_family" android:textSize="20sp"
+                android:gravity="center" android:includeFontPadding="false" android:accessibilityHeading="true"
+                android:textColor="@color/astro_light_background" android:text="@string/ai_sessions_title" />
+        </LinearLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/astro_content_margin" android:paddingVertical="10dp">
+            <FrameLayout style="@style/AstroInputSurface">
+                <EditText android:id="@+id/input_ai_sessions_search" style="@style/AstroSearchInput"
+                    android:hint="@string/ai_sessions_search" />
+                <ImageView android:layout_width="@dimen/astro_control_icon_size" android:layout_height="@dimen/astro_control_icon_size"
+                    android:layout_gravity="end|center_vertical" android:layout_marginEnd="@dimen/astro_control_icon_inset"
+                    android:src="@drawable/conversations_search" android:scaleType="fitCenter"
+                    android:contentDescription="@null" android:importantForAccessibility="no" />
+            </FrameLayout>
+        </FrameLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:paddingHorizontal="@dimen/astro_content_margin" android:baselineAligned="false">
+            <FrameLayout android:id="@+id/button_ai_sessions_filter_all" style="@style/AstroFilterTouchTarget"
+                android:contentDescription="@string/ai_sessions_filter_all">
+                <TextView style="@style/AstroFilterLabel" android:text="@string/ai_sessions_filter_all" />
+            </FrameLayout>
+            <FrameLayout android:id="@+id/button_ai_sessions_filter_active" style="@style/AstroFilterTouchTarget"
+                android:layout_marginStart="10dp" android:contentDescription="@string/ai_sessions_filter_active">
+                <TextView style="@style/AstroFilterLabel" android:text="@string/ai_sessions_filter_active" />
+            </FrameLayout>
+            <FrameLayout android:id="@+id/button_ai_sessions_filter_closed" style="@style/AstroFilterTouchTarget"
+                android:layout_marginStart="10dp" android:contentDescription="@string/ai_sessions_filter_closed">
+                <TextView style="@style/AstroFilterLabel" android:text="@string/ai_sessions_filter_closed" />
+            </FrameLayout>
+        </LinearLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_ai_sessions"
+                android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingBottom="10dp" />
+            <androidx.core.widget.NestedScrollView android:id="@+id/container_ai_sessions_empty"
+                android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:visibility="gone">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="center" android:orientation="vertical" android:paddingHorizontal="30dp" android:paddingVertical="20dp">
+                    <ImageView android:layout_width="60dp" android:layout_height="60dp" android:padding="8dp"
+                        android:src="@drawable/home_mascot" android:background="@drawable/bg_conversations_ai_avatar"
+                        android:contentDescription="@null" android:importantForAccessibility="no" />
+                    <TextView android:id="@+id/text_ai_sessions_empty_title" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center"
+                        android:fontFamily="@font/montserrat_family" android:textSize="@dimen/employee_home_body_text_size"
+                        android:textColor="@color/astro_light_background" android:text="@string/ai_sessions_empty_title" />
+                    <TextView android:id="@+id/text_ai_sessions_empty_body" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:lineSpacingExtra="3dp"
+                        android:fontFamily="@font/montserrat_family" android:textSize="@dimen/employee_home_caption_text_size"
+                        android:textColor="@color/astro_input_hint" android:text="@string/ai_sessions_empty_body" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+            <ProgressBar android:id="@+id/progress_ai_sessions" android:layout_width="32dp" android:layout_height="32dp"
+                android:layout_gravity="center" android:visibility="gone" android:indeterminateTint="@color/astro_primary_purple" />
+        </FrameLayout>
+        <TextView android:id="@+id/text_ai_sessions_notice" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingHorizontal="30dp" android:paddingVertical="8dp" android:gravity="center" android:visibility="gone"
+            android:fontFamily="@font/montserrat_family" android:textSize="@dimen/employee_home_caption_text_size"
+            android:lineSpacingExtra="3dp" android:textColor="@color/astro_input_hint" android:accessibilityLiveRegion="polite" />
+        <LinearLayout android:id="@+id/container_ai_sessions_paging" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:minHeight="40dp" android:orientation="horizontal"
+            android:gravity="center" android:padding="6dp" android:visibility="gone">
+            <ProgressBar android:layout_width="20dp" android:layout_height="20dp"
+                android:indeterminateTint="@color/astro_primary_purple" android:importantForAccessibility="no" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="10dp"
+                android:text="@string/ai_sessions_loading_more" android:fontFamily="@font/montserrat_family"
+                android:textSize="@dimen/employee_home_caption_text_size" android:textColor="@color/astro_input_hint"
+                android:accessibilityLiveRegion="polite" />
+        </LinearLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/button_ai_sessions_page_retry"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="24dp"
+            android:text="@string/chat_retry" android:textAllCaps="false" android:visibility="gone"
+            android:fontFamily="@font/montserrat_family" android:textColor="@color/astro_light_background" android:letterSpacing="0"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+        <FrameLayout android:id="@+id/button_ai_sessions_new" style="@style/AstroPrimaryAction"
+            android:layout_marginHorizontal="@dimen/astro_content_margin" android:layout_marginTop="4dp" android:layout_marginBottom="8dp"
+            android:contentDescription="@string/ai_sessions_new">
+            <TextView style="@style/AstroPrimaryActionLabel" android:text="@string/ai_sessions_new" />
+            <ImageView android:layout_width="@dimen/astro_control_icon_size" android:layout_height="@dimen/astro_control_icon_size"
+                android:layout_gravity="start|center_vertical" android:layout_marginStart="@dimen/astro_control_icon_inset"
+                android:src="@drawable/chat_add" android:scaleType="fitCenter"
+                android:contentDescription="@null" android:importantForAccessibility="no" />
+        </FrameLayout>
+        <include android:id="@+id/container_ai_sessions_bottom_nav" layout="@layout/include_conversations_bottom_nav" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

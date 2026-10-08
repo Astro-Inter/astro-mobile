@@ -117,6 +117,8 @@ public final class AiChatRepository {
                 }
                 closeErrorBody(response);
                 ChatFailure failure = code == 401 ? ChatFailure.SESSION
+                        : code == 404 ? ChatFailure.NOT_FOUND
+                        : code == 409 ? ChatFailure.CONFLICT
                         : code == 403 ? ChatFailure.FORBIDDEN
                         : code == 429 ? ChatFailure.RATE_LIMIT
                         : code == 400 || code == 422 ? ChatFailure.INVALID_MESSAGE

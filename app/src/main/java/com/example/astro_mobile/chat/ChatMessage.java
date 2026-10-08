@@ -26,6 +26,10 @@ public final class ChatMessage {
     public boolean hasFailed() { return failed; }
     public long getCreatedAt() { return createdAt; }
 
+    public static ChatMessage fromHistory(String text, boolean fromUser) {
+        return new ChatMessage(text, fromUser, false, 0);
+    }
+
     public ChatMessage withFailure(boolean failed) {
         return new ChatMessage(text, fromUser, failed, createdAt);
     }
