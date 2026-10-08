@@ -63,6 +63,7 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         holder.bubble.setLayoutParams(params);
         // Horário local da mensagem, preservado ao tentar enviar novamente.
         holder.time.setText(DateFormat.format("HH:mm", message.getCreatedAt()));
+        holder.time.setVisibility(message.getCreatedAt() == 0 ? View.GONE : View.VISIBLE);
         ConstraintLayout.LayoutParams timeParams =
                 (ConstraintLayout.LayoutParams) holder.time.getLayoutParams();
         timeParams.topToBottom = user ? ConstraintLayout.LayoutParams.UNSET : R.id.container_chat_markdown;

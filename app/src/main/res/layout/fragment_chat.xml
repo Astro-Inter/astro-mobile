@@ -21,19 +21,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="89dp"
+            android:minHeight="72dp"
             android:baselineAligned="false"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="14dp"
-            android:paddingEnd="30dp"
-            android:paddingVertical="20dp">
+            android:paddingEnd="16dp"
+            android:paddingVertical="12dp">
 
             <ImageButton
                 android:id="@+id/button_chat_close"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="4dp"
                 android:background="@drawable/bg_login_icon_button"
                 android:contentDescription="@string/chat_close"
                 android:paddingHorizontal="14dp"
@@ -42,9 +42,9 @@
                 android:src="@drawable/ic_login_back" />
 
             <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginEnd="20dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="12dp"
                 android:background="@drawable/bg_conversations_ai_avatar"
                 android:contentDescription="@null"
                 android:importantForAccessibility="no"
@@ -65,6 +65,7 @@
                     android:fontFamily="@font/montserrat_family"
                     android:includeFontPadding="false"
                     android:text="@string/chat_title"
+                    android:textStyle="bold"
                     android:textColor="@color/astro_light_background"
                     android:textSize="@dimen/employee_home_body_text_size" />
 
@@ -77,8 +78,29 @@
                     android:textColor="@color/astro_input_hint"
                     android:textSize="@dimen/employee_home_caption_text_size" />
             </LinearLayout>
+            <ImageButton android:id="@+id/button_chat_sessions"
+                android:layout_width="48dp" android:layout_height="48dp"
+                android:background="@drawable/bg_login_icon_button" android:padding="14dp" android:scaleType="fitCenter"
+                android:src="@drawable/ai_sessions_menu" android:contentDescription="@string/ai_sessions_open" />
         </LinearLayout>
 
+        <LinearLayout android:id="@+id/container_chat_session_actions"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="48dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:baselineAligned="false" android:layout_marginHorizontal="24dp" android:layout_marginBottom="8dp"
+            android:paddingStart="16dp" android:paddingEnd="4dp" android:background="@drawable/bg_chat_session_toolbar"
+            android:visibility="gone" tools:visibility="visible">
+            <TextView android:id="@+id/text_chat_session_status" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp" android:layout_marginEnd="8dp" android:includeFontPadding="false"
+                android:textColor="@color/astro_input_hint" android:fontFamily="@font/montserrat_family" android:textSize="12sp"
+                android:accessibilityLiveRegion="polite" tools:text="@string/ai_sessions_status_active" />
+            <ImageButton android:id="@+id/button_chat_session_action"
+                android:layout_width="48dp" android:layout_height="48dp"
+                android:background="@drawable/bg_login_icon_button" android:padding="14dp" android:scaleType="fitCenter"
+                android:src="@drawable/ai_session_stop" android:contentDescription="@string/ai_sessions_end"
+                android:tooltipText="@string/ai_sessions_end" />
+        </LinearLayout>
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"

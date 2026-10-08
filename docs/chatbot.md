@@ -23,8 +23,12 @@
 
 ## Tela no celular
 
+- SCRUM-452: lista remota paginada, busca nas conversas carregadas, histórico, nova conversa e retomada/encerramento explícitos conforme SCRUM-453. Contrato, falhas e disponibilidade estão em `docs/ai-sessions.md`.
+
 - A interface segue App V2 do Figma, frame 3326:5641: cabeçalho SATH / IA do Astro, avatar, balões arredondados, campo Mensagem com seta interna e navbar com Chat selecionado. Por pedido do usuário, as duas perguntas sugeridas da implementação anterior aparecem nas boas-vindas e enviam seu texto ao tocar; o robô grande da referência web foi removido. A margem inferior do composer é de 8dp.
-- Os horários mostram criação/recebimento local das mensagens, não um timestamp do servidor. Falha e retry preservam o horário original. O botão de anexos é apenas visual e informa que a funcionalidade está pendente.
+- Cabeçalho compacto de altura mínima de 72 dp e avatar de 40 dp. Sessões persistidas exibem uma faixa arredondada de 48 dp com o estado à esquerda e a ação por ícone à direita: Stop (`1011:874`) abre a confirmação de encerramento; Play circle (`1011:786`) permite continuar quando encerrada. Ícones originais do Figma, com descrições para leitores de tela, dicas ao manter pressionado e áreas de toque de 48 dp. A ação fica desabilitada e com opacidade reduzida durante uma operação. O ícone de atualizar foi removido por pedido do usuário; o histórico continua sendo consultado ao entrar na tela.
+- Confirmação personalizada baseada em `mobilePopup`, variante de dois botões (`2762:7924`): fundo Astro escuro, cantos de 20 dp, texto em bloco destacado, botão roxo de confirmação e Cancelar contornado, ambos com altura mínima de 60 dp. Cross (`1011:777`) reutiliza `conversations_close.png` em uma área de toque de 48 dp. Largura máxima de 370 dp com margens de pelo menos 24 dp; conteúdo rolável acomoda telas menores e fontes ampliadas. DialogFragment acompanha o ciclo de vida e confirma somente a sessão que originou a janela; trocar a sessão/conta ou encerrar em outra operação invalida a confirmação. Cancelar, voltar, tocar fora e o X apenas fecham a janela.
+- Os horários de mensagens novas mostram criação/recebimento local. Mensagens carregadas do histórico não exibem horário, pois a API não retorna timestamps por mensagem. Falha e retry preservam o horário original. O botão de anexos é apenas visual e informa que a funcionalidade está pendente.
 - A navbar Chat da Home abre a lista de conversas; o mascote e a IA fixada na lista abrem o mesmo assistente. Na conversa, a navbar permite retornar à Home ou à lista. Com o teclado aberto, ela fica oculta para liberar espaço.
 - Respostas, código e tabelas usam superfícies escuras com texto claro; links em lavanda e mensagens de erro na cor de erro do aplicativo.
 - Markwon renderiza títulos, negrito, itálico, listas, citações, código, links e tabelas.
@@ -35,7 +39,7 @@
 - O campo permite várias linhas e fica acima do teclado, respeitando as barras do Android.
 - A conversa e o rascunho ficam em memória no ViewModel da Home, inclusive durante recriação da tela.
 - Voltar para a Home e reabrir o chat mantém a conversa. Sair da conta remove a Home e esse estado.
-- A conversa não é restaurada depois de encerrar o processo do aplicativo.
+- Após encerrar o processo, as sessões persistidas podem ser selecionadas na lista remota; rascunhos locais não são restaurados.
 
 ## Carregamento e falhas
 
@@ -73,6 +77,16 @@ Correção visual de 05/10/2026:
 
 - Balões da IA usam a largura disponível; os do usuário se ajustam ao texto dentro do limite da tela. O modo de medição é atualizado ao reutilizar os itens da lista.
 - Build debug aprovado e instalado no Samsung SM-A566E. O teste existente `markdownLoadingDraftAndRecreation` passou com resposta local; capturas de boas-vindas, Markdown e tabela conferidas no aparelho, sem envio à API real de IA.
+
+Revisão do cabeçalho de 08/10/2026:
+
+- `:app:assembleDebug` aprovado e APK instalada no Samsung SM-M315F. Faixa de ações conferida em históricos reais de sessões ativa e encerrada, com Refresh/Stop/Play circle originais do Figma e áreas de toque de 48 dp.
+- Atualizar recarregou o histórico. Encerrar abriu o diálogo de confirmação, cancelado durante a conferência. O botão Continuar conversa teve ícone e descrição conferidos sem executar a retomada. Capturas em `.gradle/sessions-preview/header-active.png` e `header-closed.png`.
+- Não foram adicionados ou executados testes automatizados nessa revisão.
+
+Confirmação personalizada de 08/10/2026:
+
+- `:app:assembleDebug` aprovado e APK instalada no Samsung SM-M315F. Diálogo baseado no `mobilePopup` de dois botões do Figma conferido com a fonte configurada no aparelho: texto sem cortes, Cross de 20 dp, botões roxo/contornado e fundo escurecido. Cancelar fechou a janela mantendo a conversa ativa; não foi confirmado nenhum encerramento. Captura em `.gradle/sessions-preview/end-dialog.png`. Sem testes automatizados adicionados ou executados.
 
 Os commits correspondem às subtarefas `SCRUM-419` (conexão), `SCRUM-420` (envio), `SCRUM-421` (tela/Markdown) e `SCRUM-422` (carregamento/falhas).
 

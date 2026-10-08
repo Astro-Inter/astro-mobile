@@ -29,9 +29,9 @@ public final class ConversationsFragment extends Fragment {
         view.findViewById(R.id.button_conversations_close).setOnClickListener(returnHome);
         view.findViewById(R.id.button_conversations_nav_home).setOnClickListener(returnHome);
 
-        // A conversa fixada abre o mesmo assistente usado pelo mascote da Home.
+        // A IA fixada abre sua lista de sessões; o mascote mantém acesso direto ao chat.
         view.findViewById(R.id.button_conversations_ai).setOnClickListener(clicked ->
-                navigation.navigate(R.id.action_conversations_to_chat));
+                navigation.navigate(R.id.action_conversations_to_ai_sessions));
 
         // Nesta etapa, os filtros alternam apenas a seleção visual.
         int[] filterIds = {R.id.button_conversations_filter_all,
