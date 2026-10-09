@@ -95,13 +95,13 @@
 
     <fragment
         android:id="@+id/connectionErrorFragment"
-        android:name="com.example.astro_mobile.navigation.EmailErrorMockFragment"
-        android:label="Erro de conexão (mock)" />
+        android:name="com.example.astro_mobile.navigation.ErrorFragment"
+        android:label="Erro de conexão" />
 
     <fragment
         android:id="@+id/genericErrorFragment"
-        android:name="com.example.astro_mobile.navigation.EmailErrorMockFragment"
-        android:label="Erro interno (mock)" />
+        android:name="com.example.astro_mobile.navigation.ErrorFragment"
+        android:label="Erro genérico" />
 
     <fragment
         android:id="@+id/accessKeyInformationFragment"

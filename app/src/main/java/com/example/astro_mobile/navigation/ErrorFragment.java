@@ -26,15 +26,15 @@ import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 import com.example.astro_mobile.data.api.FailureKind;
 
-public class EmailErrorMockFragment extends Fragment {
+public class ErrorFragment extends Fragment {
     private EmailVerificationViewModel verificationViewModel;
     private PasswordResetViewModel resetViewModel;
     private PasswordResetViewModel.ResultCallback resetResultCallback;
     private AccessKeyViewModel accessKeyViewModel;
     private FirstLoginPasswordViewModel registrationViewModel;
 
-    public EmailErrorMockFragment() {
-        super(R.layout.fragment_email_error_mock);
+    public ErrorFragment() {
+        super(R.layout.fragment_error);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class EmailErrorMockFragment extends Fragment {
         View retryButton = view.findViewById(R.id.button_email_error_retry);
         TextView retryLabel = view.findViewById(R.id.text_email_error_retry);
         ProgressBar progress = view.findViewById(R.id.progress_email_error_retry);
-        // Usa a mesma tela mock para apresentar erro de conexão ou erro interno.
+        // Reaproveita o mesmo layout para os dois erros, mudando o título e a mensagem.
         showCopy(title, body, errorDestination == R.id.connectionErrorFragment);
         if (source == R.id.splashFragment) {
             view.findViewById(R.id.button_email_error_start).setVisibility(View.GONE);
