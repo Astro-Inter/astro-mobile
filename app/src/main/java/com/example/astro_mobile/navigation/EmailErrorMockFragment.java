@@ -16,6 +16,7 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.AccessKeyViewModel;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
@@ -257,7 +258,8 @@ public class EmailErrorMockFragment extends Fragment {
         TextView back = view.findViewById(R.id.button_email_error_start);
         back.setText(R.string.profile_retry_back);
         back.setOnClickListener(clicked -> navigation.popBackStack(
-                source == R.id.profileFragment ? R.id.employeeHomeFragment : R.id.changePasswordFragment, false));
+                source == R.id.profileFragment ? HomeNavigation.destination(requireContext())
+                        : R.id.changePasswordFragment, false));
         View retry = view.findViewById(R.id.button_email_error_retry);
         retry.setOnClickListener(clicked -> {
             if (source == R.id.profileFragment) {

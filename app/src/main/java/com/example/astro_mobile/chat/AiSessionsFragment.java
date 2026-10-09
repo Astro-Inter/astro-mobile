@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public final class AiSessionsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         if (savedInstanceState != null) selectedFilter = savedInstanceState.getString("sessions_filter", "all");
         NavController navigation = NavHostFragment.findNavController(this);
-        model = new ViewModelProvider(navigation.getBackStackEntry(R.id.employeeHomeFragment),
+        model = new ViewModelProvider(navigation.getBackStackEntry(HomeNavigation.destination(requireContext())),
                 new ChatViewModel.Factory()).get(ChatViewModel.class);
         view.findViewById(R.id.button_ai_sessions_back).setOnClickListener(clicked -> navigation.navigateUp());
         AccessibilityDelegateCompat buttonAccessibility = new AccessibilityDelegateCompat() {

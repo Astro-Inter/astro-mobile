@@ -7,6 +7,7 @@ public final class FlowPreferences {
     private static final String PREFS = "astro_flow";
     private static final String KEY_LAST_FLOW = "last_flow";
     private static final String EMPLOYEE = "EMPLOYEE";
+    private static final String MANAGER = "MANAGER";
 
     private FlowPreferences() {
     }
@@ -18,6 +19,14 @@ public final class FlowPreferences {
 
     public static void saveEmployeeFlow(Context context) {
         preferences(context).edit().putString(KEY_LAST_FLOW, EMPLOYEE).apply();
+    }
+
+    public static boolean wasManagerFlow(Context context) {
+        return MANAGER.equals(preferences(context).getString(KEY_LAST_FLOW, null));
+    }
+
+    public static void saveManagerFlow(Context context) {
+        preferences(context).edit().putString(KEY_LAST_FLOW, MANAGER).apply();
     }
 
     public static void clear(Context context) {

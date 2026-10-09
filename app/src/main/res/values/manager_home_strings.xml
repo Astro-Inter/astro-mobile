@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dados provisórios do Figma; a Home ainda não consulta a API. -->
+    <string name="manager_home_greeting">Olá, <b>Bruno Baptista</b></string>
+    <string name="manager_home_summary">Confira aqui o estado atual da conformidade do seu workspace</string>
+    <string name="manager_home_workspace_label">Workspace:</string>
+    <string name="manager_home_workspace_name">Welker\'s</string>
+    <string name="manager_home_actions_title">Ações rápidas</string>
+    <string name="manager_home_actions_subtitle">Encontre aqui tudo que o Astro oferece</string>
+    <string name="manager_home_validate">Validar eventos</string>
+    <string name="manager_home_employees">Visualizar colaboradores</string>
+    <string name="manager_home_forms_action">Responder formulários</string>
+    <string name="manager_home_conversations">Conversar</string>
+    <string name="manager_home_validations">Validações pendentes</string>
+    <string name="manager_home_forms">Formulários pendentes</string>
+    <string name="manager_home_indicators_title">Seus indicadores</string>
+    <string name="manager_home_indicators_subtitle">Tenha uma visão geral dos seus indicadores no workspace</string>
+    <string name="manager_home_events_indicator">Eventos em seu nome ocorrendo</string>
+    <string name="manager_home_employees_indicator">Colaboradores com pendências em seus eventos atuais</string>
+    <string name="manager_home_validation_count">15</string>
+    <string name="manager_home_event_count">3</string>
+    <string name="manager_home_employee_count">34</string>
+    <string name="manager_home_mock_kevin">Kevin Parker</string>
+    <string name="manager_home_mock_camilly">Camilly Arraes</string>
+    <string name="manager_home_mock_training">Treinamento de EPI</string>
+    <string name="manager_home_mock_form">Checklist de Inspeção de Segurança do Ambiente de Trabalho</string>
+    <string name="manager_home_mock_new">Novo</string>
+    <string name="manager_home_mock_seen">Visto</string>
+    <string name="manager_home_mock_deadline">Restam 2 dias</string>
+</resources>
