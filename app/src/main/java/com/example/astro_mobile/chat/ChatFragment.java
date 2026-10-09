@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.example.astro_mobile.data.ai.ChatRequest;
 import com.example.astro_mobile.data.ai.ChatFailure;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
@@ -40,10 +42,10 @@ public final class ChatFragment extends Fragment {
         NavController navigation = NavHostFragment.findNavController(this);
         view.findViewById(R.id.button_chat_sessions).setOnClickListener(clicked -> {
             if (!navigation.popBackStack(R.id.aiSessionsFragment, false)) {
-                navigation.navigate(R.id.action_chat_to_ai_sessions);
+                navigation.navigate(R.id.action_chat_to_ai_sessions, AuthArgs.copy(getArguments()));
             }
         });
-        model = new ViewModelProvider(navigation.getBackStackEntry(R.id.employeeHomeFragment),
+        model = new ViewModelProvider(navigation.getBackStackEntry(HomeNavigation.destination(requireContext())),
                 new ChatViewModel.Factory()).get(ChatViewModel.class);
         EditText input = view.findViewById(R.id.input_chat_message);
         View sendButton = view.findViewById(R.id.button_chat_send);
@@ -86,21 +88,7 @@ public final class ChatFragment extends Fragment {
         view.findViewById(R.id.button_chat_add).setOnClickListener(clicked ->
                 Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
                         Toast.LENGTH_SHORT).show());
-        view.findViewById(R.id.button_conversations_nav_events).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
-                        Toast.LENGTH_SHORT).show());
-        view.findViewById(R.id.button_conversations_nav_profile).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
-                        Toast.LENGTH_SHORT).show());
-        // A navbar volta à Home ou à lista sem duplicar o chat na pilha.
-        view.findViewById(R.id.button_conversations_nav_home).setOnClickListener(clicked ->
-                navigation.popBackStack(R.id.employeeHomeFragment, false));
-        view.findViewById(R.id.button_conversations_nav_chat).setOnClickListener(clicked -> {
-            navigation.popBackStack();
-            if (navigation.getCurrentDestination().getId() == R.id.employeeHomeFragment) {
-                navigation.navigate(R.id.action_employee_home_to_conversations);
-            }
-        });
+        // A navbar compartilhada é controlada pela Activity.
         view.findViewById(R.id.button_chat_close).setOnClickListener(clicked -> {
             if (ViewCompat.getWindowInsetsController(view) != null) {
                 ViewCompat.getWindowInsetsController(view).hide(WindowInsetsCompat.Type.ime());
@@ -187,17 +175,6 @@ public final class ChatFragment extends Fragment {
             sendButton.setEnabled(enabled);
             sendButton.setAlpha(enabled ? 1f : 0.4f);
         });
-        // O host já aplica as barras do sistema; aqui se soma apenas a área do teclado.
-        ViewCompat.setOnApplyWindowInsetsListener(view, (target, insets) -> {
-            int keyboard = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
-            int navigationBar = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
-            // Deixa o espaço do teclado para o campo; a navbar reaparece ao fechar.
-            view.findViewById(R.id.container_chat_bottom_nav)
-                    .setVisibility(keyboard > navigationBar ? View.GONE : View.VISIBLE);
-            target.setPadding(0, 0, 0, Math.max(0, keyboard - navigationBar));
-            return insets;
-        });
-        ViewCompat.requestApplyInsets(view);
     }
 
     @Override public void onResume() {

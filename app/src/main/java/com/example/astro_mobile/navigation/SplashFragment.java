@@ -224,11 +224,14 @@ public class SplashFragment extends Fragment {
             }
             NavController navController = NavHostFragment.findNavController(this);
             if (destination == EmailVerificationViewModel.Destination.PASSWORD) {
-                boolean employee = "COLABORADOR".equals(userType)
-                        || FlowPreferences.wasEmployeeFlow(requireContext());
-                navController.navigate(employee ? R.id.action_splash_to_employee_home
-                                : R.id.action_splash_to_flow_choice,
-                        AuthArgs.of(email, userType));
+                int homeAction = R.id.action_splash_to_flow_choice;
+                if ("COLABORADOR".equals(userType) || FlowPreferences.wasEmployeeFlow(requireContext())) {
+                    homeAction = R.id.action_splash_to_employee_home;
+                    FlowPreferences.saveEmployeeFlow(requireContext());
+                } else if (FlowPreferences.wasManagerFlow(requireContext())) {
+                    homeAction = R.id.action_splash_to_manager_home;
+                }
+                navController.navigate(homeAction, AuthArgs.of(email, userType));
             } else if (destination == EmailVerificationViewModel.Destination.FIRST_ACCESS_KEY
                     && "COLABORADOR".equals(userType)) {
                 // A conta Firebase já existe; retoma a ativação sem repetir a chave.

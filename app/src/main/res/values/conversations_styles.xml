@@ -21,7 +21,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:minHeight">@dimen/employee_home_nav_height</item>
-        <item name="android:background">@drawable/bg_home_row_ripple</item>
+        <item name="android:background">@drawable/bg_shared_nav_item</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:gravity">center</item>
@@ -36,7 +36,8 @@
         <item name="android:gravity">center</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:maxLines">2</item>
-        <item name="android:textColor">@color/astro_light_background</item>
+        <item name="android:textColor">@color/nav_item_tint</item>
+        <item name="android:duplicateParentState">true</item>
         <item name="android:textSize">@dimen/employee_home_caption_text_size</item>
     </style>
 </resources>

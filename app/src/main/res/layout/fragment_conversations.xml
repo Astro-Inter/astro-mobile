@@ -86,6 +86,7 @@
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/montserrat_family"
                 android:includeFontPadding="false"
+                android:id="@+id/text_conversations_subtitle"
                 android:text="@string/conversations_subtitle"
                 android:textColor="@color/astro_input_hint"
                 android:textSize="@dimen/employee_home_body_text_size" />
@@ -194,7 +195,7 @@
             android:layout_height="0dp"
             android:clipToPadding="false"
             app:layout_constraintTop_toBottomOf="@id/divider_conversations_ai"
-            app:layout_constraintBottom_toTopOf="@id/container_conversations_bottom_nav"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -205,18 +206,10 @@
             android:layout_height="0dp"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/divider_conversations_ai"
-            app:layout_constraintBottom_toTopOf="@id/container_conversations_bottom_nav"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:visibility="gone" />
 
-        <include
-            android:id="@+id/container_conversations_bottom_nav"
-            layout="@layout/include_conversations_bottom_nav"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

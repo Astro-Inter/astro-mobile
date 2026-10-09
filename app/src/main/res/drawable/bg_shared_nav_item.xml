@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/astro_button_ripple">
+    <item>
+        <selector>
+            <item android:state_selected="true">
+                <layer-list>
+                    <item android:width="@dimen/employee_home_nav_selected_size"
+                        android:height="@dimen/employee_home_nav_selected_size"
+                        android:gravity="center" android:drawable="@drawable/home_nav_selected" />
+                </layer-list>
+            </item>
+            <item android:drawable="@android:color/transparent" />
+        </selector>
+    </item>
+</ripple>
