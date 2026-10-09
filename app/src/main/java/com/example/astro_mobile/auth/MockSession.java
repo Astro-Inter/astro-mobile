@@ -3,58 +3,15 @@ package com.example.astro_mobile.auth;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.annotation.Nullable;
-
-/** Sessão local temporária para os fluxos mock, sem senha ou token. */
+/** Limpa a antiga sessão mock e identifica os perfis conhecidos do Astro. */
 public final class MockSession {
     private static final String PREFS = "astro_mock_session";
-    private static final String KEY_EMAIL = "email";
-    private static final String KEY_USER_TYPE = "user_type";
-    private static final String KEY_DESTINATION = "destination";
-
-    public enum Destination { FLOW_CHOICE, EMPLOYEE_HOME }
 
     private MockSession() {
     }
 
-    public static void save(Context context, String email, String userType,
-                            Destination destination) {
-        // Guarda somente uma combinação válida de e-mail, perfil e tela inicial mock.
-        if (email == null || email.isEmpty() || !isKnownUserType(userType)
-                || destination == null) {
-            return;
-        }
-        preferences(context).edit()
-                .putString(KEY_EMAIL, email)
-                .putString(KEY_USER_TYPE, userType)
-                .putString(KEY_DESTINATION, destination.name())
-                .apply();
-    }
-
-    @Nullable
-    public static State read(Context context) {
-        // Recupera a sessão local para decidir o destino após a splash.
-        SharedPreferences preferences = preferences(context);
-        String email = preferences.getString(KEY_EMAIL, null);
-        String userType = preferences.getString(KEY_USER_TYPE, null);
-        String savedDestination = preferences.getString(KEY_DESTINATION, null);
-        if (email == null || email.isEmpty() || !isKnownUserType(userType)
-                || savedDestination == null) {
-            return null;
-        }
-        try {
-            Destination destination = Destination.valueOf(savedDestination);
-            if (destination == Destination.FLOW_CHOICE && "COLABORADOR".equals(userType)) {
-                return null;
-            }
-            return new State(email, userType, destination);
-        } catch (IllegalArgumentException exception) {
-            return null;
-        }
-    }
-
     public static boolean clear(Context context) {
-        // Remove a sessão mock usada para pular o login na próxima abertura.
+        // Remove dados deixados pelas versões que simulavam o cadastro.
         return preferences(context).edit().clear().commit();
     }
 
@@ -65,17 +22,5 @@ public final class MockSession {
 
     private static SharedPreferences preferences(Context context) {
         return context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-    }
-
-    public static final class State {
-        public final String email;
-        public final String userType;
-        public final Destination destination;
-
-        private State(String email, String userType, Destination destination) {
-            this.email = email;
-            this.userType = userType;
-            this.destination = destination;
-        }
     }
 }

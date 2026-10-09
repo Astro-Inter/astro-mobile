@@ -175,6 +175,21 @@
 
                 </FrameLayout>
 
+                <TextView
+                    android:id="@+id/button_first_login_access_key_resume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat_family"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:padding="8dp"
+                    android:text="@string/first_login_access_key_resume"
+                    android:textColor="@color/astro_light_background"
+                    android:textSize="14sp" />
+
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,9 +8,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class FirebaseAuthRepository {
+    public interface AccountCallback {
+        void onSuccess(String firebaseUid);
+
+        void onFailure(AuthFailureKind kind);
+    }
+
     public interface ResultCallback {
         void onSuccess();
 
@@ -53,6 +61,54 @@ public class FirebaseAuthRepository {
                 callback.onFailure(classify(task.getException()));
             }
         });
+    }
+
+    public void createAccount(String email, String password, AccountCallback callback) {
+        // Cria a identidade Firebase; ativar a conta Astro é uma etapa separada.
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                reportAuthenticatedAccount(email, callback);
+            } else if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                // Conta existente só pode ser retomada depois de confirmar sua senha.
+                signInForActivation(email, password, callback);
+            } else {
+                callback.onFailure(classify(task.getException()));
+            }
+        });
+    }
+
+    public void signInForActivation(String email, String password, AccountCallback callback) {
+        // Não recria a conta nem troca a senha em uma recuperação de cadastro.
+        signIn(email, password, new ResultCallback() {
+            @Override
+            public void onSuccess() {
+                reportAuthenticatedAccount(email, callback);
+            }
+
+            @Override
+            public void onFailure(AuthFailureKind kind) {
+                callback.onFailure(kind);
+            }
+        });
+    }
+
+    @Nullable
+    public String getUidForEmail(String email) {
+        // Nunca usa o UID de uma sessão pertencente a outro e-mail.
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null || !email.equalsIgnoreCase(user.getEmail())) {
+            return null;
+        }
+        return user.getUid();
+    }
+
+    private void reportAuthenticatedAccount(String email, AccountCallback callback) {
+        String uid = getUidForEmail(email);
+        if (uid == null) {
+            callback.onFailure(AuthFailureKind.INTERNAL);
+        } else {
+            callback.onSuccess(uid);
+        }
     }
 
     public void checkCurrentUser(SessionCallback callback) {
@@ -103,6 +159,9 @@ public class FirebaseAuthRepository {
         }
         if (isDisabled(error)) {
             return AuthFailureKind.DISABLED;
+        }
+        if (error instanceof FirebaseAuthWeakPasswordException) {
+            return AuthFailureKind.WEAK_PASSWORD;
         }
         if (error instanceof FirebaseAuthInvalidCredentialsException
                 || error instanceof FirebaseAuthInvalidUserException) {
