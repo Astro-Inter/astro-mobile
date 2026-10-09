@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_marginBottom="20dp" android:background="@drawable/bg_profile_panel"
+    android:orientation="vertical">
+    <LinearLayout android:id="@+id/button_profile_nr"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="60dp" android:gravity="center_vertical" android:orientation="horizontal"
+        android:paddingHorizontal="30dp" android:paddingVertical="20dp" android:baselineAligned="false"
+        android:background="@drawable/bg_home_row_ripple" android:clickable="true" android:focusable="true">
+        <TextView android:id="@+id/text_profile_nr_title" style="@style/ProfileText"
+            android:layout_width="0dp" android:layout_weight="1"
+            tools:text="NR-06 · Validade: 21/12/2026" />
+        <ImageView android:id="@+id/image_profile_nr_chevron"
+            android:layout_width="18dp" android:layout_height="18dp" android:layout_marginStart="10dp"
+            android:src="@drawable/profile_chevron_down" android:contentDescription="@null" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/container_profile_nr_details"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingHorizontal="30dp" android:paddingBottom="20dp"
+        android:orientation="vertical" android:visibility="gone" tools:visibility="visible">
+        <TextView android:id="@+id/text_profile_nr_description" style="@style/ProfileText"
+            android:textColor="@color/astro_input_hint"
+            tools:text="Descrição:&#10;Estabelece os requisitos para o fornecimento, uso e conservação de Equipamentos de Proteção Individual – EPI." />
+        <TextView android:id="@+id/text_profile_nr_objective" style="@style/ProfileText"
+            android:layout_marginTop="20dp" android:textColor="@color/astro_input_hint"
+            tools:text="Objetivo:&#10;Garantir a proteção e a segurança do trabalhador." />
+        <TextView android:id="@+id/text_profile_nr_applicability" style="@style/ProfileText"
+            android:layout_marginTop="20dp" android:textColor="@color/astro_input_hint"
+            tools:text="Aplicabilidade:&#10;Trabalhadores expostos a riscos em suas atividades." />
+    </LinearLayout>
+</LinearLayout>

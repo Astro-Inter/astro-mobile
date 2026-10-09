@@ -95,6 +95,5 @@
                 android:src="@drawable/chat_add" android:scaleType="fitCenter"
                 android:contentDescription="@null" android:importantForAccessibility="no" />
         </FrameLayout>
-        <include android:id="@+id/container_ai_sessions_bottom_nav" layout="@layout/include_conversations_bottom_nav" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,6 +11,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 
 public final class ConversationsFragment extends Fragment {
 
@@ -23,15 +24,15 @@ public final class ConversationsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         NavController navigation = NavHostFragment.findNavController(this);
 
-        // Voltar, fechar e Home retornam à Home que já está na pilha.
-        View.OnClickListener returnHome = clicked -> navigation.popBackStack();
+        // Voltar e fechar retornam à Home que já está na pilha; a Activity controla as abas.
+        View.OnClickListener returnHome = clicked ->
+                navigation.popBackStack(R.id.employeeHomeFragment, false);
         view.findViewById(R.id.button_conversations_back).setOnClickListener(returnHome);
         view.findViewById(R.id.button_conversations_close).setOnClickListener(returnHome);
-        view.findViewById(R.id.button_conversations_nav_home).setOnClickListener(returnHome);
 
         // A IA fixada abre sua lista de sessões; o mascote mantém acesso direto ao chat.
         view.findViewById(R.id.button_conversations_ai).setOnClickListener(clicked ->
-                navigation.navigate(R.id.action_conversations_to_ai_sessions));
+                navigation.navigate(R.id.action_conversations_to_ai_sessions, AuthArgs.copy(getArguments())));
 
         // Nesta etapa, os filtros alternam apenas a seleção visual.
         int[] filterIds = {R.id.button_conversations_filter_all,
@@ -45,13 +46,9 @@ public final class ConversationsFragment extends Fragment {
             });
         }
 
-        // Busca e outras abas ainda aguardam suas funcionalidades.
-        int[] pendingIds = {R.id.button_conversations_search,
-                R.id.button_conversations_nav_events, R.id.button_conversations_nav_profile};
-        for (int id : pendingIds) {
-            view.findViewById(id).setOnClickListener(clicked ->
-                    Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
-                            Toast.LENGTH_SHORT).show());
-        }
+        // A busca ainda aguarda sua funcionalidade.
+        view.findViewById(R.id.button_conversations_search).setOnClickListener(clicked ->
+                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
+                        Toast.LENGTH_SHORT).show());
     }
 }

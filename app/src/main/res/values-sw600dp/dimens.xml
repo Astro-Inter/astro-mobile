@@ -13,7 +13,7 @@
     <dimen name="employee_home_ai_size">60dp</dimen>
     <dimen name="employee_home_ai_mascot_width">45dp</dimen>
     <dimen name="employee_home_ai_mascot_height">45dp</dimen>
-    <dimen name="employee_home_ai_bottom_margin">118dp</dimen>
+    <dimen name="employee_home_ai_bottom_margin">18dp</dimen>
     <dimen name="employee_home_ai_bubble_max_width">430dp</dimen>
     <dimen name="employee_home_ai_bubble_text_size">19sp</dimen>
 </resources>

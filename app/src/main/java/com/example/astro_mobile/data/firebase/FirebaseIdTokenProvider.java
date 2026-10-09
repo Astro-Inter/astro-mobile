@@ -1,6 +1,5 @@
 package com.example.astro_mobile.data.firebase;
 
-import com.example.astro_mobile.data.ai.IdTokenProvider;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;

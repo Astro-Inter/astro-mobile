@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.navigation.NavOptions;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
@@ -42,9 +43,21 @@ public class FlowChoiceFragment extends Fragment {
             if (sessionViewModel.hasCurrentUser()) {
                 FlowPreferences.saveEmployeeFlow(requireContext());
             }
-            Navigation.findNavController(clickedView)
-                    .navigate(R.id.action_flow_choice_to_employee_home,
-                            AuthArgs.copy(args));
+            Bundle destinationArgs = AuthArgs.copy(args);
+            boolean switching = destinationArgs.getBoolean(AuthArgs.FROM_PROFILE);
+            destinationArgs.remove(AuthArgs.FROM_PROFILE);
+            // Trocar fluxo remove as telas antigas, sem repetir login ou duplicar a Home.
+            if (switching) {
+                Navigation.findNavController(clickedView).navigate(R.id.employeeHomeFragment,
+                        destinationArgs, new NavOptions.Builder()
+                                .setPopUpTo(R.id.nav_graph, true)
+                                .setEnterAnim(R.anim.push_enter).setExitAnim(R.anim.push_exit)
+                                .setPopEnterAnim(R.anim.push_pop_enter).setPopExitAnim(R.anim.push_pop_exit)
+                                .build());
+            } else {
+                Navigation.findNavController(clickedView)
+                        .navigate(R.id.action_flow_choice_to_employee_home, destinationArgs);
+            }
         });
     }
 }

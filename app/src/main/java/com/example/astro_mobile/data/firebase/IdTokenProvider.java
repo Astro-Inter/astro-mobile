@@ -1,6 +1,6 @@
-package com.example.astro_mobile.data.ai;
+package com.example.astro_mobile.data.firebase;
 
-/** Obtém o ID token da sessão existente, sem chamar o login da API de IA. */
+/** Obtém o ID token da sessão Firebase para as APIs que exigem autenticação. */
 public interface IdTokenProvider {
     enum Failure { SESSION, CONNECTION, INTERNAL }
 

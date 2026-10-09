@@ -2,6 +2,7 @@ package com.example.astro_mobile.data.ai;
 
 import androidx.annotation.NonNull;
 import com.example.astro_mobile.data.firebase.FirebaseIdTokenProvider;
+import com.example.astro_mobile.data.firebase.IdTokenProvider;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.concurrent.atomic.AtomicBoolean;

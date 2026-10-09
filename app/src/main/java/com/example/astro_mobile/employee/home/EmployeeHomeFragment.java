@@ -27,6 +27,7 @@ import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AccessKeyViewModel;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.SessionViewModel;
@@ -134,26 +135,22 @@ public class EmployeeHomeFragment extends Fragment {
                 R.id.button_employee_home_completed_card,
                 R.id.button_employee_home_events_more,
                 R.id.button_employee_home_notifications_section,
-                R.id.button_employee_home_notifications_more,
-                R.id.button_employee_home_nav_events,
-                R.id.button_employee_home_nav_profile
+                R.id.button_employee_home_notifications_more
         };
         for (int id : mockActions) {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
         }
 
-        // A aba Chat abre a lista; o mascote continua sendo um atalho direto para a IA.
-        view.findViewById(R.id.button_employee_home_nav_chat).setOnClickListener(clicked ->
-                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_conversations));
+        // O mascote continua sendo um atalho direto para a IA; a Activity controla a navbar.
         aiBubble.setOnClickListener(clicked ->
-                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_chat));
+                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_chat,
+                        AuthArgs.copy(getArguments())));
 
         // Restringe o arraste do assistente à área entre cabeçalho e navbar.
         aiBubble.setOnTouchListener(new AiDragTouchListener(
                 aiBubble,
                 view.findViewById(R.id.container_employee_home_content),
-                view.findViewById(R.id.container_employee_home_header),
-                view.findViewById(R.id.container_employee_home_bottom_nav)));
+                view.findViewById(R.id.container_employee_home_header)));
     }
 
     @Override
@@ -482,7 +479,6 @@ public class EmployeeHomeFragment extends Fragment {
         private final View button;
         private final View content;
         private final View header;
-        private final View bottomNav;
         private final int touchSlop;
         private final float edge;
         private float downX;
@@ -491,11 +487,10 @@ public class EmployeeHomeFragment extends Fragment {
         private float buttonStartY;
         private boolean dragging;
 
-        AiDragTouchListener(View button, View content, View header, View bottomNav) {
+        AiDragTouchListener(View button, View content, View header) {
             this.button = button;
             this.content = content;
             this.header = header;
-            this.bottomNav = bottomNav;
             touchSlop = ViewConfiguration.get(requireContext()).getScaledTouchSlop();
             float density = getResources().getDisplayMetrics().density;
             edge = 8f * density;
@@ -541,8 +536,7 @@ public class EmployeeHomeFragment extends Fragment {
                         float left = content.getLeft() + edge;
                         float right = content.getRight() - edge - button.getWidth();
                         float top = content.getTop() + header.getBottom() + edge;
-                        float bottom = content.getTop() + bottomNav.getTop()
-                                - edge - button.getHeight();
+                        float bottom = content.getBottom() - edge - button.getHeight();
                         button.setX(clamp(buttonStartX + dx, left, right));
                         button.setY(clamp(buttonStartY + dy, top, bottom));
                     }

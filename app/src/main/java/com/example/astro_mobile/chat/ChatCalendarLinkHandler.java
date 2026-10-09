@@ -14,7 +14,7 @@ import com.example.astro_mobile.R;
 import com.example.astro_mobile.data.ai.AiApiClient;
 import com.example.astro_mobile.data.ai.AiChatApi;
 import com.example.astro_mobile.data.ai.GoogleCalendarConnectResponse;
-import com.example.astro_mobile.data.ai.IdTokenProvider;
+import com.example.astro_mobile.data.firebase.IdTokenProvider;
 import com.example.astro_mobile.data.firebase.FirebaseIdTokenProvider;
 
 import retrofit2.Call;

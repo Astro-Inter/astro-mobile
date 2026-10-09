@@ -1,5 +1,7 @@
 package com.example.astro_mobile.data.ai;
 
+import com.example.astro_mobile.data.firebase.IdTokenProvider;
+
 import static org.junit.Assert.*;
 
 import org.junit.Test;

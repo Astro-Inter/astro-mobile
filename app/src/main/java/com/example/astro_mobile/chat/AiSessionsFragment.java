@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -27,6 +26,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -136,29 +136,7 @@ public final class AiSessionsFragment extends Fragment {
         view.findViewById(R.id.button_ai_sessions_new).setOnClickListener(clicked -> {
             if (model.startNewConversation()) openChat(navigation);
         });
-        view.findViewById(R.id.button_conversations_nav_home).setOnClickListener(clicked ->
-                navigation.popBackStack(R.id.employeeHomeFragment, false));
-        view.findViewById(R.id.button_conversations_nav_chat).setOnClickListener(clicked -> {
-            if (!navigation.popBackStack(R.id.conversationsFragment, false)) {
-                navigation.popBackStack(R.id.employeeHomeFragment, false);
-                navigation.navigate(R.id.action_employee_home_to_conversations);
-            }
-        });
-        View.OnClickListener unavailable = clicked -> Toast.makeText(requireContext(),
-                R.string.employee_home_mock_unavailable, Toast.LENGTH_SHORT).show();
-        view.findViewById(R.id.button_conversations_nav_events).setOnClickListener(unavailable);
-        view.findViewById(R.id.button_conversations_nav_profile).setOnClickListener(unavailable);
-        ViewCompat.setOnApplyWindowInsetsListener(view, (target, insets) -> {
-            int keyboard = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
-            int bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
-            boolean typing = keyboard > bars;
-            view.findViewById(R.id.container_ai_sessions_bottom_nav).setVisibility(typing ? View.GONE : View.VISIBLE);
-            view.findViewById(R.id.button_ai_sessions_new).setVisibility(typing ? View.GONE : View.VISIBLE);
-            target.setPadding(0, 0, 0, Math.max(0, keyboard - bars));
-            view.findViewById(R.id.list_ai_sessions).post(loadNextPage);
-            return insets;
-        });
-        ViewCompat.requestApplyInsets(view);
+        // Navbar e espaço do teclado ficam na Activity, como nas demais telas autenticadas.
     }
 
     private void renderProgress(View view) {
@@ -195,7 +173,7 @@ public final class AiSessionsFragment extends Fragment {
 
     private void openChat(NavController navigation) {
         if (!navigation.popBackStack(R.id.chatFragment, false)) {
-            navigation.navigate(R.id.action_ai_sessions_to_chat);
+            navigation.navigate(R.id.action_ai_sessions_to_chat, AuthArgs.copy(getArguments()));
         }
     }
 

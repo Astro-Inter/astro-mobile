@@ -4,6 +4,41 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/splashFragment">
 
+    <action android:id="@+id/action_global_conversations" app:destination="@id/conversationsFragment"
+        app:popUpTo="@id/employeeHomeFragment" app:launchSingleTop="true"
+        app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+        app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+
+    <action android:id="@+id/action_global_profile" app:destination="@id/profileFragment"
+        app:launchSingleTop="true"
+        app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+        app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+
+    <fragment android:id="@+id/profileFragment"
+        android:name="com.example.astro_mobile.shared.profile.ProfileFragment" android:label="Perfil">
+        <action android:id="@+id/action_profile_to_change_password" app:destination="@id/changePasswordFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+        <action android:id="@+id/action_profile_to_flow_choice" app:destination="@id/flowChoiceFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+        <action android:id="@+id/action_profile_to_generic_error" app:destination="@id/genericErrorFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+    <fragment android:id="@+id/changePasswordFragment"
+        android:name="com.example.astro_mobile.shared.profile.ChangePasswordFragment" android:label="Alterar senha">
+        <action android:id="@+id/action_change_password_to_sent" app:destination="@id/passwordSentFragment"
+            app:popUpTo="@id/changePasswordFragment" app:popUpToInclusive="true"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+        <action android:id="@+id/action_change_password_to_generic_error" app:destination="@id/genericErrorFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+    <fragment android:id="@+id/passwordSentFragment"
+        android:name="com.example.astro_mobile.shared.profile.PasswordSentFragment" android:label="E-mail enviado" />
+
     <fragment
         android:id="@+id/splashFragment"
         android:name="com.example.astro_mobile.navigation.SplashFragment"
@@ -254,13 +289,6 @@
         android:id="@+id/employeeHomeFragment"
         android:name="com.example.astro_mobile.employee.home.EmployeeHomeFragment"
         android:label="Home do Colaborador">
-        <action
-            android:id="@+id/action_employee_home_to_conversations"
-            app:destination="@id/conversationsFragment"
-            app:enterAnim="@anim/push_enter"
-            app:exitAnim="@anim/push_exit"
-            app:popEnterAnim="@anim/push_pop_enter"
-            app:popExitAnim="@anim/push_pop_exit" />
         <action
             android:id="@+id/action_employee_home_to_chat"
             app:destination="@id/chatFragment"

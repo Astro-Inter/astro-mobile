@@ -33,6 +33,11 @@ public class PasswordResetViewModel extends ViewModel {
         return lastEmail;
     }
 
+    public String getCurrentEmail() {
+        // No perfil, o destinatário é a conta autenticada e não um campo editável.
+        return repository.getCurrentEmail();
+    }
+
     public void sendPasswordResetEmail(String email, ResultCallback callback) {
         if (loading) {
             return;

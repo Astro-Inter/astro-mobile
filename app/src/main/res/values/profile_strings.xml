@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_title">Perfil</string>
+    <string name="profile_unit">Unidade:</string>
+    <string name="profile_modality">Modalidade:</string>
+    <string name="profile_email">E-mail:</string>
+    <string name="profile_notifications">Receber notificações no celular</string>
+    <string name="profile_nrs">Minhas NR’s</string>
+    <string name="profile_nrs_empty">Nenhuma NR vinculada ao seu cargo.</string>
+    <string name="profile_nr_code">NR-%1$02d</string>
+    <string name="profile_nr_validity">%1$s · Validade: %2$s</string>
+    <string name="profile_nr_description">Descrição:\n%1$s</string>
+    <string name="profile_nr_objective">Objetivo:\n%1$s</string>
+    <string name="profile_nr_applicability">Aplicabilidade:\n%1$s</string>
+    <string name="profile_change_password">Alterar senha</string>
+    <string name="profile_switch_flow">Trocar tipo de usuário</string>
+    <string name="profile_logout">Sair da conta</string>
+    <string name="profile_logout_title">Sair?</string>
+    <string name="profile_logout_description">Você será desconectado e precisará se conectar novamente.</string>
+    <string name="profile_logout_confirm">Sair</string>
+    <string name="profile_logout_cancel">Cancelar</string>
+    <string name="profile_retry_back">Voltar</string>
+    <string name="profile_change_password_description">Enviaremos um link para %1$s com as instruções para você criar uma nova senha.</string>
+    <string name="profile_change_password_send">Enviar link</string>
+    <string name="profile_change_password_sent_description">Enviamos um link para %1$s. Abra o e-mail e siga as instruções para alterar sua senha.</string>
+    <string name="profile_back">Voltar ao perfil</string>
+</resources>

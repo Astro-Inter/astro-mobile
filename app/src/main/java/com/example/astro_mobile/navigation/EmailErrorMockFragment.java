@@ -25,6 +25,7 @@ import com.example.astro_mobile.auth.PasswordResetViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.auth.SessionNavigation;
 
 public class EmailErrorMockFragment extends Fragment {
     private EmailVerificationViewModel verificationViewModel;
@@ -41,13 +42,18 @@ public class EmailErrorMockFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        verificationViewModel = new ViewModelProvider(requireActivity(),
-                EmailVerificationViewModel.Factory.createDefault())
-                .get(EmailVerificationViewModel.class);
         NavController navController = NavHostFragment.findNavController(this);
         int errorDestination = navController.getCurrentDestination().getId();
         NavBackStackEntry previous = navController.getPreviousBackStackEntry();
         int source = previous == null ? 0 : previous.getDestination().getId();
+        // Erros do perfil não retomam a identificação de e-mail nem a recuperação do login.
+        if (source == R.id.profileFragment || source == R.id.changePasswordFragment) {
+            configureProfileError(view, navController, source);
+            return;
+        }
+        verificationViewModel = new ViewModelProvider(requireActivity(),
+                EmailVerificationViewModel.Factory.createDefault())
+                .get(EmailVerificationViewModel.class);
         if (source == R.id.firstLoginAccessKeyFragment
                 || source == R.id.firstLoginPasswordFragment) {
             accessKeyViewModel = new ViewModelProvider(requireActivity(),
@@ -243,6 +249,50 @@ public class EmailErrorMockFragment extends Fragment {
                         showCopy(title, body, kind == FailureKind.CONNECTION);
                     }
                 });
+    }
+
+    private void configureProfileError(View view, NavController navigation, int source) {
+        showCopy(view.findViewById(R.id.text_email_error_title),
+                view.findViewById(R.id.text_email_error_body), false);
+        TextView back = view.findViewById(R.id.button_email_error_start);
+        back.setText(R.string.profile_retry_back);
+        back.setOnClickListener(clicked -> navigation.popBackStack(
+                source == R.id.profileFragment ? R.id.employeeHomeFragment : R.id.changePasswordFragment, false));
+        View retry = view.findViewById(R.id.button_email_error_retry);
+        retry.setOnClickListener(clicked -> {
+            if (source == R.id.profileFragment) {
+                // Retorna ao perfil, que mostra skeleton e repete sua consulta.
+                navigation.popBackStack(R.id.profileFragment, false);
+                return;
+            }
+            // No erro do envio, tenta novamente com a conta Firebase da sessão.
+            resetViewModel = new ViewModelProvider(navigation.getBackStackEntry(R.id.changePasswordFragment),
+                    PasswordResetViewModel.Factory.createDefault()).get(PasswordResetViewModel.class);
+            String email = resetViewModel.getCurrentEmail();
+            if (email == null) {
+                SessionNavigation.signOut(this);
+                return;
+            }
+            retry.setEnabled(false);
+            view.findViewById(R.id.text_email_error_retry).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.progress_email_error_retry).setVisibility(View.VISIBLE);
+            resetViewModel.sendPasswordResetEmail(email, new PasswordResetViewModel.ResultCallback() {
+                @Override
+                public void onSuccess() {
+                    if (getView() != view || !isAdded()) return;
+                    navigation.navigate(R.id.passwordSentFragment, AuthArgs.of(email, null),
+                            pushReplacing(R.id.changePasswordFragment));
+                }
+
+                @Override
+                public void onFailure(AuthFailureKind kind) {
+                    if (getView() != view || !isAdded()) return;
+                    retry.setEnabled(true);
+                    view.findViewById(R.id.text_email_error_retry).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.progress_email_error_retry).setVisibility(View.GONE);
+                }
+            });
+        });
     }
 
     private void retryAccessKey(View view, View button, TextView label, ProgressBar progress,
