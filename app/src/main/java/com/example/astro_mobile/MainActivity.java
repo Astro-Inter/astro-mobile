@@ -17,9 +17,11 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -96,12 +98,17 @@ public class MainActivity extends AppCompatActivity {
     private void configureBottomNavigation(NavController navigation, View navbar) {
         // As abas usam uma única barra e preservam as telas que já estão na pilha.
         navbar.findViewById(R.id.button_conversations_nav_home).setOnClickListener(clicked ->
-                navigation.popBackStack(R.id.employeeHomeFragment, false));
+                navigation.popBackStack(HomeNavigation.destination(this), false));
         navbar.findViewById(R.id.button_conversations_nav_chat).setOnClickListener(clicked -> {
             if (navigation.getCurrentDestination().getId() == R.id.conversationsFragment) return;
             Bundle args = AuthArgs.copy(navigation.getCurrentBackStackEntry().getArguments());
             if (!navigation.popBackStack(R.id.conversationsFragment, false)) {
-                navigation.navigate(R.id.action_global_conversations, args);
+                navigation.navigate(R.id.action_global_conversations, args, new NavOptions.Builder()
+                        .setPopUpTo(HomeNavigation.destination(this), false)
+                        .setLaunchSingleTop(true)
+                        .setEnterAnim(R.anim.push_enter).setExitAnim(R.anim.push_exit)
+                        .setPopEnterAnim(R.anim.push_pop_enter).setPopExitAnim(R.anim.push_pop_exit)
+                        .build());
             }
         });
         navbar.findViewById(R.id.button_conversations_nav_profile).setOnClickListener(clicked -> {
@@ -117,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateBottomNavigation(View navbar, int destination, WindowInsetsCompat insets) {
         // Só o conteúdo muda nas telas com navbar. No chat, ela se oculta durante o teclado.
-        boolean home = destination == R.id.employeeHomeFragment;
+        boolean home = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment;
         boolean conversations = destination == R.id.conversationsFragment || destination == R.id.chatFragment
                 || destination == R.id.aiSessionsFragment;
         boolean profile = destination == R.id.profileFragment;

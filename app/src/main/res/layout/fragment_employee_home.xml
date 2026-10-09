@@ -41,21 +41,6 @@
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/button_employee_home_logout"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/bg_home_icon_ripple"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/employee_home_logout"
-                android:textColor="@android:color/white"
-                android:textSize="13sp" />
-
             <FrameLayout
                 android:id="@+id/button_employee_home_notifications"
                 android:layout_width="48dp"

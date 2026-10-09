@@ -30,6 +30,7 @@ import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public final class ChatFragment extends Fragment {
     private ChatCalendarLinkHandler calendarLinks;
@@ -44,7 +45,7 @@ public final class ChatFragment extends Fragment {
                 navigation.navigate(R.id.action_chat_to_ai_sessions, AuthArgs.copy(getArguments()));
             }
         });
-        model = new ViewModelProvider(navigation.getBackStackEntry(R.id.employeeHomeFragment),
+        model = new ViewModelProvider(navigation.getBackStackEntry(HomeNavigation.destination(requireContext())),
                 new ChatViewModel.Factory()).get(ChatViewModel.class);
         EditText input = view.findViewById(R.id.input_chat_message);
         View sendButton = view.findViewById(R.id.button_chat_send);

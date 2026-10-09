@@ -5,7 +5,7 @@
     app:startDestination="@id/splashFragment">
 
     <action android:id="@+id/action_global_conversations" app:destination="@id/conversationsFragment"
-        app:popUpTo="@id/employeeHomeFragment" app:launchSingleTop="true"
+        app:launchSingleTop="true"
         app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
         app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
 
@@ -43,6 +43,8 @@
         android:id="@+id/splashFragment"
         android:name="com.example.astro_mobile.navigation.SplashFragment"
         android:label="Splash">
+        <action android:id="@+id/action_splash_to_manager_home" app:destination="@id/managerHomeFragment"
+            app:popUpTo="@id/splashFragment" app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_splash_to_email_identification"
             app:destination="@id/emailIdentificationFragment"
@@ -274,6 +276,10 @@
         android:id="@+id/flowChoiceFragment"
         android:name="com.example.astro_mobile.navigation.FlowChoiceFragment"
         android:label="Escolha de fluxo">
+        <action android:id="@+id/action_flow_choice_to_manager_home" app:destination="@id/managerHomeFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit"
+            app:popUpTo="@id/flowChoiceFragment" app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_flow_choice_to_employee_home"
             app:destination="@id/employeeHomeFragment"
@@ -296,11 +302,6 @@
             app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter"
             app:popExitAnim="@anim/push_pop_exit" />
-        <action
-            android:id="@+id/action_employee_home_to_email_identification"
-            app:destination="@id/emailIdentificationFragment"
-            app:popUpTo="@id/employeeHomeFragment"
-            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -317,6 +318,13 @@
             app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
 
+    <fragment android:id="@+id/managerHomeFragment"
+        android:name="com.example.astro_mobile.manager.home.ManagerHomeFragment" android:label="Home do Gestor">
+        <action android:id="@+id/action_manager_home_to_chat" app:destination="@id/chatFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.example.astro_mobile.chat.ChatFragment"
@@ -325,7 +333,7 @@
         <action
             android:id="@+id/action_chat_to_email_identification"
             app:destination="@id/emailIdentificationFragment"
-            app:popUpTo="@id/employeeHomeFragment"
+            app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
 
