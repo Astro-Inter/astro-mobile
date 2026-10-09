@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="employee_events_title">Eventos</string>
+    <string name="employee_events_search">Pesquisar em Eventos</string>
+    <string name="employee_events_all">Todos</string>
+    <string name="employee_events_pending">Pendente</string>
+    <string name="employee_events_review">Em análise</string>
+    <string name="employee_events_done">Concluído</string>
+    <string name="employee_events_today">Dia atual</string>
+    <string name="employee_events_day_with_events">Dia com evento(s)</string>
+    <string name="employee_events_empty">Nenhum evento encontrado</string>
+    <string name="employee_events_tomorrow">Amanhã</string>
+    <string name="employee_events_previous_month">Mês anterior</string>
+    <string name="employee_events_next_month">Próximo mês</string>
+    <string name="employee_events_month">Selecionar mês</string>
+    <string name="employee_events_year">Selecionar ano</string>
+    <string name="employee_events_day">Dia %1$s</string>
+    <string name="employee_events_due">Data limite: %1$s</string>
+    <string name="employee_events_details_pending">Os detalhes deste evento serão implementados na próxima tarefa.</string>
+    <plurals name="employee_events_count">
+        <item quantity="one">%d evento</item>
+        <item quantity="other">%d eventos</item>
+    </plurals>
+    <string-array name="employee_events_weekdays">
+        <item>Su</item><item>Mo</item><item>Tu</item><item>We</item><item>Th</item><item>Fr</item><item>Sa</item>
+    </string-array>
+    <color name="employee_event_status_red">#FF4D4D</color>
+    <color name="employee_event_status_green">#51BF1E</color>
+    <style name="EmployeeEventsCalendarField">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:background">@drawable/bg_events_calendar_field</item>
+        <item name="android:fontFamily">@font/montserrat_family</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">8dp</item>
+        <item name="drawableEndCompat">@drawable/ic_events_chevron_down</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:textColor">@color/astro_light_background</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

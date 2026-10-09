@@ -122,16 +122,20 @@ public class EmployeeHomeFragment extends Fragment {
         // Os destinos ainda não implementados exibem a mesma mensagem provisória.
         int[] mockActions = {
                 R.id.button_employee_home_notifications,
-                R.id.button_employee_home_events,
-                R.id.button_employee_home_pending_card,
-                R.id.button_employee_home_review_card,
-                R.id.button_employee_home_completed_card,
-                R.id.button_employee_home_events_more,
                 R.id.button_employee_home_notifications_section,
                 R.id.button_employee_home_notifications_more
         };
         for (int id : mockActions) {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
+        }
+
+        // Os atalhos de eventos abrem o calendário do colaborador.
+        int[] eventsActions = { R.id.button_employee_home_events, R.id.button_employee_home_pending_card,
+                R.id.button_employee_home_review_card, R.id.button_employee_home_completed_card,
+                R.id.button_employee_home_events_more };
+        for (int id : eventsActions) {
+            view.findViewById(id).setOnClickListener(clicked -> Navigation.findNavController(clicked)
+                    .navigate(R.id.action_global_employee_events, AuthArgs.copy(getArguments())));
         }
 
         // O mascote continua sendo um atalho direto para a IA; a Activity controla a navbar.

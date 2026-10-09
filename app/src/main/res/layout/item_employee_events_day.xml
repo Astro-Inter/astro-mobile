@@ -1,0 +1,6 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp" android:layout_height="48dp"
+    android:layout_margin="1dp" android:background="@drawable/bg_events_day"
+    android:fontFamily="sans-serif" android:gravity="center" android:includeFontPadding="false"
+    android:textColor="@color/astro_light_background" android:textSize="16sp"
+    android:clickable="true" android:focusable="true" />
