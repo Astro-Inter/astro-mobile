@@ -25,7 +25,9 @@ import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.AccessKeyViewModel;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
+import com.example.astro_mobile.auth.FirstLoginPasswordViewModel;
 
 public class EmailIdentificationFragment extends Fragment {
     private EmailVerificationViewModel verificationViewModel;
@@ -96,6 +98,18 @@ public class EmailIdentificationFragment extends Fragment {
                 if (destination == EmailVerificationViewModel.Destination.FIRST_ACCESS_KEY) {
                     action = R.id.action_email_identification_to_first_login_access_key;
                     args = AuthArgs.of(email, userType);
+                    FirstLoginPasswordViewModel registration = new ViewModelProvider(
+                            requireActivity(), new FirstLoginPasswordViewModel.Factory())
+                            .get(FirstLoginPasswordViewModel.class);
+                    if ("COLABORADOR".equals(userType)
+                            && registration.hasAuthenticatedAccount(email)) {
+                        // Retoma a conta já criada, sem solicitar outra chave de acesso.
+                        new ViewModelProvider(requireActivity(), new AccessKeyViewModel.Factory())
+                                .get(AccessKeyViewModel.class).setContext(email, userType);
+                        action = R.id.action_email_identification_to_first_login_password;
+                        args = new Bundle();
+                        args.putString(AuthArgs.EMAIL, email);
+                    }
                 } else if (destination == EmailVerificationViewModel.Destination.PASSWORD) {
                     action = R.id.action_email_identification_to_login_password;
                     args = AuthArgs.of(email, userType);

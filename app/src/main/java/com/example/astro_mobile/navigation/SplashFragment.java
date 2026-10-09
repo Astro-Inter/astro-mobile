@@ -23,6 +23,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.AccessKeyViewModel;
 import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.SessionViewModel;
@@ -181,7 +182,7 @@ public class SplashFragment extends Fragment {
     }
 
     private void navigateAfterSplash() {
-        // Primeiro verifica a sessão Firebase; o primeiro acesso mock segue isolado.
+        // Primeiro verifica a sessão Firebase, inclusive cadastros ainda não ativados.
         if (!isCurrentSplash()) {
             return;
         }
@@ -228,6 +229,14 @@ public class SplashFragment extends Fragment {
                 navController.navigate(employee ? R.id.action_splash_to_employee_home
                                 : R.id.action_splash_to_flow_choice,
                         AuthArgs.of(email, userType));
+            } else if (destination == EmailVerificationViewModel.Destination.FIRST_ACCESS_KEY
+                    && "COLABORADOR".equals(userType)) {
+                // A conta Firebase já existe; retoma a ativação sem repetir a chave.
+                new ViewModelProvider(requireActivity(), new AccessKeyViewModel.Factory())
+                        .get(AccessKeyViewModel.class).setContext(email, userType);
+                Bundle args = new Bundle();
+                args.putString(AuthArgs.EMAIL, email);
+                navController.navigate(R.id.action_splash_to_first_login_password, args);
             } else if (destination == EmailVerificationViewModel.Destination.CONNECTION_ERROR
                     || destination == EmailVerificationViewModel.Destination.INTERNAL_ERROR) {
                 showStartupError(destination
@@ -250,17 +259,9 @@ public class SplashFragment extends Fragment {
     }
 
     private void navigateWithoutFirebaseSession() {
-        // Conserva temporariamente o primeiro acesso mock até a tarefa específica dele.
-        MockSession.State session = MockSession.read(requireContext());
-        NavController navController = NavHostFragment.findNavController(this);
-        if (session == null) {
-            navController.navigate(R.id.action_splash_to_email_identification);
-        } else {
-            navController.navigate(session.destination == MockSession.Destination.FLOW_CHOICE
-                            ? R.id.action_splash_to_flow_choice
-                            : R.id.action_splash_to_employee_home,
-                    AuthArgs.of(session.email, session.userType));
-        }
+        // Uma sessão mock antiga não pode pular o cadastro ou liberar a home.
+        MockSession.clear(requireContext());
+        NavHostFragment.findNavController(this).navigate(R.id.action_splash_to_email_identification);
     }
 
     private void showStartupError(boolean connection) {

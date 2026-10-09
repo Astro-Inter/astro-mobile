@@ -53,7 +53,13 @@
     <string name="first_login_password_confirmation_label">Confirmar Senha</string>
     <string name="first_login_password_hint">Insira sua senha</string>
     <string name="first_login_password_mismatch">As senhas não conferem.</string>
-    <string name="first_login_password_action">Entrar</string>
+    <string name="first_login_password_action">Cadastrar</string>
+    <string name="first_login_password_policy">Use pelo menos 8 caracteres, com uma letra maiúscula, uma minúscula, um número e um caractere especial.</string>
+    <string name="first_login_password_resume_title">Conclua seu cadastro no <b>Astro</b></string>
+    <string name="first_login_password_pending">Sua senha já foi cadastrada. Falta concluir a ativação no Astro. Toque em Cadastrar para tentar novamente.</string>
+    <string name="first_login_password_activation_error">Sua conta Firebase foi criada, mas não foi possível concluir a ativação no Astro. Tente novamente para concluir o cadastro com a mesma conta.</string>
+    <string name="first_login_password_resume_description">Informe a senha que você já cadastrou para retomar a ativação da sua conta. Ela não será alterada.</string>
+    <string name="first_login_access_key_resume"><u>Já cadastrei minha senha</u></string>
     <string name="first_login_password_back_description">Voltar</string>
     <string name="flow_choice_title">Como Você deseja entrar?</string>
     <string name="flow_choice_subtitle">Escolha o perfil que deseja utilizar agora.</string>

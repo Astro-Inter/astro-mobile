@@ -121,6 +121,19 @@ public class FirstLoginAccessKeyFragment extends Fragment {
         view.findViewById(R.id.button_first_login_access_key_back)
                 .setOnClickListener(clickedView ->
                         NavHostFragment.findNavController(this).navigateUp());
+
+        // Quem já criou a conta autentica sua senha, sem repetir a chave consumida.
+        view.findViewById(R.id.button_first_login_access_key_resume)
+                .setOnClickListener(clickedView -> {
+                    if (viewModel.isLoading()) {
+                        return;
+                    }
+                    Bundle nextArgs = new Bundle();
+                    nextArgs.putString(AuthArgs.EMAIL, viewModel.getEmail());
+                    nextArgs.putBoolean(AuthArgs.RESUME_ACTIVATION, true);
+                    NavHostFragment.findNavController(this).navigate(
+                            R.id.action_first_login_access_key_to_first_login_password, nextArgs);
+                });
     }
 
     private void configureDigitInputs() {

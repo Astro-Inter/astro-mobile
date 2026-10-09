@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 public final class AuthArgs {
     public static final String EMAIL = "auth_email";
     public static final String USER_TYPE = "auth_user_type";
+    public static final String RESUME_ACTIVATION = "auth_resume_activation";
 
     private AuthArgs() {
     }
