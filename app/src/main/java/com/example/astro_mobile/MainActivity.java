@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             boolean chat = navController != null && navController.getCurrentDestination() != null
                     && (navController.getCurrentDestination().getId() == R.id.chatFragment
+                    || navController.getCurrentDestination().getId() == R.id.employeeEventsFragment
                     || navController.getCurrentDestination().getId() == R.id.aiSessionsFragment);
             int bottom = chat ? Math.max(systemBars.bottom,
                     insets.getInsets(WindowInsetsCompat.Type.ime()).bottom) : systemBars.bottom;
@@ -114,8 +115,19 @@ public class MainActivity extends AppCompatActivity {
         // Perfil ainda pertence à PR separada; mantém o aviso já existente na main.
         navbar.findViewById(R.id.button_conversations_nav_profile).setOnClickListener(clicked ->
                 Toast.makeText(this, R.string.employee_home_mock_unavailable, Toast.LENGTH_SHORT).show());
-        navbar.findViewById(R.id.button_conversations_nav_events).setOnClickListener(clicked ->
-                Toast.makeText(this, R.string.employee_home_mock_unavailable, Toast.LENGTH_SHORT).show());
+        navbar.findViewById(R.id.button_conversations_nav_events).setOnClickListener(clicked -> {
+            // O calendário pertence ao fluxo colaborador; o calendário do gestor é outra tarefa.
+            if (HomeNavigation.destination(this) != R.id.employeeHomeFragment) {
+                Toast.makeText(this, R.string.employee_home_mock_unavailable, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (navigation.getCurrentDestination().getId() == R.id.employeeEventsFragment) return;
+            Bundle args = AuthArgs.copy(navigation.getCurrentBackStackEntry().getArguments());
+            navigation.navigate(R.id.action_global_employee_events, args, new NavOptions.Builder()
+                    .setPopUpTo(R.id.employeeHomeFragment, false).setLaunchSingleTop(true)
+                    .setEnterAnim(R.anim.push_enter).setExitAnim(R.anim.push_exit)
+                    .setPopEnterAnim(R.anim.push_pop_enter).setPopExitAnim(R.anim.push_pop_exit).build());
+        });
     }
 
     private void updateBottomNavigation(View navbar, int destination, WindowInsetsCompat insets) {
@@ -124,10 +136,12 @@ public class MainActivity extends AppCompatActivity {
         boolean conversations = destination == R.id.conversationsFragment || destination == R.id.chatFragment
                 || destination == R.id.aiSessionsFragment;
         boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
-        navbar.setVisibility((home || conversations)
+        boolean events = destination == R.id.employeeEventsFragment;
+        navbar.setVisibility((home || conversations || events)
                 && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment) && keyboard)
                 ? View.VISIBLE : View.GONE);
         navbar.findViewById(R.id.button_conversations_nav_home).setSelected(home);
+        navbar.findViewById(R.id.button_conversations_nav_events).setSelected(events);
         navbar.findViewById(R.id.button_conversations_nav_chat).setSelected(conversations);
         navbar.findViewById(R.id.button_conversations_nav_profile).setSelected(false);
     }
