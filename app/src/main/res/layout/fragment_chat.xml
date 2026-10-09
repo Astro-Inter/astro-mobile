@@ -262,8 +262,5 @@
             </FrameLayout>
         </LinearLayout>
 
-        <include
-            android:id="@+id/container_chat_bottom_nav"
-            layout="@layout/include_conversations_bottom_nav" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

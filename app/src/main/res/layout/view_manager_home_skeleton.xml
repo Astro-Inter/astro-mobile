@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    android:importantForAccessibility="noHideDescendants"
+    android:fillViewport="true"
+    android:overScrollMode="ifContentScrolls">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="90dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="20dp">
+            <View
+                android:layout_width="200dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+            <View
+                android:layout_width="180dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+        </LinearLayout>
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="20dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="175dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+                <View
+                    android:layout_width="163dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/bg_home_skeleton_surface" />
+                <View
+                    android:layout_width="163dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/bg_home_skeleton_surface" />
+                <View
+                    android:layout_width="163dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/bg_home_skeleton_surface" />
+                <View
+                    android:layout_width="163dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="0dp"
+                    android:background="@drawable/bg_home_skeleton_surface" />
+            </LinearLayout>
+        </HorizontalScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="10dp">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+        </LinearLayout>
+        <include layout="@layout/item_employee_home_skeleton_feed" />
+        <include layout="@layout/item_employee_home_skeleton_feed" />
+        <include layout="@layout/item_employee_home_skeleton_feed" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="10dp">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+        </LinearLayout>
+        <include layout="@layout/item_employee_home_skeleton_feed" />
+        <include layout="@layout/item_employee_home_skeleton_feed" />
+        <include layout="@layout/item_employee_home_skeleton_feed" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="20dp">
+            <View
+                android:layout_width="180dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="117dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+                <include layout="@layout/item_employee_home_skeleton_stat" />
+                <include
+                    layout="@layout/item_employee_home_skeleton_stat"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp" />
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="117dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_home_skeleton_block" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

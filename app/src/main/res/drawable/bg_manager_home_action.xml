@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/astro_button_ripple">
+    <item><shape android:shape="rectangle">
+        <solid android:color="@color/astro_input_background" />
+        <corners android:radius="20dp" />
+    </shape></item>
+</ripple>

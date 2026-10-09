@@ -1,19 +1,14 @@
 package com.example.astro_mobile.employee.home;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewConfiguration;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,18 +21,18 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.AccessKeyViewModel;
-import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
+import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
+import com.example.astro_mobile.shared.home.HomeAiBubble;
 
 public class EmployeeHomeFragment extends Fragment {
 
     private static final String STATE_EMPTY_PREVIEW = "empty_preview";
     private static final long HOME_MOCK_LOAD_MS = 2_000L;
-    private static final long AI_BUBBLE_VISIBLE_MS = 3_000L;
-    private static final long AI_BUBBLE_COLLAPSE_MS = 500L;
     private static final long SKELETON_PULSE_MS = 900L;
 
     private static final MockRow[] EVENT_ROWS = {
@@ -64,11 +59,10 @@ public class EmployeeHomeFragment extends Fragment {
     private TextView aiBubbleText;
     private View homeContent;
     private View homeSkeleton;
-    private Runnable hideAiBubble;
+    private HomeAiBubble assistant;
     private Runnable finishHomeLoading;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private ValueAnimator skeletonPulseAnimator;
-    private ValueAnimator aiBubbleWidthAnimator;
     private long homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
     private long homeLoadingStartedAtMs;
 
@@ -134,26 +128,21 @@ public class EmployeeHomeFragment extends Fragment {
                 R.id.button_employee_home_completed_card,
                 R.id.button_employee_home_events_more,
                 R.id.button_employee_home_notifications_section,
-                R.id.button_employee_home_notifications_more,
-                R.id.button_employee_home_nav_events,
-                R.id.button_employee_home_nav_profile
+                R.id.button_employee_home_notifications_more
         };
         for (int id : mockActions) {
             view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
         }
 
-        // A aba Chat abre a lista; o mascote continua sendo um atalho direto para a IA.
-        view.findViewById(R.id.button_employee_home_nav_chat).setOnClickListener(clicked ->
-                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_conversations));
+        // O mascote continua sendo um atalho direto para a IA; a Activity controla a navbar.
         aiBubble.setOnClickListener(clicked ->
-                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_chat));
+                Navigation.findNavController(clicked).navigate(R.id.action_employee_home_to_chat,
+                        AuthArgs.copy(getArguments())));
 
         // Restringe o arraste do assistente à área entre cabeçalho e navbar.
-        aiBubble.setOnTouchListener(new AiDragTouchListener(
-                aiBubble,
+        assistant = new HomeAiBubble(aiBubble, aiBubbleText,
                 view.findViewById(R.id.container_employee_home_content),
-                view.findViewById(R.id.container_employee_home_header),
-                view.findViewById(R.id.container_employee_home_bottom_nav)));
+                view.findViewById(R.id.container_employee_home_header));
     }
 
     @Override
@@ -161,7 +150,7 @@ public class EmployeeHomeFragment extends Fragment {
         super.onResume();
         // Ao retornar, continua o carregamento ou reabre o balão se a Home já estiver pronta.
         if (homeReady) {
-            showAiBubbleTemporarily();
+            assistant.showTemporarily();
         } else {
             startMockHomeLoad();
         }
@@ -178,20 +167,7 @@ public class EmployeeHomeFragment extends Fragment {
         }
         stopSkeletonPulse();
         finishHomeRevealIfNeeded();
-        if (aiBubble != null) {
-            if (hideAiBubble != null) {
-                aiBubble.removeCallbacks(hideAiBubble);
-            }
-            if (aiBubbleWidthAnimator != null) {
-                aiBubbleWidthAnimator.cancel();
-                aiBubbleWidthAnimator = null;
-            }
-            aiBubble.setVisibility(View.GONE);
-            aiBubble.setAlpha(1f);
-            if (aiBubbleText != null) {
-                aiBubbleText.setAlpha(1f);
-            }
-        }
+        if (assistant != null) assistant.hide();
         super.onPause();
     }
 
@@ -209,15 +185,12 @@ public class EmployeeHomeFragment extends Fragment {
         if (homeSkeleton != null) {
             homeSkeleton.animate().cancel();
         }
-        if (aiBubbleWidthAnimator != null) {
-            aiBubbleWidthAnimator.cancel();
-            aiBubbleWidthAnimator = null;
-        }
+        if (assistant != null) assistant.hide();
+        assistant = null;
         aiBubble = null;
         aiBubbleText = null;
         homeContent = null;
         homeSkeleton = null;
-        hideAiBubble = null;
         homeReady = false;
         homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
         super.onDestroyView();
@@ -250,7 +223,7 @@ public class EmployeeHomeFragment extends Fragment {
         if (!ValueAnimator.areAnimatorsEnabled()) {
             homeContent.setAlpha(1f);
             homeSkeleton.setVisibility(View.GONE);
-            showAiBubbleTemporarily();
+            assistant.showTemporarily();
             return;
         }
 
@@ -269,7 +242,7 @@ public class EmployeeHomeFragment extends Fragment {
                     if (homeSkeleton == skeleton) {
                         skeleton.setVisibility(View.GONE);
                         if (isResumed()) {
-                            showAiBubbleTemporarily();
+                            assistant.showTemporarily();
                         }
                     }
                 })
@@ -326,82 +299,6 @@ public class EmployeeHomeFragment extends Fragment {
         homeSkeleton.setVisibility(View.GONE);
         homeContent.setAlpha(1f);
         homeContent.setVisibility(View.VISIBLE);
-    }
-
-    private void showAiBubbleTemporarily() {
-        // Abre o texto do assistente e agenda seu recolhimento após três segundos.
-        if (aiBubble == null || aiBubbleText == null) {
-            return;
-        }
-        if (hideAiBubble != null) {
-            aiBubble.removeCallbacks(hideAiBubble);
-        }
-        if (aiBubbleWidthAnimator != null) {
-            aiBubbleWidthAnimator.cancel();
-            aiBubbleWidthAnimator = null;
-        }
-        ViewGroup.LayoutParams layoutParams = aiBubble.getLayoutParams();
-        layoutParams.width = 0;
-        aiBubble.setLayoutParams(layoutParams);
-        aiBubble.setAlpha(1f);
-        aiBubbleText.setAlpha(1f);
-        aiBubble.setVisibility(View.VISIBLE);
-        View bubble = aiBubble;
-        hideAiBubble = () -> {
-            if (!ValueAnimator.areAnimatorsEnabled()) {
-                setAiBubbleWidth(bubble,
-                        getResources().getDimensionPixelSize(R.dimen.employee_home_ai_size));
-                bubble.setAlpha(1f);
-                aiBubbleText.setAlpha(0f);
-                return;
-            }
-            animateAiBubbleClosed(bubble);
-        };
-        aiBubble.postDelayed(hideAiBubble, AI_BUBBLE_VISIBLE_MS);
-    }
-
-    private void animateAiBubbleClosed(View bubble) {
-        // Encolhe o botão para a direita até restar apenas o mascote.
-        int startWidth = bubble.getWidth();
-        int collapsedWidth = getResources().getDimensionPixelSize(R.dimen.employee_home_ai_size);
-        if (startWidth <= collapsedWidth) {
-            setAiBubbleWidth(bubble, collapsedWidth);
-            bubble.setAlpha(1f);
-            aiBubbleText.setAlpha(0f);
-            return;
-        }
-
-        float startTextAlpha = aiBubbleText.getAlpha();
-        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-        aiBubbleWidthAnimator = animator;
-        animator.setDuration(AI_BUBBLE_COLLAPSE_MS);
-        animator.setInterpolator(new DecelerateInterpolator());
-        animator.addUpdateListener(animation -> {
-            float fraction = (float) animation.getAnimatedValue();
-            int width = startWidth + Math.round((collapsedWidth - startWidth) * fraction);
-            setAiBubbleWidth(bubble, width);
-            aiBubbleText.setAlpha(startTextAlpha * (1f - fraction));
-        });
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (aiBubbleWidthAnimator == animator) {
-                    aiBubbleWidthAnimator = null;
-                    setAiBubbleWidth(bubble, collapsedWidth);
-                    aiBubbleText.setAlpha(0f);
-                    bubble.setAlpha(1f);
-                }
-            }
-        });
-        animator.start();
-    }
-
-    private void setAiBubbleWidth(View bubble, int width) {
-        ViewGroup.LayoutParams layoutParams = bubble.getLayoutParams();
-        if (layoutParams.width != width) {
-            layoutParams.width = width;
-            bubble.setLayoutParams(layoutParams);
-        }
     }
 
     @Override
@@ -475,108 +372,6 @@ public class EmployeeHomeFragment extends Fragment {
     private void showMockMessage() {
         Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
                 Toast.LENGTH_SHORT).show();
-    }
-
-    // Distingue toque de arraste e mantém o assistente dentro da área útil.
-    private class AiDragTouchListener implements View.OnTouchListener {
-        private final View button;
-        private final View content;
-        private final View header;
-        private final View bottomNav;
-        private final int touchSlop;
-        private final float edge;
-        private float downX;
-        private float downY;
-        private float buttonStartX;
-        private float buttonStartY;
-        private boolean dragging;
-
-        AiDragTouchListener(View button, View content, View header, View bottomNav) {
-            this.button = button;
-            this.content = content;
-            this.header = header;
-            this.bottomNav = bottomNav;
-            touchSlop = ViewConfiguration.get(requireContext()).getScaledTouchSlop();
-            float density = getResources().getDisplayMetrics().density;
-            edge = 8f * density;
-        }
-
-        @Override
-        public boolean onTouch(View touched, MotionEvent event) {
-            switch (event.getActionMasked()) {
-                case MotionEvent.ACTION_DOWN:
-                    // Guarda a posição inicial e mostra a reação ao toque.
-                    downX = event.getRawX();
-                    downY = event.getRawY();
-                    buttonStartX = button.getX();
-                    buttonStartY = button.getY();
-                    dragging = false;
-                    touched.setPressed(true);
-                    if (ValueAnimator.areAnimatorsEnabled()) {
-                        button.animate().cancel();
-                        button.animate().scaleX(0.94f).scaleY(0.94f)
-                                .setDuration(100).start();
-                    }
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    // Só começa a arrastar após ultrapassar a margem de movimento do toque.
-                    float dx = event.getRawX() - downX;
-                    float dy = event.getRawY() - downY;
-                    if (!dragging && Math.hypot(dx, dy) > touchSlop) {
-                        dragging = true;
-                        touched.setPressed(false);
-                        button.animate().cancel();
-                        button.setScaleX(1f);
-                        button.setScaleY(1f);
-                        if (hideAiBubble != null) {
-                            aiBubble.removeCallbacks(hideAiBubble);
-                        }
-                        if (aiBubbleWidthAnimator != null) {
-                            aiBubbleWidthAnimator.cancel();
-                            aiBubbleWidthAnimator = null;
-                        }
-                    }
-                    if (dragging) {
-                        // Impede que o botão passe pelo cabeçalho ou pela navbar.
-                        float left = content.getLeft() + edge;
-                        float right = content.getRight() - edge - button.getWidth();
-                        float top = content.getTop() + header.getBottom() + edge;
-                        float bottom = content.getTop() + bottomNav.getTop()
-                                - edge - button.getHeight();
-                        button.setX(clamp(buttonStartX + dx, left, right));
-                        button.setY(clamp(buttonStartY + dy, top, bottom));
-                    }
-                    return true;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    // Ao soltar, mantém a posição arrastada ou executa o clique normal.
-                    touched.setPressed(false);
-                    button.animate().cancel();
-                    if (ValueAnimator.areAnimatorsEnabled()) {
-                        button.animate().scaleX(1f).scaleY(1f)
-                                .setDuration(150).start();
-                    } else {
-                        button.setScaleX(1f);
-                        button.setScaleY(1f);
-                    }
-                    if (dragging) {
-                        if (aiBubble.getVisibility() == View.VISIBLE && hideAiBubble != null) {
-                            aiBubble.postDelayed(hideAiBubble, AI_BUBBLE_VISIBLE_MS);
-                        }
-                    } else if (event.getActionMasked() == MotionEvent.ACTION_UP
-                            && event.getX() >= 0 && event.getX() < touched.getWidth()
-                            && event.getY() >= 0 && event.getY() < touched.getHeight()) {
-                        touched.performClick();
-                    }
-                    return true;
-                default:
-                    return true;
-            }
-        }
-
-        private float clamp(float value, float min, float max) {
-            return Math.max(min, Math.min(value, Math.max(min, max)));
-        }
     }
 
     private static class MockRow {

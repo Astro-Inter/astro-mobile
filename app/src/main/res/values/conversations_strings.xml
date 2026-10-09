@@ -3,6 +3,7 @@
     <string name="conversations_title">Conversas</string>
     <string name="conversations_heading">Suas conversas</string>
     <string name="conversations_subtitle">Acesse aqui as suas conversas com os gestores</string>
+    <string name="conversations_manager_subtitle">Acesse aqui as suas conversas com os colaboradores</string>
     <string name="conversations_search_hint">Pesquisar em participantes</string>
     <string name="conversations_filter_all">Todos</string>
     <string name="conversations_filter_employees">Colaboradores</string>

@@ -1,100 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/employee_home_nav_height"
-    android:background="@drawable/bg_home_bottom_nav"
-    android:baselineAligned="false"
-    android:gravity="center_vertical"
-    android:orientation="horizontal">
-
-    <LinearLayout
-        android:id="@+id/button_conversations_nav_home"
-        style="@style/ConversationsNavItem">
-
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:minHeight="@dimen/employee_home_nav_height" android:background="@drawable/bg_home_bottom_nav"
+    android:baselineAligned="false" android:gravity="center_vertical" android:orientation="horizontal">
+    <LinearLayout android:id="@+id/button_conversations_nav_home" style="@style/ConversationsNavItem">
         <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="@dimen/employee_home_nav_icon_size"
-            android:layout_height="@dimen/employee_home_nav_icon_size"
-            android:contentDescription="@null"
-            android:importantForAccessibility="no"
-            android:src="@drawable/home_home"
-            app:tint="@color/astro_light_background" />
-
-        <TextView
-            style="@style/ConversationsNavLabel"
-            android:text="@string/employee_home_nav_home" />
+            android:layout_width="@dimen/employee_home_nav_icon_size" android:layout_height="@dimen/employee_home_nav_icon_size"
+            android:duplicateParentState="true" android:src="@drawable/home_home"
+            android:contentDescription="@null" app:tint="@color/nav_item_tint" />
+        <TextView style="@style/ConversationsNavLabel" android:text="@string/employee_home_nav_home" />
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/button_conversations_nav_events"
-        style="@style/ConversationsNavItem">
-
-        <ImageView
-            android:layout_width="@dimen/employee_home_nav_icon_size"
-            android:layout_height="@dimen/employee_home_nav_icon_size"
-            android:contentDescription="@null"
-            android:importantForAccessibility="no"
-            android:src="@drawable/home_nav_calendar" />
-
-        <TextView
-            style="@style/ConversationsNavLabel"
-            android:text="@string/employee_home_nav_events" />
+    <LinearLayout android:id="@+id/button_conversations_nav_events" style="@style/ConversationsNavItem">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/employee_home_nav_icon_size" android:layout_height="@dimen/employee_home_nav_icon_size"
+            android:duplicateParentState="true" android:src="@drawable/home_nav_calendar"
+            android:contentDescription="@null" app:tint="@color/nav_item_tint" />
+        <TextView style="@style/ConversationsNavLabel" android:text="@string/employee_home_nav_events" />
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/button_conversations_nav_chat"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/employee_home_nav_height"
-        android:layout_weight="1"
-        android:background="@drawable/bg_home_row_ripple"
-        android:clickable="true"
-        android:focusable="true">
-
-        <ImageView
-            android:layout_width="@dimen/employee_home_nav_selected_size"
-            android:layout_height="@dimen/employee_home_nav_selected_size"
-            android:layout_gravity="center"
-            android:contentDescription="@null"
-            android:importantForAccessibility="no"
-            android:src="@drawable/home_nav_selected" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/employee_home_nav_height"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="@dimen/employee_home_nav_icon_size"
-                android:layout_height="@dimen/employee_home_nav_icon_size"
-                android:contentDescription="@null"
-                android:importantForAccessibility="no"
-                android:src="@drawable/home_chat"
-                app:tint="@color/astro_primary_purple" />
-
-            <TextView
-                style="@style/ConversationsNavLabel"
-                android:text="@string/employee_home_nav_chat"
-                android:textColor="@color/astro_primary_purple" />
-        </LinearLayout>
-    </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/button_conversations_nav_profile"
-        style="@style/ConversationsNavItem">
-
-        <ImageView
-            android:layout_width="@dimen/employee_home_nav_icon_size"
-            android:layout_height="@dimen/employee_home_nav_icon_size"
-            android:contentDescription="@null"
-            android:importantForAccessibility="no"
-            android:src="@drawable/home_user" />
-
-        <TextView
-            style="@style/ConversationsNavLabel"
-            android:text="@string/employee_home_nav_profile" />
+    <LinearLayout android:id="@+id/button_conversations_nav_chat" style="@style/ConversationsNavItem">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/employee_home_nav_icon_size" android:layout_height="@dimen/employee_home_nav_icon_size"
+            android:duplicateParentState="true" android:src="@drawable/home_chat"
+            android:contentDescription="@null" app:tint="@color/nav_item_tint" />
+        <TextView style="@style/ConversationsNavLabel" android:text="@string/employee_home_nav_chat" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/button_conversations_nav_profile" style="@style/ConversationsNavItem">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/employee_home_nav_icon_size" android:layout_height="@dimen/employee_home_nav_icon_size"
+            android:duplicateParentState="true" android:src="@drawable/home_user"
+            android:contentDescription="@null" app:tint="@color/nav_item_tint" />
+        <TextView style="@style/ConversationsNavLabel" android:text="@string/employee_home_nav_profile" />
     </LinearLayout>
 </LinearLayout>

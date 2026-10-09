@@ -17,6 +17,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 /** Confirmação vinculada à sessão que o usuário escolheu encerrar. */
@@ -35,7 +36,7 @@ public final class ChatEndDialogFragment extends DialogFragment {
     @NonNull @Override public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         String sessionId = requireArguments().getString(SESSION_ID);
         NavController navigation = NavHostFragment.findNavController(requireParentFragment());
-        ChatViewModel model = new ViewModelProvider(navigation.getBackStackEntry(R.id.employeeHomeFragment),
+        ChatViewModel model = new ViewModelProvider(navigation.getBackStackEntry(HomeNavigation.destination(requireContext())),
                 new ChatViewModel.Factory()).get(ChatViewModel.class);
         View content = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_chat_end, null);
         TextView title = content.findViewById(R.id.text_chat_end_title);
