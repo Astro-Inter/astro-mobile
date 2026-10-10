@@ -44,10 +44,6 @@ public final class AiSessionsRepository {
         return request(token -> api.resumeSession(token, id), result -> result.isValid()
                 && id.equals(result.sessionId) && "ativa".equals(result.status), false, callback);
     }
-    public Operation end(String id, Callback<SessionResult> callback) {
-        return request(token -> api.endSession(token, id), result -> result.isValid()
-                && id.equals(result.sessionId) && "encerrada".equals(result.status), false, callback);
-    }
 
     private <T> Operation request(Request<T> request, Predicate<T> valid, boolean listing, Callback<T> callback) {
         Operation operation = new Operation();

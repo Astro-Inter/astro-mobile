@@ -98,6 +98,7 @@ public class ChatScreenTest {
             screenshot("error");
             f.code = 200;
             onView(withId(R.id.button_chat_retry)).perform(click());
+            onView(withText(R.string.ai_sessions_resend)).perform(click());
             awaitFinished(model);
             scenario.onActivity(activity -> {
                 assertEquals(2, model.get().getState().getValue().messages.size());
