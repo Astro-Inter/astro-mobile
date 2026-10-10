@@ -152,6 +152,18 @@ public class FirebaseAuthRepository {
         return auth.getCurrentUser() != null;
     }
 
+    @Nullable
+    public String getCurrentEmail() {
+        FirebaseUser user = auth.getCurrentUser();
+        return user == null ? null : user.getEmail();
+    }
+
+    @Nullable
+    public String getCurrentUserId() {
+        FirebaseUser user = auth.getCurrentUser();
+        return user == null ? null : user.getUid();
+    }
+
     private AuthFailureKind classify(@Nullable Exception error) {
         // Separa credenciais inválidas de falhas de rede e problemas inesperados.
         if (error instanceof FirebaseNetworkException) {

@@ -24,13 +24,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
-import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.example.astro_mobile.data.ai.ChatRequest;
 import com.example.astro_mobile.data.ai.ChatFailure;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public final class ChatFragment extends Fragment {
     private ChatCalendarLinkHandler calendarLinks;
@@ -88,7 +88,6 @@ public final class ChatFragment extends Fragment {
         view.findViewById(R.id.button_chat_add).setOnClickListener(clicked ->
                 Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
                         Toast.LENGTH_SHORT).show());
-        // A navbar compartilhada é controlada pela Activity.
         view.findViewById(R.id.button_chat_close).setOnClickListener(clicked -> {
             if (ViewCompat.getWindowInsetsController(view) != null) {
                 ViewCompat.getWindowInsetsController(view).hide(WindowInsetsCompat.Type.ime());

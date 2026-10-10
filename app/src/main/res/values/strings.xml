@@ -38,7 +38,7 @@
     <string name="password_reset_send">Enviar link</string>
     <string name="password_reset_back_description">Voltar</string>
     <string name="password_reset_confirmation_title">Confira seu e-mail</string>
-    <string name="password_reset_confirmation_body">Se houver uma conta vinculada a este endereço, você receberá um link para redefinir sua senha: %1$s</string>
+    <string name="password_reset_confirmation_body">Se houver uma conta vinculada a este endereço de e-mail, você receberá um link para redefinir sua senha.</string>
     <string name="password_reset_back_to_login">Voltar ao login</string>
     <string name="password_reset_back_to_email">Voltar à identificação de e-mail</string>
     <string name="first_login_access_key_title">Insira sua chave de acesso para entrar pela primeira vez.</string>
@@ -65,7 +65,6 @@
     <string name="flow_choice_subtitle">Escolha o perfil que deseja utilizar agora.</string>
     <string name="flow_choice_manager">Entrar como Gestor</string>
     <string name="flow_choice_employee">Entrar como Colaborador</string>
-    <string name="flow_choice_manager_mock">Fluxo de Gestor selecionado (mock)</string>
     <string name="employee_home_greeting">Olá, <b>Kevin Parker</b></string>
     <string name="employee_home_subtitle_filled">Confira aqui tudo sobre suas obrigações de colaborador.</string>
     <string name="employee_home_subtitle_empty">Confira aqui tudo sobre suas obrigações.</string>
@@ -99,5 +98,4 @@
     <string name="employee_home_ai_button">Falar com a IA do Astro</string>
     <string name="employee_home_ai_prompt">Fale com a IA do <b>Astro!</b></string>
     <string name="employee_home_mock_unavailable">Esta área ainda está em desenvolvimento.</string>
-    <string name="employee_home_logout">Sair</string>
 </resources>

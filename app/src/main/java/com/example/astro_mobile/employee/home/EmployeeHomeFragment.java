@@ -17,16 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
-import com.example.astro_mobile.auth.AccessKeyViewModel;
-import com.example.astro_mobile.auth.EmailVerificationViewModel;
-import com.example.astro_mobile.auth.MockSession;
-import com.example.astro_mobile.auth.SessionViewModel;
-import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.shared.home.HomeAiBubble;
 
 public class EmployeeHomeFragment extends Fragment {
@@ -95,21 +89,6 @@ public class EmployeeHomeFragment extends Fragment {
         aiBubble = view.findViewById(R.id.button_employee_home_ai_bubble);
         aiBubbleText = view.findViewById(R.id.text_employee_home_ai_bubble);
         aiBubble.setVisibility(View.GONE);
-
-        // Sair encerra a sessão Firebase e remove qualquer estado local anterior.
-        view.findViewById(R.id.button_employee_home_logout).setOnClickListener(clickedView -> {
-            new ViewModelProvider(requireActivity(), SessionViewModel.Factory.createDefault())
-                    .get(SessionViewModel.class).signOut();
-            FlowPreferences.clear(requireContext());
-            MockSession.clear(requireContext());
-            new ViewModelProvider(requireActivity(),
-                    EmailVerificationViewModel.Factory.createDefault())
-                    .get(EmailVerificationViewModel.class).clearForLogout();
-            new ViewModelProvider(requireActivity(), new AccessKeyViewModel.Factory())
-                    .get(AccessKeyViewModel.class).clearForLogout();
-            Navigation.findNavController(clickedView)
-                    .navigate(R.id.action_employee_home_to_email_identification);
-        });
 
         // Um toque longo no cumprimento alterna os estados de demonstração da Home.
         view.findViewById(R.id.text_employee_home_greeting).setOnLongClickListener(pressed -> {

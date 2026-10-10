@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@drawable/bg_profile_dialog" android:orientation="vertical" android:padding="24dp">
+    <ImageButton android:id="@+id/button_profile_logout_close"
+        android:layout_width="40dp" android:layout_height="40dp" android:layout_gravity="end"
+        android:background="@drawable/bg_login_icon_button" android:padding="10dp"
+        android:src="@drawable/conversations_close" android:contentDescription="@string/profile_logout_cancel" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" android:background="@drawable/bg_profile_panel"
+        android:orientation="vertical" android:padding="24dp">
+        <TextView style="@style/ProfileText" android:text="@string/profile_logout_title"
+            android:textSize="22sp" android:textStyle="bold" />
+        <TextView style="@style/ProfileText" android:layout_marginTop="10dp"
+            android:text="@string/profile_logout_description" android:textColor="@color/astro_tertiary_light_text" />
+    </LinearLayout>
+    <TextView android:id="@+id/button_profile_logout_confirm" style="@style/ProfileButton"
+        android:background="@drawable/bg_profile_logout" android:text="@string/profile_logout_confirm"
+        android:textColor="#FF4D4D" />
+    <TextView android:id="@+id/button_profile_logout_cancel" style="@style/ProfileButton"
+        android:layout_marginTop="12dp"
+        android:text="@string/profile_logout_cancel" />
+</LinearLayout>

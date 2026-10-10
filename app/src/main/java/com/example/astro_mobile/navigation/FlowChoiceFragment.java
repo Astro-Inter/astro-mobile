@@ -9,6 +9,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.NavOptions;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
@@ -27,11 +28,23 @@ public class FlowChoiceFragment extends Fragment {
     }
 
     private void openHome(View clicked, boolean manager) {
-        // Guarda somente o fluxo escolhido; a sessão continua sendo mantida pelo Firebase.
+        // Guarda o fluxo escolhido; ele muda a Home, mas não altera o perfil da conta.
         if (manager) FlowPreferences.saveManagerFlow(requireContext());
         else FlowPreferences.saveEmployeeFlow(requireContext());
-        Navigation.findNavController(clicked).navigate(manager
-                        ? R.id.action_flow_choice_to_manager_home : R.id.action_flow_choice_to_employee_home,
-                AuthArgs.copy(getArguments()));
+        Bundle args = AuthArgs.copy(getArguments());
+        boolean switching = args.getBoolean(AuthArgs.FROM_PROFILE);
+        args.remove(AuthArgs.FROM_PROFILE);
+        // Ao trocar pelo Perfil, remove o fluxo anterior sem repetir o login.
+        if (switching) {
+            Navigation.findNavController(clicked).navigate(manager
+                            ? R.id.managerHomeFragment : R.id.employeeHomeFragment,
+                    args, new NavOptions.Builder().setPopUpTo(R.id.nav_graph, true)
+                            .setEnterAnim(R.anim.push_enter).setExitAnim(R.anim.push_exit)
+                            .setPopEnterAnim(R.anim.push_pop_enter).setPopExitAnim(R.anim.push_pop_exit)
+                            .build());
+        } else {
+            Navigation.findNavController(clicked).navigate(manager
+                    ? R.id.action_flow_choice_to_manager_home : R.id.action_flow_choice_to_employee_home, args);
+        }
     }
 }
