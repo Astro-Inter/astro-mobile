@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +47,7 @@ public final class ChatFragment extends Fragment {
         model = new ViewModelProvider(navigation.getBackStackEntry(HomeNavigation.destination(requireContext())),
                 new ChatViewModel.Factory()).get(ChatViewModel.class);
         EditText input = view.findViewById(R.id.input_chat_message);
+        // O rascunho pertence à sessão no ViewModel; não restaura texto de outra tela.
         View sendButton = view.findViewById(R.id.button_chat_send);
         RecyclerView messages = view.findViewById(R.id.list_chat_messages);
         calendarLinks = new ChatCalendarLinkHandler(requireContext());
@@ -119,15 +119,6 @@ public final class ChatFragment extends Fragment {
                 model.retry();
             }
         });
-        view.findViewById(R.id.button_chat_session_action).setOnClickListener(clicked -> {
-            ChatViewModel.State current = model.getState().getValue();
-            if (current == null || current.loading || current.sessionId == null || current.unavailable) return;
-            if ("encerrada".equals(current.status)) model.resumeSession();
-            else if (!getChildFragmentManager().isStateSaved()
-                    && getChildFragmentManager().findFragmentByTag(ChatEndDialogFragment.TAG) == null) {
-                ChatEndDialogFragment.create(current.sessionId).show(getChildFragmentManager(), ChatEndDialogFragment.TAG);
-            }
-        });
         model.getState().observe(getViewLifecycleOwner(), state -> {
             boolean atBottom = !messages.canScrollVertically(1);
             adapter.submitList(state.messages, () -> {
@@ -137,8 +128,7 @@ public final class ChatFragment extends Fragment {
             view.findViewById(R.id.container_chat_loading).setVisibility(state.loading ? View.VISIBLE : View.GONE);
             ((TextView) view.findViewById(R.id.text_chat_loading)).setText(state.action == ChatViewModel.Action.HISTORY
                     ? R.string.ai_sessions_history_loading : state.action == ChatViewModel.Action.RESUME
-                    ? R.string.ai_sessions_resuming : state.action == ChatViewModel.Action.END
-                    ? R.string.ai_sessions_ending_loading : state.waitingLong ? R.string.chat_loading_slow : R.string.chat_loading);
+                    ? R.string.ai_sessions_resuming : state.waitingLong ? R.string.chat_loading_slow : R.string.chat_loading);
             view.findViewById(R.id.container_chat_error).setVisibility(state.failure == null ? View.GONE : View.VISIBLE);
             if (state.failure != null) {
                 ((TextView) view.findViewById(R.id.text_chat_error)).setText(errorMessage(state.failure));
@@ -148,21 +138,6 @@ public final class ChatFragment extends Fragment {
             retry.setEnabled(!state.loading);
             retry.setText(state.failure == ChatFailure.SESSION ? R.string.chat_sign_in
                     : state.failure == ChatFailure.CONFLICT || !model.hasPendingMessage() ? R.string.ai_sessions_refresh : R.string.chat_retry);
-            view.findViewById(R.id.container_chat_session_actions).setVisibility(state.sessionId == null || state.unavailable ? View.GONE : View.VISIBLE);
-            ((TextView) view.findViewById(R.id.text_chat_session_status)).setText("encerrada".equals(state.status)
-                    ? R.string.ai_sessions_closed : "encerrando".equals(state.status) ? R.string.ai_sessions_ending : R.string.ai_sessions_status_active);
-            ImageButton sessionAction = view.findViewById(R.id.button_chat_session_action);
-            boolean closed = "encerrada".equals(state.status);
-            int actionLabel = closed ? R.string.ai_sessions_resume
-                    : "encerrando".equals(state.status) ? R.string.ai_sessions_finish_end : R.string.ai_sessions_end;
-            sessionAction.setContentDescription(getText(actionLabel));
-            sessionAction.setTooltipText(getText(actionLabel));
-            sessionAction.setImageResource(closed ? R.drawable.ai_session_play : R.drawable.ai_session_stop);
-            // Play circle inclui a borda de 1 dp fora do frame de 20 dp no Figma.
-            int iconPadding = Math.round((closed ? 13 : 14) * getResources().getDisplayMetrics().density);
-            sessionAction.setPadding(iconPadding, iconPadding, iconPadding, iconPadding);
-            sessionAction.setEnabled(!state.loading);
-            sessionAction.setAlpha(state.loading ? 0.4f : 1f);
             view.findViewById(R.id.button_chat_suggestion_nrs).setEnabled(state.canSend());
             view.findViewById(R.id.button_chat_suggestion_dashboards).setEnabled(state.canSend());
             // Não sobrescreve uma próxima mensagem digitada enquanto espera a resposta.

@@ -14,7 +14,7 @@ import java.util.*;
 
 /** Estado em memória isolado por conta; histórico persistido vem sempre da API. */
 public final class ChatViewModel extends ViewModel {
-    public enum Action { NONE, HISTORY, RESUME, END }
+    public enum Action { NONE, HISTORY, RESUME }
 
     public static final class State {
         public final List<ChatMessage> messages;
@@ -35,7 +35,8 @@ public final class ChatViewModel extends ViewModel {
                     && failure != ChatFailure.CONFLICT;
         }
         public boolean canSend() { return !loading && !unavailable && !pending && failure != ChatFailure.CONFLICT
-                && failure != ChatFailure.SESSION && failure != ChatFailure.FORBIDDEN && "ativa".equals(status); }
+                && failure != ChatFailure.SESSION && failure != ChatFailure.FORBIDDEN
+                && ("ativa".equals(status) || "encerrada".equals(status)); }
     }
 
     public static final class Conversation {
@@ -289,37 +290,35 @@ public final class ChatViewModel extends ViewModel {
         publish(opening ? failure : error);
     }
 
-    public void resumeSession() { changeSession(true); }
-    public void endSession() { changeSession(false); }
-    private void changeSession(boolean resume) {
-        if (!checkAccount() || isBusy() || sessionId == null || unavailable || sessions == null) return;
+    /** Compatibilidade com sessões antigas: retoma somente antes do envio solicitado. */
+    private void resumeBeforeSending(String message) {
+        if (sessions == null || sessionId == null) { finishFailure(ChatFailure.INVALID_RESPONSE); return; }
         String id = sessionId;
-        ChatFailure previousFailure = failure;
         int request = ++sessionRequestId;
-        action = resume ? Action.RESUME : Action.END;
+        action = Action.RESUME;
         publish(null);
         scheduleSessionDeadline(request, () -> finishSessionFailure(ChatFailure.TIMEOUT));
         AiSessionsRepository.Callback<SessionResult> callback = new AiSessionsRepository.Callback<SessionResult>() {
             @Override public void onSuccess(SessionResult result) {
                 if (request != sessionRequestId || !checkAccount()) return;
                 clearSessionTimer(); action = Action.NONE; status = result.status;
-                publish(pendingMessageIndex >= 0 ? previousFailure : null); refreshConversations();
-                // Retomada não altera o histórico, mas outra plataforma pode tê-lo atualizado.
-                refreshCurrentHistory();
+                // Mantém UUID, histórico, mensagem pendente e qualquer próximo rascunho.
+                request(message);
             }
             @Override public void onFailure(ChatFailure error) {
                 if (request == sessionRequestId && checkAccount()) finishSessionFailure(error);
             }
         };
-        AiSessionsRepository.Operation operation = resume ? sessions.resume(id, callback) : sessions.end(id, callback);
-        if (action != Action.NONE) sessionOperation = operation;
+        AiSessionsRepository.Operation operation = sessions.resume(id, callback);
+        if (action == Action.RESUME) sessionOperation = operation;
     }
 
     private void finishSessionFailure(ChatFailure error) {
         clearSessionTimer(); action = Action.NONE;
+        if (pendingMessageIndex >= 0) messages.set(pendingMessageIndex, messages.get(pendingMessageIndex).withFailure(true));
         if (error == ChatFailure.NOT_FOUND) { unavailable = true; refreshConversations(); }
         publish(error);
-        // 409 não determina sozinho se a sessão foi encerrada. A UI oferece atualização.
+        // Não envia após falha de retomada; 409 exige consultar o histórico novamente.
     }
 
     private void scheduleSessionDeadline(int id, Runnable fail) {
@@ -346,16 +345,21 @@ public final class ChatViewModel extends ViewModel {
         }
         messages.add(new ChatMessage(message, true)); pendingMessageIndex = messages.size() - 1;
         draft = ""; retryChecked = false;
-        request(message);
+        sendOrResume(message);
     }
 
     public void retry() {
         if (!checkAccount() || isBusy() || !state.getValue().canRetry() || pendingMessageIndex < 0
-                || unavailable || !"ativa".equals(status)) return;
+                || unavailable || !("ativa".equals(status) || "encerrada".equals(status))) return;
         if (sessions != null && sessionId != null && !retryChecked) { refreshCurrentHistory(); return; }
         ChatMessage pending = messages.get(pendingMessageIndex);
         messages.set(pendingMessageIndex, pending.withFailure(false));
-        request(pending.getText());
+        sendOrResume(pending.getText());
+    }
+
+    private void sendOrResume(String message) {
+        if ("encerrada".equals(status)) resumeBeforeSending(message);
+        else request(message);
     }
 
     private void request(String message) {
@@ -370,6 +374,9 @@ public final class ChatViewModel extends ViewModel {
         AiChatRepository.Operation operation = repository.sendMessage(message, sessionId, new AiChatRepository.ResultCallback() {
             @Override public void onSuccess(ChatResponse response) {
                 if (id != requestId || !checkAccount()) return;
+                if (sessionId != null && !sessionId.equals(response.getSessionId())) {
+                    finishFailure(ChatFailure.INVALID_RESPONSE); return;
+                }
                 clearTimers();
                 String previousId = conversationId;
                 sessionId = response.getSessionId(); conversationId = sessionId; drafts.remove(previousId);

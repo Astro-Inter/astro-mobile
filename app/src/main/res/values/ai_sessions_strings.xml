@@ -23,16 +23,9 @@
     <string name="ai_sessions_closed">Encerrada</string>
     <string name="ai_sessions_ending">Encerrando</string>
     <string name="ai_sessions_status_active">Ativa</string>
-    <string name="ai_sessions_resume">Continuar conversa</string>
-    <string name="ai_sessions_end">Encerrar conversa</string>
-    <string name="ai_sessions_finish_end">Concluir encerramento</string>
-    <string name="ai_sessions_end_title">Encerrar conversa?</string>
-    <string name="ai_sessions_finish_end_title">Concluir encerramento?</string>
-    <string name="ai_sessions_end_body">Você poderá consultar o histórico e continuar esta conversa depois.</string>
     <string name="ai_sessions_cancel">Cancelar</string>
     <string name="ai_sessions_history_loading">Carregando histórico…</string>
     <string name="ai_sessions_resuming">Continuando conversa…</string>
-    <string name="ai_sessions_ending_loading">Encerrando conversa…</string>
     <string name="ai_sessions_conflict">A conversa foi alterada ou está ocupada. Atualize o histórico antes de continuar.</string>
     <string name="ai_sessions_unknown_outcome">O envio pode ter sido recebido. Confira suas conversas antes de enviar novamente para evitar uma conversa duplicada.</string>
     <string name="ai_sessions_retry_confirm">A resposta pode ainda estar sendo processada. Enviar novamente pode duplicar a mensagem. Deseja reenviar?</string>
