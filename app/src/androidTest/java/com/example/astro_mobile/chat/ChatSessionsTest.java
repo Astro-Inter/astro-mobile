@@ -25,6 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.example.astro_mobile.MainActivity;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.data.ai.*;
+import com.example.astro_mobile.data.firebase.IdTokenProvider;
 import com.example.astro_mobile.data.local.FlowPreferences;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

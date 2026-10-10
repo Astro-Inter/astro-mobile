@@ -112,9 +112,13 @@ public class MainActivity extends AppCompatActivity {
                         .build());
             }
         });
-        // Perfil ainda pertence à PR separada; mantém o aviso já existente na main.
-        navbar.findViewById(R.id.button_conversations_nav_profile).setOnClickListener(clicked ->
-                Toast.makeText(this, R.string.employee_home_mock_unavailable, Toast.LENGTH_SHORT).show());
+        navbar.findViewById(R.id.button_conversations_nav_profile).setOnClickListener(clicked -> {
+            if (navigation.getCurrentDestination().getId() == R.id.profileFragment) return;
+            Bundle args = AuthArgs.copy(navigation.getCurrentBackStackEntry().getArguments());
+            if (!navigation.popBackStack(R.id.profileFragment, false)) {
+                navigation.navigate(R.id.action_global_profile, args);
+            }
+        });
         navbar.findViewById(R.id.button_conversations_nav_events).setOnClickListener(clicked -> {
             // O calendário pertence ao fluxo colaborador; o calendário do gestor é outra tarefa.
             if (HomeNavigation.destination(this) != R.id.employeeHomeFragment) {
@@ -135,15 +139,16 @@ public class MainActivity extends AppCompatActivity {
         boolean home = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment;
         boolean conversations = destination == R.id.conversationsFragment || destination == R.id.chatFragment
                 || destination == R.id.aiSessionsFragment;
-        boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
+        boolean profile = destination == R.id.profileFragment;
         boolean events = destination == R.id.employeeEventsFragment;
-        navbar.setVisibility((home || conversations || events)
+        boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
+        navbar.setVisibility((home || conversations || profile || events)
                 && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment) && keyboard)
                 ? View.VISIBLE : View.GONE);
         navbar.findViewById(R.id.button_conversations_nav_home).setSelected(home);
-        navbar.findViewById(R.id.button_conversations_nav_events).setSelected(events);
         navbar.findViewById(R.id.button_conversations_nav_chat).setSelected(conversations);
-        navbar.findViewById(R.id.button_conversations_nav_profile).setSelected(false);
+        navbar.findViewById(R.id.button_conversations_nav_profile).setSelected(profile);
+        navbar.findViewById(R.id.button_conversations_nav_events).setSelected(events);
     }
 
     private void updateScrimHeight(View scrim, int height, int gravity) {

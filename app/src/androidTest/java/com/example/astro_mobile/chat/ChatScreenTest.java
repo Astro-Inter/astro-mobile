@@ -111,7 +111,7 @@ public class ChatScreenTest {
     @Test public void missingFirebaseSessionOffersSignIn() throws Exception {
         Fixture f = new Fixture(200);
         AiChatRepository repository = new AiChatRepository(f.api,
-                (force, callback) -> callback.onFailure(com.example.astro_mobile.data.ai.IdTokenProvider.Failure.SESSION));
+                (force, callback) -> callback.onFailure(com.example.astro_mobile.data.firebase.IdTokenProvider.Failure.SESSION));
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             AtomicReference<ChatViewModel> model = open(scenario, repository);
             onView(withId(R.id.input_chat_message)).perform(replaceText("Olá"));
