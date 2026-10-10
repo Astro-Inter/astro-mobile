@@ -4,6 +4,13 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/splashFragment">
 
+    <action android:id="@+id/action_global_employee_events" app:destination="@id/employeeEventsFragment"
+        app:launchSingleTop="true" app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+        app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+
+    <fragment android:id="@+id/employeeEventsFragment"
+        android:name="com.example.astro_mobile.employee.events.EmployeeEventsFragment" android:label="Eventos do Colaborador" />
+
     <action android:id="@+id/action_global_conversations" app:destination="@id/conversationsFragment"
         app:launchSingleTop="true"
         app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
@@ -125,13 +132,13 @@
 
     <fragment
         android:id="@+id/connectionErrorFragment"
-        android:name="com.example.astro_mobile.navigation.EmailErrorMockFragment"
-        android:label="Erro de conexão (mock)" />
+        android:name="com.example.astro_mobile.navigation.ErrorFragment"
+        android:label="Erro de conexão" />
 
     <fragment
         android:id="@+id/genericErrorFragment"
-        android:name="com.example.astro_mobile.navigation.EmailErrorMockFragment"
-        android:label="Erro interno (mock)" />
+        android:name="com.example.astro_mobile.navigation.ErrorFragment"
+        android:label="Erro genérico" />
 
     <fragment
         android:id="@+id/accessKeyInformationFragment"

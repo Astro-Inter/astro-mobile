@@ -1,0 +1,205 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:context="com.example.astro_mobile.employee.events.EmployeeEventsFragment">
+    <LinearLayout android:layout_width="0dp" android:layout_height="0dp" android:orientation="vertical"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="80dp"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:baselineAligned="false" android:paddingHorizontal="20dp">
+            <ImageButton android:id="@+id/button_employee_events_back" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/conversations_back" android:paddingHorizontal="15dp"
+                android:paddingVertical="17dp" android:src="@drawable/ic_login_back" android:scaleType="fitCenter" />
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="@string/employee_events_title" android:gravity="center"
+                android:fontFamily="@font/montserrat_family" android:includeFontPadding="false"
+                android:textColor="@color/astro_light_background" android:textSize="24sp" />
+            <Space android:layout_width="48dp" android:layout_height="1dp" />
+        </LinearLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <androidx.core.widget.NestedScrollView android:id="@+id/scroll_employee_events"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:fillViewport="true" android:clipToPadding="false">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:paddingBottom="20dp" android:focusableInTouchMode="true">
+                    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:background="@drawable/bg_email_identification_input">
+                            <EditText android:id="@+id/input_employee_events_search" android:layout_width="match_parent"
+                                android:layout_height="wrap_content" android:minHeight="60dp" android:background="@null"
+                                android:hint="@string/employee_events_search" android:inputType="text"
+                                android:imeOptions="actionSearch" android:importantForAutofill="no"
+                                android:singleLine="true" android:fontFamily="@font/montserrat_family"
+                                android:paddingStart="16dp" android:paddingEnd="54dp" android:paddingVertical="12dp"
+                                android:textColor="@color/astro_light_background" android:textColorHint="@color/astro_input_hint"
+                                android:textSize="16sp" />
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                                android:layout_gravity="end|center_vertical" android:layout_marginEnd="16dp"
+                                android:src="@drawable/conversations_search" android:contentDescription="@null"
+                                android:importantForAccessibility="no" />
+                        </FrameLayout>
+                    </FrameLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:baselineAligned="false"
+                        android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                        <TextView android:id="@+id/filter_employee_events_all" style="@style/ConversationsFilter"
+                            android:text="@string/employee_events_all" tools:background="@color/astro_primary_purple" />
+                        <TextView android:id="@+id/filter_employee_events_pending" style="@style/ConversationsFilter"
+                            android:layout_marginStart="10dp" android:text="@string/employee_events_pending" />
+                        <TextView android:id="@+id/filter_employee_events_review" style="@style/ConversationsFilter"
+                            android:layout_marginStart="10dp" android:text="@string/employee_events_review" />
+                        <TextView android:id="@+id/filter_employee_events_done" style="@style/ConversationsFilter"
+                            android:layout_marginStart="10dp" android:text="@string/employee_events_done" />
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp"
+                        android:background="@drawable/bg_events_calendar" android:padding="18dp" android:orientation="vertical">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false">
+                            <ImageButton android:id="@+id/button_employee_events_previous" android:layout_width="40dp"
+                                android:layout_height="40dp" android:background="@drawable/bg_login_icon_button"
+                                android:src="@drawable/ic_employee_events_chevron" android:rotation="180" android:padding="0dp"
+                                android:scaleType="center"
+                                android:contentDescription="@string/employee_events_previous_month" />
+                            <TextView android:id="@+id/button_employee_events_month" style="@style/EmployeeEventsCalendarField"
+                                android:layout_marginStart="18dp"
+                                android:contentDescription="@string/employee_events_month" tools:text="Out ▾" />
+                            <TextView android:id="@+id/button_employee_events_year" style="@style/EmployeeEventsCalendarField"
+                                android:layout_marginStart="8dp" android:contentDescription="@string/employee_events_year" tools:text="2026 ▾" />
+                            <ImageButton android:id="@+id/button_employee_events_next" android:layout_width="40dp"
+                                android:layout_height="40dp" android:layout_marginStart="18dp"
+                                android:background="@drawable/bg_login_icon_button"
+                                android:src="@drawable/ic_employee_events_chevron" android:padding="0dp"
+                                android:scaleType="center"
+                                android:contentDescription="@string/employee_events_next_month" />
+                        </LinearLayout>
+                        <GridLayout android:id="@+id/grid_employee_events_calendar" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:layout_marginTop="18dp" android:columnCount="7">
+                            <!-- Amostras apenas para o editor. A grade é preenchida pelo mês atual em execução. -->
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="Su" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="Mo" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="Tu" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="We" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="Th" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="Fr" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="Sa" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="27" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="28" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="29" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="30" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="1" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="2" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="3" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="4" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="5" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="6" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="7" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="8" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="9" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="10" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="11" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="12" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="13" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="14" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="15" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="16" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="17" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="18" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="19" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="20" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="21" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="22" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="23" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="24" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="25" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="26" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="27" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="28" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="29" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="30" />
+                            <TextView android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1"
+                                android:gravity="center" android:textColor="@color/astro_light_background" tools:text="31" />
+                        </GridLayout>
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:baselineAligned="false" android:paddingHorizontal="30dp"
+                        android:paddingVertical="20dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:minHeight="23dp" app:drawableStartCompat="@drawable/bg_events_legend_today"
+                            android:drawablePadding="10dp" android:fontFamily="@font/montserrat_family"
+                            android:gravity="center_vertical" android:textColor="@color/astro_light_background"
+                            android:textSize="12sp" android:text="@string/employee_events_today" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.4"
+                            android:minHeight="23dp" app:drawableStartCompat="@drawable/bg_events_legend_event"
+                            android:drawablePadding="10dp" android:fontFamily="@font/montserrat_family"
+                            android:gravity="center_vertical" android:textColor="@color/astro_light_background"
+                            android:textSize="12sp" android:text="@string/employee_events_day_with_events" />
+                    </LinearLayout>
+                    <View android:layout_width="match_parent" android:layout_height="21dp" android:background="@drawable/bg_home_divider" />
+                    <!-- Lista curta do protótipo; rola junto ao calendário, sem rolagens concorrentes. -->
+                    <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_employee_events"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_employee_event" tools:itemCount="4" />
+                    <TextView android:id="@+id/text_employee_events_empty" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:minHeight="80dp" android:padding="30dp"
+                        android:gravity="center" android:fontFamily="@font/montserrat_family"
+                        android:textSize="16sp" android:textColor="@color/astro_light_background"
+                        android:text="@string/employee_events_empty" android:visibility="gone" />
+                    <View android:id="@+id/divider_employee_events_empty" android:layout_width="match_parent"
+                        android:layout_height="21dp" android:background="@drawable/bg_home_divider"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+            <include android:id="@+id/skeleton_employee_events" layout="@layout/view_employee_events_skeleton"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:visibility="gone" tools:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

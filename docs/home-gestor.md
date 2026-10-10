@@ -71,3 +71,10 @@ A implementação inicial foi entregue sem build ou instalação, conforme o ped
 Em 2026-10-07, após autorização de instalação, assembleDebug passou e a APK foi instalada
 no Samsung SM-A566E com atualização sem apagar os dados do app. Não houve abertura,
 testes de navegação ou uso do emulador. Validação visual e de execução em telefone/tablet continuam pendentes.
+
+## Integração com a main — 2026-10-10
+
+A branch feat/SCRUM-255-perfil-usuario incorporou a main ed742e1 por merge.
+As seções de base Git acima registram a preparação anterior das PRs.
+Nesta branch, Perfil, alteração de senha e logout permanecem integrados;
+a navegação também inclui Eventos do Colaborador e as telas de erro atuais da main.

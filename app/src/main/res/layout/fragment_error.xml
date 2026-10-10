@@ -1,50 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/astro_dark_background"
-    tools:showIn="@layout/activity_main">
+    android:fillViewport="true"
+    android:overScrollMode="ifContentScrolls"
+    tools:context=".navigation.ErrorFragment">
 
-    <ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingStart="30dp"
-            android:paddingEnd="30dp">
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="370dp">
+
+            <FrameLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/bg_error_icon">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/error_warning_circle" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/text_email_error_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
                 android:fontFamily="@font/montserrat_family"
+                android:fontVariationSettings="'wght' 600"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:lineHeight="32sp"
+                android:text="@string/email_generic_error_title"
                 android:textColor="@color/astro_light_background"
-                android:textSize="24sp"
-                tools:text="Algo deu errado" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/text_email_error_body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
                 android:fontFamily="@font/montserrat_family"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:lineHeight="24sp"
+                android:text="@string/email_generic_error_body"
                 android:textColor="@color/astro_input_hint"
-                android:textSize="16sp"
-                tools:text="Não foi possível concluir esta ação. Tente novamente em instantes." />
+                android:textSize="16sp" />
 
             <FrameLayout
                 android:id="@+id/button_email_error_retry"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="28dp"
                 android:background="@drawable/bg_login_password_button"
                 android:clickable="true"
                 android:focusable="true">
@@ -55,6 +87,7 @@
                     android:layout_height="match_parent"
                     android:fontFamily="@font/montserrat_family"
                     android:gravity="center"
+                    android:includeFontPadding="false"
                     android:text="@string/email_error_retry"
                     android:textColor="@color/astro_light_background"
                     android:textSize="16sp" />
@@ -73,15 +106,16 @@
                 android:id="@+id/button_email_error_start"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="38dp"
                 android:background="@drawable/bg_flow_choice_secondary_button"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat_family"
                 android:gravity="center"
+                android:includeFontPadding="false"
                 android:text="@string/email_error_start"
                 android:textColor="@color/astro_light_background"
                 android:textSize="16sp" />
         </LinearLayout>
-    </ScrollView>
-</FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
