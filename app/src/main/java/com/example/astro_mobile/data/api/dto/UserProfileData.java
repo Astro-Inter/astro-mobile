@@ -9,6 +9,7 @@ public final class UserProfileData {
     private String unidade;
     private String modalidade;
     private String email;
+    private String profilePhotoUrl;
     private List<Nr> nrs;
 
     public String getNome() { return nome; }
@@ -16,6 +17,10 @@ public final class UserProfileData {
     public String getUnidade() { return unidade; }
     public String getModalidade() { return modalidade; }
     public String getEmail() { return email; }
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl == null || profilePhotoUrl.trim().isEmpty()
+                ? null : profilePhotoUrl.trim();
+    }
     public List<Nr> getNrs() { return nrs == null ? Collections.emptyList() : nrs; }
 
     public static final class Nr {

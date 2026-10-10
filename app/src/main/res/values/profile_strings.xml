@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_title">Perfil</string>
+    <string name="profile_change_photo">Alterar foto</string>
+    <string name="profile_photo_sending">Enviando foto…</string>
+    <string name="profile_photo_updated">Foto atualizada.</string>
+    <string name="profile_photo_invalid">Escolha uma foto JPEG, PNG ou WebP de até 5 MB.</string>
+    <string name="profile_photo_error">Não foi possível enviar a foto. Tente novamente.</string>
+    <string name="profile_photo_refresh_error">Foto enviada. Reabra o Perfil para atualizar a imagem.</string>
     <string name="profile_unit">Unidade:</string>
     <string name="profile_modality">Modalidade:</string>
     <string name="profile_email">E-mail:</string>

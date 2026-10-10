@@ -9,6 +9,17 @@ no `ProfileViewModel`, limitado à entrada de navegação do Perfil.
 - `GET /user/me`, sem corpo, com `Authorization: Bearer <ID token Firebase>`.
 - Reutiliza `ApiResponse<UserProfileData>`, Retrofit e o limite HTTP existente de 15s.
 - HTTP 200 com `success=true` e `data` preenchido apresenta o perfil e as NRs.
+- `profilePhotoUrl` contém a URL temporária da foto no R2. Glide carrega a imagem
+  com recorte circular, sem encaminhar o token Firebase ao armazenamento.
+  URL ausente, vazia ou falha ao carregar mantém o avatar padrão `home_user`.
+  A consulta do perfil é repetida ao retornar à tela para renovar a URL temporária.
+- `PUT /user/me/profile-photo` é o endpoint de upload (`multipart/form-data`, campo
+  `file`, JPEG/PNG/WebP até 5 MB, sucesso 204); não é usado para consultar a imagem.
+  O botão de lápis junto ao avatar abre o seletor do Android para adicionar ou substituir a imagem.
+  A leitura acontece fora da thread da interface, com validação do conteúdo e do
+  limite de 5 MB antes do envio. O upload mostra progresso e impede envios simultâneos.
+  Após 204, consulta novamente o perfil para obter a URL da nova foto. Erros mantêm
+  a imagem anterior e permitem tentar outra vez; 401 renova o token uma vez.
 - HTTP 401 renova o token uma vez; outro 401 encerra a sessão e abre a identificação.
 - 404, demais falhas HTTP, rede, timeout ou resposta inválida abrem o erro genérico existente.
 - Tentar novamente retorna ao Perfil e repete a consulta. Voltar retorna à Home.
@@ -27,7 +38,11 @@ no `ProfileViewModel`, limitado à entrada de navegação do Perfil.
   para GESTOR/GESTOR_WORKSPACE, inclusive na Home
   de Colaborador. Abre a escolha existente; Gestor continua mock. Escolher
   Colaborador guarda o fluxo e substitui a pilha antiga.
-- Avatar padrão não é editável; integração pendente da decisão do time.
+- A foto retornada pela API é exibida; o avatar padrão permanece quando não há foto.
+  O lápis “Edit 2” (Figma 1011:732), junto à borda inferior direita, e o toque no avatar
+  permitem escolher uma imagem, com ou sem foto atual. O ícone original de 20px foi
+  convertido por Svg2Vector para VectorDrawable, com área de toque de 48dp.
+  Cancelar o seletor mantém a imagem e não inicia o upload.
 - Notificações são apenas uma preferência local por UID, inicialmente desativada.
   Não há FCM, envio real ou pedido de permissão. Integração futura: SCRUM-434.
 - Toggle ativo roxo com círculo claro à direita; desativado cinza com círculo à esquerda.
@@ -92,6 +107,14 @@ de e-mail”; o Perfil mantém “Voltar ao perfil”. Não há reenvio automát
 - Novas telas de senha seguem o padrão visual do app; não foram criadas no Figma.
 
 ## Verificação desta entrega
+
+Atualização de 10/10/2026: contrato do Swagger consultado para a foto no R2.
+`assembleDebug`, `lintDebug` e 27 testes unitários passaram. Os testes novos
+conferem a consulta autenticada, dados/NRs e URL presente, ausente, nula ou vazia.
+Também conferem os formatos, o limite de tamanho, o multipart autenticado,
+o sucesso 204, a renovação de token e os erros 400/413/401 no upload.
+O APK inclui o avatar padrão e o lápis para alterar a foto; sem instalação ou envio de foto
+real em dispositivo nesta atualização.
 
 Compilação debug e lint sem erros. APK instalada no Samsung SM-A566E; perfil com
 dados reais, cores dos ícones, toggle ligado/desligado, segunda NR após expansão

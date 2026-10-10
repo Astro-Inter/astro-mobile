@@ -14,6 +14,7 @@ gson = "2.14.0"
 lifecycle = "2.11.0"
 markwon = "4.6.2"
 recyclerview = "1.4.0"
+glide = "4.16.0"
 googleServices = "4.5.0"
 firebaseBom = "34.19.0"
 
@@ -33,6 +34,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycle" }
 lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "lifecycle" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
 markwon-tables = { group = "io.noties.markwon", name = "ext-tables", version.ref = "markwon" }
 markwon-strikethrough = { group = "io.noties.markwon", name = "ext-strikethrough", version.ref = "markwon" }
