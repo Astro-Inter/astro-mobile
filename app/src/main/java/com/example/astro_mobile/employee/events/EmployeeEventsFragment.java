@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,8 +17,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.NavBackStackEntry;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -205,7 +207,7 @@ public class EmployeeEventsFragment extends Fragment {
     }
 
     private void showDay(LocalDate day) {
-        // Um toque no dia abre somente o resumo; detalhes completos são outra tarefa.
+        // O resumo usa as mesmas linhas e abre o mesmo detalhe da lista principal.
         List<EmployeeEvent> events = state.eventsOn(day);
         daySheet = new BottomSheetDialog(requireContext());
         View sheet = getLayoutInflater().inflate(R.layout.sheet_employee_events, null);
@@ -224,8 +226,32 @@ public class EmployeeEventsFragment extends Fragment {
     }
 
     private void populateRows(RecyclerView container, List<EmployeeEvent> events) {
-        container.setAdapter(new EmployeeEventsAdapter(events, clicked -> Toast.makeText(requireContext(),
-                R.string.employee_events_details_pending, Toast.LENGTH_SHORT).show()));
+        container.setAdapter(new EmployeeEventsAdapter(events, this::openDetails));
+    }
+
+    private void openDetails(EmployeeEvent event) {
+        // Leva o evento escolhido ao detalhe, inclusive quando veio do calendário.
+        if (daySheet != null) daySheet.dismiss();
+        Bundle args = AuthArgs.copy(getArguments());
+        args.putString(EmployeeEventDetailsFragment.EVENT_TITLE, event.title);
+        args.putString(EmployeeEventDetailsFragment.EVENT_DATE, event.date.toString());
+        args.putString(EmployeeEventDetailsFragment.EVENT_STATUS, event.status.name());
+        args.putBoolean(EmployeeEventDetailsFragment.EVENT_URGENT, event.urgent);
+        NavHostFragment.findNavController(this).navigate(R.id.action_employee_events_to_details, args);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // A conclusão é só local: atualiza a lista sem chamar ou alterar o backend.
+        NavBackStackEntry entry = NavHostFragment.findNavController(this)
+                .getBackStackEntry(R.id.employeeEventsFragment);
+        Bundle completed = entry.getSavedStateHandle().remove(EmployeeEventDetailsFragment.COMPLETED_EVENT);
+        if (completed != null) {
+            state.markCompleted(completed.getString(EmployeeEventDetailsFragment.EVENT_TITLE),
+                    LocalDate.parse(completed.getString(EmployeeEventDetailsFragment.EVENT_DATE)));
+            render(requireView());
+        }
     }
 
     @Override

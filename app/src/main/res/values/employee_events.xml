@@ -16,7 +16,6 @@
     <string name="employee_events_year">Selecionar ano</string>
     <string name="employee_events_day">Dia %1$s</string>
     <string name="employee_events_due">Data limite: %1$s</string>
-    <string name="employee_events_details_pending">Os detalhes deste evento serão implementados na próxima tarefa.</string>
     <plurals name="employee_events_count">
         <item quantity="one">%d evento</item>
         <item quantity="other">%d eventos</item>

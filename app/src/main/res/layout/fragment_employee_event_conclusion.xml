@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:context="com.example.astro_mobile.employee.events.EmployeeEventConclusionFragment">
+    <ScrollView android:layout_width="0dp" android:layout_height="0dp" android:fillViewport="true"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="center" android:paddingHorizontal="30dp"
+            android:paddingTop="30dp" android:paddingBottom="40dp">
+            <ImageView android:layout_width="144dp" android:layout_height="144dp"
+                android:src="@drawable/employee_event_confirmation" android:scaleType="fitCenter"
+                android:contentDescription="@null" android:importantForAccessibility="no" />
+            <TextView style="@style/EmployeeEventDetailsText" android:layout_marginTop="35dp"
+                android:textSize="24sp" android:gravity="center" android:text="@string/employee_event_conclusion" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
