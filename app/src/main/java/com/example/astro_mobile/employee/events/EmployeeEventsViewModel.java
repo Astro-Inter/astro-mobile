@@ -31,6 +31,17 @@ public class EmployeeEventsViewModel extends ViewModel {
     public boolean isLoaded() { return loaded; }
     public void markLoaded() { loaded = true; }
 
+    public void markCompleted(String title, LocalDate date) {
+        // Mantém a conclusão mock apenas na lista aberta nesta sessão da tela.
+        for (int index = 0; index < events.size(); index++) {
+            EmployeeEvent event = events.get(index);
+            if (event.title.equals(title) && event.date.equals(date)) {
+                events.set(index, new EmployeeEvent(title, date, EmployeeEvent.Status.DONE, false));
+                return;
+            }
+        }
+    }
+
     public List<EmployeeEvent> visibleEvents() {
         // Aplica a busca sem diferenciar acentos, o estado escolhido e o mês atual.
         List<EmployeeEvent> result = new ArrayList<>();

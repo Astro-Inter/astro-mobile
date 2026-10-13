@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:context="com.example.astro_mobile.employee.events.EmployeeEventDetailsFragment">
+    <LinearLayout android:layout_width="0dp" android:layout_height="0dp" android:orientation="vertical"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="80dp"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:baselineAligned="false" android:paddingHorizontal="20dp">
+            <ImageButton android:id="@+id/button_employee_event_details_back"
+                android:layout_width="48dp" android:layout_height="48dp"
+                android:background="@drawable/bg_login_icon_button" android:contentDescription="@string/conversations_back"
+                android:paddingHorizontal="15dp" android:paddingVertical="17dp"
+                android:src="@drawable/ic_login_back" android:scaleType="fitCenter" />
+            <TextView style="@style/EmployeeEventDetailsText" android:layout_width="0dp"
+                android:layout_weight="1" android:gravity="center" android:textSize="24sp"
+                android:text="@string/employee_event_details_title" />
+            <Space android:layout_width="48dp" android:layout_height="1dp" />
+        </LinearLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <ScrollView android:id="@+id/scroll_employee_event_details"
+                android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:paddingBottom="30dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:minHeight="99dp" android:layout_marginTop="10dp" android:orientation="horizontal"
+                        android:baselineAligned="false" android:gravity="center_vertical"
+                        android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                        <ImageView android:id="@+id/image_employee_event_badge"
+                            android:layout_width="79dp" android:layout_height="79dp" android:layout_marginEnd="20dp"
+                            android:contentDescription="@null" android:importantForAccessibility="no"
+                            android:scaleType="fitCenter" android:src="@drawable/employee_event_calendar_badge" />
+                        <FrameLayout android:id="@+id/container_employee_event_calendar"
+                            android:layout_width="79dp" android:layout_height="79dp" android:layout_marginEnd="20dp"
+                            android:background="@drawable/bg_employee_event_calendar" android:visibility="gone">
+                            <ImageView android:layout_width="45dp" android:layout_height="45dp"
+                                android:layout_gravity="center" android:src="@drawable/home_calendar"
+                                android:contentDescription="@null" android:importantForAccessibility="no" />
+                        </FrameLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:id="@+id/text_employee_event_details_title"
+                                style="@style/EmployeeEventDetailsText" android:textSize="24sp" tools:text="Treinamento de EPI" />
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp" android:orientation="horizontal"
+                                android:baselineAligned="false" android:gravity="center_vertical">
+                                <ImageView android:id="@+id/image_employee_event_urgent"
+                                    android:layout_width="18dp" android:layout_height="18dp" android:layout_marginEnd="10dp"
+                                    android:src="@drawable/ic_employee_event_warning" android:contentDescription="@null"
+                                    android:importantForAccessibility="no" android:scaleType="fitCenter" />
+                                <TextView android:id="@+id/text_employee_event_details_status"
+                                    style="@style/EmployeeEventDetailsText" android:layout_width="0dp"
+                                    android:layout_weight="1" android:textColor="@color/astro_input_hint"
+                                    android:text="@string/employee_event_urgent" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                    <FrameLayout android:id="@+id/container_employee_event_urgent_deadline"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                        <TextView android:id="@+id/text_employee_event_urgent_deadline" style="@style/EmployeeEventDetailsText"
+                            android:minHeight="60dp" android:gravity="center_vertical" android:paddingHorizontal="30dp"
+                            android:paddingVertical="20dp" android:background="@drawable/bg_employee_event_urgent"
+                            tools:text="Prazo limite: 06/07/2067" />
+                    </FrameLayout>
+                    <View style="@style/EmployeeEventDetailsDivider" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="30dp" android:layout_marginTop="20dp" android:layout_marginBottom="10dp"
+                        android:background="@drawable/bg_profile_panel" android:orientation="vertical"
+                        android:paddingHorizontal="30dp" android:paddingVertical="20dp">
+                        <TextView style="@style/EmployeeEventDetailsText" android:text="@string/employee_event_about" />
+                        <TextView android:id="@+id/text_employee_event_description" style="@style/EmployeeEventDetailsText"
+                            android:layout_marginTop="5dp" android:textColor="@color/astro_input_hint"
+                            tools:text="Treinamento sobre o uso correto, conservação e responsabilidades relacionadas aos Equipamentos de Proteção Individual (EPI) no ambiente de trabalho.&#10;&#10;Faça o curso em anexo e anexe um print do certificado emitido ao final como evidência." />
+                    </LinearLayout>
+                    <TextView style="@style/EmployeeEventDetailsText" android:textSize="24sp"
+                        android:layout_marginTop="10dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
+                        android:text="@string/employee_event_attachments" />
+                    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                        <TextView android:id="@+id/button_employee_event_attachment" style="@style/EmployeeEventDetailsButton"
+                            android:text="@string/employee_event_view_attachment" />
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:layout_gravity="start|center_vertical" android:layout_marginStart="15dp"
+                            android:src="@drawable/employee_event_link" android:contentDescription="@null"
+                            android:importantForAccessibility="no" android:scaleType="fitCenter" />
+                    </FrameLayout>
+                    <View style="@style/EmployeeEventDetailsDivider" />
+                    <LinearLayout style="@style/EmployeeEventDetailsRow">
+                        <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/home_calendar" />
+                        <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_deadline_label" />
+                        <TextView android:id="@+id/text_employee_event_deadline" style="@style/EmployeeEventDetailsValue" tools:text="06/07/2067" />
+                    </LinearLayout>
+                    <View style="@style/EmployeeEventDetailsDivider" />
+                    <LinearLayout style="@style/EmployeeEventDetailsRow">
+                        <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/home_clock" />
+                        <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_validity_label" />
+                        <TextView android:id="@+id/text_employee_event_validity" style="@style/EmployeeEventDetailsValue" tools:text="06/07/2069" />
+                    </LinearLayout>
+                    <View style="@style/EmployeeEventDetailsDivider" />
+                    <LinearLayout style="@style/EmployeeEventDetailsRow">
+                        <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/employee_event_notes" />
+                        <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_completion_mode_label" />
+                        <TextView style="@style/EmployeeEventDetailsValue" android:text="@string/employee_event_completion_mode_mock" />
+                    </LinearLayout>
+                    <View style="@style/EmployeeEventDetailsDivider" />
+                    <LinearLayout style="@style/EmployeeEventDetailsRow">
+                        <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/employee_event_user" />
+                        <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_sender_label" />
+                        <TextView style="@style/EmployeeEventDetailsValue" android:text="@string/employee_event_sender_mock" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/container_employee_event_completion"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                        <View style="@style/EmployeeEventDetailsDivider" />
+                        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="30dp" android:layout_marginTop="20dp" android:layout_marginBottom="10dp"
+                            android:background="@drawable/bg_flow_choice_secondary_button">
+                            <TextView android:id="@+id/button_employee_event_evidence" style="@style/EmployeeEventDetailsButton"
+                                android:background="?attr/selectableItemBackground" android:text="@string/employee_event_evidence_filename" />
+                            <ImageButton android:id="@+id/button_employee_event_remove_evidence"
+                                android:layout_width="48dp" android:layout_height="48dp"
+                                android:layout_gravity="end|center_vertical" android:layout_marginEnd="2dp"
+                                android:background="@drawable/bg_home_icon_ripple" android:padding="15dp"
+                                android:src="@drawable/employee_event_close" android:scaleType="fitCenter"
+                                android:contentDescription="@string/employee_event_remove_evidence" />
+                        </FrameLayout>
+                        <View style="@style/EmployeeEventDetailsDivider" />
+                        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                            <TextView android:id="@+id/button_employee_event_complete" style="@style/EmployeeEventDetailsButton"
+                                android:background="@drawable/bg_login_password_button" android:text="@string/employee_event_complete" />
+                        </FrameLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+            <!-- Oculto no XML para o editor mostrar a tela real; só aparece no loading mock. -->
+            <include android:id="@+id/skeleton_employee_event_details" layout="@layout/view_employee_event_details_skeleton"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:visibility="gone" tools:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

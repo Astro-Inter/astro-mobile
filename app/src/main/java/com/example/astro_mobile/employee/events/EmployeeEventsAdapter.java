@@ -15,12 +15,13 @@ import com.example.astro_mobile.R;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEventsAdapter.Row> {
     private final List<EmployeeEvent> events;
-    private final View.OnClickListener onClick;
+    private final Consumer<EmployeeEvent> onClick;
 
-    public EmployeeEventsAdapter(List<EmployeeEvent> events, View.OnClickListener onClick) {
+    public EmployeeEventsAdapter(List<EmployeeEvent> events, Consumer<EmployeeEvent> onClick) {
         this.events = events;
         this.onClick = onClick;
     }
@@ -53,7 +54,7 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
         int description = event.status == EmployeeEvent.Status.DONE ? R.string.employee_events_done
                 : event.status == EmployeeEvent.Status.REVIEW ? R.string.employee_events_review : R.string.employee_events_pending;
         ViewCompat.setStateDescription(row.button, row.itemView.getContext().getString(description));
-        row.button.setOnClickListener(onClick);
+        row.button.setOnClickListener(clicked -> onClick.accept(event));
     }
 
     @Override public int getItemCount() { return events.size(); }
