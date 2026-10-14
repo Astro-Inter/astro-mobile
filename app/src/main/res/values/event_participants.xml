@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="participants_title">Participantes</string>
+    <string name="participants_heading">Participantes de um evento</string>
+    <string name="participants_description">Acesse aqui o estado de cada colaborador participante em “%1$s”</string>
+    <string name="participants_assignment_notice">A conclusão desse evento deve ser atribuída por você.</string>
+    <string name="participants_search">Pesquisar em participantes</string>
+    <string name="participants_validated">Validados</string>
+    <string name="participants_not_validated">Não validados</string>
+    <string name="participants_not_completed">Não concluído</string>
+    <string name="participants_awaiting_completion">Ainda não concluiu o evento</string>
+    <string name="participants_validated_status">Validação feita</string>
+    <string name="participants_assigned_status">Conclusão atribuída</string>
+    <string name="participants_empty_mock">Nenhum participante encontrado</string>
+    <string name="participants_validation_pending">A tela de validação será implementada em uma tarefa própria. Nenhuma conclusão foi alterada.</string>
+
+    <style name="ParticipantSkeletonRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">84dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:baselineAligned">false</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+</resources>

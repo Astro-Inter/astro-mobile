@@ -14,7 +14,7 @@ UI e mocks da subtarefa de SCRUM-264. A branch `feat/SCRUM-294-detalhes-evento-g
 2. O primeiro e o terceiro exemplos abrem autodeclaração, com os três indicadores do Figma. O segundo e o quarto abrem atribuição, sem esses indicadores.
 3. Na primeira abertura de cada detalhe, o skeleton simula 1 segundo, sem bloquear a UI. Na prévia XML ele permanece oculto.
 4. Confira título, descrição, anexo, participantes, prazo, validade, modo e remetente. Os valores são exemplos locais dos frames, não registros reais.
-5. `Visualizar anexo` e `Ver participantes` dão ripple e avisam que suas ações estão pendentes; não abrem funcionalidades inventadas.
+5. `Visualizar anexo` avisa que sua ação está pendente. `Ver participantes` abre a UI/mock da SCRUM-291 no mesmo modo de conclusão do evento.
 6. Voltar retorna à lista preservando busca/filtro. Fechar retorna à Home do fluxo ativo. A navbar da Activity permanece fixa no push e mantém Eventos selecionado.
 
 ## Organização e visual
@@ -29,7 +29,7 @@ UI e mocks da subtarefa de SCRUM-264. A branch `feat/SCRUM-294-detalhes-evento-g
 ## Pendências fora desta UI
 
 - Os frames têm exemplos inconsistentes: a lista exibe 4 validações pendentes, e o detalhe tem 5 pendentes, 4 feitas e 1 conclusão pendente. Os números do detalhe foram mantidos como referência visual; unificar esses dados depende do contrato/design final.
-- Participantes, validações e atribuição real continuam em tarefas próprias. Anexos são somente referências visuais.
+- A UI/mock de participantes está na SCRUM-291. Sua integração, validações e atribuição real continuam em tarefas próprias. Anexos são somente referências visuais.
 - API, regras de autorização e cálculo de indicadores não estão implementados neste card.
 - Revisão visual em execução e previews de celular/tablet dependem de acesso ao dispositivo/editor. Nenhum emulador deve ser utilizado.
 

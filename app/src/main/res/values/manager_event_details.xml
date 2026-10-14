@@ -20,7 +20,6 @@
     <string name="manager_event_validity_mock">06/07/2069</string>
     <string name="manager_event_sender_mock">Bruno Baptista</string>
     <string name="manager_event_view_participants">Ver participantes</string>
-    <string name="manager_event_participants_pending">A lista de participantes será implementada em uma tarefa própria. Este botão é apenas visual por enquanto.</string>
 
     <style name="ManagerEventDetailsHeading" parent="ManagerEventsText">
         <item name="android:textSize">24sp</item>
