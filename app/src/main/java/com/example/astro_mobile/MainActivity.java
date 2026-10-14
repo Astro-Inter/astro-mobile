@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     && (navController.getCurrentDestination().getId() == R.id.chatFragment
                     || navController.getCurrentDestination().getId() == R.id.employeeEventsFragment
                     || navController.getCurrentDestination().getId() == R.id.managerEventsFragment
+                    || navController.getCurrentDestination().getId() == R.id.eventParticipantsFragment
                     || navController.getCurrentDestination().getId() == R.id.aiSessionsFragment);
             int bottom = hasKeyboardInput ? Math.max(systemBars.bottom,
                     insets.getInsets(WindowInsetsCompat.Type.ime()).bottom) : systemBars.bottom;
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         boolean profile = destination == R.id.profileFragment;
         boolean events = destination == R.id.employeeEventsFragment
                 || destination == R.id.employeeEventDetailsFragment || destination == R.id.managerEventsFragment
-                || destination == R.id.managerEventDetailsFragment;
+                || destination == R.id.managerEventDetailsFragment || destination == R.id.eventParticipantsFragment;
         boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
         navbar.setVisibility((home || conversations || profile || events)
                 && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment) && keyboard)

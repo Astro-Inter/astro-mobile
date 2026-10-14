@@ -108,7 +108,7 @@ public class EmployeeEventsFragment extends Fragment {
         for (int index = 0; index < filterIds.length; index++) view.findViewById(filterIds[index]).setSelected(index == selected);
         YearMonth month = state.getMonth();
         TextView monthButton = view.findViewById(R.id.button_employee_events_month);
-        monthButton.setText(month.getMonth().getDisplayName(TextStyle.SHORT, Locale.US));
+        monthButton.setText(month.getMonth().getDisplayName(TextStyle.SHORT, PT_BR));
         TextView yearButton = view.findViewById(R.id.button_employee_events_year);
         yearButton.setText(String.valueOf(month.getYear()));
         renderCalendar(view, month);

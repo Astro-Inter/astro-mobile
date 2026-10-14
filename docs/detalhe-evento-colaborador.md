@@ -14,7 +14,7 @@ Escopo: UI e mocks. Não há chamada de API, leitura de documentos ou envio de e
 2. Toque em uma linha da lista ou em um evento do resumo de um dia do calendário.
 3. Na primeira abertura do detalhe, o skeleton fica visível por um segundo. O atraso não bloqueia a interface.
 4. O evento pendente mostra a evidência de exemplo e a ação de concluir. Remover e recolocar a evidência só altera o protótipo.
-5. Concluir abre a confirmação. Voltar pelo Android retorna à lista com o item concluído localmente.
+5. Concluir abre a confirmação com o check verde por 2 segundos. Depois, retorna à Home do colaborador, recriada para executar novamente seu skeleton existente. Voltar pelo Android antes do retorno automático mantém o comportamento da lista e cancela o temporizador.
 
 A conclusão não é persistida: trocar o mês ou reabrir o fluxo pode recarregar os mocks originais. A validade de dois anos, o remetente e o arquivo são exemplos, não regras de negócio nem dados reais. Eventos em análise ou concluídos não repetem a ação de conclusão neste protótipo.
 
@@ -22,7 +22,7 @@ A conclusão não é persistida: trocar o mês ou reabrir o fluxo pode recarrega
 
 - Fragments e ViewModel em `employee/events`; dados locais em `employee/events/mock`.
 - Argumentos simples no único `nav_graph.xml`; a navbar continua na `MainActivity`, fora da transição.
-- A confirmação não exibe navbar, conforme seu frame. Nenhum retorno automático ou botão extra foi acrescentado.
+- A confirmação não exibe navbar, conforme seu frame. O retorno automático de 2 segundos foi solicitado posteriormente; ele remove a pilha de eventos e recria a Home sem alterar a autenticação nem adicionar outro loading.
 - Skeleton oculto no XML para permitir a visualização da tela real no editor.
 - Layout rolável, largura máxima do projeto e textos sem alturas fixas para permitir quebra em celular e tablet.
 
