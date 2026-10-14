@@ -9,7 +9,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 import java.util.List;
@@ -104,8 +104,7 @@ public final class ManagerEventsFragment extends Fragment {
         List<ManagerEvent> events = state.visibleEvents();
         boolean empty = events.isEmpty();
         RecyclerView list = view.findViewById(R.id.list_manager_events);
-        list.setAdapter(new ManagerEventsAdapter(events, event -> Toast.makeText(requireContext(),
-                R.string.manager_events_details_pending, Toast.LENGTH_SHORT).show()));
+        list.setAdapter(new ManagerEventsAdapter(events, this::openDetails));
         list.setVisibility(empty ? View.GONE : View.VISIBLE);
         view.findViewById(R.id.container_manager_events_empty).setVisibility(empty ? View.VISIBLE : View.GONE);
         // Preserva as duas composições: dropdown na lista e chips no estado vazio.
@@ -117,6 +116,14 @@ public final class ManagerEventsFragment extends Fragment {
         for (int index = 0; index < filterIds.length; index++) {
             view.findViewById(filterIds[index]).setSelected(index == state.getFilter().ordinal());
         }
+    }
+
+    private void openDetails(ManagerEvent event) {
+        // Leva o evento e seu modo ao detalhe, preservando o contexto da conta.
+        Bundle args = AuthArgs.copy(getArguments());
+        args.putString(ManagerEventDetailsFragment.EVENT_TITLE, event.title);
+        args.putString(ManagerEventDetailsFragment.COMPLETION_MODE, event.completionMode.name());
+        NavHostFragment.findNavController(this).navigate(R.id.action_manager_events_to_details, args);
     }
 
     @Override
