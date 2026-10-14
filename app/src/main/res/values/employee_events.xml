@@ -21,7 +21,7 @@
         <item quantity="other">%d eventos</item>
     </plurals>
     <string-array name="employee_events_weekdays">
-        <item>Su</item><item>Mo</item><item>Tu</item><item>We</item><item>Th</item><item>Fr</item><item>Sa</item>
+        <item>Dom</item><item>Seg</item><item>Ter</item><item>Qua</item><item>Qui</item><item>Sex</item><item>Sáb</item>
     </string-array>
     <color name="employee_event_status_red">#FF4D4D</color>
     <color name="employee_event_status_green">#51BF1E</color>

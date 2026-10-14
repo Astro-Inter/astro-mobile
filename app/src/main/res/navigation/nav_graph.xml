@@ -21,6 +21,16 @@
         android:label="Detalhes do evento do Gestor">
         <argument android:name="event_title" app:argType="string" />
         <argument android:name="event_completion_mode" app:argType="string" />
+        <action android:id="@+id/action_manager_event_details_to_participants" app:destination="@id/eventParticipantsFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+
+    <fragment android:id="@+id/eventParticipantsFragment"
+        android:name="com.example.astro_mobile.manager.events.participants.EventParticipantsFragment"
+        android:label="Participantes do evento">
+        <argument android:name="event_title" app:argType="string" />
+        <argument android:name="event_completion_mode" app:argType="string" />
     </fragment>
 
     <action android:id="@+id/action_global_employee_events" app:destination="@id/employeeEventsFragment"
@@ -50,7 +60,12 @@
 
     <fragment android:id="@+id/employeeEventConclusionFragment"
         android:name="com.example.astro_mobile.employee.events.EmployeeEventConclusionFragment"
-        android:label="Conclusão de evento" />
+        android:label="Conclusão de evento">
+        <action android:id="@+id/action_employee_event_conclusion_to_home" app:destination="@id/employeeHomeFragment"
+            app:popUpTo="@id/employeeHomeFragment" app:popUpToInclusive="true"
+            app:enterAnim="@anim/push_pop_enter" app:exitAnim="@anim/push_pop_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
 
     <action android:id="@+id/action_global_conversations" app:destination="@id/conversationsFragment"
         app:launchSingleTop="true"

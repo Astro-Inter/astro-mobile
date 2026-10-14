@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public final class ManagerEventDetailsFragment extends Fragment {
@@ -45,11 +46,12 @@ public final class ManagerEventDetailsFragment extends Fragment {
         view.findViewById(R.id.button_manager_event_close).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack(HomeNavigation.destination(requireContext()), false));
 
-        // Estes botões dão feedback, mas não simulam upload nem criam telas de outras tarefas.
+        // O anexo continua visual; participantes abre a variante correspondente ao modo.
         view.findViewById(R.id.button_manager_event_attachment).setOnClickListener(clicked ->
                 showMockNotice(R.string.employee_event_attachment_mock));
         view.findViewById(R.id.button_manager_event_participants).setOnClickListener(clicked ->
-                showMockNotice(R.string.manager_event_participants_pending));
+                NavHostFragment.findNavController(this).navigate(
+                        R.id.action_manager_event_details_to_participants, AuthArgs.copy(getArguments())));
 
         // Mostra o skeleton por um segundo sem bloquear a interface ou ocultar a prévia XML.
         if (!state.isLoaded()) {
