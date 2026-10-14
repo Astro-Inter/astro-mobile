@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manager_events_title">Meus eventos</string>
+    <string name="manager_events_heading">Seus eventos</string>
+    <string name="manager_events_description">Acesse aqui o estado de qualquer evento atribuído por você</string>
+    <string name="manager_events_filter">Filtrar por estado</string>
+    <string name="manager_events_in_progress">Em andamento</string>
+    <string name="manager_events_finished">Finalizados</string>
+    <string name="manager_events_finished_status">Finalizado</string>
+    <string name="manager_events_pending_count">Validações pendentes: %1$d</string>
+    <string name="manager_events_validation_pending">Validação pendente</string>
+    <string name="manager_events_assign_hint">Você precisa atribuir conclusões!</string>
+    <string name="manager_events_assign">Atribuir conclusões</string>
+    <string name="manager_events_no_validation">Nenhuma validação pendente</string>
+    <string name="manager_events_no_action">Sem ação necessária</string>
+    <string name="manager_events_empty">Nenhum evento encontrado</string>
+    <string name="manager_events_details_pending">Os detalhes do evento serão implementados na SCRUM-294.</string>
+
+    <style name="ManagerEventsText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/montserrat_family</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">@color/astro_light_background</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="ManagerEventsCaption" parent="ManagerEventsText">
+        <item name="android:textColor">@color/astro_input_hint</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+</resources>
