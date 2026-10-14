@@ -14,7 +14,6 @@
     <string name="manager_events_no_validation">Nenhuma validação pendente</string>
     <string name="manager_events_no_action">Sem ação necessária</string>
     <string name="manager_events_empty">Nenhum evento encontrado</string>
-    <string name="manager_events_details_pending">Os detalhes do evento serão implementados na SCRUM-294.</string>
 
     <style name="ManagerEventsText">
         <item name="android:layout_width">match_parent</item>

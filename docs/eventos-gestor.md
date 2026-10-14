@@ -12,7 +12,7 @@ UI e mocks, sob a tarefa SCRUM-263. Não há API, criação de eventos, validaç
 
 1. Entre no fluxo gestor e toque em Eventos na navbar.
 2. O skeleton simula um segundo sem bloquear a interface e não aparece na prévia XML.
-3. São quatro exemplos do Figma: validação pendente, atribuição de conclusões, nenhuma ação e finalizado.
+3. São quatro exemplos do Figma: validação pendente, atribuição de conclusões, nenhuma ação e finalizado. Toque em qualquer linha para abrir seu detalhe (SCRUM-294).
 4. Use o dropdown para mostrar Todos, Em andamento ou Finalizados. É apenas filtragem local: os três exemplos não finalizados pertencem ao grupo Em andamento.
 5. Pesquise `EPI` para encontrar os exemplos ou `teste` para mostrar o estado vazio. A busca ignora maiúsculas e acentos.
 6. O frame vazio usa os três chips; o preenchido usa dropdown. Ambos controlam o mesmo filtro, mantendo a diferença visual dos frames.
@@ -33,5 +33,5 @@ Os quatro títulos repetidos são os exemplos do Figma, não quatro registros re
 - Build debug e lint aprovados sem erros. XMLs, diff, referências e hashes dos assets conferidos.
 - Novos assets de busca, chevron e caderno exportados dos SVGs oficiais sem redesenho. X e ponto vermelho reutilizados após comparação; check mantém geometria e cor oficiais.
 - Nenhum dispositivo físico conectado. Não houve instalação, teste em execução ou uso do emulador disponível. A comparação visual em celular/tablet permanece pendente.
-- Os detalhes e seus destinos ficam na SCRUM-294; por enquanto, o toque na linha só informa essa pendência. Foi aprovada a correção do campo para `Atribuição` na futura variante do gestor.
+- Os detalhes da SCRUM-294 usam modos explícitos nos mocks: primeiro/terceiro exemplos são autodeclaração; segundo/quarto são atribuição. Isso não estabelece uma regra entre estado e modo. Veja [detalhe-evento-gestor.md](detalhe-evento-gestor.md).
 - API, regras definitivas de estados e interações reais ficam na SCRUM-298 e nas tarefas específicas de detalhe/participantes/validação.

@@ -11,9 +11,13 @@ public final class ManagerEventSamples {
     public static List<ManagerEvent> events() {
         // Um exemplo por estado do Figma; nenhum dado vem da API.
         return Arrays.asList(
-                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.VALIDATION_PENDING, 4),
-                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.ASSIGNMENT_PENDING, 0),
-                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.NO_ACTION, 0),
-                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.FINISHED, 0));
+                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.VALIDATION_PENDING, 4,
+                        ManagerEvent.CompletionMode.SELF_DECLARATION),
+                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.ASSIGNMENT_PENDING, 0,
+                        ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT),
+                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.NO_ACTION, 0,
+                        ManagerEvent.CompletionMode.SELF_DECLARATION),
+                new ManagerEvent("Treinamento de EPI", ManagerEvent.Status.FINISHED, 0,
+                        ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT));
     }
 }

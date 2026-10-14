@@ -10,7 +10,18 @@
 
     <fragment android:id="@+id/managerEventsFragment"
         android:name="com.example.astro_mobile.manager.events.ManagerEventsFragment"
-        android:label="Eventos do Gestor" />
+        android:label="Eventos do Gestor">
+        <action android:id="@+id/action_manager_events_to_details" app:destination="@id/managerEventDetailsFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+
+    <fragment android:id="@+id/managerEventDetailsFragment"
+        android:name="com.example.astro_mobile.manager.events.ManagerEventDetailsFragment"
+        android:label="Detalhes do evento do Gestor">
+        <argument android:name="event_title" app:argType="string" />
+        <argument android:name="event_completion_mode" app:argType="string" />
+    </fragment>
 
     <action android:id="@+id/action_global_employee_events" app:destination="@id/employeeEventsFragment"
         app:launchSingleTop="true" app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"

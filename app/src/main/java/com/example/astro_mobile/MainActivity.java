@@ -141,7 +141,8 @@ public class MainActivity extends AppCompatActivity {
                 || destination == R.id.aiSessionsFragment;
         boolean profile = destination == R.id.profileFragment;
         boolean events = destination == R.id.employeeEventsFragment
-                || destination == R.id.employeeEventDetailsFragment || destination == R.id.managerEventsFragment;
+                || destination == R.id.employeeEventDetailsFragment || destination == R.id.managerEventsFragment
+                || destination == R.id.managerEventDetailsFragment;
         boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
         navbar.setVisibility((home || conversations || profile || events)
                 && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment) && keyboard)

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manager_event_title_mock">Treinamento de EPI</string>
+    <string name="manager_event_self_declaration">Autodeclaração de colaborador</string>
+    <string name="manager_event_assignment">Atribuição de conclusão do gestor</string>
+    <string name="manager_event_assignment_mode">Atribuição</string>
+    <string name="manager_event_description_mock">Treinamento sobre o uso correto, conservação e responsabilidades relacionadas aos Equipamentos de Proteção Individual (EPI) no ambiente de trabalho.\n\nFaça o curso em anexo e anexe um print do certificado emitido ao final como evidência.</string>
+    <string name="manager_event_validations">Validações para esse evento</string>
+    <string name="manager_event_validations_description">Você precisa validar conclusões dos colaboradores, visualize aqui o estado das suas validações</string>
+    <string name="manager_event_validations_pending">Validações pendentes</string>
+    <string name="manager_event_validations_done">Validações feitas</string>
+    <string name="manager_event_conclusion_pending">Conclusão pendente</string>
+    <string name="manager_event_validations_pending_mock">5</string>
+    <string name="manager_event_validations_done_mock">4</string>
+    <string name="manager_event_conclusion_pending_mock">1</string>
+    <string name="manager_event_participants_label">Participantes:</string>
+    <string name="manager_event_participants_mock">10</string>
+    <string name="manager_event_information">Informações do evento</string>
+    <string name="manager_event_deadline_mock">06/07/2067</string>
+    <string name="manager_event_validity_mock">06/07/2069</string>
+    <string name="manager_event_sender_mock">Bruno Baptista</string>
+    <string name="manager_event_view_participants">Ver participantes</string>
+    <string name="manager_event_participants_pending">A lista de participantes será implementada em uma tarefa própria. Este botão é apenas visual por enquanto.</string>
+
+    <style name="ManagerEventDetailsHeading" parent="ManagerEventsText">
+        <item name="android:textSize">24sp</item>
+        <item name="android:paddingHorizontal">30dp</item>
+        <item name="android:paddingVertical">10dp</item>
+    </style>
+    <style name="ManagerEventDetailsRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">60dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:baselineAligned">false</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingHorizontal">30dp</item>
+        <item name="android:paddingVertical">20dp</item>
+    </style>
+    <style name="ManagerEventDetailsLabel" parent="ManagerEventsText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">134</item>
+        <item name="android:layout_marginEnd">20dp</item>
+    </style>
+    <style name="ManagerEventDetailsValue" parent="ManagerEventsText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">178</item>
+        <item name="android:gravity">end</item>
+    </style>
+    <style name="ManagerEventDetailsIcon">
+        <item name="android:layout_width">18.25dp</item>
+        <item name="android:layout_height">18.25dp</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:contentDescription">@null</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="tint">@color/astro_primary_purple</item>
+    </style>
+    <style name="ManagerEventDetailsDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">21dp</item>
+        <item name="android:background">@drawable/bg_home_divider</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+    <style name="ManagerEventValidationCard">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">117dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:background">@drawable/bg_profile_panel</item>
+    </style>
+    <style name="ManagerEventValidationCount" parent="ManagerEventsText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="ManagerEventValidationIcon">
+        <item name="android:layout_width">18dp</item>
+        <item name="android:layout_height">18dp</item>
+        <item name="android:contentDescription">@null</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+    <style name="ManagerEventValidationCaption" parent="ManagerEventsText">
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:gravity">bottom</item>
+    </style>
+</resources>
