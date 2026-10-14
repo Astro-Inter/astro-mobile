@@ -5,7 +5,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.SystemBarStyle;
@@ -74,11 +73,12 @@ public class MainActivity extends AppCompatActivity {
 
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            boolean chat = navController != null && navController.getCurrentDestination() != null
+            boolean hasKeyboardInput = navController != null && navController.getCurrentDestination() != null
                     && (navController.getCurrentDestination().getId() == R.id.chatFragment
                     || navController.getCurrentDestination().getId() == R.id.employeeEventsFragment
+                    || navController.getCurrentDestination().getId() == R.id.managerEventsFragment
                     || navController.getCurrentDestination().getId() == R.id.aiSessionsFragment);
-            int bottom = chat ? Math.max(systemBars.bottom,
+            int bottom = hasKeyboardInput ? Math.max(systemBars.bottom,
                     insets.getInsets(WindowInsetsCompat.Type.ime()).bottom) : systemBars.bottom;
             content.setPadding(
                     systemBars.left,
@@ -120,15 +120,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         navbar.findViewById(R.id.button_conversations_nav_events).setOnClickListener(clicked -> {
-            // O calendário pertence ao fluxo colaborador; o calendário do gestor é outra tarefa.
-            if (HomeNavigation.destination(this) != R.id.employeeHomeFragment) {
-                Toast.makeText(this, R.string.employee_home_mock_unavailable, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (navigation.getCurrentDestination().getId() == R.id.employeeEventsFragment) return;
+            // A mesma aba abre a lista correspondente ao fluxo ativo.
+            int home = HomeNavigation.destination(this);
+            boolean manager = home == R.id.managerHomeFragment;
+            int events = manager ? R.id.managerEventsFragment : R.id.employeeEventsFragment;
+            if (navigation.getCurrentDestination().getId() == events) return;
             Bundle args = AuthArgs.copy(navigation.getCurrentBackStackEntry().getArguments());
-            navigation.navigate(R.id.action_global_employee_events, args, new NavOptions.Builder()
-                    .setPopUpTo(R.id.employeeHomeFragment, false).setLaunchSingleTop(true)
+            navigation.navigate(manager ? R.id.action_global_manager_events : R.id.action_global_employee_events,
+                    args, new NavOptions.Builder()
+                    .setPopUpTo(home, false).setLaunchSingleTop(true)
                     .setEnterAnim(R.anim.push_enter).setExitAnim(R.anim.push_exit)
                     .setPopEnterAnim(R.anim.push_pop_enter).setPopExitAnim(R.anim.push_pop_exit).build());
         });
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 || destination == R.id.aiSessionsFragment;
         boolean profile = destination == R.id.profileFragment;
         boolean events = destination == R.id.employeeEventsFragment
-                || destination == R.id.employeeEventDetailsFragment;
+                || destination == R.id.employeeEventDetailsFragment || destination == R.id.managerEventsFragment;
         boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
         navbar.setVisibility((home || conversations || profile || events)
                 && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment) && keyboard)
