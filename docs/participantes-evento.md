@@ -18,7 +18,7 @@ UI e mocks da subtarefa de [SCRUM-265](https://luizacursino.atlassian.net/browse
 5. Filtros e pesquisa são combinados somente nos mocks locais, sem estabelecer regras definitivas de status do backend.
    O status de quem ainda não terminou usa “Ainda não concluiu o evento”, conforme o texto atualizado pelo solicitante.
 6. A primeira abertura mostra skeleton por 1 segundo. Ele está oculto na prévia XML; conteúdo rolável na RecyclerView e navbar fixa na Activity.
-7. Voltar preserva o detalhe. Fechar retorna à Home do fluxo ativo. A linha de validação pendente, único link de participante no frame, informa que seu destino ainda está pendente, sem alterar conclusões.
+7. Voltar preserva o detalhe. Fechar retorna à Home do fluxo ativo. A linha de validação pendente informa que seu destino ainda está pendente, sem alterar conclusões. Na SCRUM-285, participantes ainda não concluídos do modo Atribuição passam a abrir a tela de atribuição com seus dados locais.
 
 ## Organização
 
