@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.astro_mobile.notifications.NotificationsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <FrameLayout
+            android:id="@+id/container_notifications_header"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/button_notifications_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/notifications_back"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="17dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_login_back" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_family"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/notifications_title"
+                android:textColor="@color/astro_light_background"
+                android:textSize="24sp" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/container_notifications_body"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/container_notifications_header"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scroll_notifications_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:fillViewport="true">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="16dp">
+
+                    <FrameLayout
+                        android:id="@+id/container_notifications_search_input"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/bg_email_identification_input"
+                        app:layout_constraintWidth_percent="0.86"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginTop="20dp">
+
+                        <EditText
+                            android:id="@+id/input_notifications_search"
+                            style="@style/AstroSearchInput"
+                            android:hint="@string/notifications_search_hint"
+                            android:importantForAutofill="no" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="end|center_vertical"
+                            android:layout_marginEnd="16dp"
+                            android:contentDescription="@null"
+                            android:importantForAccessibility="no"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/conversations_search" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/button_notifications_search"
+                        style="@style/AstroPrimaryAction"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="20dp"
+                        app:layout_constraintWidth_percent="0.86"
+                        app:layout_constraintTop_toBottomOf="@id/container_notifications_search_input"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <TextView
+                            style="@style/AstroPrimaryActionLabel"
+                            android:text="@string/notifications_search_action" />
+                    </FrameLayout>
+
+                    <View
+                        android:id="@+id/divider_notifications_top"
+                        android:layout_width="0dp"
+                        android:layout_height="21dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_notifications_divider"
+                        android:importantForAccessibility="no"
+                        app:layout_constraintWidth_percent="0.86"
+                        app:layout_constraintTop_toBottomOf="@id/button_notifications_search"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/list_notifications"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintWidth_percent="0.86"
+                        app:layout_constraintTop_toBottomOf="@id/divider_notifications_top"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_notification" />
+
+                    <LinearLayout
+                        android:id="@+id/container_notifications_empty"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        app:layout_constraintWidth_percent="0.86"
+                        app:layout_constraintTop_toBottomOf="@id/divider_notifications_top"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        tools:visibility="gone">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:fontFamily="@font/montserrat_family"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:text="@string/notifications_empty"
+                            android:textColor="@color/astro_light_background"
+                            android:textSize="16sp" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="21dp"
+                            android:background="@drawable/bg_notifications_divider"
+                            android:importantForAccessibility="no" />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+
+            <include
+                android:id="@+id/skeleton_notifications"
+                layout="@layout/view_notifications_skeleton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                tools:visibility="gone" />
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
