@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/chat_surface" tools:context="com.example.astro_mobile.chat.human.HumanChatFragment">
+    <LinearLayout android:layout_width="0dp" android:layout_height="0dp" android:orientation="vertical"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="89dp"
+            android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false"
+            android:paddingStart="14dp" android:paddingEnd="30dp" android:paddingVertical="20dp">
+            <ImageButton android:id="@+id/button_human_chat_back" android:layout_width="48dp" android:layout_height="48dp"
+                android:layout_marginEnd="12dp" android:background="@drawable/bg_login_icon_button"
+                android:paddingHorizontal="14dp" android:paddingVertical="16dp" android:scaleType="fitCenter"
+                android:src="@drawable/ic_login_back" android:contentDescription="@string/conversations_back" />
+            <ImageView android:id="@+id/image_human_chat_peer" android:layout_width="48dp" android:layout_height="48dp"
+                android:layout_marginEnd="20dp" android:src="@drawable/participant_avatar_1"
+                android:scaleType="fitCenter" android:contentDescription="@null" android:importantForAccessibility="no" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/text_human_chat_name" style="@style/ManagerEventsText"
+                    tools:text="Kevin Parker" />
+                <TextView android:id="@+id/text_human_chat_role" style="@style/ManagerEventsCaption"
+                    tools:text="Eletricista" />
+            </LinearLayout>
+        </LinearLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_human_chat_messages"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:clipToPadding="false" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_chat_message" tools:itemCount="2" />
+            <include android:id="@+id/skeleton_human_chat" layout="@layout/view_human_chat_skeleton"
+                android:visibility="gone" tools:visibility="gone" />
+        </FrameLayout>
+        <LinearLayout android:id="@+id/container_human_chat_composer" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:minHeight="100dp" android:orientation="horizontal"
+            android:gravity="center_vertical" android:baselineAligned="false" android:paddingStart="16dp"
+            android:paddingEnd="30dp" android:paddingVertical="20dp" android:layout_marginBottom="20dp">
+            <ImageButton android:id="@+id/button_human_chat_add" android:layout_width="44dp" android:layout_height="48dp"
+                android:layout_marginEnd="16dp" android:background="@drawable/bg_login_icon_button"
+                android:padding="13dp" android:scaleType="fitCenter" android:src="@drawable/chat_add"
+                android:contentDescription="@string/chat_add_attachment" />
+            <FrameLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:background="@drawable/bg_chat_input">
+                <EditText android:id="@+id/input_human_chat_message" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="60dp" android:maxLines="5"
+                    android:gravity="start|center_vertical" android:background="@null" android:paddingStart="16dp"
+                    android:paddingEnd="54dp" android:paddingVertical="20dp" android:includeFontPadding="false"
+                    android:fontFamily="@font/montserrat_family" android:textSize="16sp" android:hint="@string/chat_input_hint"
+                    android:textColor="@color/chat_text" android:textColorHint="@color/chat_muted"
+                    android:inputType="textCapSentences|textMultiLine" android:imeOptions="actionSend"
+                    android:importantForAutofill="no" android:saveEnabled="false" />
+                <ImageButton android:id="@+id/button_human_chat_send" android:layout_width="48dp" android:layout_height="48dp"
+                    android:layout_gravity="end|center_vertical" android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_login_icon_button" android:padding="14dp"
+                    android:scaleType="fitCenter" android:src="@drawable/chat_send_arrow"
+                    android:contentDescription="@string/chat_send" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,7 +10,6 @@
     <string name="staff_detail_modality_mock">Presencial</string>
     <string name="staff_detail_email_mock">kevin.parker@picpay.com</string>
     <string name="staff_detail_nr_mock">NR-06 - &lt;font color="#B3B1C1">Validade: 21/12/1002&lt;/font></string>
-    <string name="staff_detail_chat_pending">A conversa com este colaborador ainda não está disponível.</string>
     <string name="staff_detail_events_pending">Os eventos deste colaborador serão implementados na SCRUM-258.</string>
     <string name="staff_detail_nr_content_pending">O conteúdo desta NR será definido na integração. Exemplo apenas visual.</string>
     <style name="StaffDetailField" parent="ProfileField">

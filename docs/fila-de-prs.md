@@ -5,9 +5,11 @@ Atualizada em 2026-10-15. Registro para retomar a publicação sem depender do h
 ## Colaboradores
 
 1. SCRUM-313 — lista de colaboradores: branch `feat/SCRUM-313-lista-colaboradores-ui`, base `main` em `293e7b2`. UI implementada; build/lint aprovados, conferência visual pendente. Commit local autorizado pelo solicitante em 15/10.
-2. SCRUM-311 — detalhes do funcionário (pai SCRUM-257): implementação na branch `feat/SCRUM-311-detalhes-funcionario-ui`, empilhada na SCRUM-313 em `2cee85c`. Abertura pela lista e dados locais; sem API da SCRUM-312. Commit local autorizado em 15/10/2026 para iniciar a SCRUM-309 empilhada. Sem push ou PR.
+2. SCRUM-311 — detalhes do funcionário (pai SCRUM-257): implementação na branch `feat/SCRUM-311-detalhes-funcionario-ui`, empilhada na SCRUM-313 em `2cee85c`. Abertura pela lista e dados locais; sem API da SCRUM-312. Ícone do campo e-mail atualizado para o vetor envelope já usado no Perfil; alteração local ainda sem commit. Commit local autorizado em 15/10/2026 para iniciar a SCRUM-309 empilhada. Sem push ou PR.
+3. SCRUM-309 — eventos do funcionário: preservada na branch `feat/SCRUM-309-eventos-funcionario-ui`, commit local `2e25cbb`, base `e888e83` da SCRUM-311. Sem push/PR. Não está incluída nesta branch da conversa humana.
+4. SCRUM-301 — conversa entre gestor e colaborador: branch `feat/SCRUM-301-conversa-gestor-colaborador-ui` sobre a SCRUM-311 em `e888e83`, irmã da SCRUM-309. UI e mocks com entrada por Conversar e um contato humano aprovado por fluxo na lista; IA fixada preservada. Sem commit, push ou PR desta tarefa. Conferência visual em device pendente.
 
-Publicar/mergear a lista antes dos detalhes. Após o merge da lista, atualizar `origin/main` e reaplicar somente os commits próprios dos detalhes sobre a main, conferindo o diff antes de trocar a base da PR.
+Ordem recomendada: **SCRUM-313 → SCRUM-311 → SCRUM-309 → SCRUM-301**. As duas últimas são irmãs, não dependem uma da outra. Após cada merge, atualizar `origin/main` e reaplicar somente os commits próprios da próxima branch sobre a main, conferindo o diff antes de trocar a base da PR. A integração das irmãs pode exigir manter ambas as ações em `StaffDetailsFragment`, ambos os destinos do grafo e ambas as condições de navbar; não resolver escolhendo uma versão inteira sobre a outra.
 
 ## Eventos — fila independente
 

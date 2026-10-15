@@ -11,13 +11,13 @@ UI e mocks do [card SCRUM-311](https://luizacursino.atlassian.net/browse/SCRUM-3
 - Conteúdo rolável, largura máxima compartilhada com as telas existentes e colunas proporcionais, sem campos de largura fixa que sobreponham o e-mail.
 - Skeleton local de 1 segundo seguindo o padrão atual, oculto no XML, cancelado ao sair; não há requisição nem bloqueio da thread principal.
 - Três cartões NR-06, como no frame. Expandem individualmente, sem animação adicional e sem cobrir a próxima NR. O conteúdo expandido ainda está pendente; por ora informa essa ausência em vez de inventar regras/textos normativos.
-- Conversar e Ver pendências dão ripple e sinalizam o destino pendente. Conversa humana não foi substituída pelo chatbot. Eventos do funcionário pertencem à SCRUM-258, API do detalhe à SCRUM-312.
+- Na branch da SCRUM-301, Conversar abre a conversa humana mock com o funcionário selecionado, sem chamar o chatbot; veja `docs/conversa-humana.md`. Eventos do funcionário estão na branch irmã da SCRUM-309, não nesta cópia. API do detalhe na SCRUM-312.
 
 ## Recursos e diferenças de dados
 
 Retrato inicial com SHA-256 idêntico ao export do Figma (`CCCB5B8D072AD8CE22A53730F08CBBEA48F064389A167E0E9BFDB892859F34FD`), reutilizado com os demais retratos da lista. Ícones de cargo, unidade, modalidade, aviso, voltar, fechar, seta, chat e dividers reutilizam os recursos canônicos. Unidade/modalidade/aviso/e-mail são roxos; cargo secundário e ações claras. Chevrons reutilizam o export oficial já presente (`manager_events_chevron_down`, pixels conferidos), no slot compacto de 18dp do componente compartilhado do Perfil.
 
-O novo `staff_detail_email.png` foi renderizado do SVG oficial de 18×18 a 4x, pois o export é um envelope preenchido, diferente do vetor outline anterior. Não há URLs temporárias em runtime nem novas dependências. O componente de NR do Perfil foi reutilizado sem mudar o comportamento do Perfil integrado.
+O campo de e-mail usa o vetor `ic_email_closed`, igual ao ícone de envelope do Perfil, colorido com o roxo do Figma. O PNG anterior `staff_detail_email.png` deixa de ser referenciado pela tela. Não há URLs temporárias em runtime nem novas dependências. O componente de NR do Perfil foi reutilizado sem mudar o comportamento do Perfil integrado.
 
 O ano `1002` foi preservado literalmente na validade do Figma e continua pendente de revisão editorial. O frame mostra 3 eventos; no mock em execução a contagem é a do item escolhido na lista (10/10/0), para não contradizer a seleção. A prévia usa 3 como no frame. Não há cálculo de pendências ou validade no aplicativo.
 

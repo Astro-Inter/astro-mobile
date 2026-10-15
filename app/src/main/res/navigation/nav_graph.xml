@@ -372,6 +372,10 @@
         android:name="com.example.astro_mobile.chat.ConversationsFragment"
         android:label="Conversas">
         <action android:id="@+id/action_conversations_to_ai_sessions" app:destination="@id/aiSessionsFragment" />
+        <action android:id="@+id/action_conversations_to_human_chat"
+            app:destination="@id/humanChatFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
         <action
             android:id="@+id/action_conversations_to_chat"
             app:destination="@id/chatFragment"
@@ -412,7 +416,14 @@
     </fragment>
     <fragment android:id="@+id/staffDetailsFragment"
         android:name="com.example.astro_mobile.manager.staff.StaffDetailsFragment"
-        android:label="Colaborador" />
+        android:label="Colaborador">
+        <action android:id="@+id/action_staff_details_to_human_chat" app:destination="@id/humanChatFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+    <fragment android:id="@+id/humanChatFragment"
+        android:name="com.example.astro_mobile.chat.human.HumanChatFragment"
+        android:label="Conversa" />
 
     <fragment android:id="@+id/aiSessionsFragment"
         android:name="com.example.astro_mobile.chat.AiSessionsFragment"

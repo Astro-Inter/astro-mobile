@@ -15,6 +15,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.chat.human.HumanChatFragment;
 import com.example.astro_mobile.manager.staff.mock.StaffSamples;
 
 public final class StaffDetailsFragment extends Fragment {
@@ -47,9 +49,15 @@ public final class StaffDetailsFragment extends Fragment {
         view.findViewById(R.id.button_staff_details_close).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack(R.id.managerHomeFragment, false));
 
-        // Conversa humana e eventos do funcionário pertencem a outras tarefas.
-        view.findViewById(R.id.button_staff_details_chat).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.staff_detail_chat_pending, Toast.LENGTH_SHORT).show());
+        // Leva somente a identidade do exemplo à conversa humana, sem abrir o chatbot.
+        view.findViewById(R.id.button_staff_details_chat).setOnClickListener(clicked -> {
+            Bundle chatArgs = AuthArgs.copy(getArguments());
+            chatArgs.putString(HumanChatFragment.PEER_NAME, member.name);
+            chatArgs.putString(HumanChatFragment.PEER_ROLE, member.role);
+            chatArgs.putInt(HumanChatFragment.PEER_AVATAR_INDEX, member.avatarIndex);
+            NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_human_chat, chatArgs);
+        });
+        // Os eventos do funcionário permanecem na branch irmã da SCRUM-309.
         view.findViewById(R.id.button_staff_details_pending).setOnClickListener(clicked ->
                 Toast.makeText(requireContext(), R.string.staff_detail_events_pending, Toast.LENGTH_SHORT).show());
         showNrs(view.findViewById(R.id.list_staff_details_nrs));
