@@ -5,7 +5,7 @@ Atualizada em 2026-10-15. Registro para retomar a publicação sem depender do h
 ## Colaboradores
 
 1. SCRUM-313 — lista de colaboradores: branch `feat/SCRUM-313-lista-colaboradores-ui`, base `main` em `293e7b2`. UI implementada; build/lint aprovados, conferência visual pendente. Commit local autorizado pelo solicitante em 15/10.
-2. SCRUM-311 — detalhes do funcionário (pai SCRUM-257): próxima UI escolhida, ainda não implementada. Criar branch empilhada na SCRUM-313 para ligar a abertura pela lista. Não incluir API da SCRUM-312.
+2. SCRUM-311 — detalhes do funcionário (pai SCRUM-257): implementação na branch `feat/SCRUM-311-detalhes-funcionario-ui`, empilhada na SCRUM-313 em `2cee85c`. Abertura pela lista e dados locais; sem API da SCRUM-312. Commit local autorizado em 15/10/2026 para iniciar a SCRUM-309 empilhada. Sem push ou PR.
 
 Publicar/mergear a lista antes dos detalhes. Após o merge da lista, atualizar `origin/main` e reaplicar somente os commits próprios dos detalhes sobre a main, conferindo o diff antes de trocar a base da PR.
 
