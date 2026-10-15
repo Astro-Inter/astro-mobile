@@ -75,7 +75,7 @@
                 <View style="@style/StaffDetailDivider" />
                 <LinearLayout style="@style/StaffDetailField">
                     <androidx.appcompat.widget.AppCompatImageView style="@style/ProfileFieldIcon"
-                        android:src="@drawable/staff_detail_email" app:tint="@color/astro_primary_purple" android:contentDescription="@null" />
+                        android:src="@drawable/ic_email_closed" app:tint="@color/astro_primary_purple" android:contentDescription="@null" />
                     <TextView style="@style/StaffDetailLabel" android:text="@string/profile_email" />
                     <TextView style="@style/StaffDetailValue" android:text="@string/staff_detail_email_mock" />
                 </LinearLayout>
