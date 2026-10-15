@@ -11,7 +11,7 @@ UI e mocks do [card SCRUM-311](https://luizacursino.atlassian.net/browse/SCRUM-3
 - Conteúdo rolável, largura máxima compartilhada com as telas existentes e colunas proporcionais, sem campos de largura fixa que sobreponham o e-mail.
 - Skeleton local de 1 segundo seguindo o padrão atual, oculto no XML, cancelado ao sair; não há requisição nem bloqueio da thread principal.
 - Três cartões NR-06, como no frame. Expandem individualmente, sem animação adicional e sem cobrir a próxima NR. O conteúdo expandido ainda está pendente; por ora informa essa ausência em vez de inventar regras/textos normativos.
-- Conversar e Ver pendências dão ripple e sinalizam o destino pendente. Conversa humana não foi substituída pelo chatbot. Eventos do funcionário pertencem à SCRUM-258, API do detalhe à SCRUM-312.
+- Conversar dá ripple e sinaliza o destino humano pendente, sem abrir o chatbot. Na branch empilhada da SCRUM-309, Ver pendências abre os eventos do funcionário preservando o mock selecionado; veja `docs/eventos-funcionario.md`. API do detalhe na SCRUM-312.
 
 ## Recursos e diferenças de dados
 
