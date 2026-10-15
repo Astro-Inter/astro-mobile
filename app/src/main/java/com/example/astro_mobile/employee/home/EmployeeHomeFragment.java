@@ -98,14 +98,15 @@ public class EmployeeHomeFragment extends Fragment {
             return true;
         });
 
-        // Os destinos ainda não implementados exibem a mesma mensagem provisória.
-        int[] mockActions = {
+        // Os destinos de notificação abrem a lista mockada.
+        int[] notificationActions = {
                 R.id.button_employee_home_notifications,
                 R.id.button_employee_home_notifications_section,
                 R.id.button_employee_home_notifications_more
         };
-        for (int id : mockActions) {
-            view.findViewById(id).setOnClickListener(clicked -> showMockMessage());
+        for (int id : notificationActions) {
+            view.findViewById(id).setOnClickListener(clicked ->
+                    Navigation.findNavController(clicked).navigate(R.id.action_global_notifications));
         }
 
         // Os atalhos de eventos abrem o calendário do colaborador.
