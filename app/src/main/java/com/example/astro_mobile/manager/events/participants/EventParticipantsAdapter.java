@@ -14,17 +14,23 @@ import com.example.astro_mobile.R;
 import java.util.List;
 
 public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventParticipantsAdapter.Row> {
+    public interface OnParticipantClickListener {
+        void onClick(EventParticipant participant);
+    }
+
     private final int[] avatars = {R.drawable.participant_avatar_1,
             R.drawable.participant_avatar_2, R.drawable.participant_avatar_3};
     private final List<EventParticipant> participants;
     private final String eventTitle;
-    private final View.OnClickListener pendingValidationClick;
+    private final boolean assignmentMode;
+    private final OnParticipantClickListener participantClick;
 
     public EventParticipantsAdapter(List<EventParticipant> participants, String eventTitle,
-                                    View.OnClickListener pendingValidationClick) {
+                                    boolean assignmentMode, OnParticipantClickListener participantClick) {
         this.participants = participants;
         this.eventTitle = eventTitle;
-        this.pendingValidationClick = pendingValidationClick;
+        this.assignmentMode = assignmentMode;
+        this.participantClick = participantClick;
     }
 
     @NonNull
@@ -66,11 +72,13 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
         iconParams.width = Math.round((validationPending ? 22f : 18.2f) * density);
         iconParams.height = Math.round((validationPending ? 22f : 18f) * density);
         row.icon.setLayoutParams(iconParams);
-        // Só a validação pendente é um link no frame; o destino real fica em outra tarefa.
-        row.button.setOnClickListener(validationPending ? pendingValidationClick : null);
-        row.button.setClickable(validationPending);
-        row.button.setFocusable(validationPending);
-        row.button.setBackgroundResource(validationPending ? R.drawable.bg_home_row_ripple : 0);
+        // No modo Atribuição, os exemplos ainda não concluídos abrem a tela do participante.
+        boolean actionable = validationPending || (assignmentMode
+                && participant.status == EventParticipant.Status.AWAITING_COMPLETION);
+        row.button.setOnClickListener(actionable ? clicked -> participantClick.onClick(participant) : null);
+        row.button.setClickable(actionable);
+        row.button.setFocusable(actionable);
+        row.button.setBackgroundResource(actionable ? R.drawable.bg_home_row_ripple : 0);
     }
 
     @Override

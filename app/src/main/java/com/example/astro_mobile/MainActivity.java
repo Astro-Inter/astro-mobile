@@ -143,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
         boolean profile = destination == R.id.profileFragment;
         boolean events = destination == R.id.employeeEventsFragment
                 || destination == R.id.employeeEventDetailsFragment || destination == R.id.managerEventsFragment
-                || destination == R.id.managerEventDetailsFragment || destination == R.id.eventParticipantsFragment;
+                || destination == R.id.managerEventDetailsFragment || destination == R.id.eventParticipantsFragment
+                || destination == R.id.eventAssignmentFragment;
         boolean notifications = destination == R.id.notificationsFragment;
         boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
         navbar.setVisibility((home || conversations || profile || events || notifications)

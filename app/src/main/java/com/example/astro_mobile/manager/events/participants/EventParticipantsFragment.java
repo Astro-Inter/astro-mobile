@@ -22,6 +22,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.manager.events.ManagerEvent;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
@@ -32,6 +33,7 @@ public final class EventParticipantsFragment extends Fragment {
             R.id.filter_participants_finished, R.id.filter_participants_not_finished};
     private EventParticipantsViewModel state;
     private String eventTitle;
+    private ManagerEvent.CompletionMode completionMode;
     private Runnable finishLoading;
 
     public EventParticipantsFragment() { super(R.layout.fragment_event_participants); }
@@ -41,10 +43,10 @@ public final class EventParticipantsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle args = requireArguments();
         eventTitle = args.getString("event_title");
-        ManagerEvent.CompletionMode mode = ManagerEvent.CompletionMode.valueOf(args.getString("event_completion_mode"));
-        boolean selfDeclaration = mode == ManagerEvent.CompletionMode.SELF_DECLARATION;
+        completionMode = ManagerEvent.CompletionMode.valueOf(args.getString("event_completion_mode"));
+        boolean selfDeclaration = completionMode == ManagerEvent.CompletionMode.SELF_DECLARATION;
         state = new ViewModelProvider(this).get(EventParticipantsViewModel.class);
-        state.initialize(mode);
+        state.initialize(completionMode);
 
         // O evento e o modo são os mesmos do detalhe que abriu esta tela.
         String description = getString(R.string.participants_description, eventTitle);
@@ -112,14 +114,27 @@ public final class EventParticipantsFragment extends Fragment {
         // Atualiza a lista local, mantendo as diferenças dos filtros das duas variantes.
         List<EventParticipant> participants = state.visibleParticipants();
         RecyclerView list = view.findViewById(R.id.list_event_participants);
-        list.setAdapter(new EventParticipantsAdapter(participants, eventTitle, clicked ->
-                Toast.makeText(requireContext(), R.string.participants_validation_pending, Toast.LENGTH_SHORT).show()));
+        list.setAdapter(new EventParticipantsAdapter(participants, eventTitle,
+                completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT, this::openParticipant));
         boolean empty = participants.isEmpty();
         list.setVisibility(empty ? View.GONE : View.VISIBLE);
         view.findViewById(R.id.text_participants_empty).setVisibility(empty ? View.VISIBLE : View.GONE);
         for (int index = 0; index < filterIds.length; index++) {
             view.findViewById(filterIds[index]).setSelected(index == state.getFilter().ordinal());
         }
+    }
+
+    private void openParticipant(EventParticipant participant) {
+        // A atribuição recebe o participante clicado. A validação continua em sua própria tarefa.
+        if (completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT) {
+            Bundle args = AuthArgs.copy(getArguments());
+            args.putString("event_title", eventTitle);
+            args.putString("participant_name", participant.name);
+            args.putInt("participant_avatar_index", participant.avatarIndex);
+            NavHostFragment.findNavController(this).navigate(R.id.action_event_participants_to_assignment, args);
+            return;
+        }
+        Toast.makeText(requireContext(), R.string.participants_validation_pending, Toast.LENGTH_SHORT).show();
     }
 
     @Override
