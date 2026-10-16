@@ -11,7 +11,7 @@ UI e mocks do [card SCRUM-311](https://luizacursino.atlassian.net/browse/SCRUM-3
 - Conteúdo rolável, largura máxima compartilhada com as telas existentes e colunas proporcionais, sem campos de largura fixa que sobreponham o e-mail.
 - Skeleton local de 1 segundo seguindo o padrão atual, oculto no XML, cancelado ao sair; não há requisição nem bloqueio da thread principal.
 - Três cartões NR-06, como no frame. Expandem individualmente, sem animação adicional e sem cobrir a próxima NR. O conteúdo expandido ainda está pendente; por ora informa essa ausência em vez de inventar regras/textos normativos.
-- Na branch da SCRUM-301, Conversar abre a conversa humana mock com o funcionário selecionado, sem chamar o chatbot; veja `docs/conversa-humana.md`. Eventos do funcionário estão na branch irmã da SCRUM-309, não nesta cópia. API do detalhe na SCRUM-312.
+- Conversar abre a conversa humana mock com o funcionário selecionado, sem chamar o chatbot; veja `docs/conversa-humana.md`. Ver pendências abre os eventos do funcionário preservando o mock selecionado; veja `docs/eventos-funcionario.md`. Ambas as ações foram mantidas ao integrar a main na SCRUM-301. API do detalhe na SCRUM-312.
 
 ## Recursos e diferenças de dados
 

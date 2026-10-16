@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/container_notification_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="80dp"
+        android:background="@drawable/bg_home_row_ripple"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="18dp">
+
+        <TextView
+            android:id="@+id/text_notification_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/montserrat_family"
+            android:includeFontPadding="false"
+            android:maxLines="2"
+            android:textColor="@color/astro_light_background"
+            android:textSize="16sp"
+            tools:text="Você tem validações pendentes" />
+
+        <TextView
+            android:id="@+id/text_notification_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/montserrat_family"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/astro_input_hint"
+            android:textSize="12sp"
+            tools:text="Há 2h" />
+
+        <ImageView
+            android:id="@+id/image_notification_unread"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="18dp"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            android:src="@drawable/home_new"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="21dp"
+        android:background="@drawable/bg_notifications_divider"
+        android:importantForAccessibility="no" />
+</LinearLayout>

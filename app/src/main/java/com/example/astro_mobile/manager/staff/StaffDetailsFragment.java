@@ -57,9 +57,10 @@ public final class StaffDetailsFragment extends Fragment {
             chatArgs.putInt(HumanChatFragment.PEER_AVATAR_INDEX, member.avatarIndex);
             NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_human_chat, chatArgs);
         });
-        // Os eventos do funcionário permanecem na branch irmã da SCRUM-309.
+        // Abre os eventos mantendo o funcionário escolhido na lista.
         view.findViewById(R.id.button_staff_details_pending).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.staff_detail_events_pending, Toast.LENGTH_SHORT).show());
+                NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_events,
+                        AuthArgs.copy(getArguments())));
         showNrs(view.findViewById(R.id.list_staff_details_nrs));
 
         // Simula a futura consulta sem bloquear a interface nem esconder a prévia XML.

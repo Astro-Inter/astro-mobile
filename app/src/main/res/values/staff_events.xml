@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="staff_events_title">Eventos</string>
+    <string name="staff_events_heading">Eventos de &lt;b>%1$s&lt;/b></string>
+    <string name="staff_events_description">Acesse aqui qualquer evento ou pendência relacionados a um colaborador</string>
+    <string name="staff_events_expired">Prazo expirado</string>
+    <string name="staff_events_details_pending">O detalhe do evento deste colaborador ainda não está disponível.</string>
+</resources>
