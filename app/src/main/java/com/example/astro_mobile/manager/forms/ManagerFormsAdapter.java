@@ -35,7 +35,7 @@ public final class ManagerFormsAdapter extends RecyclerView.Adapter<ManagerForms
         // Cada item exibe os dados de prazo, NR e estado definidos no mock.
         ManagerForm form = forms.get(position);
         row.title.setText(form.title);
-        row.deadline.setText(form.deadline);
+        row.deadline.setText(row.itemView.getContext().getString(R.string.manager_forms_deadline, form.deadline));
         row.nr.setText(form.nr);
         row.status.setText(statusLabel(form.status));
         int icon = statusIcon(form.status);

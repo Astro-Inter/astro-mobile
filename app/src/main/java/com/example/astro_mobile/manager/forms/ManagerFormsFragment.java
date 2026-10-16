@@ -9,7 +9,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.manager.forms.details.FormDetailsFragment;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 import java.util.List;
@@ -98,7 +99,7 @@ public final class ManagerFormsFragment extends Fragment {
     private void render(View view) {
         List<ManagerForm> forms = state.visibleForms();
         RecyclerView list = view.findViewById(R.id.list_manager_forms);
-        list.setAdapter(new ManagerFormsAdapter(forms, this::showDetailsPending));
+        list.setAdapter(new ManagerFormsAdapter(forms, this::openDetails));
         list.setVisibility(forms.isEmpty() ? View.GONE : View.VISIBLE);
         view.findViewById(R.id.text_manager_forms_empty).setVisibility(forms.isEmpty() ? View.VISIBLE : View.GONE);
         for (int index = 0; index < filterIds.length; index++) {
@@ -109,8 +110,14 @@ public final class ManagerFormsFragment extends Fragment {
                 : R.string.manager_forms_nr_5);
     }
 
-    private void showDetailsPending(ManagerForm form) {
-        Toast.makeText(requireContext(), R.string.manager_forms_details_pending, Toast.LENGTH_SHORT).show();
+    private void openDetails(ManagerForm form) {
+        // Leva o formulário selecionado e a variante de endereço do mock ao detalhe.
+        Bundle args = AuthArgs.copy(getArguments());
+        args.putString(FormDetailsFragment.FORM_TITLE, form.title);
+        args.putString(FormDetailsFragment.DEADLINE, form.deadline);
+        args.putBoolean(FormDetailsFragment.LOCATION_MATCHES_UNIT, form.locationMatchesUnit);
+        args.putBoolean(FormDetailsFragment.REQUIRES_UNIT_LOCATION, form.requiresUnitLocation);
+        NavHostFragment.findNavController(this).navigate(R.id.action_manager_forms_to_details, args);
     }
 
     @Override

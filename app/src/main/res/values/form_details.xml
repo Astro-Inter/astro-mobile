@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="form_details_title_mock">Checklist de Inspeção de segurança</string>
+    <string name="form_details_subtitle">Formulário de inspeção</string>
+    <string name="form_details_deadline_mock">06/07/2067</string>
+    <string name="form_details_sender_mock">Ronaldo Fenômeno</string>
+    <string name="form_details_unit_label">Unidade:</string>
+    <string name="form_details_unit_mock">Osasco</string>
+    <string name="form_details_location_notice">Atenção: sua geolocalização será registrada</string>
+    <string name="form_details_location_explanation">Sua localização será registrada durante o preenchimento do formulário. Caso você esteja a mais de 100 m da unidade, o formulário será cancelado.</string>
+    <string name="form_details_anywhere_explanation">Sua localização será registrada durante o preenchimento do formulário, mas não é necessário estar em um endereço específico.</string>
+    <string name="form_details_inside_unit">Você está no endereço correto para responder o formulário. Clique no botão abaixo para começar.</string>
+    <string name="form_details_outside_unit">Você <b>NÃO</b> está no endereço correto para responder o formulário. Dirija-se para a unidade “Osasco” para começar.</string>
+    <string name="form_details_no_specific_address">Este formulário não requer um endereço específico para ser respondido. Clique no botão abaixo para começar.</string>
+    <string name="form_details_precise_location_required">Para responder este formulário, permita o acesso à sua localização precisa. A localização aproximada não é suficiente. Toque na opção abaixo para continuar.</string>
+    <string name="form_details_consent">Entendo compartilhar minha localização</string>
+    <string name="form_details_permission_error">Permita o acesso à localização precisa para continuar. A localização aproximada não é suficiente.</string>
+    <string name="form_details_open_settings"><u>Abrir configurações</u></string>
+    <string name="form_details_answer">Responder formulário</string>
+    <string name="form_details_answer_pending">O preenchimento do formulário estará disponível na próxima etapa.</string>
+</resources>

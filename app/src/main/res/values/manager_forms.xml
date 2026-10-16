@@ -12,7 +12,7 @@
     <string name="manager_forms_pending">Pendente</string>
     <string name="manager_forms_finished">Concluído</string>
     <string name="manager_forms_empty">Nenhum formulário encontrado</string>
-    <string name="manager_forms_details_pending">Os detalhes do formulário estarão disponíveis em uma próxima etapa.</string>
+    <string name="manager_forms_deadline">Data limite: %1$s</string>
     <style name="ManagerFormsText" parent="ManagerEventsText" />
     <style name="ManagerFormsCaption" parent="ManagerEventsCaption" />
 </resources>
