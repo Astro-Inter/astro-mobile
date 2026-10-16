@@ -1,6 +1,7 @@
 package com.example.astro_mobile.manager.forms.answer;
 
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,11 +10,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -26,6 +30,7 @@ import com.example.astro_mobile.data.location.FormLocationRepository;
 import com.example.astro_mobile.manager.forms.details.FormDetailsFragment;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -36,12 +41,19 @@ public final class FormAnswerFragment extends Fragment {
     private FormAnswerViewModel state;
     private boolean requiresUnitLocation;
     private Runnable finishLoading;
+    private final ActivityResultLauncher<Uri> camera = registerForActivityResult(
+            new ActivityResultContracts.TakePicture(), captured -> {
+                state.onPhotoResult(captured);
+                if (getView() == null) return;
+                renderEvidences(requireView());
+                render(requireView());
+            });
     private final Runnable locationTick = new Runnable() {
         @Override public void run() {
-            if (getView() == null || !isResumed() || state.isCompleted() || state.isCancelled()) return;
+            if (getView() == null || !isResumed() || state.isCompleted() || state.isOutside()) return;
             requestLocation(false);
             // O intervalo existe somente enquanto este formulário permanece em primeiro plano.
-            if (!state.isCompleted() && !state.isCancelled()) requireView().postDelayed(this, 60_000L);
+            if (!state.isCompleted() && !state.isOutside()) requireView().postDelayed(this, 60_000L);
         }
     };
 
@@ -49,7 +61,9 @@ public final class FormAnswerFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        state = new ViewModelProvider(this, FormAnswerViewModel.factory(requireContext()))
+        // Detalhes e resposta compartilham a tentativa enquanto os detalhes estiverem na pilha.
+        state = new ViewModelProvider(NavHostFragment.findNavController(this)
+                .getBackStackEntry(R.id.formDetailsFragment), FormAnswerViewModel.factory(requireContext()))
                 .get(FormAnswerViewModel.class);
         Bundle args = requireArguments();
         requiresUnitLocation = args.getBoolean(FormDetailsFragment.REQUIRES_UNIT_LOCATION, true);
@@ -83,12 +97,7 @@ public final class FormAnswerFragment extends Fragment {
             @Override public void afterTextChanged(Editable text) { }
         });
         view.findViewById(R.id.button_form_answer_date).setOnClickListener(clicked -> showDatePicker());
-        view.findViewById(R.id.button_form_answer_attach).setOnClickListener(clicked -> {
-            // Esta UI usa evidências identificadas como exemplo; a câmera pertence à SCRUM-276.
-            state.addEvidence();
-            renderEvidences(view);
-            render(view);
-        });
+        view.findViewById(R.id.button_form_answer_attach).setOnClickListener(clicked -> openCamera());
         view.findViewById(R.id.button_form_answer_location_retry).setOnClickListener(clicked -> retryLocation());
         view.findViewById(R.id.button_form_answer_complete).setOnClickListener(clicked -> {
             if (state.canSubmit()) requestLocation(true);
@@ -110,6 +119,16 @@ public final class FormAnswerFragment extends Fragment {
         }
     }
 
+    private void openCamera() {
+        try {
+            Uri photo = state.preparePhoto();
+            if (photo != null) camera.launch(photo);
+        } catch (IOException | ActivityNotFoundException | SecurityException error) {
+            state.onPhotoResult(false);
+            Toast.makeText(requireContext(), R.string.form_answer_camera_error, Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void showDatePicker() {
         Calendar date = Calendar.getInstance();
         new DatePickerDialog(requireContext(), (picker, year, month, day) -> {
@@ -123,7 +142,12 @@ public final class FormAnswerFragment extends Fragment {
         state.requestLocation(finish, requiresUnitLocation, () -> {
             if (getView() == null || !isResumed()) return;
             render(requireView());
-            if (state.isCompleted() || state.isCancelled()) requireView().removeCallbacks(locationTick);
+            if (state.isOutside()) {
+                // Sai da resposta sem descartá-la; após o aviso, os detalhes verificam a localização novamente.
+                NavHostFragment.findNavController(this).navigate(R.id.action_form_answer_to_outside);
+                return;
+            }
+            if (state.isCompleted()) requireView().removeCallbacks(locationTick);
             if (state.isCompleted()) Toast.makeText(requireContext(), R.string.form_answer_completed, Toast.LENGTH_LONG).show();
         });
         render(requireView());
@@ -140,7 +164,7 @@ public final class FormAnswerFragment extends Fragment {
     }
 
     private void render(View view) {
-        boolean editable = !state.isCompleted() && !state.isCancelled();
+        boolean editable = !state.isCompleted() && !state.isOutside();
         for (int groupId : groupIds) {
             RadioGroup group = view.findViewById(groupId);
             for (int index = 0; index < group.getChildCount(); index++) group.getChildAt(index).setEnabled(editable);
@@ -155,8 +179,8 @@ public final class FormAnswerFragment extends Fragment {
         for (int index = 0; index < evidences.getChildCount(); index++) {
             evidences.getChildAt(index).findViewById(R.id.button_form_answer_remove_evidence).setEnabled(editable);
         }
-        ((TextView) view.findViewById(R.id.text_form_answer_mock_evidences))
-                .setText(getString(R.string.form_answer_mock_evidences, state.evidenceCount()));
+        ((TextView) view.findViewById(R.id.text_form_answer_evidence_count))
+                .setText(getString(R.string.form_answer_evidence_count, state.evidenceCount()));
         TextView complete = view.findViewById(R.id.button_form_answer_complete);
         complete.setEnabled(state.canSubmit());
         complete.setText(state.isCompleted() ? R.string.form_answer_completed_button : R.string.form_answer_complete);
@@ -167,11 +191,18 @@ public final class FormAnswerFragment extends Fragment {
         LinearLayout list = view.findViewById(R.id.list_form_answer_evidences);
         list.removeAllViews();
         for (int index = 0; index < state.evidenceCount(); index++) {
+            Uri photo = state.evidenceAt(index);
             View item = getLayoutInflater().inflate(R.layout.item_form_answer_evidence, list, false);
             ((TextView) item.findViewById(R.id.text_form_answer_evidence))
-                    .setText(getString(R.string.form_answer_mock_evidence, index + 1));
+                    .setText(getString(R.string.form_answer_evidence_name, index + 1));
+            ImageView preview = item.findViewById(R.id.image_form_answer_evidence);
+            try {
+                preview.setImageBitmap(state.evidencePreview(photo));
+            } catch (IOException error) {
+                preview.setVisibility(View.GONE);
+            }
             item.findViewById(R.id.button_form_answer_remove_evidence).setOnClickListener(clicked -> {
-                state.removeEvidence();
+                state.removeEvidence(photo);
                 renderEvidences(view);
                 render(view);
             });
@@ -183,7 +214,10 @@ public final class FormAnswerFragment extends Fragment {
         TextView message = view.findViewById(R.id.text_form_answer_location);
         TextView retry = view.findViewById(R.id.button_form_answer_location_retry);
         FormLocationRepository.Failure failure = state.getFailure();
-        boolean error = state.isCancelled() || failure != null;
+        // Sem painel de depuração: só mostra uma falha ou a conclusão local.
+        view.findViewById(R.id.container_form_answer_location).setVisibility(
+                failure != null || state.isCompleted() ? View.VISIBLE : View.GONE);
+        boolean error = failure != null;
         message.setTextColor(ContextCompat.getColor(requireContext(), error ? R.color.astro_error : R.color.astro_light_background));
         view.findViewById(R.id.container_form_answer_location).setBackgroundResource(state.isCompleted()
                 ? R.drawable.bg_home_positive_message : R.drawable.bg_profile_panel);
@@ -191,14 +225,9 @@ public final class FormAnswerFragment extends Fragment {
         retry.setText(failure == FormLocationRepository.Failure.UNAVAILABLE
                 ? R.string.form_answer_location_retry : R.string.form_answer_location_settings);
         if (state.isCompleted()) message.setText(R.string.form_answer_completed);
-        else if (state.isCancelled()) message.setText(R.string.form_answer_cancelled);
-        else if (state.isBusy()) message.setText(R.string.form_answer_locating);
         else if (failure == FormLocationRepository.Failure.PERMISSION_REQUIRED) message.setText(R.string.form_answer_location_permission);
         else if (failure == FormLocationRepository.Failure.LOCATION_DISABLED) message.setText(R.string.form_answer_location_disabled);
         else if (failure != null) message.setText(R.string.form_answer_location_unavailable);
-        else message.setText(requiresUnitLocation
-                ? getString(R.string.form_answer_location_reading, state.readingCount(), state.getDistance())
-                : getString(R.string.form_answer_location_unrestricted, state.readingCount()));
     }
 
     @Override public void onResume() {

@@ -7,7 +7,7 @@
     <string name="form_details_unit_label">Unidade:</string>
     <string name="form_details_unit_mock">Osasco</string>
     <string name="form_details_location_notice">Atenção: sua geolocalização será registrada</string>
-    <string name="form_details_location_explanation">Sua localização será registrada durante o preenchimento do formulário. Caso você esteja a mais de 100 m da unidade, o formulário será cancelado.</string>
+    <string name="form_details_location_explanation">Sua localização será registrada durante o preenchimento do formulário. Caso você esteja a mais de 100 m da unidade, o preenchimento será pausado até você retornar.</string>
     <string name="form_details_anywhere_explanation">Sua localização será registrada durante o preenchimento do formulário, mas não é necessário estar em um endereço específico.</string>
     <string name="form_details_inside_unit">Você está no endereço correto para responder o formulário. Clique no botão abaixo para começar.</string>
     <string name="form_details_outside_unit">Você <b>NÃO</b> está no endereço correto para responder o formulário. Dirija-se para a unidade “Osasco” para começar.</string>
@@ -17,4 +17,5 @@
     <string name="form_details_permission_error">Permita o acesso à localização precisa para continuar. A localização aproximada não é suficiente.</string>
     <string name="form_details_open_settings"><u>Abrir configurações</u></string>
     <string name="form_details_answer">Responder formulário</string>
+    <string name="form_details_check_location">Verificar localização novamente</string>
 </resources>

@@ -11,21 +11,19 @@
     <string name="form_answer_date_hint">dd/mm/aaaa</string>
     <string name="form_answer_evidence">6. Se alguma irregularidade foi encontrada, registre aqui</string>
     <string name="form_answer_attach">Anexar evidências</string>
-    <string name="form_answer_mock_evidences">Evidências de exemplo: %1$d/3. A câmera real ainda não está integrada.</string>
-    <string name="form_answer_mock_evidence">Evidência de exemplo %1$d</string>
-    <string name="form_answer_remove_evidence">Remover evidência de exemplo</string>
+    <string name="form_answer_evidence_count">Fotos: %1$d/3</string>
+    <string name="form_answer_evidence_name">Foto %1$d</string>
+    <string name="form_answer_remove_evidence">Remover foto</string>
+    <string name="form_answer_camera_error">Não foi possível abrir a câmera ou salvar a foto. Tente novamente.</string>
     <string name="form_answer_complete">Concluir formulário</string>
-    <string name="form_answer_required">Todos os campos são obrigatórios, incluindo ao menos uma evidência de exemplo.</string>
-    <string name="form_answer_location_notice">GPS de teste: a referência é sua posição ao iniciar, não a unidade. Nada é enviado à API.</string>
+    <string name="form_answer_required">Todos os campos são obrigatórios, incluindo ao menos uma foto de evidência.</string>
     <string name="form_answer_locating">Obtendo localização precisa…</string>
-    <string name="form_answer_location_reading">Registros nesta sessão: %1$d · distância da referência: %2$.0f m · limite: 100 m.</string>
-    <string name="form_answer_location_unrestricted">Registros nesta sessão: %1$d. Este formulário não exige um endereço específico.</string>
     <string name="form_answer_location_permission">Permita a localização precisa nas configurações para continuar. A localização aproximada não é suficiente.</string>
     <string name="form_answer_location_disabled">Ative a localização do celular para continuar.</string>
     <string name="form_answer_location_unavailable">Não foi possível obter sua localização agora. Tente novamente em um local com melhor sinal.</string>
     <string name="form_answer_location_retry">Tentar novamente</string>
     <string name="form_answer_location_settings">Abrir configurações</string>
-    <string name="form_answer_cancelled">Formulário cancelado: você está a mais de 100 m da referência de teste. Volte para iniciar outra tentativa.</string>
+    <string name="form_outside_location">Você não está no local correto para responder esse formulário, retorne para a localização para continuar.</string>
     <string name="form_answer_completed">Formulário concluído neste protótipo. As respostas não foram enviadas à API e o GPS foi interrompido.</string>
     <string name="form_answer_completed_button">Concluído (mock)</string>
     <style name="FormAnswerQuestion" parent="ManagerFormsText">

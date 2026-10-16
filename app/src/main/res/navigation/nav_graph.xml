@@ -435,7 +435,15 @@
     </fragment>
     <fragment android:id="@+id/formAnswerFragment"
         android:name="com.example.astro_mobile.manager.forms.answer.FormAnswerFragment"
-        android:label="Responder formulário" />
+        android:label="Responder formulário">
+        <action android:id="@+id/action_form_answer_to_outside" app:destination="@id/formOutsideLocationFragment"
+            app:popUpTo="@id/formDetailsFragment" app:popUpToInclusive="false"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+    <fragment android:id="@+id/formOutsideLocationFragment"
+        android:name="com.example.astro_mobile.manager.forms.answer.FormOutsideLocationFragment"
+        android:label="Fora da localização do formulário" />
 
     <fragment
         android:id="@+id/chatFragment"

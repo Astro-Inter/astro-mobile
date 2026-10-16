@@ -5,8 +5,11 @@
     android:layout_marginTop="8dp" android:orientation="horizontal" android:gravity="center_vertical"
     android:baselineAligned="false" android:paddingStart="12dp" android:paddingEnd="0dp"
     android:background="@drawable/bg_profile_panel">
+    <ImageView android:id="@+id/image_form_answer_evidence" android:layout_width="64dp"
+        android:layout_height="64dp" android:layout_marginVertical="8dp" android:layout_marginEnd="12dp"
+        android:scaleType="centerCrop" android:contentDescription="@null" android:importantForAccessibility="no" />
     <TextView android:id="@+id/text_form_answer_evidence" style="@style/ManagerFormsCaption"
-        android:layout_width="0dp" android:layout_weight="1" tools:text="Evidência de exemplo 1" />
+        android:layout_width="0dp" android:layout_weight="1" tools:text="Foto 1" />
     <ImageButton android:id="@+id/button_form_answer_remove_evidence"
         android:layout_width="48dp" android:layout_height="48dp" android:padding="15dp"
         android:scaleType="fitCenter" android:src="@drawable/conversations_close"

@@ -28,7 +28,7 @@ Há um stash de SCRUM-307 (notificações) que precisa ser comparado à main ant
 
 - SCRUM-279: [PR #41](https://github.com/Astro-Inter/astro-mobile/pull/41), integrada à main em 60ab01b.
 - SCRUM-277: [PR #42](https://github.com/Astro-Inter/astro-mobile/pull/42), integrada à main em 911ab3d. Snapshot anterior à separação preservado no stash `9f17a50db93ad30eced055eedf53b44d6a6b657c` e nas branches de backup correspondentes.
-- SCRUM-274: branch `feat/SCRUM-274-responder-formulario-ui`, base main 911ab3d. UI e mocks, campos obrigatórios, GPS real antecipado da SCRUM-276 com referência inicial provisória e raio de 100 m, pausa/retomada. Evidências e conclusão locais; sem câmera ou API. Publicar em rascunho enquanto a validação visual/GPS não puder ser feita. A SCRUM-276 está parcialmente em andamento; não concluir o card de câmera/evidências só pelo GPS.
+- SCRUM-274/276: branch `feat/SCRUM-274-responder-formulario-ui`, base main 911ab3d; [PR #43](https://github.com/Astro-Inter/astro-mobile/pull/43) em rascunho. UI/campos obrigatórios, câmera externa real com até três fotos temporárias, GPS real nos detalhes/ao iniciar/a cada minuto/ao concluir, raio provisório de 100 m sobre a primeira posição nos detalhes e pausa/retomada. Fora do raio: aviso Figma de 3s, retorno aos detalhes e respostas/fotos preservadas. Sem painel de registros, upload ou API; conclusão local. Build/lint e 27 testes existentes aprovados; sem físico conectado para validar esta atualização. SCRUM-274/276 continuam Em andamento até conferência manual e integrações correspondentes; não concluir upload/API só pela captura local.
 
 ## Procedimento de publicação
 

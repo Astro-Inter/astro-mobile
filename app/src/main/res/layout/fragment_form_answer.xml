@@ -77,17 +77,16 @@
                 <LinearLayout android:id="@+id/list_form_answer_evidences" android:layout_width="match_parent"
                     android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"
                     android:orientation="vertical" />
-                <TextView android:id="@+id/text_form_answer_mock_evidences" style="@style/ManagerFormsCaption"
+                <TextView android:id="@+id/text_form_answer_evidence_count" style="@style/ManagerFormsCaption"
                     android:layout_marginHorizontal="30dp" android:layout_marginTop="8dp"
-                    tools:text="Evidências de exemplo: 0/3. A câmera real ainda não está integrada." />
-                <!-- Feedback provisório para demonstrar a coleta real, sem expor as coordenadas. -->
+                    tools:text="Fotos: 0/3" />
+                <!-- Apenas falhas de localização e a conclusão precisam de mensagem na resposta. -->
                 <LinearLayout android:id="@+id/container_form_answer_location" android:layout_width="match_parent"
                     android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"
                     android:layout_marginTop="20dp" android:padding="16dp" android:orientation="vertical"
-                    android:background="@drawable/bg_profile_panel">
-                    <TextView style="@style/ManagerFormsCaption" android:text="@string/form_answer_location_notice" />
+                    android:background="@drawable/bg_profile_panel" android:visibility="gone">
                     <TextView android:id="@+id/text_form_answer_location" style="@style/ManagerFormsText"
-                        android:layout_marginTop="8dp" android:text="@string/form_answer_locating" />
+                        android:text="@string/form_answer_location_unavailable" />
                     <TextView android:id="@+id/button_form_answer_location_retry" style="@style/ManagerFormsText"
                         android:layout_height="wrap_content" android:minHeight="48dp" android:gravity="center_vertical"
                         android:background="@drawable/bg_home_row_ripple" android:clickable="true" android:focusable="true"
