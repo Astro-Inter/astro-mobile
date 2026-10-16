@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:context="com.example.astro_mobile.manager.events.evidence.EventEvidenceFragment">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <FrameLayout android:id="@+id/header_event_evidence" android:layout_width="0dp" android:layout_height="80dp"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <TextView style="@style/ManagerEventsText" android:layout_gravity="center"
+                android:layout_marginHorizontal="60dp" android:gravity="center"
+                android:textSize="24sp" android:text="@string/event_evidence_title" />
+            <ImageButton android:id="@+id/button_event_evidence_back" android:layout_width="48dp"
+                android:layout_height="48dp" android:layout_gravity="start|center_vertical" android:layout_marginStart="20dp"
+                android:paddingHorizontal="14dp" android:paddingVertical="16dp" android:scaleType="fitCenter"
+                android:background="@drawable/bg_login_icon_button" android:src="@drawable/ic_login_back"
+                android:contentDescription="@string/conversations_back" />
+        </FrameLayout>
+        <ScrollView android:id="@+id/scroll_event_evidence" android:layout_width="0dp" android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/header_event_evidence"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView android:id="@+id/image_event_evidence" android:layout_width="0dp" android:layout_height="0dp"
+                    android:src="@drawable/event_evidence_mock" android:scaleType="matrix" tools:scaleType="centerCrop"
+                    android:contentDescription="@string/event_evidence_image_description"
+                    app:layout_constraintDimensionRatio="H,430:563"
+                    app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+                <LinearLayout android:id="@+id/container_event_evidence_pages" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:layout_marginTop="25dp" android:layout_marginBottom="19dp"
+                    android:orientation="horizontal" android:baselineAligned="false" android:padding="20dp"
+                    android:background="@drawable/bg_event_evidence_pages"
+                    app:layout_constraintTop_toBottomOf="@id/image_event_evidence"
+                    app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <TextView android:id="@+id/button_event_evidence_page_one" style="@style/EventEvidencePage"
+                        android:text="@string/event_evidence_page_one" tools:backgroundTint="@color/astro_primary_purple"
+                        tools:textColor="@color/astro_light_background" />
+                    <TextView android:id="@+id/button_event_evidence_page_two" style="@style/EventEvidencePage"
+                        android:layout_marginStart="10dp" android:text="@string/event_evidence_page_two" />
+                    <TextView android:id="@+id/button_event_evidence_page_three" style="@style/EventEvidencePage"
+                        android:layout_marginStart="10dp" android:text="@string/event_evidence_page_three" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+        <!-- O editor mostra o conteúdo; o skeleton só aparece durante o segundo de espera mock. -->
+        <include android:id="@+id/skeleton_event_evidence" layout="@layout/view_event_evidence_skeleton"
+            android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" tools:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/header_event_evidence"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

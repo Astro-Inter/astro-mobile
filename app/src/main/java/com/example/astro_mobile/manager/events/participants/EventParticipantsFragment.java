@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -125,16 +124,14 @@ public final class EventParticipantsFragment extends Fragment {
     }
 
     private void openParticipant(EventParticipant participant) {
-        // A atribuição recebe o participante clicado. A validação continua em sua própria tarefa.
-        if (completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT) {
-            Bundle args = AuthArgs.copy(getArguments());
-            args.putString("event_title", eventTitle);
-            args.putString("participant_name", participant.name);
-            args.putInt("participant_avatar_index", participant.avatarIndex);
-            NavHostFragment.findNavController(this).navigate(R.id.action_event_participants_to_assignment, args);
-            return;
-        }
-        Toast.makeText(requireContext(), R.string.participants_validation_pending, Toast.LENGTH_SHORT).show();
+        // Cada modo abre sua própria ação, preservando evento e participante selecionados.
+        Bundle args = AuthArgs.copy(getArguments());
+        args.putString("event_title", eventTitle);
+        args.putString("participant_name", participant.name);
+        args.putInt("participant_avatar_index", participant.avatarIndex);
+        int action = completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT
+                ? R.id.action_event_participants_to_assignment : R.id.action_event_participants_to_validation;
+        NavHostFragment.findNavController(this).navigate(action, args);
     }
 
     @Override

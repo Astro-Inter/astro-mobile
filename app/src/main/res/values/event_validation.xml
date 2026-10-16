@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_validation_title">Validação</string>
+    <string name="event_validation_participant_mock">Kevin Parker</string>
+    <string name="event_validation_job_mock">Eletricista</string>
+    <string name="event_validation_event_label">Evento:</string>
+    <string name="event_validation_unit_mock">Osasco</string>
+    <string name="event_validation_completion_label">Data de conclusão:</string>
+    <string name="event_validation_completion_mock">26/08/2026 às 09:15</string>
+    <string name="event_validation_deadline_label">Data de término:</string>
+    <string name="event_validation_deadline_mock">30/08/2026</string>
+    <string name="event_validation_evidence_required">Evidência: Obrigatória</string>
+    <string name="event_validation_evidence_yes">Sim</string>
+    <string name="event_validation_evidence_title">Evidências envidadas</string>
+    <string name="event_validation_evidence_description">Verifique as evidências deste colaborador para este evento</string>
+    <string name="event_validation_confirm">Validar</string>
+    <string name="event_validation_reject">Rejeitar</string>
+    <string name="event_validation_reason_label">Justificativa</string>
+    <string name="event_validation_reason_hint">Insira uma Justificativa para rejeitar uma validação</string>
+    <string name="event_validation_confirmation">Você validou uma conclusão!</string>
+
+    <style name="EventValidationRow" parent="ManagerEventDetailsRow">
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+    <style name="EventValidationDivider" parent="ManagerEventDetailsDivider">
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+    <style name="EventValidationHeading" parent="ManagerEventDetailsHeading">
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+</resources>
