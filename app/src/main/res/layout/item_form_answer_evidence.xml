@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
+    android:layout_marginTop="8dp" android:orientation="horizontal" android:gravity="center_vertical"
+    android:baselineAligned="false" android:paddingStart="12dp" android:paddingEnd="0dp"
+    android:background="@drawable/bg_profile_panel">
+    <TextView android:id="@+id/text_form_answer_evidence" style="@style/ManagerFormsCaption"
+        android:layout_width="0dp" android:layout_weight="1" tools:text="Evidência de exemplo 1" />
+    <ImageButton android:id="@+id/button_form_answer_remove_evidence"
+        android:layout_width="48dp" android:layout_height="48dp" android:padding="15dp"
+        android:scaleType="fitCenter" android:src="@drawable/conversations_close"
+        android:background="@drawable/bg_login_icon_button"
+        android:contentDescription="@string/form_answer_remove_evidence" />
+</LinearLayout>

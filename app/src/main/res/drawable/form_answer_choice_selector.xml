@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <layer-list>
+            <item android:width="31dp" android:height="31dp">
+                <bitmap android:src="@drawable/form_answer_circle" android:gravity="fill" />
+            </item>
+            <item android:width="13dp" android:height="13dp" android:gravity="center">
+                <shape android:shape="oval"><solid android:color="@color/astro_primary_purple" /></shape>
+            </item>
+        </layer-list>
+    </item>
+    <item>
+        <layer-list>
+            <item android:width="31dp" android:height="31dp">
+                <bitmap android:src="@drawable/form_answer_circle" android:gravity="fill" />
+            </item>
+        </layer-list>
+    </item>
+</selector>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:context="com.example.astro_mobile.manager.forms.answer.FormAnswerFragment">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:id="@+id/header_form_answer" android:layout_width="0dp" android:layout_height="80dp"
+            android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false"
+            android:paddingHorizontal="20dp" app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+            <ImageButton android:id="@+id/button_form_answer_back" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/conversations_back" android:paddingHorizontal="14dp"
+                android:paddingVertical="16dp" android:src="@drawable/ic_login_back" android:scaleType="fitCenter" />
+            <TextView style="@style/ManagerFormsText" android:layout_width="0dp" android:layout_weight="1"
+                android:gravity="center" android:textSize="24sp" android:text="@string/manager_forms_title" />
+            <ImageButton android:id="@+id/button_form_answer_close" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/conversations_close" android:padding="14dp"
+                android:src="@drawable/conversations_close" android:scaleType="fitCenter" />
+        </LinearLayout>
+        <ScrollView android:id="@+id/scroll_form_answer" android:layout_width="0dp" android:layout_height="0dp"
+            android:clipToPadding="false" app:layout_constraintTop_toBottomOf="@id/header_form_answer"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:paddingBottom="30dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:padding="30dp" android:orientation="vertical">
+                    <TextView android:id="@+id/text_form_answer_title" style="@style/ManagerFormsText"
+                        android:textSize="24sp" tools:text="@string/form_details_title_mock" />
+                    <TextView style="@style/ManagerFormsText" android:layout_marginTop="5dp"
+                        android:textColor="@color/astro_input_hint" android:text="@string/form_details_subtitle" />
+                </LinearLayout>
+                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_helmets" />
+                <include android:id="@+id/group_form_answer_helmets" layout="@layout/view_form_answer_choices" />
+                <View style="@style/ManagerEventDetailsDivider" />
+                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_boots" />
+                <include android:id="@+id/group_form_answer_boots" layout="@layout/view_form_answer_choices" />
+                <View style="@style/ManagerEventDetailsDivider" />
+                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_gloves" />
+                <include android:id="@+id/group_form_answer_gloves" layout="@layout/view_form_answer_choices" />
+                <View style="@style/ManagerEventDetailsDivider" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                    <TextView style="@style/ManagerFormsText" android:text="@string/form_answer_risks" />
+                    <EditText android:id="@+id/input_form_answer_risks" style="@style/FormAnswerInput"
+                        android:layout_marginTop="10dp" android:hint="@string/form_answer_input_hint"
+                        android:inputType="textCapSentences|textMultiLine" android:gravity="top|start"
+                        android:importantForAutofill="no" />
+                </LinearLayout>
+                <View style="@style/ManagerEventDetailsDivider" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                    <TextView style="@style/ManagerFormsText" android:text="@string/form_answer_date" />
+                    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp">
+                        <TextView android:id="@+id/button_form_answer_date" style="@style/FormAnswerInput"
+                            android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="52dp"
+                            android:hint="@string/form_answer_date_hint" android:clickable="true" android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground" />
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:layout_gravity="end|center_vertical" android:layout_marginEnd="16dp"
+                            android:src="@drawable/home_calendar" android:scaleType="fitCenter"
+                            android:contentDescription="@null" android:importantForAccessibility="no" />
+                    </FrameLayout>
+                </LinearLayout>
+                <View style="@style/ManagerEventDetailsDivider" />
+                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_evidence" />
+                <TextView android:id="@+id/button_form_answer_attach" style="@style/EmployeeEventDetailsButton"
+                    android:layout_width="match_parent" android:layout_marginHorizontal="30dp"
+                    android:layout_marginVertical="10dp" android:text="@string/form_answer_attach" />
+                <LinearLayout android:id="@+id/list_form_answer_evidences" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"
+                    android:orientation="vertical" />
+                <TextView android:id="@+id/text_form_answer_mock_evidences" style="@style/ManagerFormsCaption"
+                    android:layout_marginHorizontal="30dp" android:layout_marginTop="8dp"
+                    tools:text="Evidências de exemplo: 0/3. A câmera real ainda não está integrada." />
+                <!-- Feedback provisório para demonstrar a coleta real, sem expor as coordenadas. -->
+                <LinearLayout android:id="@+id/container_form_answer_location" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"
+                    android:layout_marginTop="20dp" android:padding="16dp" android:orientation="vertical"
+                    android:background="@drawable/bg_profile_panel">
+                    <TextView style="@style/ManagerFormsCaption" android:text="@string/form_answer_location_notice" />
+                    <TextView android:id="@+id/text_form_answer_location" style="@style/ManagerFormsText"
+                        android:layout_marginTop="8dp" android:text="@string/form_answer_locating" />
+                    <TextView android:id="@+id/button_form_answer_location_retry" style="@style/ManagerFormsText"
+                        android:layout_height="wrap_content" android:minHeight="48dp" android:gravity="center_vertical"
+                        android:background="@drawable/bg_home_row_ripple" android:clickable="true" android:focusable="true"
+                        android:text="@string/form_answer_location_retry" android:visibility="gone" />
+                </LinearLayout>
+                <TextView style="@style/ManagerFormsCaption" android:layout_marginHorizontal="30dp"
+                    android:layout_marginTop="15dp" android:text="@string/form_answer_required" />
+                <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp">
+                    <TextView android:id="@+id/button_form_answer_complete" style="@style/EmployeeEventDetailsButton"
+                        android:enabled="false" android:background="@drawable/bg_form_details_button"
+                        android:textColor="@color/form_details_button_text" android:text="@string/form_answer_complete" />
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                        android:layout_gravity="end|center_vertical" android:layout_marginEnd="15dp"
+                        android:src="@drawable/ic_arrow_right" android:scaleType="fitCenter"
+                        android:contentDescription="@null" android:importantForAccessibility="no" />
+                </FrameLayout>
+            </LinearLayout>
+        </ScrollView>
+        <include android:id="@+id/skeleton_form_answer" layout="@layout/view_form_answer_skeleton"
+            android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" tools:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/header_form_answer" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

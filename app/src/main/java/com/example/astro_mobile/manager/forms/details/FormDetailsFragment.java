@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -71,7 +70,7 @@ public final class FormDetailsFragment extends Fragment {
                 renderConsent(view);
                 return;
             }
-            Toast.makeText(requireContext(), R.string.form_details_answer_pending, Toast.LENGTH_SHORT).show();
+            NavHostFragment.findNavController(this).navigate(R.id.action_form_details_to_answer, getArguments());
         });
         renderConsent(view);
 
