@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_evidence_title">Evidência</string>
+    <string name="event_evidence_image_description">Imagem de evidência de exemplo</string>
+    <string name="event_evidence_page_one">1</string>
+    <string name="event_evidence_page_two">2</string>
+    <string name="event_evidence_page_three">3</string>
+    <style name="EventEvidencePage">
+        <item name="android:layout_width">65dp</item>
+        <item name="android:layout_height">65dp</item>
+        <item name="android:background">@drawable/bg_event_evidence_page</item>
+        <item name="android:fontFamily">@font/inter_variable</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/event_evidence_page_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

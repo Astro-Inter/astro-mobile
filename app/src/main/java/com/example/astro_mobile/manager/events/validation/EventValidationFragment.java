@@ -14,7 +14,6 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,11 +54,11 @@ public final class EventValidationFragment extends Fragment {
                 NavHostFragment.findNavController(this).popBackStack(R.id.managerEventDetailsFragment, false));
         view.findViewById(R.id.button_validation_close).setOnClickListener(clicked -> returnHome());
 
-        // O comprovante é apenas um exemplo. Sua visualização pertence à SCRUM-287.
+        // Abre a imagem de exemplo; a validação permanece na pilha com o participante selecionado.
         TextView filename = view.findViewById(R.id.text_validation_evidence);
         filename.setPaintFlags(filename.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         view.findViewById(R.id.button_validation_evidence).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.event_validation_evidence_pending, Toast.LENGTH_SHORT).show());
+                NavHostFragment.findNavController(this).navigate(R.id.action_event_validation_to_evidence));
 
         // Mostra a confirmação local; não altera conclusões nem envia dados à API.
         view.findViewById(R.id.button_validation_confirm).setOnClickListener(clicked ->

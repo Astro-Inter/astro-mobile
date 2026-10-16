@@ -443,6 +443,9 @@
         <argument android:name="event_title" app:argType="string" />
         <argument android:name="participant_name" app:argType="string" />
         <argument android:name="participant_avatar_index" app:argType="integer" android:defaultValue="0" />
+        <action android:id="@+id/action_event_validation_to_evidence" app:destination="@id/eventEvidenceFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
         <action android:id="@+id/action_event_validation_to_confirmation" app:destination="@id/eventValidationConfirmationFragment"
             app:popUpTo="@id/eventValidationFragment" app:popUpToInclusive="true"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
@@ -457,6 +460,10 @@
             app:enterAnim="@anim/push_pop_enter" app:exitAnim="@anim/push_pop_exit"
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
+
+    <fragment android:id="@+id/eventEvidenceFragment"
+        android:name="com.example.astro_mobile.manager.events.evidence.EventEvidenceFragment"
+        android:label="Evidência" />
     <fragment android:id="@+id/formAnswerFragment"
         android:name="com.example.astro_mobile.manager.forms.answer.FormAnswerFragment"
         android:label="Responder formulário">
