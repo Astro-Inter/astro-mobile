@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -23,16 +22,17 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.data.location.FormLocationRepository;
+import com.example.astro_mobile.manager.forms.answer.FormAnswerViewModel;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public final class FormDetailsFragment extends Fragment {
     public static final String FORM_TITLE = "form_title";
     public static final String DEADLINE = "form_deadline";
-    public static final String LOCATION_MATCHES_UNIT = "form_location_matches_unit";
     public static final String REQUIRES_UNIT_LOCATION = "form_requires_unit_location";
 
     private FormDetailsViewModel state;
-    private boolean locationMatchesUnit;
+    private FormAnswerViewModel answer;
     private boolean requiresUnitLocation;
     private Runnable finishLoading;
     private final ActivityResultLauncher<String[]> locationPermission = registerForActivityResult(
@@ -40,6 +40,7 @@ public final class FormDetailsFragment extends Fragment {
                 if (getView() == null) return;
                 state.onPermissionResult(hasPreciseLocation());
                 renderConsent(requireView());
+                if (hasPreciseLocation()) checkLocation(false);
             });
 
     public FormDetailsFragment() { super(R.layout.fragment_form_details); }
@@ -48,8 +49,10 @@ public final class FormDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         state = new ViewModelProvider(this).get(FormDetailsViewModel.class);
+        answer = new ViewModelProvider(NavHostFragment.findNavController(this)
+                .getBackStackEntry(R.id.formDetailsFragment), FormAnswerViewModel.factory(requireContext()))
+                .get(FormAnswerViewModel.class);
         Bundle args = requireArguments();
-        locationMatchesUnit = args.getBoolean(LOCATION_MATCHES_UNIT);
         requiresUnitLocation = args.getBoolean(REQUIRES_UNIT_LOCATION, true);
         ((TextView) view.findViewById(R.id.text_form_details_title)).setText(args.getString(FORM_TITLE));
         ((TextView) view.findViewById(R.id.text_form_details_deadline)).setText(args.getString(DEADLINE));
@@ -64,14 +67,19 @@ public final class FormDetailsFragment extends Fragment {
 
         view.findViewById(R.id.checkbox_form_location).setOnClickListener(clicked -> onConsentClick((CheckBox) clicked));
         view.findViewById(R.id.button_form_location_settings).setOnClickListener(clicked -> openLocationSettings());
+        view.findViewById(R.id.button_form_details_location_retry).setOnClickListener(clicked -> {
+            if (answer.getFailure() == FormLocationRepository.Failure.LOCATION_DISABLED) {
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            } else checkLocation(false);
+        });
         view.findViewById(R.id.button_form_details_answer).setOnClickListener(clicked -> {
-            // Confere a permissão novamente antes de liberar o próximo passo do protótipo.
+            // Revalida a posição no toque: uma leitura antiga não autoriza iniciar fora do raio.
             if (!hasPreciseLocation()) {
                 state.onPermissionResult(false);
                 renderConsent(view);
                 return;
             }
-            Toast.makeText(requireContext(), R.string.form_details_answer_pending, Toast.LENGTH_SHORT).show();
+            if (state.isConsentAccepted()) checkLocation(true);
         });
         renderConsent(view);
 
@@ -98,6 +106,7 @@ public final class FormDetailsFragment extends Fragment {
             state.clearConsent();
         } else if (hasPreciseLocation()) {
             state.onPermissionResult(true);
+            checkLocation(false);
         } else if (state.hasPermissionError()
                 && !shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
             // Após o bloqueio do Android, o novo toque leva às configurações em vez de parecer sem ação.
@@ -120,17 +129,33 @@ public final class FormDetailsFragment extends Fragment {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    private void checkLocation(boolean openAnswer) {
+        answer.requestLocation(false, requiresUnitLocation, () -> {
+            if (getView() == null || !isResumed()) return;
+            renderConsent(requireView());
+            if (openAnswer && state.isConsentAccepted() && hasPreciseLocation() && answer.canStart()) {
+                NavHostFragment.findNavController(this).navigate(R.id.action_form_details_to_answer, getArguments());
+            }
+        });
+        renderConsent(requireView());
+    }
+
     private void renderConsent(View view) {
         boolean preciseGranted = hasPreciseLocation();
         if (state.isConsentAccepted() && !preciseGranted) state.onPermissionResult(false);
         renderLocationMessage(view, preciseGranted);
-        boolean addressAllowed = !requiresUnitLocation || locationMatchesUnit;
+        boolean addressAllowed = answer.canStart();
         view.findViewById(R.id.container_form_details_consent).setVisibility(
-                !preciseGranted || addressAllowed ? View.VISIBLE : View.GONE);
+                !preciseGranted || !answer.isOutside() ? View.VISIBLE : View.GONE);
         ((CheckBox) view.findViewById(R.id.checkbox_form_location)).setChecked(state.isConsentAccepted());
         boolean denied = state.hasPermissionError();
         view.findViewById(R.id.text_form_location_permission_error).setVisibility(denied ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.button_form_location_settings).setVisibility(denied ? View.VISIBLE : View.GONE);
+        TextView retry = view.findViewById(R.id.button_form_details_location_retry);
+        retry.setVisibility(preciseGranted && !answer.isBusy() && !addressAllowed && !answer.isCompleted()
+                ? View.VISIBLE : View.GONE);
+        retry.setText(answer.getFailure() == FormLocationRepository.Failure.LOCATION_DISABLED
+                ? R.string.form_answer_location_settings : R.string.form_details_check_location);
         view.findViewById(R.id.button_form_details_answer).setEnabled(
                 addressAllowed && state.isConsentAccepted() && preciseGranted);
     }
@@ -144,7 +169,20 @@ public final class FormDetailsFragment extends Fragment {
             text = R.string.form_details_precise_location_required;
             icon = R.drawable.ic_employee_event_warning;
             background = R.drawable.bg_profile_panel;
-        } else if (requiresUnitLocation && !locationMatchesUnit) {
+        } else if (answer.isCompleted()) {
+            text = R.string.form_answer_completed;
+            icon = R.drawable.form_location_check;
+            background = R.drawable.bg_home_positive_message;
+        } else if (answer.isBusy() || (!answer.canStart() && !answer.isOutside() && answer.getFailure() == null)) {
+            text = R.string.form_answer_locating;
+            icon = R.drawable.ic_employee_event_warning;
+            background = R.drawable.bg_profile_panel;
+        } else if (answer.getFailure() != null) {
+            text = answer.getFailure() == FormLocationRepository.Failure.LOCATION_DISABLED
+                    ? R.string.form_answer_location_disabled : R.string.form_answer_location_unavailable;
+            icon = R.drawable.ic_employee_event_warning;
+            background = R.drawable.bg_profile_panel;
+        } else if (answer.isOutside()) {
             text = R.string.form_details_outside_unit;
             icon = R.drawable.conversations_close;
             background = R.drawable.bg_form_location_error;
@@ -169,7 +207,13 @@ public final class FormDetailsFragment extends Fragment {
         if (state != null) {
             if (state.hasPermissionError() && hasPreciseLocation()) state.onPermissionResult(true);
             renderConsent(requireView());
+            if (hasPreciseLocation()) checkLocation(false);
         }
+    }
+
+    @Override public void onPause() {
+        if (answer != null) answer.pauseLocation();
+        super.onPause();
     }
 
     @Override

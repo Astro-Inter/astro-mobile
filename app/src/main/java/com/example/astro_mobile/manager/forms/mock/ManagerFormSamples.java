@@ -12,9 +12,9 @@ public final class ManagerFormSamples {
         // Exemplos visuais do Figma; a lista real será carregada pela API posteriormente.
         String title = "Checklist de Inspeção de segurança";
         return Arrays.asList(
-                new ManagerForm(title, "Amanhã", "NR - 5", ManagerForm.Status.URGENT, true, true),
-                new ManagerForm(title, "20/05/2027", "NR - 5", ManagerForm.Status.NEW, true, false),
-                new ManagerForm(title, "20/05/2027", "NR - 5", ManagerForm.Status.PENDING, false, false),
-                new ManagerForm(title, "20/05/2027", "NR - 5", ManagerForm.Status.FINISHED, true, true));
+                new ManagerForm(title, "Amanhã", "NR - 5", ManagerForm.Status.URGENT, true),
+                new ManagerForm(title, "20/05/2027", "NR - 5", ManagerForm.Status.NEW, true),
+                new ManagerForm(title, "20/05/2027", "NR - 5", ManagerForm.Status.PENDING, false),
+                new ManagerForm(title, "20/05/2027", "NR - 5", ManagerForm.Status.FINISHED, true));
     }
 }

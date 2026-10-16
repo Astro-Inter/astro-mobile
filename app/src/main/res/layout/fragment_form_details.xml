@@ -83,6 +83,11 @@
                     <TextView android:id="@+id/text_form_details_location_status" style="@style/ManagerFormsText"
                         android:layout_width="0dp" android:layout_weight="1" android:text="@string/form_details_inside_unit" />
                 </LinearLayout>
+                <TextView android:id="@+id/button_form_details_location_retry" style="@style/ManagerFormsText"
+                    android:layout_marginHorizontal="30dp" android:layout_height="wrap_content"
+                    android:minHeight="48dp" android:gravity="center_vertical" android:paddingVertical="10dp"
+                    android:background="@drawable/bg_home_row_ripple" android:clickable="true" android:focusable="true"
+                    android:text="@string/form_details_check_location" android:visibility="gone" />
                 <View style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout android:id="@+id/container_form_details_consent" android:layout_width="match_parent"
                     android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"

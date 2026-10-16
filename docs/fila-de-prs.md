@@ -1,6 +1,6 @@
 # Fila local de Pull Requests
 
-Atualizada em 2026-10-16. PRs #35–40 integradas à main 46757b8. Formulários separados em SCRUM-279 sobre main e SCRUM-277 empilhada na SCRUM-279; as duas versões passaram em build/lint, sem merges da antiga integração.
+Atualizada em 2026-10-16. PRs #35–42 integradas à main 911ab3d. A SCRUM-274 começa diretamente dessa main, sem empilhamento nas antigas branches de integração. Build/lint e 27 testes existentes aprovados; validação visual/GPS pendente devido ao erro de restauração da sessão no aparelho.
 
 ## Colaboradores
 
@@ -26,9 +26,9 @@ Há um stash de SCRUM-307 (notificações) que precisa ser comparado à main ant
 
 ## Formulários — sequência local posterior à integração
 
-- SCRUM-279: [PR #41](https://github.com/Astro-Inter/astro-mobile/pull/41), branch `feat/SCRUM-279-formularios-ui`, lista com mocks, commit `446800a`, base main `46757b8`; build/lint da lista isolada sem erros (99 avisos).
-- SCRUM-277: branch `feat/SCRUM-277-detalhes-formulario-ui`, empilhada na PR #41; detalhes, quatro estados de localização, raio de 100 m no texto e permissão precisa pelo checkbox Material. Build/lint finais sem erros (100 avisos); dados/endereço ainda mockados, sem GPS/API. O snapshot anterior à separação permanece em stash `9f17a50db93ad30eced055eedf53b44d6a6b657c` e nas branches backup/SCRUM-279-antes-publicar-20261016 e backup/SCRUM-277-antes-publicar-20261016.
-- Publicar/mergear na ordem SCRUM-279 → SCRUM-277. A PR da lista usa base main; a do detalhe usa a branch da lista. Após merge da lista, atualizar a base do detalhe e conferir o diff. Os merges da antiga branch de integração foram retirados das duas branches.
+- SCRUM-279: [PR #41](https://github.com/Astro-Inter/astro-mobile/pull/41), integrada à main em 60ab01b.
+- SCRUM-277: [PR #42](https://github.com/Astro-Inter/astro-mobile/pull/42), integrada à main em 911ab3d. Snapshot anterior à separação preservado no stash `9f17a50db93ad30eced055eedf53b44d6a6b657c` e nas branches de backup correspondentes.
+- SCRUM-274/276: branch `feat/SCRUM-274-responder-formulario-ui`, base main 911ab3d; [PR #43](https://github.com/Astro-Inter/astro-mobile/pull/43) em rascunho. UI/campos obrigatórios, câmera externa real com até três fotos temporárias, GPS real nos detalhes/ao iniciar/a cada minuto/ao concluir, raio provisório de 100 m sobre a primeira posição nos detalhes e pausa/retomada. Fora do raio: aviso Figma de 3s, retorno aos detalhes e respostas/fotos preservadas. Sem painel de registros, upload ou API; conclusão local. Build/lint e 27 testes existentes aprovados; sem físico conectado para validar esta atualização. SCRUM-274/276 continuam Em andamento até conferência manual e integrações correspondentes; não concluir upload/API só pela captura local.
 
 ## Procedimento de publicação
 

@@ -111,11 +111,10 @@ public final class ManagerFormsFragment extends Fragment {
     }
 
     private void openDetails(ManagerForm form) {
-        // Leva o formulário selecionado e a variante de endereço do mock ao detalhe.
+        // Leva o formulário selecionado e informa se ele exige um endereço específico.
         Bundle args = AuthArgs.copy(getArguments());
         args.putString(FormDetailsFragment.FORM_TITLE, form.title);
         args.putString(FormDetailsFragment.DEADLINE, form.deadline);
-        args.putBoolean(FormDetailsFragment.LOCATION_MATCHES_UNIT, form.locationMatchesUnit);
         args.putBoolean(FormDetailsFragment.REQUIRES_UNIT_LOCATION, form.requiresUnitLocation);
         NavHostFragment.findNavController(this).navigate(R.id.action_manager_forms_to_details, args);
     }
