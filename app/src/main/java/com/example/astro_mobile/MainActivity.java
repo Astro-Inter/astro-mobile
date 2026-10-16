@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     && (navController.getCurrentDestination().getId() == R.id.chatFragment
                     || navController.getCurrentDestination().getId() == R.id.employeeEventsFragment
                     || navController.getCurrentDestination().getId() == R.id.managerEventsFragment
+                    || navController.getCurrentDestination().getId() == R.id.managerFormsFragment
                     || navController.getCurrentDestination().getId() == R.id.eventParticipantsFragment
                     || navController.getCurrentDestination().getId() == R.id.aiSessionsFragment);
             int bottom = hasKeyboardInput ? Math.max(systemBars.bottom,
@@ -149,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
         navbar.setVisibility((home || conversations || profile || events || notifications
                 || destination == R.id.staffFragment || destination == R.id.staffDetailsFragment
-                || destination == R.id.staffEventsFragment)
+                || destination == R.id.staffEventsFragment || destination == R.id.managerFormsFragment)
                 && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment
                         || destination == R.id.humanChatFragment) && keyboard)
                 ? View.VISIBLE : View.GONE);
