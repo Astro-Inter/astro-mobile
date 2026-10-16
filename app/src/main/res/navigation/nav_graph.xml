@@ -31,6 +31,17 @@
         android:label="Participantes do evento">
         <argument android:name="event_title" app:argType="string" />
         <argument android:name="event_completion_mode" app:argType="string" />
+        <action android:id="@+id/action_event_participants_to_assignment" app:destination="@id/eventAssignmentFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
+
+    <fragment android:id="@+id/eventAssignmentFragment"
+        android:name="com.example.astro_mobile.manager.events.assignment.EventAssignmentFragment"
+        android:label="Atribuição de conclusão">
+        <argument android:name="event_title" app:argType="string" />
+        <argument android:name="participant_name" app:argType="string" />
+        <argument android:name="participant_avatar_index" app:argType="integer" android:defaultValue="0" />
     </fragment>
 
     <action android:id="@+id/action_global_employee_events" app:destination="@id/employeeEventsFragment"
@@ -68,6 +79,10 @@
     </fragment>
 
     <action android:id="@+id/action_global_conversations" app:destination="@id/conversationsFragment"
+        app:launchSingleTop="true"
+        app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+        app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    <action android:id="@+id/action_global_notifications" app:destination="@id/notificationsFragment"
         app:launchSingleTop="true"
         app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
         app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
@@ -380,6 +395,11 @@
             app:popEnterAnim="@anim/push_pop_enter"
             app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.example.astro_mobile.notifications.NotificationsFragment"
+        android:label="Notificações" />
 
     <fragment android:id="@+id/managerHomeFragment"
         android:name="com.example.astro_mobile.manager.home.ManagerHomeFragment" android:label="Home do Gestor">
