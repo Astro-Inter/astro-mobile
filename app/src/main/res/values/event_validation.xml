@@ -17,7 +17,6 @@
     <string name="event_validation_reject">Rejeitar</string>
     <string name="event_validation_reason_label">Justificativa</string>
     <string name="event_validation_reason_hint">Insira uma Justificativa para rejeitar uma validação</string>
-    <string name="event_validation_evidence_pending">A visualização da evidência será implementada na SCRUM-287. Este arquivo é apenas um exemplo.</string>
     <string name="event_validation_confirmation">Você validou uma conclusão!</string>
 
     <style name="EventValidationRow" parent="ManagerEventDetailsRow">

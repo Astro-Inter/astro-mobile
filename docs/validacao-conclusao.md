@@ -27,7 +27,7 @@ Validar abre confirmação mock por 2 segundos, sem navbar, e recria a Home do G
 
 Reutilizados retratos, calendários, relógio, link, backgrounds, estilos e navbar existentes. Dois ícones oficiais preservados do trabalho anterior foram recuperados sem duplicatas binárias. O título `Evidências envidadas` é literal do Figma atual; não foi corrigido por iniciativa própria.
 
-O comprovante não abre um arquivo real nesta tarefa: informa que a visualização pertence à SCRUM-287. Integração e envio da rejeição/validação permanecem na SCRUM-290.
+O comprovante abre a imagem de exemplo da SCRUM-287 quando essa branch filha estiver integrada, sem ler um PDF real. A SCRUM-289 isolada mantém o aviso de pendência. Integração e envio da rejeição/validação permanecem na SCRUM-290.
 
 ## Plano de testes manuais — executar pelo solicitante
 
@@ -35,7 +35,7 @@ O comprovante não abre um arquivo real nesta tarefa: informa que a visualizaç�
 2. Rolar até os botões. Conferir ícones roxos, texto legível e navbar fixa; testar seta de voltar e manutenção da busca/filtro na lista. Reabrir e testar a linha do evento (retorna ao detalhe) e o X (Home).
 3. Tocar em Rejeitar. Conferir fundo escuro, posição do X e teclado. Botão desabilitado com campo vazio ou somente espaços, habilitado com justificativa. X/voltar fecham sem sair da validação; confirmar com texto volta à Home sem alterar dados reais.
 4. Reabrir e tocar em Validar. Conferir check e texto `Você validou uma conclusão!`, navbar oculta, espera de 2s e retorno à Home do Gestor com skeleton. Não deve voltar à Home do Colaborador.
-5. Tocar no comprovante: deve apenas informar que a visualização está pendente, sem arquivo ou upload real. Esse comportamento não é defeito nesta UI.
+5. Com a SCRUM-287 integrada, tocar no comprovante deve abrir a imagem de exemplo e sua paginação; voltar preserva a validação. Sem ela, a SCRUM-289 isolada apenas informa a pendência. Nenhum PDF ou upload real faz parte deste mock.
 6. Conferir que participantes já validados/ainda sem conclusão não abrem indevidamente a validação. Abrir o segundo evento (Atribuição) e conferir que o participante não concluído continua abrindo Atribuição, não Validação.
 7. No tablet em orientação vertical, conferir rolagem, colunas, pop-up limitado a 370dp e ausência de sobreposição com a navbar/teclado. Este roteiro não autoriza iniciar emulador automaticamente.
 8. Como o layout de confirmação é compartilhado, conferir manualmente que a conclusão de evento do Colaborador mantém seu texto e retorno à própria Home após 2s.

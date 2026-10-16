@@ -16,9 +16,9 @@ As quatro PRs da sequência de colaboradores já estão na main. Manter os dois 
 1. SCRUM-307 — notificações: [PR #35](https://github.com/Astro-Inter/astro-mobile/pull/35), já integrada à `main`.
 2. SCRUM-285 — atribuição de conclusão: [PR #36](https://github.com/Astro-Inter/astro-mobile/pull/36), integrada à main no merge ad0f6b4.
 3. SCRUM-289 — validação de conclusão: recuperada seletivamente na branch `feat/SCRUM-289-validacao-evento-ui`, empilhada na SCRUM-274 em `dd4f522`. UI, rejeição e confirmação locais; build aprovado e instalada no Samsung. Sem testes/lint por pedido. Publicação empilhada com base na branch da PR #43; integrar a #43 antes de realinhar esta branch à main. Roteiro manual em `docs/validacao-conclusao.md`.
-4. SCRUM-287 — visualização da evidência: integrada localmente à validação, ainda sem commit. Publicar depois da validação, mantendo cada tarefa separada.
+4. SCRUM-287 — visualização da evidência: recuperada seletivamente na branch `feat/SCRUM-287-evidencia-evento-ui`, empilhada na SCRUM-289 em `6c5ff85` (PR #44). Tela local com imagem/paginação e skeleton de 1s, ligada ao comprovante. Build aprovado; sem testes/lint/instalação por pedido. Publicar em rascunho sobre a branch da #44, mantendo um commit próprio e a ordem #43 → #44 → evidência. Roteiro em `docs/evidencia-evento.md`.
 
-Backup completo de SCRUM-289/287, incluindo novos arquivos: stash `1aba05a51ef51483d1190bffb54c39e968625ecf`. Backup isolado da SCRUM-289: `d631bc459e4a0a8fc792116ee24853835d0b3abb`. Ambos preservados. A recuperação da SCRUM-289 manteve a navegação de atribuição já presente na main e não incorporou a SCRUM-287. Não descartar os backups enquanto a visualização da evidência ainda precisar ser recuperada.
+Backup completo de SCRUM-289/287, incluindo novos arquivos: stash `1aba05a51ef51483d1190bffb54c39e968625ecf`. Backup isolado da SCRUM-289: `d631bc459e4a0a8fc792116ee24853835d0b3abb`. Ambos preservados. As duas tarefas foram recuperadas seletivamente em branches/commits separados, mantendo a atribuição já presente na main. Não descartar os backups antes da conferência manual e integração das PRs correspondentes.
 
 ## Pendência antiga a revisar
 
