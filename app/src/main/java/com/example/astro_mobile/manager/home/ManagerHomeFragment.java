@@ -59,11 +59,18 @@ public final class ManagerHomeFragment extends Fragment {
                 navigation.navigate(R.id.action_manager_home_to_chat, AuthArgs.copy(getArguments())));
         view.findViewById(R.id.button_manager_home_employees).setOnClickListener(clicked ->
                 navigation.navigate(R.id.action_manager_home_to_staff, AuthArgs.copy(getArguments())));
+        View.OnClickListener openForms = clicked ->
+                navigation.navigate(R.id.action_manager_home_to_forms, AuthArgs.copy(getArguments()));
+        view.findViewById(R.id.button_manager_home_forms_action).setOnClickListener(openForms);
+        view.findViewById(R.id.button_manager_home_forms).setOnClickListener(openForms);
+        view.findViewById(R.id.button_manager_home_forms_more).setOnClickListener(openForms);
+        int[] formRows = {R.id.row_manager_forms_1, R.id.row_manager_forms_2, R.id.row_manager_forms_3};
+        for (int id : formRows) {
+            view.findViewById(id).findViewById(R.id.button_home_feed_row).setOnClickListener(openForms);
+        }
         // Os demais atalhos têm feedback de toque, mas seus destinos ainda não existem.
         int[] pendingActions = {R.id.button_manager_home_validate,
-                R.id.button_manager_home_forms_action,
-                R.id.button_manager_home_validations, R.id.button_manager_home_validations_more,
-                R.id.button_manager_home_forms, R.id.button_manager_home_forms_more};
+                R.id.button_manager_home_validations, R.id.button_manager_home_validations_more};
         for (int id : pendingActions) view.findViewById(id).setOnClickListener(clicked -> showPending());
     }
 
