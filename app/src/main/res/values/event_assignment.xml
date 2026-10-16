@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event_assignment_title">Validação</string>
+    <string name="event_assignment_participant_mock">Kevin Parker</string>
+    <string name="event_assignment_job_mock">Eletricista</string>
+    <string name="event_assignment_event_label">Evento:</string>
+    <string name="event_assignment_unit_mock">Osasco</string>
+    <string name="event_assignment_deadline_label">Data de término:</string>
+    <string name="event_assignment_deadline_mock">30/08/2026</string>
+    <string name="event_assignment_submit">Atribuir conclusão</string>
+    <string name="event_assignment_action_pending">A atribuição de conclusão ainda não está disponível nesta versão.</string>
+</resources>

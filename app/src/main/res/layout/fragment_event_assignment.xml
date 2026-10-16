@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:context="com.example.astro_mobile.manager.events.assignment.EventAssignmentFragment">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:id="@+id/header_event_assignment" android:layout_width="0dp"
+            android:layout_height="80dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:baselineAligned="false" android:paddingHorizontal="20dp"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <ImageButton android:id="@+id/button_assignment_back" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/conversations_back" android:paddingHorizontal="14dp"
+                android:paddingVertical="16dp" android:src="@drawable/ic_login_back" android:scaleType="fitCenter" />
+            <TextView style="@style/ManagerEventsText" android:layout_width="0dp" android:layout_weight="1"
+                android:gravity="center" android:textSize="24sp" android:text="@string/event_assignment_title" />
+            <ImageButton android:id="@+id/button_assignment_close" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/conversations_close" android:padding="14dp"
+                android:src="@drawable/conversations_close" android:scaleType="fitCenter" />
+        </LinearLayout>
+
+        <ScrollView android:id="@+id/container_assignment_content" android:layout_width="0dp"
+            android:layout_height="0dp" android:clipToPadding="false" android:paddingBottom="110dp"
+            app:layout_constraintTop_toBottomOf="@id/header_event_assignment"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="74dp" android:orientation="horizontal" android:gravity="center_vertical"
+                    android:baselineAligned="false" android:paddingHorizontal="30dp" android:paddingVertical="9dp">
+                    <ImageView android:id="@+id/image_assignment_participant" android:layout_width="56dp"
+                        android:layout_height="56dp" android:src="@drawable/participant_avatar_1"
+                        android:scaleType="fitCenter" android:contentDescription="@null" android:importantForAccessibility="no" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:layout_marginStart="30dp" android:orientation="vertical">
+                        <TextView android:id="@+id/text_assignment_participant" style="@style/ManagerEventsText"
+                            android:textSize="24sp" android:textStyle="bold" android:text="@string/event_assignment_participant_mock" />
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp" android:orientation="horizontal"
+                            android:baselineAligned="false" android:gravity="center_vertical">
+                            <ImageView android:layout_width="20dp" android:layout_height="18dp"
+                                android:layout_marginEnd="10dp" android:src="@drawable/profile_user_group"
+                                app:tint="@color/astro_input_hint" android:scaleType="fitCenter"
+                                android:contentDescription="@null" android:importantForAccessibility="no" />
+                            <TextView style="@style/ManagerEventsText" android:layout_width="0dp" android:layout_weight="1"
+                                android:textColor="@color/astro_input_hint" android:textStyle="bold"
+                                android:text="@string/event_assignment_job_mock" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+                <View style="@style/ManagerEventDetailsDivider" />
+                <LinearLayout android:id="@+id/button_assignment_event" style="@style/ManagerEventDetailsRow"
+                    android:background="@drawable/bg_home_row_ripple" android:clickable="true" android:focusable="true">
+                    <ImageView style="@style/ManagerEventDetailsIcon" android:src="@drawable/home_calendar"
+                        android:contentDescription="@null" />
+                    <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/event_assignment_event_label" />
+                    <TextView android:id="@+id/text_assignment_event" style="@style/ManagerEventDetailsValue"
+                        android:text="@string/manager_event_title_mock" />
+                </LinearLayout>
+                <View style="@style/ManagerEventDetailsDivider" />
+                <LinearLayout style="@style/ManagerEventDetailsRow">
+                    <ImageView style="@style/ManagerEventDetailsIcon" android:layout_width="20dp"
+                        android:layout_height="18.2dp" android:src="@drawable/profile_building" android:contentDescription="@null" />
+                    <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/profile_unit" />
+                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/event_assignment_unit_mock" />
+                </LinearLayout>
+                <View style="@style/ManagerEventDetailsDivider" />
+                <TextView style="@style/ManagerEventDetailsHeading" android:text="@string/manager_event_information" />
+                <LinearLayout style="@style/ManagerEventDetailsRow" android:paddingVertical="10dp">
+                    <ImageView style="@style/ManagerEventDetailsIcon" android:layout_width="20dp"
+                        android:layout_height="18.2dp" android:src="@drawable/event_assignment_clock" android:contentDescription="@null" />
+                    <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/event_assignment_deadline_label" />
+                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/event_assignment_deadline_mock" />
+                </LinearLayout>
+                <View style="@style/ManagerEventDetailsDivider" />
+                <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp" android:paddingVertical="25dp">
+                    <TextView android:id="@+id/button_assignment_submit" style="@style/EmployeeEventDetailsButton"
+                        android:background="@drawable/bg_login_password_button" android:text="@string/event_assignment_submit" />
+                </FrameLayout>
+            </LinearLayout>
+        </ScrollView>
+        <!-- A prévia XML mostra a tela. O skeleton só aparece durante a espera local. -->
+        <include android:id="@+id/skeleton_event_assignment" layout="@layout/view_event_assignment_skeleton"
+            android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" tools:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/header_event_assignment" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
