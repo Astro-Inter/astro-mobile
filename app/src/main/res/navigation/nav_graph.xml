@@ -403,6 +403,9 @@
 
     <fragment android:id="@+id/managerHomeFragment"
         android:name="com.example.astro_mobile.manager.home.ManagerHomeFragment" android:label="Home do Gestor">
+        <action android:id="@+id/action_manager_home_to_staff" app:destination="@id/staffFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
         <action android:id="@+id/action_manager_home_to_chat" app:destination="@id/chatFragment"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
@@ -419,6 +422,10 @@
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
+
+    <fragment android:id="@+id/staffFragment"
+        android:name="com.example.astro_mobile.manager.staff.StaffFragment"
+        android:label="Colaboradores" />
 
     <fragment android:id="@+id/aiSessionsFragment"
         android:name="com.example.astro_mobile.chat.AiSessionsFragment"

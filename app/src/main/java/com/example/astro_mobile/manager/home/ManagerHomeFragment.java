@@ -57,8 +57,10 @@ public final class ManagerHomeFragment extends Fragment {
                 navigation.navigate(R.id.action_global_notifications));
         assistant.setOnClickListener(clicked ->
                 navigation.navigate(R.id.action_manager_home_to_chat, AuthArgs.copy(getArguments())));
+        view.findViewById(R.id.button_manager_home_employees).setOnClickListener(clicked ->
+                navigation.navigate(R.id.action_manager_home_to_staff, AuthArgs.copy(getArguments())));
         // Os demais atalhos têm feedback de toque, mas seus destinos ainda não existem.
-        int[] pendingActions = {R.id.button_manager_home_validate, R.id.button_manager_home_employees,
+        int[] pendingActions = {R.id.button_manager_home_validate,
                 R.id.button_manager_home_forms_action,
                 R.id.button_manager_home_validations, R.id.button_manager_home_validations_more,
                 R.id.button_manager_home_forms, R.id.button_manager_home_forms_more};
