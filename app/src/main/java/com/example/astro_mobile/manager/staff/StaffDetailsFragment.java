@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.chat.human.HumanChatFragment;
 import com.example.astro_mobile.manager.staff.mock.StaffSamples;
 
 public final class StaffDetailsFragment extends Fragment {
@@ -48,9 +49,15 @@ public final class StaffDetailsFragment extends Fragment {
         view.findViewById(R.id.button_staff_details_close).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack(R.id.managerHomeFragment, false));
 
-        // A conversa humana continua pendente; os eventos abrem preservando o exemplo selecionado.
-        view.findViewById(R.id.button_staff_details_chat).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.staff_detail_chat_pending, Toast.LENGTH_SHORT).show());
+        // Leva somente a identidade do exemplo à conversa humana, sem abrir o chatbot.
+        view.findViewById(R.id.button_staff_details_chat).setOnClickListener(clicked -> {
+            Bundle chatArgs = AuthArgs.copy(getArguments());
+            chatArgs.putString(HumanChatFragment.PEER_NAME, member.name);
+            chatArgs.putString(HumanChatFragment.PEER_ROLE, member.role);
+            chatArgs.putInt(HumanChatFragment.PEER_AVATAR_INDEX, member.avatarIndex);
+            NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_human_chat, chatArgs);
+        });
+        // Abre os eventos mantendo o funcionário escolhido na lista.
         view.findViewById(R.id.button_staff_details_pending).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_events,
                         AuthArgs.copy(getArguments())));

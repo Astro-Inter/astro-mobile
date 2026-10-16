@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         // Só o conteúdo muda nas telas com navbar. No chat, ela se oculta durante o teclado.
         boolean home = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment;
         boolean conversations = destination == R.id.conversationsFragment || destination == R.id.chatFragment
-                || destination == R.id.aiSessionsFragment;
+                || destination == R.id.aiSessionsFragment || destination == R.id.humanChatFragment;
         boolean profile = destination == R.id.profileFragment;
         boolean events = destination == R.id.employeeEventsFragment
                 || destination == R.id.employeeEventDetailsFragment || destination == R.id.managerEventsFragment
@@ -150,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
         navbar.setVisibility((home || conversations || profile || events || notifications
                 || destination == R.id.staffFragment || destination == R.id.staffDetailsFragment
                 || destination == R.id.staffEventsFragment)
-                && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment) && keyboard)
+                && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment
+                        || destination == R.id.humanChatFragment) && keyboard)
                 ? View.VISIBLE : View.GONE);
         navbar.findViewById(R.id.button_conversations_nav_home).setSelected(home);
         navbar.findViewById(R.id.button_conversations_nav_chat).setSelected(conversations);

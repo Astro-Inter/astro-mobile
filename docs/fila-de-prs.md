@@ -1,18 +1,19 @@
 # Fila local de Pull Requests
 
-Atualizada em 2026-10-15. Registro para retomar a publicação sem depender do histórico do chat. Não significa que houve push, abertura de PR ou merge.
+Atualizada em 2026-10-16. PRs #35–39 integradas à main fae427d. PR #40 integra essa base, preservando as duas ações do detalhe do funcionário; build/lint sem erros (99 avisos). Aprovação e merge continuam separados desta resolução.
 
 ## Colaboradores
 
-1. SCRUM-313 — lista de colaboradores: branch `feat/SCRUM-313-lista-colaboradores-ui`, base `main` em `293e7b2`. UI implementada; build/lint aprovados, conferência visual pendente. Commit local autorizado pelo solicitante em 15/10.
-2. SCRUM-311 — detalhes do funcionário (pai SCRUM-257): branch `feat/SCRUM-311-detalhes-funcionario-ui`, empilhada na SCRUM-313 em `2cee85c`, commit local `e888e83`. Abertura pela lista e dados locais; sem API da SCRUM-312. Sem push ou PR.
-3. SCRUM-309 — eventos do funcionário selecionado (pai SCRUM-258): branch `feat/SCRUM-309-eventos-funcionario-ui` sobre a SCRUM-311 em `e888e83`. UI, três exemplos, filtro por estado e skeleton de 1s; sem API da SCRUM-310. Build/lint aprovados; commit local autorizado em 15/10/2026 para iniciar a SCRUM-301 como irmã sobre a SCRUM-311. Sem push ou PR. Conferência visual pendente.
+1. SCRUM-313 — lista de colaboradores: [PR #37](https://github.com/Astro-Inter/astro-mobile/pull/37), integrada à main em e2274d3.
+2. SCRUM-311 — detalhe do funcionário: [PR #38](https://github.com/Astro-Inter/astro-mobile/pull/38), integrada à main em f66cab2.
+3. SCRUM-309 — eventos do funcionário: [PR #39](https://github.com/Astro-Inter/astro-mobile/pull/39), integrada à main em fae427d.
+4. SCRUM-301 — conversa entre gestor e colaborador: [PR #40](https://github.com/Astro-Inter/astro-mobile/pull/40); integra a main fae427d e passa a ter base main. Manter Conversar e Ver pendências no detalhe, os dois destinos e o tratamento da navbar/teclado. Sem API nesta etapa.
 
-Publicar/mergear na ordem **SCRUM-313 → SCRUM-311 → SCRUM-309**. Após cada merge, atualizar `origin/main` e reaplicar somente os commits próprios da próxima branch sobre a main, conferindo o diff antes de trocar a base da PR. Registrar o SHA antigo de cada base; não mover todas as branches de uma vez.
+As branches SCRUM-309 e SCRUM-301 nasceram como irmãs da SCRUM-311; após os merges anteriores, a PR #40 deve comparar somente a conversa humana com a main atual.
 
 ## Eventos — fila independente
 
-1. SCRUM-285 — atribuição de conclusão: branch `feat/SCRUM-285-atribuicao-conclusao-ui`, commit local `85ba3e9`, ainda fora da main local consultada.
+1. SCRUM-285 — atribuição de conclusão: PR #36 integrada à main em ad0f6b4.
 2. SCRUM-289 — validação de conclusão: alterações preservadas, ainda sem commit.
 3. SCRUM-287 — visualização da evidência: integrada localmente à validação, ainda sem commit. Publicar depois da validação, mantendo cada tarefa separada.
 
@@ -29,4 +30,4 @@ Há um stash de SCRUM-307 (notificações) que precisa ser comparado à main ant
 - Em stacks, registrar o SHA antigo da base antes de rebase. Após squash/merge da base, preferir rebase `--onto` para retirar somente os commits herdados, sem duplicar alterações.
 - Não reescrever branch de colega nem sobrescrever mudanças remotas. Push com histórico reescrito exige aprovação específica e conferência do remoto.
 - Após cada merge confirmado, atualizar os cards correspondentes e conferir a sprint atual.
-- A autorização deste turno é para o commit local da SCRUM-313. Não inclui push, abertura de PR ou merge. Pedir autorização para essas ações quando chegarmos à publicação.
+- O solicitante autorizou commits, push e abertura de PRs nesta sequência. Essa autorização não substitui as aprovações da equipe; não mergear nesta resolução.
