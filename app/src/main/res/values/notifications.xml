@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="notifications_title">Notificações</string>
+    <string name="notifications_back">Voltar</string>
+    <string name="notifications_close">Fechar notificação</string>
+    <string name="notifications_search_hint">Pesquisar em Notificações</string>
+    <string name="notifications_search_action">Pesquisar</string>
+    <string name="notifications_empty">Nenhuma notificação encontrada</string>
+    <string name="notifications_time">Há 2h</string>
+    <string name="notifications_manager_validations">Você tem validações pendentes</string>
+    <string name="notifications_manager_form">Você tem um novo formulário para resolver</string>
+    <string name="notifications_employee_training">Lembrete de treinamento de EPI</string>
+    <string name="notifications_detail_title">Lembrete de treinamento de EPI</string>
+    <string name="notifications_manager_detail_body">Você tem 67 validações pendentes</string>
+    <string name="notifications_employee_detail_body" tools:ignore="Typos">Não se esqueça de participar do treinamento sobre o uso correto, conservação e responsabilidades relacionadas aos Equipamentos de Proteção Individual (EPI) no ambiente de trabalho.\n\nEsse treinamento é essencial para garantir a segurança de todos, promover boas práticas e assegurar que cada colaborador saiba utilizar os EPIs de forma adequada.</string>
+    <string name="notifications_open_event">Visualizar evento</string>
+    <string name="notifications_event_pending">A visualização do evento ainda não está disponível.</string>
+    <dimen name="notifications_detail_max_width">370dp</dimen>
+    <dimen name="notifications_employee_detail_height">385dp</dimen>
+    <dimen name="notifications_manager_sheet_bottom_padding">40dp</dimen>
+</resources>
