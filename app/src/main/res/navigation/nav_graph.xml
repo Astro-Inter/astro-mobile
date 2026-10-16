@@ -82,6 +82,10 @@
         app:launchSingleTop="true"
         app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
         app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    <action android:id="@+id/action_global_notifications" app:destination="@id/notificationsFragment"
+        app:launchSingleTop="true"
+        app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+        app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
 
     <action android:id="@+id/action_global_profile" app:destination="@id/profileFragment"
         app:launchSingleTop="true"
@@ -391,6 +395,11 @@
             app:popEnterAnim="@anim/push_pop_enter"
             app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.example.astro_mobile.notifications.NotificationsFragment"
+        android:label="Notificações" />
 
     <fragment android:id="@+id/managerHomeFragment"
         android:name="com.example.astro_mobile.manager.home.ManagerHomeFragment" android:label="Home do Gestor">
