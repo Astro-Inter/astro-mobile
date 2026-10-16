@@ -18,7 +18,7 @@ UI e mocks da subtarefa de [SCRUM-256](https://luizacursino.atlassian.net/browse
 3. Pesquise `eletricista`, `analista` ou `tech`, com diferenças de caixa/acentuação, para conferir o filtro de cargo. `Kevin` encontra os três; um termo inexistente mostra o estado vazio. Limpar a pesquisa mantém o filtro selecionado.
 4. A ação de pesquisa do teclado apenas fecha o teclado; não faz requisição.
 5. Voltar preserva a Home. O X retorna diretamente à Home do Gestor.
-6. Tocar em um exemplo dá feedback e informa que o detalhe pertence à próxima tarefa; não abre uma tela inventada.
+6. Na branch empilhada da SCRUM-311, tocar em um exemplo abre os detalhes do funcionário com a identidade do mock escolhido.
 
 ## Fidelidade e recursos
 
@@ -34,7 +34,7 @@ O contexto completo e o screenshot do Figma foram obtidos na consulta anterior. 
 
 Classes em `manager/staff`; `StaffViewModel` guarda estado/filtros, `StaffAdapter` preenche os itens e `StaffSamples` isola os mocks. Sem LiveData, Safe Args, nova Activity, Repository vazio, API ou Firebase. Contagens e cargos são apenas dados de exemplo, sem aplicar regras de domínio do backend.
 
-O detalhe de funcionário pertence à SCRUM-257 e os eventos desse funcionário à SCRUM-258; não foram implementados aqui. Integração da listagem na SCRUM-314.
+O detalhe de funcionário foi ligado na SCRUM-311, subtarefa de SCRUM-257, em branch empilhada; veja `docs/detalhes-funcionario.md`. Os eventos desse funcionário pertencem à SCRUM-258. Integração da listagem na SCRUM-314.
 
 ## Git
 

@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 
 import java.util.List;
 
@@ -82,11 +82,14 @@ public final class StaffFragment extends Fragment {
     }
 
     private void render(View view) {
-        // A próxima UI implementará o detalhe; tocar no mock apenas sinaliza essa pendência.
+        // Abre o detalhe do exemplo escolhido sem perder a pesquisa e o filtro da lista.
         List<StaffMember> members = state.visibleMembers();
         RecyclerView list = view.findViewById(R.id.list_staff);
-        list.setAdapter(new StaffAdapter(members, clicked ->
-                Toast.makeText(requireContext(), R.string.staff_details_pending, Toast.LENGTH_SHORT).show()));
+        list.setAdapter(new StaffAdapter(members, member -> {
+            Bundle args = AuthArgs.copy(getArguments());
+            args.putInt(StaffDetailsFragment.ARG_SAMPLE_INDEX, member.avatarIndex);
+            NavHostFragment.findNavController(this).navigate(R.id.action_staff_to_details, args);
+        }));
         list.setVisibility(members.isEmpty() ? View.GONE : View.VISIBLE);
         view.findViewById(R.id.text_staff_empty).setVisibility(members.isEmpty() ? View.VISIBLE : View.GONE);
         for (int index = 0; index < filterIds.length; index++) {

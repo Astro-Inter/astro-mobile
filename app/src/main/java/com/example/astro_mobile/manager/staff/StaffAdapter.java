@@ -12,14 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.astro_mobile.R;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.Row> {
     private final int[] avatars = {R.drawable.participant_avatar_1,
             R.drawable.participant_avatar_2, R.drawable.participant_avatar_3};
     private final List<StaffMember> members;
-    private final View.OnClickListener memberClick;
+    private final Consumer<StaffMember> memberClick;
 
-    public StaffAdapter(List<StaffMember> members, View.OnClickListener memberClick) {
+    public StaffAdapter(List<StaffMember> members, Consumer<StaffMember> memberClick) {
         this.members = members;
         this.memberClick = memberClick;
     }
@@ -41,7 +42,7 @@ public final class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.Row> {
                 ? row.itemView.getContext().getString(R.string.staff_no_pending)
                 : row.itemView.getResources().getQuantityString(R.plurals.staff_pending_count,
                         member.pendingCount, member.pendingCount));
-        row.button.setOnClickListener(memberClick);
+        row.button.setOnClickListener(clicked -> memberClick.accept(member));
     }
 
     @Override

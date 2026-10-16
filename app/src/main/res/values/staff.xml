@@ -8,5 +8,4 @@
         <item quantity="other">%1$d Pendências</item>
     </plurals>
     <string name="staff_empty_mock">Nenhum colaborador encontrado</string>
-    <string name="staff_details_pending">O detalhe do colaborador será implementado na próxima tarefa.</string>
 </resources>

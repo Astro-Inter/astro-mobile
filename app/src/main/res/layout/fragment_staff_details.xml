@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/astro_dark_background"
+    tools:context="com.example.astro_mobile.manager.staff.StaffDetailsFragment">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintWidth_max="@dimen/employee_home_content_max_width"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:id="@+id/header_staff_details" android:layout_width="0dp"
+            android:layout_height="80dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:baselineAligned="false" android:paddingHorizontal="20dp"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <ImageButton android:id="@+id/button_staff_details_back" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/conversations_back" android:paddingHorizontal="14dp"
+                android:paddingVertical="16dp" android:src="@drawable/ic_login_back" android:scaleType="fitCenter" />
+            <TextView style="@style/ProfileText" android:layout_width="0dp" android:layout_weight="1"
+                android:gravity="center" android:textSize="24sp" android:text="@string/staff_detail_title" />
+            <ImageButton android:id="@+id/button_staff_details_close" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/conversations_close" android:padding="14dp"
+                android:src="@drawable/conversations_close" android:scaleType="fitCenter" />
+        </LinearLayout>
+        <ScrollView android:id="@+id/scroll_staff_details" android:layout_width="0dp" android:layout_height="0dp"
+            android:clipToPadding="false" android:overScrollMode="ifContentScrolls"
+            app:layout_constraintTop_toBottomOf="@id/header_staff_details" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:paddingBottom="30dp">
+                <LinearLayout style="@style/ProfileField" android:minHeight="74dp" android:paddingHorizontal="30dp">
+                    <ImageView android:id="@+id/image_staff_details_avatar" android:layout_width="56dp"
+                        android:layout_height="56dp" android:src="@drawable/participant_avatar_1"
+                        android:contentDescription="@null" android:scaleType="fitCenter" android:layout_marginEnd="30dp" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:paddingVertical="10dp">
+                        <TextView android:id="@+id/text_staff_details_name" style="@style/ProfileText"
+                            android:textSize="24sp" android:textStyle="bold" tools:text="Kevin Parker" />
+                        <LinearLayout style="@style/ProfileField" android:layout_marginTop="5dp">
+                            <ImageView android:layout_width="20dp" android:layout_height="18dp"
+                                android:layout_marginEnd="10dp" android:src="@drawable/profile_user_group"
+                                android:contentDescription="@null" android:scaleType="fitCenter" />
+                            <TextView android:id="@+id/text_staff_details_role" style="@style/ProfileText"
+                                android:layout_width="0dp" android:layout_weight="1" android:textSize="16sp"
+                                android:textStyle="bold" android:textColor="@color/astro_input_hint" tools:text="Eletricista" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+                    <FrameLayout android:id="@+id/button_staff_details_chat" android:layout_width="match_parent"
+                        android:layout_marginHorizontal="30dp" android:layout_marginVertical="15dp"
+                        android:layout_height="wrap_content" android:minHeight="60dp" android:clickable="true"
+                        android:focusable="true" android:background="@drawable/bg_access_key_button">
+                        <TextView style="@style/ProfileText" android:layout_gravity="center"
+                            android:paddingVertical="18dp" android:layout_marginHorizontal="50dp"
+                            android:text="@string/staff_detail_chat" android:textSize="16sp" android:gravity="center" />
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp" android:layout_marginEnd="18dp"
+                            android:layout_gravity="end|center_vertical" android:src="@drawable/home_chat"
+                            android:contentDescription="@null" android:scaleType="fitCenter" />
+                    </FrameLayout>
+                <View style="@style/StaffDetailDivider" />
+                <LinearLayout style="@style/StaffDetailField">
+                    <ImageView android:layout_width="20dp" android:layout_height="18.2dp" android:layout_marginEnd="20dp"
+                        android:src="@drawable/profile_building" android:contentDescription="@null" android:scaleType="fitCenter" />
+                    <TextView style="@style/StaffDetailLabel" android:text="@string/profile_unit" />
+                    <TextView style="@style/StaffDetailValue" android:text="@string/staff_detail_unit_mock" />
+                </LinearLayout>
+                <View style="@style/StaffDetailDivider" />
+                <LinearLayout style="@style/StaffDetailField">
+                    <ImageView style="@style/ProfileFieldIcon" android:src="@drawable/profile_tag" android:contentDescription="@null" />
+                    <TextView style="@style/StaffDetailLabel" android:text="@string/profile_modality" />
+                    <TextView style="@style/StaffDetailValue" android:text="@string/staff_detail_modality_mock" />
+                </LinearLayout>
+                <View style="@style/StaffDetailDivider" />
+                <LinearLayout style="@style/StaffDetailField">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/ProfileFieldIcon"
+                        android:src="@drawable/ic_email_closed" app:tint="@color/astro_primary_purple" android:contentDescription="@null" />
+                    <TextView style="@style/StaffDetailLabel" android:text="@string/profile_email" />
+                    <TextView style="@style/StaffDetailValue" android:text="@string/staff_detail_email_mock" />
+                </LinearLayout>
+                <View style="@style/StaffDetailDivider" />
+                <LinearLayout style="@style/StaffDetailField">
+                    <androidx.appcompat.widget.AppCompatImageView style="@style/ProfileFieldIcon"
+                        android:layout_width="18.2dp" android:layout_height="18.2dp"
+                        android:src="@drawable/ic_employee_event_warning" app:tint="@color/astro_primary_purple" android:contentDescription="@null" />
+                    <TextView style="@style/StaffDetailLabel" android:text="@string/staff_detail_pending_events" />
+                    <TextView android:id="@+id/text_staff_details_pending" style="@style/StaffDetailValue" tools:text="3" />
+                </LinearLayout>
+                <View style="@style/StaffDetailDivider" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:padding="30dp" android:orientation="vertical">
+                    <TextView android:id="@+id/text_staff_details_nrs_title" style="@style/ProfileText"
+                        android:textSize="24sp" tools:text="NR’s de Kevin Parker" />
+                    <TextView style="@style/ProfileText" android:layout_marginTop="5dp"
+                        android:textColor="@color/astro_input_hint" android:textSize="16sp"
+                        android:text="@string/staff_detail_nrs_description" />
+                </LinearLayout>
+                <!-- Lista curta: as NRs expandidas acompanham a rolagem e não cobrem as seguintes. -->
+                <LinearLayout android:id="@+id/list_staff_details_nrs" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="30dp">
+                    <include layout="@layout/item_profile_nr" android:visibility="gone" tools:visibility="visible" />
+                    <include layout="@layout/item_profile_nr" android:visibility="gone" tools:visibility="visible" />
+                    <include layout="@layout/item_profile_nr" android:visibility="gone" tools:visibility="visible" />
+                </LinearLayout>
+                    <FrameLayout android:id="@+id/button_staff_details_pending" android:layout_width="match_parent"
+                        android:layout_marginHorizontal="30dp" android:layout_marginTop="10dp" android:layout_marginBottom="20dp"
+                        android:layout_height="wrap_content" android:minHeight="60dp" android:clickable="true"
+                        android:focusable="true" android:background="@drawable/bg_access_key_button">
+                        <TextView style="@style/ProfileText" android:layout_gravity="center"
+                            android:paddingVertical="18dp" android:layout_marginHorizontal="50dp"
+                            android:text="@string/staff_detail_view_pending" android:textSize="16sp" android:gravity="center" />
+                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:layout_marginEnd="18dp"
+                            android:layout_gravity="end|center_vertical" android:src="@drawable/ic_arrow_right"
+                            android:contentDescription="@null" android:scaleType="fitCenter" />
+                    </FrameLayout>
+            </LinearLayout>
+        </ScrollView>
+        <!-- Oculto no editor; exibido somente durante o carregamento mock. -->
+        <include android:id="@+id/skeleton_staff_details" layout="@layout/view_profile_skeleton"
+            android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" tools:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/header_staff_details" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
