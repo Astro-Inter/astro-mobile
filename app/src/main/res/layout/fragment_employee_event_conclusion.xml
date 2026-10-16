@@ -14,7 +14,7 @@
             <ImageView android:layout_width="144dp" android:layout_height="144dp"
                 android:src="@drawable/employee_event_confirmation" android:scaleType="fitCenter"
                 android:contentDescription="@null" android:importantForAccessibility="no" />
-            <TextView style="@style/EmployeeEventDetailsText" android:layout_marginTop="35dp"
+            <TextView android:id="@+id/text_event_confirmation" style="@style/EmployeeEventDetailsText" android:layout_marginTop="35dp"
                 android:textSize="24sp" android:gravity="center" android:text="@string/employee_event_conclusion" />
         </LinearLayout>
     </ScrollView>

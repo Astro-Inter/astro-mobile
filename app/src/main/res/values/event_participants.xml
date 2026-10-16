@@ -12,7 +12,6 @@
     <string name="participants_validated_status">Validação feita</string>
     <string name="participants_assigned_status">Conclusão atribuída</string>
     <string name="participants_empty_mock">Nenhum participante encontrado</string>
-    <string name="participants_validation_pending">A tela de validação será implementada em uma tarefa própria. Nenhuma conclusão foi alterada.</string>
 
     <style name="ParticipantSkeletonRow">
         <item name="android:layout_width">match_parent</item>
