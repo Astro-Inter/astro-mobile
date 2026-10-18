@@ -1,51 +1,115 @@
 package com.example.astro_mobile.notifications;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.example.astro_mobile.notifications.mock.NotificationSamples;
+import com.example.astro_mobile.data.api.NotificationsRepository;
+import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.dto.NotificationData;
 
+import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class NotificationsViewModel extends ViewModel {
-    private List<NotificationItem> notifications = Collections.emptyList();
+    public interface ResultCallback {
+        void onSuccess(List<NotificationData> notifications);
+        void onFailure(FailureKind failure);
+    }
+
+    private final NotificationsRepository repository;
+    private List<NotificationData> notifications = Collections.emptyList();
     private String searchQuery = "";
-    private boolean managerFlow;
-    private boolean configured;
-    private boolean loaded;
+    private boolean loading;
+    private int requestId;
+    private ResultCallback pendingCallback;
 
-    // Mantém a busca e as amostras enquanto o Fragment recria sua interface.
-    public void configure(boolean isManagerFlow) {
-        if (configured && managerFlow == isManagerFlow) return;
-        loaded = false;
-        managerFlow = isManagerFlow;
-        notifications = managerFlow
-                ? NotificationSamples.forManager() : NotificationSamples.forEmployee();
-        searchQuery = "";
-        configured = true;
+    public NotificationsViewModel(NotificationsRepository repository) {
+        this.repository = repository;
     }
 
-    public List<NotificationItem> getNotifications() {
-        return notifications;
+    public List<NotificationData> getNotifications() { return notifications; }
+    public boolean isLoading() { return loading; }
+    public String getSearchQuery() { return searchQuery; }
+    public void setSearchQuery(String query) { searchQuery = query; }
+
+    public List<NotificationData> visibleNotifications() {
+        // Mantém a lista recebida intacta e aplica a pesquisa no estado da tela.
+        List<NotificationData> visible = new ArrayList<>();
+        String query = normalize(searchQuery.trim());
+        for (NotificationData notification : notifications) {
+            if (normalize(notification.getTitle()).contains(query)) visible.add(notification);
+        }
+        return visible;
     }
 
-    public String getSearchQuery() {
-        return searchQuery;
+    private String normalize(String value) {
+        return Normalizer.normalize(value, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
     }
 
-    public void setSearchQuery(String query) {
-        searchQuery = query;
+    public void load(ResultCallback callback) {
+        if (loading) return;
+        loading = true;
+        notifications = Collections.emptyList();
+        pendingCallback = callback;
+        int id = ++requestId;
+        repository.load(new NotificationsRepository.ResultCallback() {
+            @Override
+            public void onSuccess(List<NotificationData> result) {
+                ResultCallback current = finishRequest(id);
+                if (current == null) return;
+                notifications = result;
+                current.onSuccess(result);
+            }
+
+            @Override
+            public void onFailure(FailureKind failure) {
+                ResultCallback current = finishRequest(id);
+                if (current != null) current.onFailure(failure);
+            }
+        });
     }
 
-    public boolean isManagerFlow() {
-        return managerFlow;
+    private ResultCallback finishRequest(int id) {
+        if (id != requestId || !loading) return null;
+        loading = false;
+        ResultCallback callback = pendingCallback;
+        pendingCallback = null;
+        return callback;
     }
 
-    public boolean isLoaded() {
-        return loaded;
+    public void cancel() {
+        ++requestId;
+        // Libera o callback da View antes de cancelar token/HTTP e descarta dados da entrada anterior.
+        pendingCallback = null;
+        loading = false;
+        notifications = Collections.emptyList();
+        repository.cancel();
     }
 
-    public void markLoaded() {
-        loaded = true;
+    @Override
+    protected void onCleared() { cancel(); }
+
+    public static final class Factory implements ViewModelProvider.Factory {
+        private final NotificationsRepository repository;
+
+        public Factory(NotificationsRepository repository) { this.repository = repository; }
+
+        public static Factory createDefault() {
+            return new Factory(NotificationsRepository.createDefault());
+        }
+
+        @NonNull
+        @Override
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            if (!modelClass.isAssignableFrom(NotificationsViewModel.class)) {
+                throw new IllegalArgumentException("Unknown ViewModel: " + modelClass.getName());
+            }
+            return modelClass.cast(new NotificationsViewModel(repository));
+        }
     }
 }

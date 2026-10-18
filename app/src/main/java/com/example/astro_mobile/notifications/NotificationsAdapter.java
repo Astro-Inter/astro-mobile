@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.data.api.dto.NotificationData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +18,15 @@ import java.util.List;
 public final class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.NotificationViewHolder> {
     private final boolean managerFlow;
     private final OnNotificationClickListener clickListener;
-    private final List<NotificationItem> notifications = new ArrayList<>();
+    private final List<NotificationData> notifications = new ArrayList<>();
 
     public NotificationsAdapter(boolean managerFlow, OnNotificationClickListener clickListener) {
         this.managerFlow = managerFlow;
         this.clickListener = clickListener;
     }
 
-    // Troca a lista visível depois da busca local.
-    public void submit(List<NotificationItem> items) {
+    // Troca a lista visível depois da consulta ou da busca local.
+    public void submit(List<NotificationData> items) {
         notifications.clear();
         notifications.addAll(items);
         notifyDataSetChanged();
@@ -48,11 +49,13 @@ public final class NotificationsAdapter extends RecyclerView.Adapter<Notificatio
 
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
-        NotificationItem notification = notifications.get(position);
-        holder.title.setText(notification.title);
-        holder.time.setText(notification.time);
-        holder.unreadDot.setVisibility(notification.unread ? View.VISIBLE : View.INVISIBLE);
-        holder.itemView.setOnClickListener(clicked -> clickListener.onNotificationClick(notification));
+        NotificationData notification = notifications.get(position);
+        holder.title.setText(notification.getTitle());
+        holder.time.setText(holder.itemView.getContext().getString(notification.getHours() == 0
+                ? R.string.notifications_recent : R.string.notifications_hours, notification.getHours()));
+        holder.unreadDot.setVisibility(notification.isViewed() ? View.INVISIBLE : View.VISIBLE);
+        holder.itemView.findViewById(R.id.container_notification_row)
+                .setOnClickListener(clicked -> clickListener.onNotificationClick(notification));
     }
 
     @Override
@@ -61,7 +64,7 @@ public final class NotificationsAdapter extends RecyclerView.Adapter<Notificatio
     }
 
     public interface OnNotificationClickListener {
-        void onNotificationClick(NotificationItem notification);
+        void onNotificationClick(NotificationData notification);
     }
 
     static final class NotificationViewHolder extends RecyclerView.ViewHolder {
