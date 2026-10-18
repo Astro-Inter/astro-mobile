@@ -7,6 +7,7 @@ import com.example.astro_mobile.data.api.dto.VerifyEmailRequest;
 import com.example.astro_mobile.data.api.dto.VerifyKeyRequest;
 import com.example.astro_mobile.data.api.dto.UserProfileData;
 import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
+import com.example.astro_mobile.data.api.dto.ManagerHomeData;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -19,6 +20,10 @@ import retrofit2.http.PUT;
 import okhttp3.MultipartBody;
 
 public interface AstroApi {
+    @GET("home/manager")
+    Call<ApiResponse<ManagerHomeData>> getManagerHome(
+            @Header("Authorization") String authorization);
+
     @GET("home/collaborator")
     Call<ApiResponse<CollaboratorHomeData>> getCollaboratorHome(
             @Header("Authorization") String authorization);

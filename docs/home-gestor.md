@@ -1,80 +1,70 @@
-# Home do Gestor — UI (SCRUM-340)
+# Home do Gestor — integração (SCRUM-582)
 
-## Escopo
+A Home consulta `GET /home/manager` com `Authorization: Bearer <Firebase ID token>`.
+O contrato foi conferido no controller, DTOs e service da [API Astro](https://github.com/Astro-Inter/astro-api/tree/main/src/main/java/com/astro/api/home).
+O endpoint exige uma conta ativa com papel GESTOR ou GESTOR_WORKSPACE; não recebe IDs de usuário ou workspace pela interface.
 
-Subtarefa de UI da SCRUM-243. Referência: App V2, frame `2590:12241` do Figma Astro.
-Implementação em `manager/home/ManagerHomeFragment` e `fragment_manager_home.xml`.
-Nome, workspace, contagens e prévias vêm de mocks identificados em `manager_home_strings.xml`.
-Nenhum endpoint da Home foi inventado ou implementado; a integração fica para a SCRUM-341.
+## Dados exibidos
 
-## Comportamento
+| Campo da API | Uso na Home |
+| --- | --- |
+| `username` | Saudação, com o nome em negrito |
+| `workspace_name` | Nome do workspace |
+| `pending_validations` | Prévia de colaborador, título do evento e Novo/Visto |
+| `pending_forms` | Prévia de título do formulário, prazo e ícone de estado |
+| `indicators.current_events` | Eventos em seu nome ocorrendo |
+| `indicators.pending_validations` | Total de validações pendentes |
+| `indicators.collaborators_with_pending_events` | Colaboradores com pendências em seus eventos atuais |
 
-- Escolher Gestor abre esta Home; escolher Colaborador preserva a Home existente.
-- Skeleton simula 1 segundo sem bloquear a interface e faz um dissolve de 250ms.
-  Fica oculto no XML para visualizar a Home no editor. Ao retornar de outra tela, não repete a espera na mesma instância.
-- Atalho Conversar e aba Chat abrem a mesma listagem; o mascote abre diretamente a IA existente.
-- A listagem usa o texto do frame `3272:11270`: “Acesse aqui as suas conversas com os colaboradores”.
-  Quando o Gestor escolhe atuar como Colaborador, volta ao texto do fluxo de Colaborador.
-- Perfil, alteração de senha e logout reutilizam a implementação da SCRUM-255.
-  A navbar continua na Activity, fora das transições dos Fragments.
-- O assistente reutiliza `shared/home/HomeAiBubble` nas duas Homes: texto aberto por 3 segundos,
-  recolhimento para a direita em 500ms e arraste limitado entre cabeçalho e navbar.
-  Ao retornar à Home, reabre o texto; ao sair, cancela os callbacks e animações.
-- O último fluxo escolhido é mantido como preferência de interface e limpo no logout.
-  Não substitui o tipo da conta, a sessão Firebase nem a autorização do backend.
-- Validações, formulários, colaboradores e notificações exibem apenas o aviso de funcionalidade pendente.
-  As prévias têm feedback de clique, mas não abrem telas inexistentes.
+As contagens vêm dos indicadores, independentemente da quantidade de itens das prévias.
+As listas são montadas a partir da resposta; não há linhas de exemplo em execução.
+Listas nulas ou vazias exibem mensagens independentes e ocultam o respectivo Ver mais.
+Nome/workspace ausentes ou vazios e indicadores ausentes ou negativos são tratados como resposta inválida.
 
-## Estrutura e adaptação
+`days_left` é calculado pela API em dias de calendário no fuso America/Sao_Paulo.
+A Home mostra Sem prazo para null, Prazo encerrado para negativos, Vence hoje para zero,
+Resta 1 dia para um e Restam N dias para os demais.
+O ícone de alerta tem prioridade quando faltam até dois dias, incluindo prazos vencidos;
+fora dessa condição, itens não visualizados usam Novo e itens vistos mantêm a coluna sem ícone.
 
-Atalhos têm rolagem horizontal; prévias e indicadores usam altura flexível e textos com quebra de linha.
-A largura máxima e a tipografia reutilizam os recursos de telefone/tablet já existentes.
-As prévias são seis itens curtos dentro da rolagem da Home, não uma lista paginada de API.
-O ícone Notes veio do Figma e foi convertido em VectorDrawable, sem duplicata PNG.
+## Carregamento e autenticação
 
-Para a integração, substituir os mocks por dados do ViewModel/Repository e retirar o atraso artificial.
-Não foi criado ViewModel ou Repository vazio para uma UI estática.
+- O skeleton acompanha a requisição real, sem atraso artificial; o dissolve de 250 ms foi mantido.
+- A consulta é refeita ao abrir ou retomar a Home, inclusive ao voltar de outra tela.
+- Uma resposta 401 força a renovação do token e repete a consulta uma única vez. Outro 401 encerra a sessão.
+- HTTP 403/404 mostram indisponibilidade de acesso, sem encerrar a sessão.
+- Falhas de conexão, resposta inválida e erros do serviço exibem mensagem e Tentar novamente.
+- O cliente compartilhado mantém o limite total de 15 segundos, inclusive na inicialização do Render.
+- Ao pausar ou destruir a tela, a consulta e as animações são canceladas; callbacks antigos são descartados.
+- O assistente compartilhado aparece depois da resposta e mantém arraste/recolhimento e acesso à IA.
 
-### Ajustes visuais de 2026-10-07
+## Navegação e limites
 
-- Cabeçalhos roxos usam setas explícitas de 20dp junto ao texto e ícones de 18dp à direita.
-- As prévias do Gestor usam `item_manager_home_feed_row`, com altura livre para títulos longos,
-  status em uma linha e espaço de ícone reservado mesmo quando não há ícone.
-- Indicadores mantêm altura mínima de 117dp, cartões pareados com a mesma altura e rótulos na base.
-- Removido um contêiner redundante; retirados o logout provisório da Home do Colaborador e suas referências sem uso.
-  O logout real no Perfil permanece intacto.
-- `assembleDebug` e `lintDebug` aprovados, sem erros de lint. A instalação desta revisão não foi possível:
-  o Samsung desconectou. Conferência visual da Home autenticada ainda pendente; nenhum emulador foi usado.
+Conversas, notificações, colaboradores, formulários, IA e navbar mantêm os destinos existentes.
+As prévias de formulários abrem a lista atual de formulários, cuja integração é uma tarefa separada.
+Validações ainda mostram o aviso de funcionalidade pendente: as telas de validação existentes usam dados locais,
+e os IDs reais da Home não são vinculados a esses exemplos. Nenhuma conclusão, rejeição ou marcação de visto é enviada.
+Esta tarefa integra somente a leitura da Home.
 
-## Base Git e revisão
+## Estrutura
 
-Branch: `feat/SCRUM-340-home-gestor-ui`, na worktree `home-gestor-ui`.
-Alinhada por fast-forward ao commit `a290f8b` do Perfil (PR #24), em 2026-10-09.
-O snapshot anterior foi preservado em stash, e somente o delta da Home foi reaplicado.
-Cadastro Firebase/ativação e sessões da IA atuais permanecem intactos.
-A PR da Home tem como base `feat/SCRUM-255-perfil-usuario`, sem repetir o diff do Perfil.
-Não mergear a Home na branch do Perfil: aguardar a PR #24 entrar na main e então atualizar
-a base da PR da Home para main, alinhando o histórico se necessário.
+- `data/api/AstroApi`: rota Retrofit.
+- `data/api/dto/ManagerHomeData`: contrato com campos em snake_case, IDs numéricos para validações e textuais para formulários.
+- `data/api/ManagerHomeRepository`: token, consulta, renovação, validação da resposta e cancelamento.
+- `manager/home/ManagerHomeFragment`: apresentação e ciclo de vida, seguindo a integração da Home do Colaborador.
+- `fragment_manager_home.xml`: listas dinâmicas, estados vazios e nova tentativa; dados de exemplo somente no editor.
+- `ManagerHomeRepositoryTest`: contrato HTTP/JSON com respostas locais, prazos, indicadores, autenticação, erros e descarte de callbacks.
 
-### Validação para a PR — 2026-10-09
+## Validação em 18/10/2026
 
-- `assembleDebug`, `lintDebug` e `testDebugUnitTest` aprovados: 20 testes, sem falhas.
-- Lint sem erros; 76 avisos no projeto, sendo cinco nos novos layouts
-  (pesos aninhados, possíveis fundos sobrepostos e quantidade de Views).
-- Recursos novos referenciados e sem duplicatas por hash; diff sem conflitos ou erros de whitespace.
-- Chat, sessões e confirmação de encerramento usam o ViewModel da Home do fluxo ativo.
-- Nenhum novo teste, emulador ou instalação executado nesta preparação.
+`assembleDebug`, `lintDebug` e `testDebugUnitTest` aprovados: 50 testes, incluindo 12 novos
+da Home do Gestor, sem falhas; lint sem erros e com 111 avisos no projeto.
+XMLs bem formados e diff sem erros de whitespace. APK debug gerado, sem instalação nesta tarefa.
+A execução local usou Java 25 e TEMP/TMP em `app/build/tmp` para evitar o limite de caminho
+dos sockets locais do Java no diretório temporário do ambiente; nenhuma configuração do projeto foi alterada para isso.
 
-Revisão estática: XMLs bem formados, referências locais de recursos resolvidas,
-classes dos destinos presentes e diff sem erros de whitespace.
-A implementação inicial foi entregue sem build ou instalação, conforme o pedido daquele turno.
-Em 2026-10-07, após autorização de instalação, assembleDebug passou e a APK foi instalada
-no Samsung SM-A566E com atualização sem apagar os dados do app. Não houve abertura,
-testes de navegação ou uso do emulador. Validação visual e de execução em telefone/tablet continuam pendentes.
+## Validação manual pendente
 
-## Integração com a main — 2026-10-10
-
-A branch feat/SCRUM-255-perfil-usuario incorporou a main ed742e1 por merge.
-As seções de base Git acima registram a preparação anterior das PRs.
-Nesta branch, Perfil, alteração de senha e logout permanecem integrados;
-a navegação também inclui Eventos do Colaborador e as telas de erro atuais da main.
+Com uma conta real de gestor, conferir nome/workspace, indicadores, prévias, estados vazios e prazos.
+Verificar nova tentativa após desconexão, retorno à Home, ações rápidas e assistente.
+Build, testes locais e lint não substituem essa conferência autenticada no aparelho.
