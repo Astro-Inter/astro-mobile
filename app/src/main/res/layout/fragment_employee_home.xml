@@ -67,7 +67,8 @@
             android:clipToPadding="false"
             android:fillViewport="true"
             android:overScrollMode="ifContentScrolls"
-            android:visibility="visible"
+            android:visibility="invisible"
+            tools:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -94,7 +95,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_family"
                         android:includeFontPadding="false"
-                        android:text="@string/employee_home_greeting"
+                        tools:text="@string/employee_home_greeting"
                         android:textColor="@color/astro_light_background"
                         android:textSize="@dimen/employee_home_heading_text_size" />
 
@@ -133,7 +134,8 @@
                             android:layout_weight="1"
                             android:fontFamily="@font/montserrat_family"
                             android:includeFontPadding="false"
-                            android:text="@string/employee_home_workspace"
+                            android:id="@+id/text_employee_home_workspace"
+                            tools:text="@string/employee_home_workspace"
                             android:textColor="@color/astro_light_background"
                             android:textSize="@dimen/employee_home_body_text_size" />
 
@@ -248,7 +250,8 @@
                                 android:layout_weight="1"
                                 android:fontFamily="@font/montserrat_family"
                                 android:includeFontPadding="false"
-                                android:text="@string/employee_home_pending_count"
+                                android:id="@+id/text_employee_home_pending_count"
+                                tools:text="@string/employee_home_pending_count"
                                 android:textColor="@color/astro_light_background"
                                 android:textSize="@dimen/employee_home_heading_text_size" />
 
@@ -300,7 +303,8 @@
                                 android:layout_weight="1"
                                 android:fontFamily="@font/montserrat_family"
                                 android:includeFontPadding="false"
-                                android:text="@string/employee_home_review_count"
+                                android:id="@+id/text_employee_home_review_count"
+                                tools:text="@string/employee_home_review_count"
                                 android:textColor="@color/astro_light_background"
                                 android:textSize="@dimen/employee_home_heading_text_size" />
 
@@ -352,7 +356,8 @@
                                 android:layout_weight="1"
                                 android:fontFamily="@font/montserrat_family"
                                 android:includeFontPadding="false"
-                                android:text="@string/employee_home_completed_count"
+                                android:id="@+id/text_employee_home_completed_count"
+                                tools:text="@string/employee_home_completed_count"
                                 android:textColor="@color/astro_light_background"
                                 android:textSize="@dimen/employee_home_heading_text_size" />
 
@@ -628,6 +633,37 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/container_employee_home_error"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="30dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/container_employee_home_header"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/text_employee_home_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_family"
+                android:gravity="center"
+                android:accessibilityLiveRegion="polite"
+                android:textColor="@color/astro_light_background"
+                android:textSize="@dimen/employee_home_body_text_size" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_employee_home_retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/employee_home_retry" />
+        </LinearLayout>
 
         <include
             android:id="@+id/container_employee_home_skeleton"
