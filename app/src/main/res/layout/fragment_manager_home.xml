@@ -79,7 +79,7 @@
                     <TextView
                         android:id="@+id/text_manager_home_greeting"
                         style="@style/ManagerHomeText.Heading"
-                        android:text="@string/manager_home_greeting" />
+                        tools:text="Olá, Bruno Baptista" />
                     <TextView
                         style="@style/ManagerHomeText.Subtitle"
                         android:text="@string/manager_home_summary" />
@@ -107,7 +107,7 @@
                         style="@style/ManagerHomeText"
                         android:layout_width="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:text="@string/manager_home_workspace_name" />
+                        tools:text="Welker’s" />
                 </LinearLayout>
                 <View style="@style/ManagerHomeDivider" />
                 <LinearLayout
@@ -259,15 +259,18 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-                <include
-                    android:id="@+id/row_manager_validations_1"
-                    layout="@layout/item_manager_home_feed_row" />
-                <include
-                    android:id="@+id/row_manager_validations_2"
-                    layout="@layout/item_manager_home_feed_row" />
-                <include
-                    android:id="@+id/row_manager_validations_3"
-                    layout="@layout/item_manager_home_feed_row" />
+                <LinearLayout
+                    android:id="@+id/list_manager_home_validations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+                <TextView
+                    android:id="@+id/text_manager_home_validations_empty"
+                    style="@style/ManagerHomeText"
+                    android:paddingHorizontal="30dp"
+                    android:paddingVertical="20dp"
+                    android:visibility="gone"
+                    android:text="@string/manager_home_validations_empty" />
                 <TextView
                     android:id="@+id/button_manager_home_validations_more"
                     style="@style/ManagerHomeMore" />
@@ -309,15 +312,18 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-                <include
-                    android:id="@+id/row_manager_forms_1"
-                    layout="@layout/item_manager_home_feed_row" />
-                <include
-                    android:id="@+id/row_manager_forms_2"
-                    layout="@layout/item_manager_home_feed_row" />
-                <include
-                    android:id="@+id/row_manager_forms_3"
-                    layout="@layout/item_manager_home_feed_row" />
+                <LinearLayout
+                    android:id="@+id/list_manager_home_forms"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+                <TextView
+                    android:id="@+id/text_manager_home_forms_empty"
+                    style="@style/ManagerHomeText"
+                    android:paddingHorizontal="30dp"
+                    android:paddingVertical="20dp"
+                    android:visibility="gone"
+                    android:text="@string/manager_home_forms_empty" />
                 <TextView
                     android:id="@+id/button_manager_home_forms_more"
                     style="@style/ManagerHomeMore" />
@@ -362,7 +368,7 @@
                                 style="@style/ManagerHomeText.Heading"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:text="@string/manager_home_validation_count" />
+                                tools:text="15" />
                             <androidx.appcompat.widget.AppCompatImageView
                                 style="@style/ManagerHomeIcon"
                                 android:src="@drawable/home_eye" />
@@ -395,7 +401,7 @@
                                 style="@style/ManagerHomeText.Heading"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:text="@string/manager_home_event_count" />
+                                tools:text="3" />
                             <androidx.appcompat.widget.AppCompatImageView
                                 style="@style/ManagerHomeIcon"
                                 android:src="@drawable/home_calendar" />
@@ -431,7 +437,7 @@
                             style="@style/ManagerHomeText.Heading"
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:text="@string/manager_home_employee_count" />
+                            tools:text="34" />
                         <androidx.appcompat.widget.AppCompatImageView
                             style="@style/ManagerHomeIcon"
                             android:src="@drawable/profile_user_group" />
@@ -446,6 +452,34 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
+        <LinearLayout
+            android:id="@+id/container_manager_home_error"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="30dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/header_manager_home"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <TextView
+                android:id="@+id/text_manager_home_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_family"
+                android:gravity="center"
+                android:accessibilityLiveRegion="polite"
+                android:textColor="@color/astro_light_background"
+                android:textSize="@dimen/employee_home_body_text_size" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_manager_home_retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/manager_home_retry" />
+        </LinearLayout>
         <include
             android:id="@+id/container_manager_home_skeleton"
             layout="@layout/view_manager_home_skeleton"
