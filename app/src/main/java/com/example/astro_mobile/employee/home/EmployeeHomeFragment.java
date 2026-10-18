@@ -1,10 +1,11 @@
 package com.example.astro_mobile.employee.home;
 
 import android.animation.ValueAnimator;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,44 +21,28 @@ import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.SessionNavigation;
+import com.example.astro_mobile.data.api.CollaboratorHomeRepository;
+import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
 import com.example.astro_mobile.shared.home.HomeAiBubble;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class EmployeeHomeFragment extends Fragment {
 
-    private static final String STATE_EMPTY_PREVIEW = "empty_preview";
-    private static final long HOME_MOCK_LOAD_MS = 2_000L;
     private static final long SKELETON_PULSE_MS = 900L;
-
-    private static final MockRow[] EVENT_ROWS = {
-            new MockRow(R.string.employee_home_training, R.string.employee_home_due_tomorrow,
-                    R.string.employee_home_urgent, R.drawable.home_warning),
-            new MockRow(R.string.employee_home_training, R.string.employee_home_due_date,
-                    R.string.employee_home_new, R.drawable.home_new),
-            new MockRow(R.string.employee_home_training, R.string.employee_home_due_date,
-                    R.string.employee_home_pending, 0)
-    };
-
-    private static final MockRow[] NOTIFICATION_ROWS = {
-            new MockRow(R.string.employee_home_notification_item, 0,
-                    R.string.employee_home_notification_time, R.drawable.home_new),
-            new MockRow(R.string.employee_home_notification_item, 0,
-                    R.string.employee_home_notification_time, 0),
-            new MockRow(R.string.employee_home_notification_item, 0,
-                    R.string.employee_home_notification_time, 0)
-    };
-
-    private boolean emptyPreview;
+    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private CollaboratorHomeRepository repository;
     private boolean homeReady;
     private View aiBubble;
     private TextView aiBubbleText;
     private View homeContent;
     private View homeSkeleton;
     private HomeAiBubble assistant;
-    private Runnable finishHomeLoading;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private ValueAnimator skeletonPulseAnimator;
-    private long homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
-    private long homeLoadingStartedAtMs;
 
     public EmployeeHomeFragment() {
         super(R.layout.fragment_employee_home);
@@ -68,37 +52,15 @@ public class EmployeeHomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        emptyPreview = savedInstanceState != null
-                && savedInstanceState.getBoolean(STATE_EMPTY_PREVIEW);
-
-        // Preenche eventos e notificações com dados de demonstração.
-        addRows(view.findViewById(R.id.list_employee_home_events), EVENT_ROWS);
-        addRows(view.findViewById(R.id.list_employee_home_notifications), NOTIFICATION_ROWS);
-        showPreview(view);
-
-        // Mostra o skeleton antes do conteúdo enquanto simula o carregamento.
+        repository = CollaboratorHomeRepository.createDefault();
         homeContent = view.findViewById(R.id.scroll_employee_home);
         homeSkeleton = view.findViewById(R.id.container_employee_home_skeleton);
-        homeReady = false;
-        homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
-        homeContent.setAlpha(0f);
-        homeContent.setVisibility(View.INVISIBLE);
-        homeSkeleton.setAlpha(1f);
-        homeSkeleton.setVisibility(View.VISIBLE);
+        view.findViewById(R.id.button_employee_home_retry).setOnClickListener(clicked -> loadHome());
 
         aiBubble = view.findViewById(R.id.button_employee_home_ai_bubble);
         aiBubbleText = view.findViewById(R.id.text_employee_home_ai_bubble);
         aiBubble.setVisibility(View.GONE);
 
-        // Um toque longo no cumprimento alterna os estados de demonstração da Home.
-        view.findViewById(R.id.text_employee_home_greeting).setOnLongClickListener(pressed -> {
-            emptyPreview = !emptyPreview;
-            showPreview(view);
-            view.findViewById(R.id.scroll_employee_home).scrollTo(0, 0);
-            return true;
-        });
-
-        // Os destinos de notificação abrem a lista mockada.
         int[] notificationActions = {
                 R.id.button_employee_home_notifications,
                 R.id.button_employee_home_notifications_section,
@@ -132,23 +94,12 @@ public class EmployeeHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Ao retornar, continua o carregamento ou reabre o balão se a Home já estiver pronta.
-        if (homeReady) {
-            assistant.showTemporarily();
-        } else {
-            startMockHomeLoad();
-        }
+        loadHome();
     }
 
     @Override
     public void onPause() {
-        // Pausa o tempo restante do skeleton e esconde o balão ao deixar a Home.
-        if (!homeReady && finishHomeLoading != null) {
-            mainHandler.removeCallbacks(finishHomeLoading);
-            homeLoadingRemainingMs = Math.max(0L, homeLoadingRemainingMs
-                    - (SystemClock.uptimeMillis() - homeLoadingStartedAtMs));
-            finishHomeLoading = null;
-        }
+        repository.cancel();
         stopSkeletonPulse();
         finishHomeRevealIfNeeded();
         if (assistant != null) assistant.hide();
@@ -157,11 +108,7 @@ public class EmployeeHomeFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        // Cancela tarefas e animações ligadas às Views antes de descartá-las.
-        if (finishHomeLoading != null) {
-            mainHandler.removeCallbacks(finishHomeLoading);
-            finishHomeLoading = null;
-        }
+        repository.cancel();
         stopSkeletonPulse();
         if (homeContent != null) {
             homeContent.animate().cancel();
@@ -176,23 +123,45 @@ public class EmployeeHomeFragment extends Fragment {
         homeContent = null;
         homeSkeleton = null;
         homeReady = false;
-        homeLoadingRemainingMs = HOME_MOCK_LOAD_MS;
         super.onDestroyView();
     }
 
-    private void startMockHomeLoad() {
-        // Espera o tempo restante da simulação antes de revelar a Home.
-        if (homeReady || homeSkeleton == null || finishHomeLoading != null) {
-            return;
-        }
+    private void loadHome() {
+        View view = getView();
+        if (view == null) return;
+        homeReady = false;
+        homeContent.animate().cancel();
+        homeSkeleton.animate().cancel();
+        homeContent.setVisibility(View.INVISIBLE);
+        homeSkeleton.setAlpha(1f);
+        homeSkeleton.setVisibility(View.VISIBLE);
+        view.findViewById(R.id.container_employee_home_error).setVisibility(View.GONE);
+        assistant.hide();
         startSkeletonPulse();
-        homeLoadingStartedAtMs = SystemClock.uptimeMillis();
-        finishHomeLoading = () -> {
-            finishHomeLoading = null;
-            homeLoadingRemainingMs = 0L;
-            revealHome();
-        };
-        mainHandler.postDelayed(finishHomeLoading, homeLoadingRemainingMs);
+        repository.load(new CollaboratorHomeRepository.ResultCallback() {
+            @Override
+            public void onSuccess(CollaboratorHomeData home) {
+                if (getView() != view || !isResumed()) return;
+                bindHome(view, home);
+                revealHome();
+            }
+
+            @Override
+            public void onFailure(FailureKind failure) {
+                if (getView() != view || !isResumed()) return;
+                stopSkeletonPulse();
+                homeSkeleton.setVisibility(View.GONE);
+                if (failure == FailureKind.SESSION) {
+                    SessionNavigation.signOut(EmployeeHomeFragment.this);
+                    return;
+                }
+                TextView message = view.findViewById(R.id.text_employee_home_error);
+                message.setText(failure == FailureKind.CONNECTION ? R.string.employee_home_connection_error
+                        : failure == FailureKind.BUSINESS ? R.string.employee_home_access_error
+                        : R.string.employee_home_load_error);
+                view.findViewById(R.id.container_employee_home_error).setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void revealHome() {
@@ -234,7 +203,7 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void startSkeletonPulse() {
-        // Faz as áreas de preenchimento pulsarem durante a espera mock.
+        // Faz as áreas de preenchimento pulsarem durante a consulta da API.
         if (homeSkeleton == null || !ValueAnimator.areAnimatorsEnabled()
                 || skeletonPulseAnimator != null) {
             return;
@@ -285,90 +254,95 @@ public class EmployeeHomeFragment extends Fragment {
         homeContent.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        // Mantém o estado de demonstração vazio ou preenchido ao recriar a tela.
-        outState.putBoolean(STATE_EMPTY_PREVIEW, emptyPreview);
-        super.onSaveInstanceState(outState);
-    }
+    private void bindHome(View view, CollaboratorHomeData home) {
+        setNamedText(view, R.id.text_employee_home_greeting,
+                R.string.employee_home_greeting_api, home.getUsername());
+        setNamedText(view, R.id.text_employee_home_workspace,
+                R.string.employee_home_workspace_api, home.getWorkspaceName());
+        CollaboratorHomeData.EventsMetrics metrics = home.getEventsMetrics();
+        setText(view, R.id.text_employee_home_pending_count, String.valueOf(metrics.getPending()));
+        setText(view, R.id.text_employee_home_review_count, String.valueOf(metrics.getUnderAnalysis()));
+        setText(view, R.id.text_employee_home_completed_count, String.valueOf(metrics.getDone()));
 
-    private void addRows(LinearLayout container, MockRow[] rows) {
-        // Monta as linhas dos feeds a partir dos dados locais de exemplo.
-        LayoutInflater inflater = LayoutInflater.from(requireContext());
-        for (MockRow row : rows) {
-            View item = inflater.inflate(R.layout.item_home_feed_row, container, false);
-            TextView title = item.findViewById(R.id.text_home_feed_title);
-            TextView subtitle = item.findViewById(R.id.text_home_feed_subtitle);
-            TextView meta = item.findViewById(R.id.text_home_feed_meta);
-            ImageView statusIcon = item.findViewById(R.id.image_home_feed_status);
+        boolean ok = "OK".equals(home.getStatusMessage());
+        int status = "URGENT".equals(home.getStatusMessage()) ? R.string.employee_home_urgent_pending
+                : "PENDENT".equals(home.getStatusMessage()) ? R.string.employee_home_has_pending
+                : "ANALYSIS".equals(home.getStatusMessage()) ? R.string.employee_home_under_analysis
+                : R.string.employee_home_no_pending;
+        ((TextView) view.findViewById(R.id.text_employee_home_message)).setText(status);
+        ((ImageView) view.findViewById(R.id.image_employee_home_message))
+                .setImageResource(ok ? R.drawable.home_check : R.drawable.home_warning);
+        view.findViewById(R.id.container_employee_home_message).setBackgroundResource(ok
+                ? R.drawable.bg_home_positive_message : R.drawable.bg_home_warning_message);
 
-            title.setText(row.title);
-            if (row.subtitle == 0) {
-                subtitle.setVisibility(View.GONE);
-            } else {
-                subtitle.setText(row.subtitle);
-            }
-            meta.setText(row.meta);
-            if (row.statusIcon == 0) {
-                statusIcon.setVisibility(View.INVISIBLE);
-            } else {
-                statusIcon.setImageResource(row.statusIcon);
-            }
-            item.findViewById(R.id.button_home_feed_row)
-                    .setOnClickListener(clicked -> showMockMessage());
-            container.addView(item);
+        LinearLayout events = view.findViewById(R.id.list_employee_home_events);
+        events.removeAllViews();
+        for (CollaboratorHomeData.PendingEvent event : home.getPendingEvents()) {
+            if (event == null) continue;
+            View row = addRow(events, event.getTitle(), formatDeadline(event.getLimitDate()),
+                    getString(event.isViewed() ? R.string.employee_home_pending : R.string.employee_home_new),
+                    event.isViewed() ? 0 : R.drawable.home_new);
+            row.setOnClickListener(clicked -> Navigation.findNavController(clicked)
+                    .navigate(R.id.action_global_employee_events, AuthArgs.copy(getArguments())));
         }
-    }
+        showFeed(view, events.getChildCount() == 0, R.id.list_employee_home_events,
+                R.id.container_employee_home_events_more, R.id.container_employee_home_events_empty);
 
-    private void showPreview(View view) {
-        // Alterna textos, ícones e listas entre Home vazia e preenchida.
-        TextView subtitle = view.findViewById(R.id.text_employee_home_subtitle);
-        TextView message = view.findViewById(R.id.text_employee_home_message);
-        ImageView messageIcon = view.findViewById(R.id.image_employee_home_message);
-        View messageContainer = view.findViewById(R.id.container_employee_home_message);
-
-        subtitle.setText(emptyPreview ? R.string.employee_home_subtitle_empty
-                : R.string.employee_home_subtitle_filled);
-        message.setText(emptyPreview ? R.string.employee_home_urgent_pending
-                : R.string.employee_home_no_pending);
-        messageIcon.setImageResource(emptyPreview ? R.drawable.home_warning
-                : R.drawable.home_check);
-        messageContainer.setBackgroundResource(emptyPreview
-                ? R.drawable.bg_home_warning_message
-                : R.drawable.bg_home_positive_message);
-
-        view.findViewById(R.id.container_employee_home_workspace)
-                .setVisibility(emptyPreview ? View.GONE : View.VISIBLE);
-        view.findViewById(R.id.list_employee_home_events)
-                .setVisibility(emptyPreview ? View.GONE : View.VISIBLE);
-        view.findViewById(R.id.container_employee_home_events_more)
-                .setVisibility(emptyPreview ? View.GONE : View.VISIBLE);
-        view.findViewById(R.id.container_employee_home_events_empty)
-                .setVisibility(emptyPreview ? View.VISIBLE : View.GONE);
-        view.findViewById(R.id.list_employee_home_notifications)
-                .setVisibility(emptyPreview ? View.GONE : View.VISIBLE);
-        view.findViewById(R.id.container_employee_home_notifications_more)
-                .setVisibility(emptyPreview ? View.GONE : View.VISIBLE);
-        view.findViewById(R.id.container_employee_home_notifications_empty)
-                .setVisibility(emptyPreview ? View.VISIBLE : View.GONE);
-    }
-
-    private void showMockMessage() {
-        Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
-                Toast.LENGTH_SHORT).show();
-    }
-
-    private static class MockRow {
-        final int title;
-        final int subtitle;
-        final int meta;
-        final int statusIcon;
-
-        MockRow(int title, int subtitle, int meta, int statusIcon) {
-            this.title = title;
-            this.subtitle = subtitle;
-            this.meta = meta;
-            this.statusIcon = statusIcon;
+        LinearLayout notifications = view.findViewById(R.id.list_employee_home_notifications);
+        notifications.removeAllViews();
+        for (CollaboratorHomeData.HomeNotification notification : home.getLastNotifications()) {
+            if (notification == null) continue;
+            long hours = Math.max(0, notification.getSentAtInHours());
+            View row = addRow(notifications, notification.getTitle(), null,
+                    hours == 0 ? getString(R.string.employee_home_notification_recent)
+                            : getString(R.string.employee_home_notification_hours, hours),
+                    notification.isViewed() ? 0 : R.drawable.home_new);
+            row.setOnClickListener(clicked -> Navigation.findNavController(clicked)
+                    .navigate(R.id.action_global_notifications));
         }
+        showFeed(view, notifications.getChildCount() == 0, R.id.list_employee_home_notifications,
+                R.id.container_employee_home_notifications_more, R.id.container_employee_home_notifications_empty);
+    }
+
+    private void setText(View view, int id, String text) {
+        ((TextView) view.findViewById(id)).setText(text);
+    }
+
+    private void setNamedText(View view, int id, int template, String name) {
+        String text = getString(template, name);
+        SpannableString styled = new SpannableString(text);
+        styled.setSpan(new StyleSpan(Typeface.BOLD), text.length() - name.length(),
+                text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ((TextView) view.findViewById(id)).setText(styled);
+    }
+
+    private String formatDeadline(String date) {
+        if (date != null) {
+            try {
+                return getString(R.string.employee_home_deadline, LocalDate.parse(date).format(DATE));
+            } catch (DateTimeParseException ignored) {
+                // Prazo ausente ou inválido não impede a exibição dos demais dados.
+            }
+        }
+        return getString(R.string.employee_home_no_deadline);
+    }
+
+    private void showFeed(View view, boolean empty, int list, int more, int placeholder) {
+        view.findViewById(list).setVisibility(empty ? View.GONE : View.VISIBLE);
+        view.findViewById(more).setVisibility(empty ? View.GONE : View.VISIBLE);
+        view.findViewById(placeholder).setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
+    private View addRow(LinearLayout container, String title, String subtitle, String meta, int icon) {
+        View item = LayoutInflater.from(requireContext()).inflate(R.layout.item_home_feed_row, container, false);
+        setText(item, R.id.text_home_feed_title, title);
+        setText(item, R.id.text_home_feed_meta, meta);
+        setText(item, R.id.text_home_feed_subtitle, subtitle);
+        item.findViewById(R.id.text_home_feed_subtitle).setVisibility(subtitle == null ? View.GONE : View.VISIBLE);
+        ImageView statusIcon = item.findViewById(R.id.image_home_feed_status);
+        if (icon == 0) statusIcon.setVisibility(View.INVISIBLE);
+        else statusIcon.setImageResource(icon);
+        container.addView(item);
+        return item.findViewById(R.id.button_home_feed_row);
     }
 }
