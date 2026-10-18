@@ -17,12 +17,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
-import com.example.astro_mobile.data.api.CollaboratorHomeRepository;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
 import com.example.astro_mobile.shared.home.HomeAiBubble;
@@ -35,7 +35,7 @@ public class EmployeeHomeFragment extends Fragment {
 
     private static final long SKELETON_PULSE_MS = 900L;
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private CollaboratorHomeRepository repository;
+    private EmployeeHomeViewModel model;
     private boolean homeReady;
     private View aiBubble;
     private TextView aiBubbleText;
@@ -52,7 +52,8 @@ public class EmployeeHomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        repository = CollaboratorHomeRepository.createDefault();
+        model = new ViewModelProvider(this, EmployeeHomeViewModel.Factory.createDefault())
+                .get(EmployeeHomeViewModel.class);
         homeContent = view.findViewById(R.id.scroll_employee_home);
         homeSkeleton = view.findViewById(R.id.container_employee_home_skeleton);
         view.findViewById(R.id.button_employee_home_retry).setOnClickListener(clicked -> loadHome());
@@ -99,7 +100,7 @@ public class EmployeeHomeFragment extends Fragment {
 
     @Override
     public void onPause() {
-        repository.cancel();
+        model.cancel();
         stopSkeletonPulse();
         finishHomeRevealIfNeeded();
         if (assistant != null) assistant.hide();
@@ -108,7 +109,7 @@ public class EmployeeHomeFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        repository.cancel();
+        model.cancel();
         stopSkeletonPulse();
         if (homeContent != null) {
             homeContent.animate().cancel();
@@ -128,7 +129,7 @@ public class EmployeeHomeFragment extends Fragment {
 
     private void loadHome() {
         View view = getView();
-        if (view == null) return;
+        if (view == null || model.isLoading()) return;
         homeReady = false;
         homeContent.animate().cancel();
         homeSkeleton.animate().cancel();
@@ -138,7 +139,7 @@ public class EmployeeHomeFragment extends Fragment {
         view.findViewById(R.id.container_employee_home_error).setVisibility(View.GONE);
         assistant.hide();
         startSkeletonPulse();
-        repository.load(new CollaboratorHomeRepository.ResultCallback() {
+        model.load(new EmployeeHomeViewModel.ResultCallback() {
             @Override
             public void onSuccess(CollaboratorHomeData home) {
                 if (getView() != view || !isResumed()) return;

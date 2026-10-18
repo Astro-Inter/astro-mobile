@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -24,12 +25,11 @@ import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
-import com.example.astro_mobile.data.api.ManagerHomeRepository;
 import com.example.astro_mobile.data.api.dto.ManagerHomeData;
 import com.example.astro_mobile.shared.home.HomeAiBubble;
 
 public final class ManagerHomeFragment extends Fragment {
-    private ManagerHomeRepository repository;
+    private ManagerHomeViewModel model;
     private View content;
     private View skeleton;
     private HomeAiBubble aiBubble;
@@ -41,7 +41,8 @@ public final class ManagerHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
         super.onViewCreated(view, state);
-        repository = ManagerHomeRepository.createDefault();
+        model = new ViewModelProvider(this, ManagerHomeViewModel.Factory.createDefault())
+                .get(ManagerHomeViewModel.class);
         content = view.findViewById(R.id.scroll_manager_home);
         skeleton = view.findViewById(R.id.container_manager_home_skeleton);
         View assistant = view.findViewById(R.id.button_manager_home_ai);
@@ -167,7 +168,7 @@ public final class ManagerHomeFragment extends Fragment {
 
     private void loadHome() {
         View view = getView();
-        if (view == null) return;
+        if (view == null || model.isLoading()) return;
         loaded = false;
         content.animate().cancel();
         skeleton.animate().cancel();
@@ -177,7 +178,7 @@ public final class ManagerHomeFragment extends Fragment {
         view.findViewById(R.id.container_manager_home_error).setVisibility(View.GONE);
         aiBubble.hide();
         startSkeletonPulse();
-        repository.load(new ManagerHomeRepository.ResultCallback() {
+        model.load(new ManagerHomeViewModel.ResultCallback() {
             @Override
             public void onSuccess(ManagerHomeData home) {
                 if (getView() != view || !isResumed()) return;
@@ -205,7 +206,7 @@ public final class ManagerHomeFragment extends Fragment {
 
     @Override
     public void onPause() {
-        repository.cancel();
+        model.cancel();
         stopSkeletonPulse();
         content.animate().cancel();
         skeleton.animate().cancel();
@@ -246,7 +247,7 @@ public final class ManagerHomeFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        repository.cancel();
+        model.cancel();
         stopSkeletonPulse();
         content.animate().cancel();
         skeleton.animate().cancel();

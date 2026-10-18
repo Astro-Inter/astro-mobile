@@ -51,7 +51,8 @@ Esta tarefa integra somente a leitura da Home.
 - `data/api/AstroApi`: rota Retrofit.
 - `data/api/dto/ManagerHomeData`: contrato com campos em snake_case, IDs numéricos para validações e textuais para formulários.
 - `data/api/ManagerHomeRepository`: token, consulta, renovação, validação da resposta e cancelamento.
-- `manager/home/ManagerHomeFragment`: apresentação e ciclo de vida, seguindo a integração da Home do Colaborador.
+- `manager/home/ManagerHomeViewModel`: dados e carregamento da consulta, callbacks e cancelamento, com Factory para criação manual das dependências.
+- `manager/home/ManagerHomeFragment`: apresentação, animações e navegação, delegando as consultas ao ViewModel.
 - `fragment_manager_home.xml`: listas dinâmicas, estados vazios e nova tentativa; dados de exemplo somente no editor.
 - `ManagerHomeRepositoryTest`: contrato HTTP/JSON com respostas locais, prazos, indicadores, autenticação, erros e descarte de callbacks.
 
@@ -68,3 +69,24 @@ dos sockets locais do Java no diretório temporário do ambiente; nenhuma config
 Com uma conta real de gestor, conferir nome/workspace, indicadores, prévias, estados vazios e prazos.
 Verificar nova tentativa após desconexão, retorno à Home, ações rápidas e assistente.
 Build, testes locais e lint não substituem essa conferência autenticada no aparelho.
+
+## Revisão arquitetural das PRs #47 e #48 — SCRUM-582
+
+As duas PRs já usavam Java/XML, DTOs em `data/api/dto`, Retrofit e Firebase na camada
+de dados, mas faltava o ViewModel entre Fragment e Repository. A correção conjunta usa
+`Fragment → ViewModel → Repository`, conforme os fluxos de Perfil e autenticação.
+
+O `ManagerHomeViewModel` controla os dados, o carregamento e o cancelamento por callbacks,
+com injeção manual pela Factory. Impede consultas simultâneas e descarta o callback da
+View e dados anteriores ao cancelar. `onCleared` também cancela a consulta. O Fragment
+mantém Views, formatação, animações e navegação; `loaded` sinaliza somente o estado visual
+do dissolve. Contrato, autenticação, renovação do token e erros HTTP permanecem na camada de dados.
+
+A revisão mantém os contratos e o comportamento das duas Homes, sem LiveData ou novas
+dependências. Os testes do ViewModel verificam carregamento, bloqueio de concorrência,
+erro/retry, descarte de dados antigos, cancelamento e limpeza ao remover o ViewModel.
+
+Validação da correção arquitetural em 18/10/2026: `assembleDebug`, `lintDebug` e
+`testDebugUnitTest` aprovados, com 62 testes (12 novos dos ViewModels), sem falhas.
+Lint sem erros e com 111 avisos no projeto. Nenhuma instalação ou consulta autenticada
+em produção executada nesta revisão.
