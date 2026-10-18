@@ -1,6 +1,7 @@
 # Home do colaborador
 
-A `EmployeeHomeFragment` consulta `GET /home/collaborator` ao entrar ou retornar à tela,
+A `EmployeeHomeFragment` solicita ao `EmployeeHomeViewModel` a consulta de
+`GET /home/collaborator` ao entrar ou retornar à tela,
 usando a URL configurada em `BuildConfig.API_BASE_URL`. O carregamento simulado e os
 dados de demonstração da home foram removidos.
 
@@ -63,3 +64,26 @@ Gradle ou no ambiente do usuário.
 
 A consulta autenticada contra produção e a conferência visual em aparelho ainda
 não foram realizadas.
+
+## Revisão arquitetural das PRs #47 e #48 — SCRUM-582
+
+As integrações iniciais usavam Repository e DTOs no lugar correto, mas as duas Homes
+chamavam o Repository diretamente do Fragment. Isso não seguia o fluxo
+`Fragment → ViewModel → Repository` usado pelo Perfil e pela autenticação.
+
+O `EmployeeHomeViewModel`, em `employee/home`, passa a controlar os dados da consulta,
+o carregamento e o cancelamento, com callbacks próprios e injeção manual pela Factory.
+Bloqueia consultas simultâneas, libera o callback da View ao concluir/cancelar e limpa
+os dados ao sair ou iniciar nova consulta. `onCleared` também cancela a operação.
+O Fragment mantém Views, formatação, animações e navegação; `homeReady` controla somente
+o dissolve. HTTP, token, renovação e validação do contrato continuam no Repository/DTO.
+
+Não foram adicionados LiveData, novas dependências ou outra camada de rede.
+Mantida a atualização ao retomar a tela, com cancelamento em `onPause`/`onDestroyView`.
+Os testes do ViewModel cobrem carregamento, bloqueio de chamadas concorrentes, erro e
+nova tentativa, dados antigos, cancelamento e limpeza ao remover o ViewModel.
+
+Validação da correção arquitetural em 18/10/2026: `assembleDebug`, `lintDebug` e
+`testDebugUnitTest` aprovados, com 62 testes (12 novos dos ViewModels), sem falhas.
+Lint sem erros e com 111 avisos no projeto. Nenhuma instalação ou consulta autenticada
+em produção executada nesta revisão.
