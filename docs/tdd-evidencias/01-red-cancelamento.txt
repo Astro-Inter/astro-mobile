@@ -1,0 +1,40 @@
+Comando: gradlew.bat :app:testDebugUnitTest --tests com.example.astro_mobile.employee.events.EventStatusClassifierTest --console=plain
+Estado: classify tinha somente return null; assinatura e enums compilavam.
+Exit code: 1
+> Task :app:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:processDebugResources
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:compileDebugUnitTestKotlin NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes NO-SOURCE
+
+> Task :app:compileDebugUnitTestJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:testDebugUnitTest
+
+EventStatusClassifierTest > cancellationTakesPriorityOverApprovalAndDeadline FAILED
+    java.lang.AssertionError at EventStatusClassifierTest.java:14
+
+
+1 test completed, 1 failed
+> Task :app:testDebugUnitTest FAILED
+
+[Incubating] Problems report is available at: file:///C:/MOBILE/astro-mobile/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///C:/MOBILE/astro-mobile/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:24 actionable tasks: 13 executed, 11 up-to-date
+Configuration cache entry stored.
+
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 19s
