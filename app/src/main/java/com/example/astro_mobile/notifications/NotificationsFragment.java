@@ -53,7 +53,6 @@ public final class NotificationsFragment extends Fragment {
                 .get(NotificationsViewModel.class);
         managerFlow = FlowPreferences.wasManagerFlow(requireContext());
         adapter = new NotificationsAdapter(managerFlow, this::showDetails);
-        view.findViewById(R.id.button_notifications_retry).setOnClickListener(clicked -> loadNotifications());
 
         // Filtra a lista já carregada a cada mudança no texto, sem novas requisições.
         RecyclerView list = view.findViewById(R.id.list_notifications);
@@ -97,7 +96,6 @@ public final class NotificationsFragment extends Fragment {
         if (view == null || state.isLoading()) return;
         adapter.submit(java.util.Collections.emptyList());
         view.findViewById(R.id.scroll_notifications_content).setVisibility(View.INVISIBLE);
-        view.findViewById(R.id.container_notifications_error).setVisibility(View.GONE);
         view.findViewById(R.id.skeleton_notifications).setVisibility(View.VISIBLE);
         state.load(new NotificationsViewModel.ResultCallback() {
             @Override
@@ -116,11 +114,8 @@ public final class NotificationsFragment extends Fragment {
                     SessionNavigation.signOut(NotificationsFragment.this);
                     return;
                 }
-                ((TextView) view.findViewById(R.id.text_notifications_error)).setText(
-                        failure == FailureKind.CONNECTION ? R.string.notifications_connection_error
-                                : failure == FailureKind.BUSINESS ? R.string.notifications_access_error
-                                : R.string.notifications_load_error);
-                view.findViewById(R.id.container_notifications_error).setVisibility(View.VISIBLE);
+                androidx.navigation.fragment.NavHostFragment.findNavController(NotificationsFragment.this)
+                        .navigate(R.id.genericErrorFragment);
             }
         });
     }

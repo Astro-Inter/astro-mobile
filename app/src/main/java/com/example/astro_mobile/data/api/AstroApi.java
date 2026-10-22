@@ -10,6 +10,7 @@ import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
 import com.example.astro_mobile.data.api.dto.ManagerHomeData;
 import com.example.astro_mobile.data.api.dto.NotificationData;
 import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
+import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
 
 import java.util.List;
 
@@ -33,6 +34,10 @@ public interface AstroApi {
     @PATCH("notifications/{notificationId}/viewed")
     Call<ApiResponse<Void>> markNotificationViewed(
             @Header("Authorization") String authorization, @Path("notificationId") String id);
+
+    @GET("events/collaborator")
+    Call<ApiResponse<List<CollaboratorEventData>>> getCollaboratorEvents(
+            @Header("Authorization") String authorization);
 
     @GET("notifications")
     Call<ApiResponse<List<NotificationData>>> getNotifications(

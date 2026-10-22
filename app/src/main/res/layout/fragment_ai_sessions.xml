@@ -64,18 +64,10 @@
                 android:background="@color/astro_dark_background"
                 android:visibility="gone" tools:visibility="gone" />
         </FrameLayout>
-        <TextView android:id="@+id/text_ai_sessions_notice" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:paddingHorizontal="30dp" android:paddingVertical="8dp" android:gravity="center" android:visibility="gone"
-            android:fontFamily="@font/montserrat_family" android:textSize="@dimen/employee_home_caption_text_size"
-            android:lineSpacingExtra="3dp" android:textColor="@color/astro_input_hint" android:accessibilityLiveRegion="polite" />
         <include android:id="@+id/container_ai_sessions_paging" layout="@layout/item_conversation_skeleton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:visibility="gone" tools:visibility="gone" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/button_ai_sessions_page_retry"
-            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="24dp"
-            android:text="@string/chat_retry" android:textAllCaps="false" android:visibility="gone"
-            android:fontFamily="@font/montserrat_family" android:textColor="@color/astro_light_background" android:letterSpacing="0"
-            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

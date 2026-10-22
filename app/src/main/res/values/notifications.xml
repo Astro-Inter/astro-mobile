@@ -10,9 +10,9 @@
     <string name="notifications_retry">Tentar novamente</string>
     <string name="notifications_connection_error">Sem conexão. Confira sua internet e tente novamente.</string>
     <string name="notifications_access_error">Não foi possível acessar seus alertas.</string>
-    <string name="notifications_load_error">Não foi possível carregar os alertas. Tente novamente.</string>
     <string name="notification_detail_load_error">Não foi possível carregar este alerta. Tente novamente.</string>
     <string name="notification_detail_read_error">Não foi possível marcar este alerta como lido. Tente novamente.</string>
+
     <string name="notifications_open_event">Visualizar evento</string>
     <dimen name="notifications_detail_max_width">370dp</dimen>
 </resources>
