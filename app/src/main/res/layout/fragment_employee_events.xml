@@ -26,36 +26,6 @@
                 android:fillViewport="true" android:clipToPadding="false">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="vertical" android:paddingBottom="20dp" android:focusableInTouchMode="true">
-                    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:paddingHorizontal="30dp" android:paddingVertical="10dp">
-                        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:background="@drawable/bg_email_identification_input">
-                            <EditText android:id="@+id/input_employee_events_search" android:layout_width="match_parent"
-                                android:layout_height="wrap_content" android:minHeight="60dp" android:background="@null"
-                                android:hint="@string/employee_events_search" android:inputType="text"
-                                android:imeOptions="actionSearch" android:importantForAutofill="no"
-                                android:singleLine="true" android:fontFamily="@font/montserrat_family"
-                                android:paddingStart="16dp" android:paddingEnd="54dp" android:paddingVertical="12dp"
-                                android:textColor="@color/astro_light_background" android:textColorHint="@color/astro_input_hint"
-                                android:textSize="16sp" />
-                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
-                                android:layout_gravity="end|center_vertical" android:layout_marginEnd="16dp"
-                                android:src="@drawable/conversations_search" android:contentDescription="@null"
-                                android:importantForAccessibility="no" />
-                        </FrameLayout>
-                    </FrameLayout>
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:baselineAligned="false"
-                        android:paddingHorizontal="30dp" android:paddingVertical="10dp">
-                        <TextView android:id="@+id/filter_employee_events_all" style="@style/ConversationsFilter"
-                            android:text="@string/employee_events_all" tools:background="@color/astro_primary_purple" />
-                        <TextView android:id="@+id/filter_employee_events_pending" style="@style/ConversationsFilter"
-                            android:layout_marginStart="10dp" android:text="@string/employee_events_pending" />
-                        <TextView android:id="@+id/filter_employee_events_review" style="@style/ConversationsFilter"
-                            android:layout_marginStart="10dp" android:text="@string/employee_events_review" />
-                        <TextView android:id="@+id/filter_employee_events_done" style="@style/ConversationsFilter"
-                            android:layout_marginStart="10dp" android:text="@string/employee_events_done" />
-                    </LinearLayout>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp"
                         android:background="@drawable/bg_events_calendar" android:padding="18dp" android:orientation="vertical">
@@ -181,8 +151,38 @@
                             android:gravity="center_vertical" android:textColor="@color/astro_light_background"
                             android:textSize="12sp" android:text="@string/employee_events_day_with_events" />
                     </LinearLayout>
+                    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:background="@drawable/bg_email_identification_input">
+                            <EditText android:id="@+id/input_employee_events_search" android:layout_width="match_parent"
+                                android:layout_height="wrap_content" android:minHeight="60dp" android:background="@null"
+                                android:hint="@string/employee_events_search" android:inputType="text"
+                                android:imeOptions="actionSearch" android:importantForAutofill="no"
+                                android:singleLine="true" android:fontFamily="@font/montserrat_family"
+                                android:paddingStart="16dp" android:paddingEnd="54dp" android:paddingVertical="12dp"
+                                android:textColor="@color/astro_light_background" android:textColorHint="@color/astro_input_hint"
+                                android:textSize="16sp" />
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                                android:layout_gravity="end|center_vertical" android:layout_marginEnd="16dp"
+                                android:src="@drawable/conversations_search" android:contentDescription="@null"
+                                android:importantForAccessibility="no" />
+                        </FrameLayout>
+                    </FrameLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:baselineAligned="false"
+                        android:paddingHorizontal="30dp" android:paddingVertical="10dp">
+                        <TextView android:id="@+id/filter_employee_events_all" style="@style/ConversationsFilter"
+                            android:text="@string/employee_events_all" tools:background="@color/astro_primary_purple" />
+                        <TextView android:id="@+id/filter_employee_events_pending" style="@style/ConversationsFilter"
+                            android:layout_marginStart="10dp" android:text="@string/employee_events_pending" />
+                        <TextView android:id="@+id/filter_employee_events_review" style="@style/ConversationsFilter"
+                            android:layout_marginStart="10dp" android:text="@string/employee_events_review" />
+                        <TextView android:id="@+id/filter_employee_events_done" style="@style/ConversationsFilter"
+                            android:layout_marginStart="10dp" android:text="@string/employee_events_done" />
+                    </LinearLayout>
                     <View android:layout_width="match_parent" android:layout_height="21dp" android:background="@drawable/bg_home_divider" />
-                    <!-- Lista curta do protótipo; rola junto ao calendário, sem rolagens concorrentes. -->
+                    <!-- Itens do mês rolando junto ao calendário, sem rolagens concorrentes. -->
                     <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_employee_events"
                         android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

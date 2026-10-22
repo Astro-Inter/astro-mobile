@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,11 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
-import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.SessionNavigation;
+import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -38,7 +38,6 @@ public class EmployeeEventsFragment extends Fragment {
     private final int[] filterIds = { R.id.filter_employee_events_all, R.id.filter_employee_events_pending,
             R.id.filter_employee_events_review, R.id.filter_employee_events_done };
     private EmployeeEventsViewModel state;
-    private Runnable finishLoading;
     private BottomSheetDialog daySheet;
 
     public EmployeeEventsFragment() { super(R.layout.fragment_employee_events); }
@@ -46,7 +45,7 @@ public class EmployeeEventsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        state = new ViewModelProvider(this).get(EmployeeEventsViewModel.class);
+        state = new ViewModelProvider(this, new EmployeeEventsViewModel.Factory()).get(EmployeeEventsViewModel.class);
         GridLayout calendarGrid = view.findViewById(R.id.grid_employee_events_calendar);
         calendarGrid.addOnLayoutChangeListener((changedView, left, top, right, bottom,
                                                 oldLeft, oldTop, oldRight, oldBottom) -> {
@@ -54,7 +53,7 @@ public class EmployeeEventsFragment extends Fragment {
                 renderCalendar(view, state.getMonth());
             }
         });
-        // A lista e o calendário compartilham os mesmos filtros locais.
+        // A lista e o calendário filtram a mesma resposta real, sem novas chamadas ao pesquisar.
         for (int index = 0; index < filterIds.length; index++) {
             final int selected = index;
             view.findViewById(filterIds[index]).setOnClickListener(clicked -> {
@@ -86,20 +85,31 @@ public class EmployeeEventsFragment extends Fragment {
         view.findViewById(R.id.button_employee_events_month).setOnClickListener(clicked -> showMonthMenu(view, clicked));
         view.findViewById(R.id.button_employee_events_year).setOnClickListener(clicked -> showYearMenu(view, clicked));
         render(view);
-        // Simula um segundo de carregamento sem bloquear a interface nem acessar a API.
-        if (!state.isLoaded()) {
-            View content = view.findViewById(R.id.scroll_employee_events);
-            View skeleton = view.findViewById(R.id.skeleton_employee_events);
-            content.setVisibility(View.INVISIBLE);
-            skeleton.setVisibility(View.VISIBLE);
-            finishLoading = () -> {
-                state.markLoaded();
-                skeleton.setVisibility(View.GONE);
-                content.setVisibility(View.VISIBLE);
-                finishLoading = null;
-            };
-            view.postDelayed(finishLoading, 1_000L);
-        }
+    }
+
+    private void loadEvents() {
+        View view = getView();
+        if (view == null || state.isLoading()) return;
+        view.findViewById(R.id.scroll_employee_events).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.skeleton_employee_events).setVisibility(View.VISIBLE);
+        state.load(new EmployeeEventsViewModel.ResultCallback() {
+            @Override public void onSuccess() {
+                if (getView() != view || !isResumed()) return;
+                view.findViewById(R.id.skeleton_employee_events).setVisibility(View.GONE);
+                view.findViewById(R.id.scroll_employee_events).setVisibility(View.VISIBLE);
+                render(view);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (getView() != view || !isResumed()) return;
+                view.findViewById(R.id.skeleton_employee_events).setVisibility(View.GONE);
+                if (failure == FailureKind.SESSION) {
+                    SessionNavigation.signOut(EmployeeEventsFragment.this);
+                    return;
+                }
+                // Usa a tela de erro do app; ao tentar novamente, retorna e repete a consulta.
+                Navigation.findNavController(view).navigate(R.id.genericErrorFragment);
+            }
+        });
     }
 
     private void render(View view) {
@@ -230,35 +240,26 @@ public class EmployeeEventsFragment extends Fragment {
     }
 
     private void openDetails(EmployeeEvent event) {
-        // Leva o evento escolhido ao detalhe, inclusive quando veio do calendário.
-        if (daySheet != null) daySheet.dismiss();
-        Bundle args = AuthArgs.copy(getArguments());
-        args.putString(EmployeeEventDetailsFragment.EVENT_TITLE, event.title);
-        args.putString(EmployeeEventDetailsFragment.EVENT_DATE, event.date.toString());
-        args.putString(EmployeeEventDetailsFragment.EVENT_STATUS, event.status.name());
-        args.putBoolean(EmployeeEventDetailsFragment.EVENT_URGENT, event.urgent);
-        NavHostFragment.findNavController(this).navigate(R.id.action_employee_events_to_details, args);
+        // Não mistura um evento real com descrição, anexos ou conclusão fictícios da SCRUM-282.
+        Toast.makeText(requireContext(), R.string.employee_events_details_pending, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // A conclusão é só local: atualiza a lista sem chamar ou alterar o backend.
-        NavBackStackEntry entry = NavHostFragment.findNavController(this)
-                .getBackStackEntry(R.id.employeeEventsFragment);
-        Bundle completed = entry.getSavedStateHandle().remove(EmployeeEventDetailsFragment.COMPLETED_EVENT);
-        if (completed != null) {
-            state.markCompleted(completed.getString(EmployeeEventDetailsFragment.EVENT_TITLE),
-                    LocalDate.parse(completed.getString(EmployeeEventDetailsFragment.EVENT_DATE)));
-            render(requireView());
-        }
+        loadEvents();
+    }
+
+    @Override public void onPause() {
+        state.cancel();
+        if (daySheet != null) daySheet.dismiss();
+        super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        // Descarta o atraso e o resumo quando as Views da tela deixam de existir.
-        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
-        finishLoading = null;
+        // Descarta consulta e resumo quando as Views deixam de existir.
+        state.cancel();
         if (daySheet != null) daySheet.dismiss();
         daySheet = null;
         super.onDestroyView();

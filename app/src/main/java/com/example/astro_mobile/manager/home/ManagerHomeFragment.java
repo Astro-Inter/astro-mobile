@@ -53,7 +53,6 @@ public final class ManagerHomeFragment extends Fragment {
                 view.findViewById(R.id.text_manager_home_ai_bubble),
                 view.findViewById(R.id.container_manager_home),
                 view.findViewById(R.id.header_manager_home));
-        view.findViewById(R.id.button_manager_home_retry).setOnClickListener(clicked -> loadHome());
         NavController navigation = NavHostFragment.findNavController(this);
         view.findViewById(R.id.button_manager_home_conversations).setOnClickListener(clicked ->
                 navigation.navigate(R.id.action_global_conversations, AuthArgs.copy(getArguments())));
@@ -175,7 +174,6 @@ public final class ManagerHomeFragment extends Fragment {
         content.setVisibility(View.INVISIBLE);
         skeleton.setAlpha(1f);
         skeleton.setVisibility(View.VISIBLE);
-        view.findViewById(R.id.container_manager_home_error).setVisibility(View.GONE);
         aiBubble.hide();
         startSkeletonPulse();
         model.load(new ManagerHomeViewModel.ResultCallback() {
@@ -195,11 +193,8 @@ public final class ManagerHomeFragment extends Fragment {
                     SessionNavigation.signOut(ManagerHomeFragment.this);
                     return;
                 }
-                ((TextView) view.findViewById(R.id.text_manager_home_error)).setText(
-                        failure == FailureKind.CONNECTION ? R.string.manager_home_connection_error
-                        : failure == FailureKind.BUSINESS ? R.string.manager_home_access_error
-                        : R.string.manager_home_load_error);
-                view.findViewById(R.id.container_manager_home_error).setVisibility(View.VISIBLE);
+                androidx.navigation.fragment.NavHostFragment.findNavController(ManagerHomeFragment.this)
+                        .navigate(R.id.genericErrorFragment);
             }
         });
     }

@@ -47,6 +47,26 @@ public class ErrorFragment extends Fragment {
         int errorDestination = navController.getCurrentDestination().getId();
         NavBackStackEntry previous = navController.getPreviousBackStackEntry();
         int source = previous == null ? 0 : previous.getDestination().getId();
+        if (source == R.id.employeeEventsFragment || source == R.id.employeeHomeFragment
+                || source == R.id.managerHomeFragment || source == R.id.notificationsFragment
+                || source == R.id.aiSessionsFragment || source == R.id.chatFragment) {
+            // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
+            showCopy(view.findViewById(R.id.text_email_error_title),
+                    view.findViewById(R.id.text_email_error_body), false);
+            view.findViewById(R.id.button_email_error_retry).setOnClickListener(clicked -> {
+                String conversation = getArguments() == null ? null : getArguments().getString("retry_ai_conversation");
+                if (source == R.id.aiSessionsFragment && conversation != null) {
+                    navController.getBackStackEntry(source).getSavedStateHandle()
+                            .set("retry_ai_conversation", conversation);
+                }
+                navController.popBackStack(source, false);
+            });
+            TextView back = view.findViewById(R.id.button_email_error_start);
+            back.setText(R.string.profile_retry_back);
+            back.setOnClickListener(clicked -> navController.popBackStack(
+                    HomeNavigation.destination(requireContext()), false));
+            return;
+        }
         // Erros do perfil não retomam a identificação de e-mail nem a recuperação do login.
         if (source == R.id.profileFragment || source == R.id.changePasswordFragment) {
             configureProfileError(view, navController, source);

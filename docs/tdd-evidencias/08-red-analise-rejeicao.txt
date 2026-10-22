@@ -1,0 +1,34 @@
+Evolução aprovada em 21/10/2026: aguardar aprovação passa a exibir Em análise, e rejeição passa a ser um estado próprio mesmo após o prazo. Assinaturas/enums compilaram; comportamento anterior ainda sem alteração.
+Exit code: 1
+> Task :app:compileDebugUnitTestJavaWithJavac
+
+> Task :app:testDebugUnitTest
+
+EventStatusClassifierTest > awaitingApprovalIsNotUrgentOrNew FAILED
+    java.lang.AssertionError at EventStatusClassifierTest.java:39
+
+EventStatusClassifierTest > awaitingApprovalRemainsInAnalysisAfterDeadline FAILED
+    java.lang.AssertionError at EventStatusClassifierTest.java:31
+
+EventStatusClassifierTest > rejectionIsNotUrgentOrNew FAILED
+    java.lang.AssertionError at EventStatusClassifierTest.java:103
+
+EventStatusClassifierTest > rejectionRemainsRejectedAfterDeadline FAILED
+    java.lang.AssertionError at EventStatusClassifierTest.java:96
+
+13 tests completed, 4 failed
+
+> Task :app:testDebugUnitTest FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///C:/MOBILE/astro-mobile/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 35s
+24 actionable tasks: 5 executed, 19 up-to-date
+Configuration cache entry reused.

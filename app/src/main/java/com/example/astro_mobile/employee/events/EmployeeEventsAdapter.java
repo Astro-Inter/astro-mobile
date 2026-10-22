@@ -3,6 +3,7 @@ package com.example.astro_mobile.employee.events;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.content.res.ColorStateList;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,18 +42,44 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
                 : DateTimeFormatter.ofPattern("dd/MM/yyyy").format(event.date);
         row.due.setText(row.itemView.getContext().getString(R.string.employee_events_due,
                 dueDate));
-        if (event.urgent) {
-            row.icon.setImageResource(R.drawable.ic_employee_event_warning);
-        } else if (event.status == EmployeeEvent.Status.PENDING) {
-            row.icon.setImageResource(R.drawable.ic_employee_event_new);
-        } else if (event.status == EmployeeEvent.Status.DONE) {
-            row.icon.setImageResource(R.drawable.ic_employee_event_done);
-        } else {
-            // O estado “Em análise” não exibe ícone no frame do Figma.
-            row.icon.setImageDrawable(null);
+        // Limpa o tint da linha reciclada antes de aplicar cada estado.
+        row.icon.setImageTintList(null);
+        row.icon.setVisibility(View.VISIBLE);
+        int description;
+        switch (event.displayStatus) {
+            case URGENT:
+                description = R.string.employee_events_urgent;
+                row.icon.setImageResource(R.drawable.ic_employee_event_warning);
+                break;
+            case NEW:
+                description = R.string.employee_events_new;
+                row.icon.setImageResource(R.drawable.ic_employee_event_new);
+                break;
+            case DONE:
+                description = R.string.employee_events_done;
+                row.icon.setImageResource(R.drawable.ic_employee_event_done);
+                break;
+            case ANALYSIS:
+                description = R.string.employee_events_review;
+                row.icon.setImageResource(R.drawable.home_clock);
+                break;
+            case CANCELLED:
+            case REJECTED:
+            case EXPIRED:
+                description = event.displayStatus == EventStatusClassifier.DisplayStatus.CANCELLED
+                        ? R.string.employee_events_cancelled
+                        : event.displayStatus == EventStatusClassifier.DisplayStatus.REJECTED
+                        ? R.string.employee_events_rejected : R.string.employee_events_expired;
+                row.icon.setImageResource(R.drawable.conversations_close);
+                row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext()
+                        .getColor(R.color.employee_event_status_red)));
+                break;
+            default:
+                description = R.string.employee_events_pending;
+                row.icon.setImageDrawable(null);
+                row.icon.setVisibility(View.INVISIBLE);
         }
-        int description = event.status == EmployeeEvent.Status.DONE ? R.string.employee_events_done
-                : event.status == EmployeeEvent.Status.REVIEW ? R.string.employee_events_review : R.string.employee_events_pending;
+        row.status.setText(description);
         ViewCompat.setStateDescription(row.button, row.itemView.getContext().getString(description));
         row.button.setOnClickListener(clicked -> onClick.accept(event));
     }
@@ -64,6 +91,7 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
         final TextView due;
         final ImageView icon;
         final View button;
+        final TextView status;
 
         Row(View view) {
             super(view);
@@ -71,6 +99,7 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
             due = view.findViewById(R.id.text_employee_event_due);
             icon = view.findViewById(R.id.image_employee_event_status);
             button = view.findViewById(R.id.button_employee_event);
+            status = view.findViewById(R.id.text_employee_event_status);
         }
     }
 }

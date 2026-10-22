@@ -120,6 +120,15 @@ public final class ChatFragment extends Fragment {
             }
         });
         model.getState().observe(getViewLifecycleOwner(), state -> {
+            // Sem histórico ou envio pendente, a falha impede carregar a própria tela.
+            if (state.failure != null && state.messages.isEmpty() && !model.hasPendingMessage()
+                    && state.failure != ChatFailure.INVALID_MESSAGE && isResumed()
+                    && navigation.getCurrentDestination().getId() == R.id.chatFragment) {
+                if (state.failure == ChatFailure.SESSION) {
+                    com.example.astro_mobile.auth.SessionNavigation.signOut(this);
+                } else navigation.navigate(R.id.genericErrorFragment);
+                return;
+            }
             boolean atBottom = !messages.canScrollVertically(1);
             adapter.submitList(state.messages, () -> {
                 if (atBottom && !state.messages.isEmpty()) messages.scrollToPosition(state.messages.size() - 1);

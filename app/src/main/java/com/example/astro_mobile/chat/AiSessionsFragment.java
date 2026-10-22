@@ -114,12 +114,13 @@ public final class AiSessionsFragment extends Fragment {
             renderProgress(view);
             if (state.opened) { model.consumeOpened(); openChat(navigation); }
             else if (state.failure != null) {
-                Toast.makeText(requireContext(), state.failure == com.example.astro_mobile.data.ai.ChatFailure.NOT_FOUND
-                        ? R.string.ai_sessions_not_found : R.string.ai_sessions_load_error, Toast.LENGTH_LONG).show();
+                Bundle errorArgs = new Bundle();
+                errorArgs.putString("retry_ai_conversation", state.id);
+                com.example.astro_mobile.data.ai.ChatFailure failure = state.failure;
                 model.consumeOpened();
+                showLoadError(failure, errorArgs);
             }
         });
-        view.findViewById(R.id.button_ai_sessions_page_retry).setOnClickListener(clicked -> model.retryConversations());
         view.findViewById(R.id.button_ai_sessions_new).setOnClickListener(clicked -> {
             if (model.startNewConversation()) openChat(navigation);
         });
@@ -136,19 +137,29 @@ public final class AiSessionsFragment extends Fragment {
         view.findViewById(R.id.skeleton_ai_sessions).setVisibility(showSkeleton ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.list_ai_sessions).setVisibility(showSkeleton ? View.INVISIBLE : View.VISIBLE);
         view.findViewById(R.id.container_ai_sessions_paging).setVisibility(list.loadingMore ? View.VISIBLE : View.GONE);
-        view.findViewById(R.id.button_ai_sessions_page_retry).setVisibility(!loading && list.failure != null
-                && list.failure != com.example.astro_mobile.data.ai.ChatFailure.SESSION
-                && list.failure != com.example.astro_mobile.data.ai.ChatFailure.FORBIDDEN ? View.VISIBLE : View.GONE);
-        TextView notice = view.findViewById(R.id.text_ai_sessions_notice);
-        notice.setVisibility(!loading && list.failure != null ? View.VISIBLE : View.GONE);
-        notice.setTextColor(requireContext().getColor(R.color.astro_error));
-        notice.setText(list.failure == com.example.astro_mobile.data.ai.ChatFailure.SESSION
-                ? R.string.chat_session_error : R.string.ai_sessions_load_error);
+        if (!loading && list.failure != null) showLoadError(list.failure, null);
+    }
+
+    private void showLoadError(com.example.astro_mobile.data.ai.ChatFailure failure, Bundle args) {
+        if (!isResumed()) return;
+        NavController navigation = NavHostFragment.findNavController(this);
+        if (navigation.getCurrentDestination().getId() != R.id.aiSessionsFragment) return;
+        if (failure == com.example.astro_mobile.data.ai.ChatFailure.SESSION) {
+            com.example.astro_mobile.auth.SessionNavigation.signOut(this);
+            return;
+        }
+        navigation.navigate(R.id.genericErrorFragment, args);
     }
 
     @Override public void onResume() {
         super.onResume();
-        if (model != null) model.refreshConversations();
+        String retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry()
+                .getSavedStateHandle().remove("retry_ai_conversation");
+        if (model != null) {
+            // Repete a abertura específica quando o erro veio do histórico dessa conversa.
+            if (retry != null) model.openConversation(retry);
+            else model.refreshConversations();
+        }
     }
 
     @Override public void onDestroyView() {

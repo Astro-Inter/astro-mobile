@@ -17,7 +17,6 @@
     <string name="ai_sessions_open">Ver conversas com o Astrinho</string>
     <string name="ai_sessions_refresh">Atualizar</string>
     <string name="ai_sessions_more">Carregar mais conversas</string>
-    <string name="ai_sessions_load_error">Não foi possível carregar as conversas. Tente novamente.</string>
     <string name="ai_sessions_not_found">Esta conversa não está mais disponível para sua conta.</string>
     <string name="ai_sessions_closed">Encerrada</string>
     <string name="ai_sessions_ending">Encerrando</string>
