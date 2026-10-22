@@ -13,6 +13,8 @@
     <color name="astro_button_ripple">#33FFFFFF</color>
     <color name="astro_back_button_ripple">#66FFFFFF</color>
     <color name="home_positive_background">#3351BF1E</color>
+    <color name="home_pending_background">#33C2A44A</color>
+    <color name="home_pending_icon">#C2A44A</color>
     <color name="home_warning_background">#338F00C4</color>
     <color name="home_ai_bubble_background">#573D93</color>
     <color name="home_nav_stroke">#444252</color>

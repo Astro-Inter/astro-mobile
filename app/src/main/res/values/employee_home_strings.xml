@@ -2,8 +2,8 @@
 <resources>
     <string name="employee_home_greeting_api">Olá, %1$s</string>
     <string name="employee_home_workspace_api">Workspace %1$s</string>
-    <string name="employee_home_has_pending">Você tem eventos pendentes.</string>
-    <string name="employee_home_under_analysis">Você tem eventos em análise.</string>
+    <string name="employee_home_has_pending">Você tem pendências!</string>
+    <string name="employee_home_under_analysis">Você tem eventos em análise!</string>
     <string name="employee_home_deadline">Data limite: %1$s</string>
     <string name="employee_home_no_deadline">Sem data limite</string>
     <string name="employee_home_notification_recent">Há menos de 1h</string>

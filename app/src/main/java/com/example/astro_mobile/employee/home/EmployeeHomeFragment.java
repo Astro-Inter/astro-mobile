@@ -1,6 +1,7 @@
 package com.example.astro_mobile.employee.home;
 
 import android.animation.ValueAnimator;
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -265,16 +266,39 @@ public class EmployeeHomeFragment extends Fragment {
         setText(view, R.id.text_employee_home_review_count, String.valueOf(metrics.getUnderAnalysis()));
         setText(view, R.id.text_employee_home_completed_count, String.valueOf(metrics.getDone()));
 
-        boolean ok = "OK".equals(home.getStatusMessage());
-        int status = "URGENT".equals(home.getStatusMessage()) ? R.string.employee_home_urgent_pending
-                : "PENDENT".equals(home.getStatusMessage()) ? R.string.employee_home_has_pending
-                : "ANALYSIS".equals(home.getStatusMessage()) ? R.string.employee_home_under_analysis
-                : R.string.employee_home_no_pending;
+        // Aplica o texto, ícone e cor da mensagem definida pela API.
+        int status;
+        int icon;
+        int background;
+        int iconColor = R.color.astro_light_background;
+        switch (home.getStatusMessage()) {
+            case "URGENT":
+                status = R.string.employee_home_urgent_pending;
+                icon = R.drawable.home_warning;
+                background = R.drawable.bg_home_urgent_message;
+                break;
+            case "PENDENT":
+                status = R.string.employee_home_has_pending;
+                icon = R.drawable.home_clock;
+                background = R.drawable.bg_home_pending_message;
+                iconColor = R.color.home_pending_icon;
+                break;
+            case "ANALYSIS":
+                status = R.string.employee_home_under_analysis;
+                icon = R.drawable.home_eye;
+                background = R.drawable.bg_home_warning_message;
+                break;
+            default:
+                status = R.string.employee_home_no_pending;
+                icon = R.drawable.home_check;
+                background = R.drawable.bg_home_positive_message;
+                break;
+        }
         ((TextView) view.findViewById(R.id.text_employee_home_message)).setText(status);
-        ((ImageView) view.findViewById(R.id.image_employee_home_message))
-                .setImageResource(ok ? R.drawable.home_check : R.drawable.home_warning);
-        view.findViewById(R.id.container_employee_home_message).setBackgroundResource(ok
-                ? R.drawable.bg_home_positive_message : R.drawable.bg_home_warning_message);
+        ImageView messageIcon = view.findViewById(R.id.image_employee_home_message);
+        messageIcon.setImageResource(icon);
+        messageIcon.setImageTintList(ColorStateList.valueOf(getResources().getColor(iconColor, null)));
+        view.findViewById(R.id.container_employee_home_message).setBackgroundResource(background);
 
         LinearLayout events = view.findViewById(R.id.list_employee_home_events);
         events.removeAllViews();
