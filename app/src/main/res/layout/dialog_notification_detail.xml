@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_notifications_detail_sheet"
+    android:clipToOutline="true">
+
+<LinearLayout
     android:id="@+id/container_notification_detail_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:paddingStart="0dp"
-        android:paddingEnd="20dp">
+        android:paddingEnd="16dp">
 
         <ImageButton
             android:id="@+id/button_notification_detail_close"
@@ -32,8 +38,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/bg_email_identification_input"
-        android:minHeight="125dp"
         android:orientation="vertical"
         android:paddingHorizontal="30dp"
         android:paddingVertical="20dp">
@@ -52,7 +58,7 @@
             android:id="@+id/text_notification_detail_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:fontFamily="@font/montserrat_family"
             android:includeFontPadding="false"
             android:lineSpacingExtra="1dp"
@@ -61,12 +67,40 @@
             tools:text="Você tem 67 validações pendentes" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/progress_notification_detail"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:indeterminateTint="@color/astro_light_background"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/text_notification_detail_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/montserrat_family"
+        android:textColor="@color/astro_light_background"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/button_notification_detail_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="@string/notifications_retry"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/container_notification_open_event"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="10dp"
         android:visibility="gone"
         tools:visibility="visible">
 
@@ -94,3 +128,4 @@
         </FrameLayout>
     </FrameLayout>
 </LinearLayout>
+</ScrollView>

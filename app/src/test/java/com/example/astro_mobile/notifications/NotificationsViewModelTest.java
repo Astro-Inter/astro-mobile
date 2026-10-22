@@ -30,11 +30,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class NotificationsViewModelTest {
-    private static final String SUCCESS = "{\"success\":true,\"data\":[{\"id\":\"id\",\"titulo\":\"Aviso\",\"viewed\":false,\"horas\":2}]}";
+    private static final String SUCCESS = "{\"success\":true,\"data\":[{\"id\":\"id\",\"title\":\"Aviso\",\"viewed\":false,\"hours\":2}]}";
     private static final String SEARCH_DATA = "{\"success\":true,\"data\":["
-            + "{\"id\":\"first\",\"titulo\":\"Validações pendentes\",\"viewed\":false,\"horas\":0},"
-            + "{\"id\":\"second\",\"titulo\":\"Treinamento de EPI\",\"viewed\":true,\"horas\":2},"
-            + "{\"id\":\"third\",\"titulo\":\"Novas validações\",\"viewed\":false,\"horas\":4}]}";
+            + "{\"id\":\"first\",\"title\":\"Validações pendentes\",\"viewed\":false,\"hours\":0},"
+            + "{\"id\":\"second\",\"title\":\"Treinamento de EPI\",\"viewed\":true,\"hours\":2},"
+            + "{\"id\":\"third\",\"title\":\"Novas validações\",\"viewed\":false,\"hours\":4}]}";
 
     @Test
     public void searchIgnoresAccentsCaseAndOuterSpacesAndKeepsServerOrder() throws Exception {

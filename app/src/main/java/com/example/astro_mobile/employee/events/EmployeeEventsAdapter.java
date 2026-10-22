@@ -51,8 +51,10 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
             // O estado “Em análise” não exibe ícone no frame do Figma.
             row.icon.setImageDrawable(null);
         }
-        int description = event.status == EmployeeEvent.Status.DONE ? R.string.employee_events_done
+        int description = event.urgent ? R.string.employee_events_urgent
+                : event.status == EmployeeEvent.Status.DONE ? R.string.employee_events_done
                 : event.status == EmployeeEvent.Status.REVIEW ? R.string.employee_events_review : R.string.employee_events_pending;
+        row.status.setText(description);
         ViewCompat.setStateDescription(row.button, row.itemView.getContext().getString(description));
         row.button.setOnClickListener(clicked -> onClick.accept(event));
     }
@@ -64,6 +66,7 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
         final TextView due;
         final ImageView icon;
         final View button;
+        final TextView status;
 
         Row(View view) {
             super(view);
@@ -71,6 +74,7 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
             due = view.findViewById(R.id.text_employee_event_due);
             icon = view.findViewById(R.id.image_employee_event_status);
             button = view.findViewById(R.id.button_employee_event);
+            status = view.findViewById(R.id.text_employee_event_status);
         }
     }
 }

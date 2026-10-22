@@ -10,7 +10,7 @@
     <string name="profile_unit">Unidade:</string>
     <string name="profile_modality">Modalidade:</string>
     <string name="profile_email">E-mail:</string>
-    <string name="profile_notifications">Receber notificações no celular</string>
+    <string name="profile_notifications">Receber alertas no celular</string>
     <string name="profile_nrs">Minhas NR’s</string>
     <string name="profile_nrs_empty">Nenhuma NR vinculada ao seu cargo.</string>
     <string name="profile_nr_code">NR-%1$02d</string>
