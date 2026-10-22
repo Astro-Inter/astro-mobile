@@ -27,8 +27,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class NotificationsRepositoryTest {
     private static final String SUCCESS = "{\"success\":true,\"data\":["
-            + "{\"id\":\"new-id\",\"titulo\":\"Validações pendentes\",\"viewed\":false,\"horas\":0},"
-            + "{\"id\":\"old-id\",\"titulo\":\"Treinamento de EPI\",\"viewed\":true,\"horas\":48}]}";
+            + "{\"id\":\"new-id\",\"title\":\"Validações pendentes\",\"viewed\":false,\"hours\":0},"
+            + "{\"id\":\"old-id\",\"title\":\"Treinamento de EPI\",\"viewed\":true,\"hours\":48}]}";
 
     @Test
     public void loadsAuthenticatedContractAndPreservesOrder() throws Exception {
@@ -59,7 +59,7 @@ public final class NotificationsRepositoryTest {
         for (String json : new String[]{"{}", "", "<html>unavailable</html>",
                 "{\"success\":true,\"data\":null}", "{\"success\":true,\"data\":[null]}",
                 "{\"success\":true,\"data\":[{}]}", SUCCESS.replace("true,\"data", "false,\"data"),
-                SUCCESS.replace("\"horas\":0", "\"horas\":-1"),
+                SUCCESS.replace("\"hours\":0", "\"hours\":-1"),
                 SUCCESS.replace("\"viewed\":false", "\"viewed\":null")}) {
             Result invalid = load(repository(chain -> response(chain, 200, json), tokens()));
             assertEquals(FailureKind.INTERNAL, invalid.failure);

@@ -19,12 +19,6 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_home_skeleton_block" />
-
-        <View
-            android:layout_width="match_parent"
             android:layout_height="21dp"
             android:layout_marginTop="18dp"
             android:background="@drawable/bg_home_skeleton_block" />

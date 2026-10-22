@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.astro_mobile.data.api.NotificationsRepository;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.NotificationData;
+import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -35,6 +36,25 @@ public final class NotificationsViewModel extends ViewModel {
     public boolean isLoading() { return loading; }
     public String getSearchQuery() { return searchQuery; }
     public void setSearchQuery(String query) { searchQuery = query; }
+
+    public void loadDetail(String id, NotificationsRepository.OperationCallback<NotificationDetailsData> callback) {
+        repository.loadDetail(id, callback);
+    }
+
+    public void markViewed(String id, NotificationsRepository.OperationCallback<Void> callback) {
+        repository.markViewed(id, new NotificationsRepository.OperationCallback<Void>() {
+            @Override public void onSuccess(Void result) {
+                // Atualiza a indicação local apenas depois da confirmação do servidor.
+                for (NotificationData notification : notifications) {
+                    if (notification.getId().equals(id)) notification.markViewed();
+                }
+                callback.onSuccess(null);
+            }
+            @Override public void onFailure(FailureKind failure) { callback.onFailure(failure); }
+        });
+    }
+
+    public void cancelDetail() { repository.cancelDetail(); }
 
     public List<NotificationData> visibleNotifications() {
         // Mantém a lista recebida intacta e aplica a pesquisa no estado da tela.

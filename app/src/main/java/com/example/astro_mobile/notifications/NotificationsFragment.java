@@ -1,8 +1,15 @@
 package com.example.astro_mobile.notifications;
 
 import android.content.Context;
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,18 +23,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.SessionNavigation;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.NotificationsRepository;
 import com.example.astro_mobile.data.api.dto.NotificationData;
+import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 import com.example.astro_mobile.data.local.FlowPreferences;
+import com.example.astro_mobile.employee.events.EmployeeEvent;
+import com.example.astro_mobile.manager.events.ManagerEvent;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public final class NotificationsFragment extends Fragment {
     private NotificationsViewModel state;
     private NotificationsAdapter adapter;
-    private BottomSheetDialog detailDialog;
+    private Dialog detailDialog;
     private boolean managerFlow;
 
     public NotificationsFragment() {
@@ -42,19 +54,21 @@ public final class NotificationsFragment extends Fragment {
         managerFlow = FlowPreferences.wasManagerFlow(requireContext());
         adapter = new NotificationsAdapter(managerFlow, this::showDetails);
 
-        // Liga a lista e executa a busca somente quando o botão ou teclado é acionado.
+        // Filtra a lista já carregada a cada mudança no texto, sem novas requisições.
         RecyclerView list = view.findViewById(R.id.list_notifications);
         list.setAdapter(adapter);
         EditText search = view.findViewById(R.id.input_notifications_search);
         search.setText(state.getSearchQuery());
-        view.findViewById(R.id.button_notifications_search).setOnClickListener(clicked -> {
-            state.setSearchQuery(search.getText().toString());
-            renderNotifications(view);
-            hideKeyboard(search);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence text, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence text, int start, int before, int count) {
+                state.setSearchQuery(text.toString());
+                renderNotifications(view);
+            }
+            @Override public void afterTextChanged(Editable text) { }
         });
         search.setOnEditorActionListener((input, action, event) -> {
-            state.setSearchQuery(search.getText().toString());
-            renderNotifications(view);
+            // O botão do teclado apenas fecha o teclado; a pesquisa já foi aplicada.
             hideKeyboard(search);
             return true;
         });
@@ -115,30 +129,119 @@ public final class NotificationsFragment extends Fragment {
         view.findViewById(R.id.list_notifications).setVisibility(empty ? View.GONE : View.VISIBLE);
     }
 
-    // O contrato da listagem só fornece título, horas e estado de visualização.
+    // Abre o popup centralizado do Figma e busca a mensagem completa.
     private void showDetails(NotificationData notification) {
-        detailDialog = new BottomSheetDialog(requireContext());
-        detailDialog.setContentView(R.layout.sheet_notification_detail);
+        if (detailDialog != null) detailDialog.dismiss();
+        detailDialog = new Dialog(requireContext());
+        detailDialog.setContentView(R.layout.dialog_notification_detail);
         View sheet = detailDialog.findViewById(R.id.container_notification_detail_sheet);
         ((TextView) sheet.findViewById(R.id.text_notification_detail_title))
                 .setText(notification.getTitle());
-        ((TextView) sheet.findViewById(R.id.text_notification_detail_body)).setText(
-                getString(notification.getHours() == 0 ? R.string.notifications_recent
-                        : R.string.notifications_hours, notification.getHours()));
         sheet.findViewById(R.id.container_notification_open_event).setVisibility(View.GONE);
-        if (managerFlow) {
-            sheet.setPadding(0, sheet.getPaddingTop(), 0,
-                    getResources().getDimensionPixelSize(R.dimen.notifications_manager_sheet_bottom_padding));
-        }
-        sheet.findViewById(R.id.button_notification_detail_close)
-                .setOnClickListener(clicked -> detailDialog.dismiss());
+        Dialog dialog = detailDialog;
+        sheet.findViewById(R.id.button_notification_detail_close).setOnClickListener(clicked -> dialog.dismiss());
+        dialog.setOnDismissListener(ignored -> state.cancelDetail());
 
-        detailDialog.getBehavior().setMaxWidth(
-                getResources().getDimensionPixelSize(R.dimen.notifications_detail_max_width));
         detailDialog.show();
-        View bottomSheet = detailDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-        if (bottomSheet != null) bottomSheet.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-        if (detailDialog.getWindow() != null) detailDialog.getWindow().setDimAmount(0.65f);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            dialog.getWindow().setDimAmount(0.8f);
+            int margin = Math.round(30 * getResources().getDisplayMetrics().density);
+            int width = Math.min(getResources().getDisplayMetrics().widthPixels - 2 * margin,
+                    getResources().getDimensionPixelSize(R.dimen.notifications_detail_max_width));
+            dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        loadDetail(dialog, sheet, notification);
+    }
+
+    private boolean isDetailActive(Dialog dialog) {
+        return getView() != null && isResumed() && detailDialog == dialog && dialog.isShowing();
+    }
+
+    private void setDetailLoading(View sheet) {
+        sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.VISIBLE);
+        sheet.findViewById(R.id.text_notification_detail_error).setVisibility(View.GONE);
+        sheet.findViewById(R.id.button_notification_detail_retry).setVisibility(View.GONE);
+    }
+
+    private void loadDetail(Dialog dialog, View sheet, NotificationData notification) {
+        setDetailLoading(sheet);
+        sheet.findViewById(R.id.container_notification_open_event).setVisibility(View.GONE);
+        sheet.findViewById(R.id.text_notification_detail_body).setVisibility(View.GONE);
+        state.loadDetail(notification.getId(), new NotificationsRepository.OperationCallback<NotificationDetailsData>() {
+            @Override public void onSuccess(NotificationDetailsData detail) {
+                if (!isDetailActive(dialog)) return;
+                String title = detail.getTitle();
+                ((TextView) sheet.findViewById(R.id.text_notification_detail_title)).setText(
+                        title == null || title.trim().isEmpty() ? notification.getTitle() : title);
+                TextView body = sheet.findViewById(R.id.text_notification_detail_body);
+                body.setText(detail.getMessage());
+                body.setVisibility(View.VISIBLE);
+                sheet.findViewById(R.id.container_notification_open_event)
+                        .setVisibility(detail.getEventId() == null ? View.GONE : View.VISIBLE);
+                sheet.findViewById(R.id.button_notification_open_event).setOnClickListener(clicked -> {
+                    dialog.dismiss();
+                    openEvent(detail.getEventId());
+                });
+                sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.GONE);
+                if (!notification.isViewed()) markViewed(dialog, sheet, notification);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (!isDetailActive(dialog)) return;
+                showDetailError(sheet, failure, R.string.notification_detail_load_error,
+                        () -> loadDetail(dialog, sheet, notification));
+            }
+        });
+    }
+
+    // A mensagem permanece visível mesmo se a confirmação de leitura falhar.
+    private void markViewed(Dialog dialog, View sheet, NotificationData notification) {
+        setDetailLoading(sheet);
+        state.markViewed(notification.getId(), new NotificationsRepository.OperationCallback<Void>() {
+            @Override public void onSuccess(Void result) {
+                if (!isDetailActive(dialog)) return;
+                sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.GONE);
+                renderNotifications(requireView());
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (!isDetailActive(dialog)) return;
+                showDetailError(sheet, failure, R.string.notification_detail_read_error,
+                        () -> markViewed(dialog, sheet, notification));
+            }
+        });
+    }
+
+    private void openEvent(long eventId) {
+        // Preserva o ID real; os demais dados são do protótipo até integrar o detalhe.
+        Bundle args = AuthArgs.copy(getArguments());
+        args.putLong("event_id", eventId);
+        args.putString("event_title", getString(R.string.employee_home_training));
+        if (managerFlow) {
+            args.putString("event_completion_mode", ManagerEvent.CompletionMode.SELF_DECLARATION.name());
+        } else {
+            args.putString("event_date", LocalDate.now().plusDays(1).toString());
+            args.putString("event_status", EmployeeEvent.Status.PENDING.name());
+            args.putBoolean("event_urgent", false);
+        }
+        Navigation.findNavController(requireView()).navigate(managerFlow
+                ? R.id.action_notifications_to_manager_event : R.id.action_notifications_to_employee_event, args);
+    }
+
+    private void showDetailError(View sheet, FailureKind failure, int message, Runnable retry) {
+        sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.GONE);
+        if (failure == FailureKind.SESSION) {
+            detailDialog.dismiss();
+            SessionNavigation.signOut(this);
+            return;
+        }
+        TextView error = sheet.findViewById(R.id.text_notification_detail_error);
+        error.setText(failure == FailureKind.CONNECTION ? R.string.notifications_connection_error
+                : failure == FailureKind.BUSINESS ? R.string.notifications_access_error : message);
+        error.setVisibility(View.VISIBLE);
+        View button = sheet.findViewById(R.id.button_notification_detail_retry);
+        button.setVisibility(View.VISIBLE);
+        button.setOnClickListener(clicked -> retry.run());
     }
 
     // Fecha o teclado após aplicar a busca.
