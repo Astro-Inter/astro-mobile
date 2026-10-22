@@ -23,12 +23,6 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:maxLines="1" android:ellipsize="end" />
         </LinearLayout>
-        <TextView android:id="@+id/text_human_conversation_count"
-            style="@style/ManagerEventsText"
-            android:layout_width="29dp" android:layout_height="29dp"
-            android:layout_marginStart="10dp" android:gravity="center"
-            android:background="@drawable/bg_human_chat_badge"
-            android:textSize="17.5sp" android:text="@string/human_conversation_example_count" />
     </LinearLayout>
     <View android:id="@+id/divider_human_conversation"
         android:layout_width="match_parent" android:layout_height="21dp"

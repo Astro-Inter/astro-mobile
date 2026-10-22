@@ -3,7 +3,7 @@ package com.example.astro_mobile.chat;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.DateUtils;
+import android.widget.ImageView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +37,10 @@ import java.util.Locale;
 /** Sessões da conta, com paginação e leitura do histórico antes da navegação. */
 public final class AiSessionsFragment extends Fragment {
     private ChatViewModel model;
-    private String selectedFilter = "all";
     public AiSessionsFragment() { super(R.layout.fragment_ai_sessions); }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (savedInstanceState != null) selectedFilter = savedInstanceState.getString("sessions_filter", "all");
         NavController navigation = NavHostFragment.findNavController(this);
         model = new ViewModelProvider(navigation.getBackStackEntry(HomeNavigation.destination(requireContext())),
                 new ChatViewModel.Factory()).get(ChatViewModel.class);
@@ -53,10 +51,7 @@ public final class AiSessionsFragment extends Fragment {
                 info.setClassName("android.widget.Button");
             }
         };
-        for (int id : new int[]{R.id.button_ai_sessions_filter_all, R.id.button_ai_sessions_filter_active,
-                R.id.button_ai_sessions_filter_closed, R.id.button_ai_sessions_new}) {
-            ViewCompat.setAccessibilityDelegate(view.findViewById(id), buttonAccessibility);
-        }
+        ViewCompat.setAccessibilityDelegate(view.findViewById(R.id.button_ai_sessions_new), buttonAccessibility);
         EditText search = view.findViewById(R.id.input_ai_sessions_search);
         RecyclerView list = view.findViewById(R.id.list_ai_sessions);
         SessionAdapter adapter = new SessionAdapter(conversation -> {
@@ -86,28 +81,19 @@ public final class AiSessionsFragment extends Fragment {
             String query = normalize(search.getText().toString().trim());
             List<ChatViewModel.Conversation> filtered = new ArrayList<>();
             if (all != null) for (ChatViewModel.Conversation conversation : all) {
-                boolean matchesStatus = "all".equals(selectedFilter)
-                        || ("active".equals(selectedFilter) && !"encerrada".equals(conversation.status))
-                        || ("closed".equals(selectedFilter) && "encerrada".equals(conversation.status));
-                if (matchesStatus && normalize(conversation.title + " " + conversation.preview).contains(query)) filtered.add(conversation);
+                if (normalize(conversation.title + " " + conversation.preview).contains(query)) filtered.add(conversation);
             }
             adapter.submitList(filtered, () -> list.post(loadNextPage));
-            view.findViewById(R.id.button_ai_sessions_filter_all).setSelected("all".equals(selectedFilter));
-            view.findViewById(R.id.button_ai_sessions_filter_active).setSelected("active".equals(selectedFilter));
-            view.findViewById(R.id.button_ai_sessions_filter_closed).setSelected("closed".equals(selectedFilter));
             ChatViewModel.ListState state = model.getListState().getValue();
             view.findViewById(R.id.container_ai_sessions_empty).setVisibility(filtered.isEmpty()
                     && state != null && !state.loading && !state.loadingMore && !state.hasMore
                     && state.failure == null ? View.VISIBLE : View.GONE);
-            boolean searching = !query.isEmpty() || !"all".equals(selectedFilter);
+            boolean searching = !query.isEmpty();
             ((TextView) view.findViewById(R.id.text_ai_sessions_empty_title)).setText(searching
                     ? R.string.ai_sessions_no_results_title : R.string.ai_sessions_empty_title);
             ((TextView) view.findViewById(R.id.text_ai_sessions_empty_body)).setText(searching
                     ? R.string.ai_sessions_no_results_body : R.string.ai_sessions_empty_body);
         };
-        view.findViewById(R.id.button_ai_sessions_filter_all).setOnClickListener(clicked -> { selectedFilter = "all"; filter.run(); });
-        view.findViewById(R.id.button_ai_sessions_filter_active).setOnClickListener(clicked -> { selectedFilter = "active"; filter.run(); });
-        view.findViewById(R.id.button_ai_sessions_filter_closed).setOnClickListener(clicked -> { selectedFilter = "closed"; filter.run(); });
         search.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence text, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence text, int start, int before, int count) { filter.run(); }
@@ -145,21 +131,19 @@ public final class AiSessionsFragment extends Fragment {
         ChatViewModel.OpenState open = model.getOpenState().getValue();
         if (list == null || open == null) return;
         boolean loading = list.loading || list.loadingMore || open.loading;
-        view.findViewById(R.id.progress_ai_sessions).setVisibility(list.loading || open.loading ? View.VISIBLE : View.GONE);
+        // O skeleton acompanha a consulta/abertura real, sem atraso artificial.
+        boolean showSkeleton = list.loading || open.loading;
+        view.findViewById(R.id.skeleton_ai_sessions).setVisibility(showSkeleton ? View.VISIBLE : View.GONE);
+        view.findViewById(R.id.list_ai_sessions).setVisibility(showSkeleton ? View.INVISIBLE : View.VISIBLE);
         view.findViewById(R.id.container_ai_sessions_paging).setVisibility(list.loadingMore ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.button_ai_sessions_page_retry).setVisibility(!loading && list.failure != null
                 && list.failure != com.example.astro_mobile.data.ai.ChatFailure.SESSION
                 && list.failure != com.example.astro_mobile.data.ai.ChatFailure.FORBIDDEN ? View.VISIBLE : View.GONE);
         TextView notice = view.findViewById(R.id.text_ai_sessions_notice);
-        notice.setVisibility(list.loading || open.loading || list.failure != null ? View.VISIBLE : View.GONE);
-        notice.setTextColor(requireContext().getColor(!loading && list.failure != null ? R.color.astro_error : R.color.astro_input_hint));
-        notice.setText(open.loading ? R.string.ai_sessions_history_loading : loading ? R.string.ai_sessions_loading
-                : list.failure == com.example.astro_mobile.data.ai.ChatFailure.SESSION ? R.string.chat_session_error : R.string.ai_sessions_load_error);
-    }
-
-    @Override public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("sessions_filter", selectedFilter);
+        notice.setVisibility(!loading && list.failure != null ? View.VISIBLE : View.GONE);
+        notice.setTextColor(requireContext().getColor(R.color.astro_error));
+        notice.setText(list.failure == com.example.astro_mobile.data.ai.ChatFailure.SESSION
+                ? R.string.chat_session_error : R.string.ai_sessions_load_error);
     }
 
     @Override public void onResume() {
@@ -190,9 +174,7 @@ public final class AiSessionsFragment extends Fragment {
                 return before.id.equals(after.id);
             }
             @Override public boolean areContentsTheSame(@NonNull ChatViewModel.Conversation before, @NonNull ChatViewModel.Conversation after) {
-                return before.title.equals(after.title) && before.preview.equals(after.preview)
-                        && before.status.equals(after.status) && before.updatedAt == after.updatedAt
-                        && before.active == after.active && before.responding == after.responding;
+                return before.title.equals(after.title) && before.preview.equals(after.preview);
             }
         };
         private final OpenConversation open;
@@ -206,7 +188,7 @@ public final class AiSessionsFragment extends Fragment {
         }
 
         @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
-            return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ai_session, parent, false));
+            return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_human_conversation, parent, false));
         }
 
         @Override public void onBindViewHolder(@NonNull Holder holder, int position) {
@@ -214,29 +196,26 @@ public final class AiSessionsFragment extends Fragment {
             holder.title.setText(conversation.title.isEmpty() ? holder.itemView.getContext().getString(R.string.ai_sessions_draft)
                     : conversation.title.replaceAll("\\s+", " "));
             holder.preview.setText(conversation.preview.replaceAll("\\s+", " "));
-            int statusLabel = conversation.responding ? R.string.ai_sessions_responding
-                    : "encerrada".equals(conversation.status) ? R.string.ai_sessions_closed
-                    : "encerrando".equals(conversation.status) ? R.string.ai_sessions_ending
-                    : conversation.active ? R.string.ai_sessions_active : R.string.ai_sessions_status_active;
-            String status = holder.itemView.getContext().getString(statusLabel);
-            String date = DateUtils.formatDateTime(holder.itemView.getContext(), conversation.updatedAt,
-                    DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_ABBREV_MONTH);
-            holder.status.setText(conversation.updatedAt == 0 ? status
-                    : holder.itemView.getContext().getString(R.string.ai_sessions_metadata, status, date));
-            holder.itemView.setSelected(conversation.active);
-            holder.itemView.setEnabled(enabled);
-            holder.status.setTextColor(holder.itemView.getContext().getColor(conversation.active
-                    ? R.color.astro_light_background : R.color.astro_input_hint));
-            holder.itemView.setOnClickListener(clicked -> open.open(conversation));
+            // Compartilha o card humano; somente o avatar e os dados vêm da sessão da IA.
+            holder.button.setEnabled(enabled);
+            holder.button.setOnClickListener(clicked -> open.open(conversation));
         }
 
         static final class Holder extends RecyclerView.ViewHolder {
-            final TextView title, preview, status;
+            final TextView title, preview;
+            final View button;
             Holder(View view) {
                 super(view);
-                title = view.findViewById(R.id.text_ai_session_title);
-                preview = view.findViewById(R.id.text_ai_session_preview);
-                status = view.findViewById(R.id.text_ai_session_status);
+                title = view.findViewById(R.id.text_human_conversation_name);
+                title.setMaxLines(1);
+                title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                preview = view.findViewById(R.id.text_human_conversation_preview);
+                button = view.findViewById(R.id.button_human_conversation);
+                ImageView avatar = view.findViewById(R.id.image_human_conversation_avatar);
+                avatar.setImageResource(R.drawable.home_mascot);
+                avatar.setBackgroundResource(R.drawable.bg_conversations_ai_avatar);
+                int padding = Math.round(7 * view.getResources().getDisplayMetrics().density);
+                avatar.setPadding(padding, padding, padding, padding);
             }
         }
     }

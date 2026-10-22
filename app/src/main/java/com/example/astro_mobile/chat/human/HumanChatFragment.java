@@ -25,7 +25,9 @@ public final class HumanChatFragment extends Fragment {
     public static final String PEER_NAME = "human_peer_name";
     public static final String PEER_ROLE = "human_peer_role";
     public static final String PEER_AVATAR_INDEX = "human_peer_avatar_index";
-    private HumanChatViewModel state;
+    public static final String PEER_IS_MANAGER = "human_peer_is_manager";
+    private HumanConversationsViewModel state;
+    private HumanConversation conversation;
     private Runnable finishLoading;
 
     public HumanChatFragment() { super(R.layout.fragment_human_chat); }
@@ -34,17 +36,16 @@ public final class HumanChatFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         boolean manager = FlowPreferences.wasManagerFlow(requireContext());
-        state = new ViewModelProvider(this).get(HumanChatViewModel.class);
-        state.initialize(manager);
+        state = new ViewModelProvider(requireActivity()).get(HumanConversationsViewModel.class);
 
-        // O fluxo ativo escolhe a variante visual; argumentos levam o contato mock selecionado.
+        // Pesquisa e detalhe do funcionário recuperam o mesmo histórico durante a sessão.
         Bundle args = requireArguments();
-        ((TextView) view.findViewById(R.id.text_human_chat_name)).setText(args.getString(PEER_NAME,
-                getString(manager ? R.string.human_chat_employee_name : R.string.human_chat_manager_name)));
-        ((TextView) view.findViewById(R.id.text_human_chat_role)).setText(args.getString(PEER_ROLE,
-                getString(manager ? R.string.human_chat_employee_role : R.string.human_chat_manager_role)));
+        conversation = state.open(args.getString(PEER_NAME), args.getString(PEER_ROLE),
+                args.getBoolean(PEER_IS_MANAGER, !manager), args.getInt(PEER_AVATAR_INDEX));
+        ((TextView) view.findViewById(R.id.text_human_chat_name)).setText(conversation.name);
+        ((TextView) view.findViewById(R.id.text_human_chat_role)).setText(conversation.role);
         int[] avatars = {R.drawable.participant_avatar_1, R.drawable.participant_avatar_2, R.drawable.participant_avatar_3};
-        int avatar = manager ? avatars[args.getInt(PEER_AVATAR_INDEX)] : R.drawable.human_chat_manager_avatar;
+        int avatar = conversation.manager ? R.drawable.human_chat_manager_avatar : avatars[conversation.avatarIndex];
         ImageView peer = view.findViewById(R.id.image_human_chat_peer);
         peer.setImageResource(avatar);
         ViewGroup.LayoutParams peerSize = peer.getLayoutParams();
@@ -57,13 +58,13 @@ public final class HumanChatFragment extends Fragment {
                 Toast.makeText(requireContext(), R.string.human_chat_attachment_pending, Toast.LENGTH_SHORT).show());
 
         RecyclerView messages = view.findViewById(R.id.list_human_chat_messages);
-        HumanMessagesAdapter adapter = new HumanMessagesAdapter(state.getMessages(), avatar, manager);
+        HumanMessagesAdapter adapter = new HumanMessagesAdapter(conversation.messages, avatar, manager);
         messages.setAdapter(adapter);
         EditText input = view.findViewById(R.id.input_human_chat_message);
-        input.setText(state.getDraft());
+        input.setText(conversation.draft);
         input.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { state.setDraft(s.toString()); }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { conversation.draft = s.toString(); }
             @Override public void afterTextChanged(Editable s) { }
         });
         view.findViewById(R.id.button_human_chat_send).setOnClickListener(clicked -> send(input, messages, adapter));
@@ -74,13 +75,13 @@ public final class HumanChatFragment extends Fragment {
         });
 
         // Mostra um segundo de skeleton no protótipo; a prévia XML permanece visível.
-        if (!state.isLoaded()) {
+        if (!conversation.loaded) {
             View skeleton = view.findViewById(R.id.skeleton_human_chat);
             messages.setVisibility(View.INVISIBLE);
             skeleton.setVisibility(View.VISIBLE);
             view.findViewById(R.id.container_human_chat_composer).setVisibility(View.INVISIBLE);
             finishLoading = () -> {
-                state.markLoaded();
+                conversation.loaded = true;
                 skeleton.setVisibility(View.GONE);
                 messages.setVisibility(View.VISIBLE);
                 view.findViewById(R.id.container_human_chat_composer).setVisibility(View.VISIBLE);
@@ -92,8 +93,8 @@ public final class HumanChatFragment extends Fragment {
 
     private void send(EditText input, RecyclerView messages, HumanMessagesAdapter adapter) {
         // A mensagem aparece somente nesta demonstração, sem chamar o chatbot ou enviar à rede.
-        if (!state.send()) return;
-        int last = state.getMessages().size() - 1;
+        if (!state.send(conversation)) return;
+        int last = conversation.messages.size() - 1;
         adapter.notifyItemInserted(last);
         input.setText("");
         messages.scrollToPosition(last);

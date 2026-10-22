@@ -59,7 +59,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_chat_sender"
-            tools:text="Olá, sou o SATH, a IA do Astro, o que vamos fazer hoje?" />
+            tools:text="Olá, sou o Astrinho, a IA do Astro, o que vamos fazer hoje?" />
 
         <LinearLayout
             android:id="@+id/container_chat_markdown"

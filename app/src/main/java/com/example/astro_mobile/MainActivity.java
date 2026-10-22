@@ -15,11 +15,13 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.splashscreen.SplashScreen;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.chat.human.HumanConversationsViewModel;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
             configureBottomNavigation(navController, bottomNavigation);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 int destinationId = destination.getId();
+                if (destinationId == R.id.emailIdentificationFragment) {
+                    new ViewModelProvider(this).get(HumanConversationsViewModel.class).clearSession();
+                }
                 boolean isAuthenticationScreen = destinationId == R.id.emailIdentificationFragment
                         || destinationId == R.id.accessKeyInformationFragment
                         || destinationId == R.id.loginPasswordFragment
@@ -75,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             boolean hasKeyboardInput = navController != null && navController.getCurrentDestination() != null
                     && (navController.getCurrentDestination().getId() == R.id.chatFragment
+                    || navController.getCurrentDestination().getId() == R.id.humanChatFragment
+                    || navController.getCurrentDestination().getId() == R.id.conversationsFragment
+                    || navController.getCurrentDestination().getId() == R.id.newConversationFragment
                     || navController.getCurrentDestination().getId() == R.id.employeeEventsFragment
                     || navController.getCurrentDestination().getId() == R.id.managerEventsFragment
                     || navController.getCurrentDestination().getId() == R.id.managerFormsFragment
@@ -140,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         // Só o conteúdo muda nas telas com navbar. No chat, ela se oculta durante o teclado.
         boolean home = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment;
         boolean conversations = destination == R.id.conversationsFragment || destination == R.id.chatFragment
+                || destination == R.id.newConversationFragment
                 || destination == R.id.aiSessionsFragment || destination == R.id.humanChatFragment;
         boolean profile = destination == R.id.profileFragment;
         boolean events = destination == R.id.employeeEventsFragment

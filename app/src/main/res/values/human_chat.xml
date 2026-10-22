@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="human_chat_manager_name">Tyler, the Creator</string>
-    <string name="human_chat_manager_role">Engenheiro de segurança</string>
-    <string name="human_chat_employee_name">Kevin Parker</string>
-    <string name="human_chat_employee_role">Eletricista</string>
     <string name="human_chat_attachment_pending">Anexos ainda não estão disponíveis nesta demonstração.</string>
     <string name="human_conversation_manager_label">&lt;b>Gestor - &lt;/b>%1$s</string>
-    <string name="human_conversation_employee_preview">Você: Proximo evento que você nao fizer...</string>
-    <string name="human_conversation_manager_preview">Já é o terceiro evento q vc não conclui, na...</string>
-    <string name="human_conversation_example_count">1</string>
+    <string name="human_conversation_sent_preview">Você: %1$s</string>
 </resources>

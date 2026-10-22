@@ -1,13 +1,16 @@
 package com.example.astro_mobile.chat;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,63 +19,92 @@ import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.chat.human.HumanChatFragment;
 import com.example.astro_mobile.chat.human.HumanConversationAdapter;
+import com.example.astro_mobile.chat.human.HumanConversationsViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public final class ConversationsFragment extends Fragment {
+    private String query = "";
+    private Runnable finishLoading;
+    private boolean contactsLoaded;
 
-    public ConversationsFragment() {
-        super(R.layout.fragment_conversations);
-    }
+    public ConversationsFragment() { super(R.layout.fragment_conversations); }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         NavController navigation = NavHostFragment.findNavController(this);
+        boolean contacts = navigation.getCurrentDestination().getId() == R.id.newConversationFragment;
         boolean manager = FlowPreferences.wasManagerFlow(requireContext());
+        HumanConversationsViewModel state = new ViewModelProvider(requireActivity())
+                .get(HumanConversationsViewModel.class);
 
-        // O Gestor pode usar o fluxo de Colaborador; o texto acompanha o fluxo ativo.
-        ((TextView) view.findViewById(R.id.text_conversations_subtitle)).setText(
-                manager
-                        ? R.string.conversations_manager_subtitle : R.string.conversations_subtitle);
-
-        // Voltar e fechar retornam à Home que já está na pilha; a Activity controla as abas.
-        View.OnClickListener returnHome = clicked ->
-                navigation.popBackStack(HomeNavigation.destination(requireContext()), false);
-        view.findViewById(R.id.button_conversations_back).setOnClickListener(returnHome);
-        view.findViewById(R.id.button_conversations_close).setOnClickListener(returnHome);
-
-        // A IA fixada abre sua lista de sessões; o mascote mantém acesso direto ao chat.
+        // Os dois destinos compartilham o layout; a pesquisa não tem introdução nem IA fixada.
+        view.findViewById(R.id.container_conversations_heading).setVisibility(contacts ? View.GONE : View.VISIBLE);
+        view.findViewById(R.id.button_conversations_new).setVisibility(contacts ? View.GONE : View.VISIBLE);
+        ((TextView) view.findViewById(R.id.text_conversations_subtitle)).setText(manager
+                ? R.string.conversations_manager_subtitle : R.string.conversations_subtitle);
+        view.findViewById(R.id.button_conversations_back).setOnClickListener(clicked -> navigation.popBackStack());
+        view.findViewById(R.id.button_conversations_back).setContentDescription(getString(contacts
+                ? R.string.conversations_return_list : R.string.conversations_back));
+        view.findViewById(R.id.button_conversations_close).setOnClickListener(clicked ->
+                navigation.popBackStack(HomeNavigation.destination(requireContext()), false));
+        view.findViewById(R.id.button_conversations_new_action).setOnClickListener(clicked ->
+                navigation.navigate(R.id.action_conversations_to_new, AuthArgs.copy(getArguments())));
         view.findViewById(R.id.button_conversations_ai).setOnClickListener(clicked ->
                 navigation.navigate(R.id.action_conversations_to_ai_sessions, AuthArgs.copy(getArguments())));
 
-        // O contato mock acompanha o fluxo ativo e abre a conversa humana, não o chat da IA.
-        RecyclerView humans = view.findViewById(R.id.list_conversations);
-        humans.setAdapter(new HumanConversationAdapter(manager, clicked -> {
+        RecyclerView list = view.findViewById(R.id.list_conversations);
+        HumanConversationAdapter adapter = new HumanConversationAdapter(contacts, conversation -> {
             Bundle args = AuthArgs.copy(getArguments());
-            args.putString(HumanChatFragment.PEER_NAME, getString(manager
-                    ? R.string.human_chat_employee_name : R.string.human_chat_manager_name));
-            args.putString(HumanChatFragment.PEER_ROLE, getString(manager
-                    ? R.string.human_chat_employee_role : R.string.human_chat_manager_role));
-            args.putInt(HumanChatFragment.PEER_AVATAR_INDEX, 0);
-            navigation.navigate(R.id.action_conversations_to_human_chat, args);
-        }));
+            args.putString(HumanChatFragment.PEER_NAME, conversation.name);
+            args.putString(HumanChatFragment.PEER_ROLE, conversation.role);
+            args.putInt(HumanChatFragment.PEER_AVATAR_INDEX, conversation.avatarIndex);
+            args.putBoolean(HumanChatFragment.PEER_IS_MANAGER, conversation.manager);
+            navigation.navigate(contacts ? R.id.action_new_conversation_to_human_chat
+                    : R.id.action_conversations_to_human_chat, args);
+        });
+        list.setAdapter(adapter);
+        list.setItemAnimator(null);
+        EditText search = view.findViewById(R.id.input_conversations_search);
+        search.setHint(contacts ? (manager ? R.string.conversations_search_employees
+                : R.string.conversations_search_managers) : R.string.conversations_search_hint);
+        search.setText(query);
+        Runnable filter = () -> {
+            adapter.submit(state.visible(manager, contacts, query));
+            boolean showAi = !contacts && HumanConversationsViewModel.matches(
+                    getString(R.string.conversations_ai_title), query);
+            view.findViewById(R.id.button_conversations_ai).setVisibility(showAi ? View.VISIBLE : View.GONE);
+            view.findViewById(R.id.divider_conversations_ai).setVisibility(showAi ? View.VISIBLE : View.GONE);
+        };
+        // Cada edição atualiza a lista imediatamente, sem timer ou botão de pesquisa.
+        search.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                query = s.toString();
+                filter.run();
+            }
+            @Override public void afterTextChanged(Editable s) { }
+        });
+        filter.run();
 
-        // Nesta etapa, os filtros alternam apenas a seleção visual.
-        int[] filterIds = {R.id.button_conversations_filter_all,
-                R.id.button_conversations_filter_employees, R.id.button_conversations_filter_managers};
-        view.findViewById(R.id.button_conversations_filter_all).setSelected(true);
-        for (int filterId : filterIds) {
-            view.findViewById(filterId).setOnClickListener(clicked -> {
-                for (int id : filterIds) {
-                    view.findViewById(id).setSelected(id == clicked.getId());
-                }
-            });
+        // Apenas a pesquisa de contatos simula a futura carga com um segundo de skeleton.
+        if (contacts && !contactsLoaded) {
+            View skeleton = view.findViewById(R.id.container_conversations_skeleton);
+            list.setVisibility(View.INVISIBLE);
+            skeleton.setVisibility(View.VISIBLE);
+            finishLoading = () -> {
+                contactsLoaded = true;
+                skeleton.setVisibility(View.GONE);
+                list.setVisibility(View.VISIBLE);
+                finishLoading = null;
+            };
+            view.postDelayed(finishLoading, 1_000L);
         }
+    }
 
-        // A busca ainda aguarda sua funcionalidade.
-        view.findViewById(R.id.button_conversations_search).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
-                        Toast.LENGTH_SHORT).show());
+    @Override public void onDestroyView() {
+        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
+        finishLoading = null;
+        super.onDestroyView();
     }
 }
