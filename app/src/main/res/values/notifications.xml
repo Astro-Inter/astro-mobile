@@ -11,7 +11,6 @@
     <string name="notifications_retry">Tentar novamente</string>
     <string name="notifications_connection_error">Sem conexão. Confira sua internet e tente novamente.</string>
     <string name="notifications_access_error">Não foi possível acessar suas notificações.</string>
-    <string name="notifications_load_error">Não foi possível carregar as notificações. Tente novamente.</string>
     <string name="notifications_open_event">Visualizar evento</string>
     <dimen name="notifications_detail_max_width">370dp</dimen>
     <dimen name="notifications_manager_sheet_bottom_padding">40dp</dimen>

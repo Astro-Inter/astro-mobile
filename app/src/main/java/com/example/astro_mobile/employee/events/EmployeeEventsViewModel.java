@@ -1,71 +1,126 @@
 package com.example.astro_mobile.employee.events;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.example.astro_mobile.employee.events.mock.EmployeeEventSamples;
+import com.example.astro_mobile.data.api.CollaboratorEventsRepository;
+import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
 
+import java.text.Normalizer;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.text.Normalizer;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class EmployeeEventsViewModel extends ViewModel {
+public final class EmployeeEventsViewModel extends ViewModel {
+    public interface ResultCallback {
+        void onSuccess();
+        void onFailure(FailureKind failure);
+    }
+
+    private final CollaboratorEventsRepository repository;
+    private List<CollaboratorEventData> events = Collections.emptyList();
     private YearMonth month = YearMonth.now();
-    // A fonte mock pode ser trocada pelo repositório da API quando o contrato chegar.
-    private List<EmployeeEvent> events = EmployeeEventSamples.forMonth(month);
     private EmployeeEvent.Status filter;
     private String query = "";
-    private boolean loaded;
+    private boolean loading;
+    private ResultCallback pendingCallback;
+
+    public EmployeeEventsViewModel(CollaboratorEventsRepository repository) { this.repository = repository; }
 
     public YearMonth getMonth() { return month; }
-    public void setMonth(YearMonth month) {
-        this.month = month;
-        events = EmployeeEventSamples.forMonth(month);
-    }
+    public void setMonth(YearMonth month) { this.month = month; }
     public EmployeeEvent.Status getFilter() { return filter; }
     public void setFilter(EmployeeEvent.Status filter) { this.filter = filter; }
     public String getQuery() { return query; }
     public void setQuery(String query) { this.query = query.trim(); }
-    public boolean isLoaded() { return loaded; }
-    public void markLoaded() { loaded = true; }
+    public boolean isLoading() { return loading; }
 
-    public void markCompleted(String title, LocalDate date) {
-        // Mantém a conclusão mock apenas na lista aberta nesta sessão da tela.
-        for (int index = 0; index < events.size(); index++) {
-            EmployeeEvent event = events.get(index);
-            if (event.title.equals(title) && event.date.equals(date)) {
-                events.set(index, new EmployeeEvent(title, date, EmployeeEvent.Status.DONE, false));
-                return;
+    public void load(ResultCallback callback) {
+        if (loading) return;
+        loading = true;
+        pendingCallback = callback;
+        repository.load(new CollaboratorEventsRepository.ResultCallback() {
+            @Override public void onSuccess(List<CollaboratorEventData> result) {
+                events = result;
+                ResultCallback current = finishRequest();
+                if (current != null) current.onSuccess();
             }
-        }
+            @Override public void onFailure(FailureKind failure) {
+                ResultCallback current = finishRequest();
+                if (current != null) current.onFailure(failure);
+            }
+        });
+    }
+
+    private ResultCallback finishRequest() {
+        loading = false;
+        ResultCallback current = pendingCallback;
+        pendingCallback = null;
+        return current;
     }
 
     public List<EmployeeEvent> visibleEvents() {
-        // Aplica a busca sem diferenciar acentos, o estado escolhido e o mês atual.
+        // Recalcula os prazos ao renderizar; trocar o mês nunca cria dados fictícios.
         List<EmployeeEvent> result = new ArrayList<>();
-        for (EmployeeEvent event : events) {
-            if (YearMonth.from(event.date).equals(month)
-                    && (filter == null || event.status == filter)
-                    && matches(event.title, query)) result.add(event);
+        Instant now = Instant.now();
+        ZoneId zone = ZoneId.systemDefault();
+        String search = normalize(query);
+        for (CollaboratorEventData item : events) {
+            LocalDate date = item.getDeadline().toLocalDate();
+            if (!YearMonth.from(date).equals(month) || !normalize(item.getEventTitle()).contains(search)) continue;
+            EventStatusClassifier.DisplayStatus display = EventStatusClassifier.classify(
+                    item.getEventStatus() == CollaboratorEventData.EventStatus.CANCELADO,
+                    participation(item.getParticipationStatus()), item.isViewed(),
+                    item.getDeadline().atZone(zone).toInstant(), now);
+            EmployeeEvent event = new EmployeeEvent(item.getId(), item.getEventTitle(), date, display);
+            if (filter == null || event.status == filter) result.add(event);
         }
         return result;
     }
 
-    private boolean matches(String title, String query) {
-        String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD)
+    private EventStatusClassifier.Participation participation(CollaboratorEventData.ParticipationStatus status) {
+        switch (status) {
+            case EM_ANALISE: return EventStatusClassifier.Participation.AWAITING_APPROVAL;
+            case CONCLUIDO: return EventStatusClassifier.Participation.APPROVED;
+            case REJEITADO: return EventStatusClassifier.Participation.REJECTED;
+            default: return EventStatusClassifier.Participation.NOT_SUBMITTED;
+        }
+    }
+
+    private String normalize(String value) {
+        return Normalizer.normalize(value, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
-        String normalizedQuery = Normalizer.normalize(query, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
-        return normalizedTitle.contains(normalizedQuery);
     }
 
     public List<EmployeeEvent> eventsOn(LocalDate day) {
         List<EmployeeEvent> result = new ArrayList<>();
-        for (EmployeeEvent event : visibleEvents()) {
-            if (event.date.equals(day)) result.add(event);
-        }
+        for (EmployeeEvent event : visibleEvents()) if (event.date.equals(day)) result.add(event);
         return result;
+    }
+
+    public void cancel() {
+        // Solta o callback da View e os dados da sessão anterior, preservando só filtros.
+        pendingCallback = null;
+        loading = false;
+        repository.cancel();
+        events = Collections.emptyList();
+    }
+
+    @Override protected void onCleared() { cancel(); }
+
+    public static final class Factory implements ViewModelProvider.Factory {
+        @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            if (!modelClass.isAssignableFrom(EmployeeEventsViewModel.class)) {
+                throw new IllegalArgumentException("Unknown ViewModel: " + modelClass.getName());
+            }
+            return modelClass.cast(new EmployeeEventsViewModel(CollaboratorEventsRepository.createDefault()));
+        }
     }
 }

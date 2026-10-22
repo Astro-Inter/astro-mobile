@@ -168,39 +168,6 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.core.widget.NestedScrollView>
 
-            <LinearLayout
-                android:id="@+id/container_notifications_error"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="28dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/text_notifications_error"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/montserrat_family"
-                    android:gravity="center"
-                    android:accessibilityLiveRegion="polite"
-                    android:text="@string/notifications_load_error"
-                    android:textColor="@color/astro_light_background"
-                    android:textSize="16sp" />
-
-                <FrameLayout
-                    android:id="@+id/button_notifications_retry"
-                    style="@style/AstroPrimaryAction"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="24dp"
-                    android:contentDescription="@string/notifications_retry">
-
-                    <TextView
-                        style="@style/AstroPrimaryActionLabel"
-                        android:text="@string/notifications_retry" />
-                </FrameLayout>
-            </LinearLayout>
 
             <include
                 android:id="@+id/skeleton_notifications"

@@ -26,8 +26,4 @@
         <item quantity="one">Resta %1$d dia</item>
         <item quantity="other">Restam %1$d dias</item>
     </plurals>
-    <string name="manager_home_connection_error">Não foi possível conectar. Confira sua conexão e tente novamente.</string>
-    <string name="manager_home_access_error">Sua conta não tem acesso à home de gestor ou está inativa.</string>
-    <string name="manager_home_load_error">Não foi possível carregar sua home. Tente novamente.</string>
-    <string name="manager_home_retry">Tentar novamente</string>
 </resources>

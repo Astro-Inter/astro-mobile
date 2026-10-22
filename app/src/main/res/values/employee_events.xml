@@ -6,6 +6,12 @@
     <string name="employee_events_pending">Pendente</string>
     <string name="employee_events_review">Em análise</string>
     <string name="employee_events_done">Concluído</string>
+    <string name="employee_events_urgent">Urgente</string>
+    <string name="employee_events_new">Novo</string>
+    <string name="employee_events_rejected">Rejeitado</string>
+    <string name="employee_events_cancelled">Cancelado</string>
+    <string name="employee_events_expired">Prazo encerrado</string>
+    <string name="employee_events_details_pending">Os detalhes deste evento ainda não estão integrados.</string>
     <string name="employee_events_today">Dia atual</string>
     <string name="employee_events_day_with_events">Dia com evento(s)</string>
     <string name="employee_events_empty">Nenhum evento encontrado</string>

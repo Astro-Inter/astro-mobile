@@ -27,8 +27,8 @@ public final class EventStatusClassifierTest {
     }
 
     @Test
-    public void awaitingApprovalRemainsPendingAfterDeadline() {
-        assertEquals(EventStatusClassifier.DisplayStatus.PENDING,
+    public void awaitingApprovalRemainsInAnalysisAfterDeadline() {
+        assertEquals(EventStatusClassifier.DisplayStatus.ANALYSIS,
                 EventStatusClassifier.classify(false,
                         EventStatusClassifier.Participation.AWAITING_APPROVAL, true,
                         NOW.minusSeconds(1), NOW));
@@ -36,7 +36,7 @@ public final class EventStatusClassifierTest {
 
     @Test
     public void awaitingApprovalIsNotUrgentOrNew() {
-        assertEquals(EventStatusClassifier.DisplayStatus.PENDING,
+        assertEquals(EventStatusClassifier.DisplayStatus.ANALYSIS,
                 EventStatusClassifier.classify(false,
                         EventStatusClassifier.Participation.AWAITING_APPROVAL, false,
                         NOW.plusSeconds(3600), NOW));
@@ -89,5 +89,26 @@ public final class EventStatusClassifierTest {
                 EventStatusClassifier.classify(false,
                         EventStatusClassifier.Participation.NOT_SUBMITTED, true,
                         NOW.plus(Duration.ofHours(72)).plusNanos(1), NOW));
+    }
+
+    @Test
+    public void rejectionRemainsRejectedAfterDeadline() {
+        assertEquals(EventStatusClassifier.DisplayStatus.REJECTED,
+                EventStatusClassifier.classify(false, EventStatusClassifier.Participation.REJECTED,
+                        true, NOW.minusSeconds(1), NOW));
+    }
+
+    @Test
+    public void rejectionIsNotUrgentOrNew() {
+        assertEquals(EventStatusClassifier.DisplayStatus.REJECTED,
+                EventStatusClassifier.classify(false, EventStatusClassifier.Participation.REJECTED,
+                        false, NOW.plusSeconds(3600), NOW));
+    }
+
+    @Test
+    public void cancellationTakesPriorityOverRejection() {
+        assertEquals(EventStatusClassifier.DisplayStatus.CANCELLED,
+                EventStatusClassifier.classify(true, EventStatusClassifier.Participation.REJECTED,
+                        true, NOW.minusSeconds(1), NOW));
     }
 }

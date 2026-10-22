@@ -8,8 +8,4 @@
     <string name="employee_home_no_deadline">Sem data limite</string>
     <string name="employee_home_notification_recent">Há menos de 1h</string>
     <string name="employee_home_notification_hours">Há %1$dh</string>
-    <string name="employee_home_load_error">Não foi possível carregar sua home. Tente novamente.</string>
-    <string name="employee_home_connection_error">Não foi possível conectar. Verifique sua conexão e tente novamente.</string>
-    <string name="employee_home_access_error">Sua conta não tem acesso à home do colaborador. Se o problema persistir, fale com seu gestor.</string>
-    <string name="employee_home_retry">Tentar novamente</string>
 </resources>
