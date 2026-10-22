@@ -1,4 +1,4 @@
-# SCRUM-452 — Sessões do SATH no mobile
+# SCRUM-452 — Sessões do Astrinho no mobile
 
 ## Contrato integrado
 
@@ -22,17 +22,17 @@ O serviço independente no Cloudflare executará de hora em hora e identificará
 ### Referência visual
 
 - Lista de Conversas do App V2 no Figma (`3326:5570`), componentes `mobileNav`, `mobileInput`, `mobileFilterGroup` (`2762:7991`), `mobileChatCard` e `mobileButton` (`2762:7514`). Os rótulos e ações foram adaptados para as sessões da IA.
-- Reutiliza os tokens Astro, Montserrat, campo de busca com altura mínima de 60 dp/raio de 9 dp, botões com raio de 10 dp, margens de 30 dp, avatar do SATH, divisórias e navbar com Chat selecionado. Busca e ação principal usam os estilos compartilhados de `astro_components.xml`, baseados na composição das telas de acesso e nos componentes do Figma. Cabeçalho único de 64 dp, sem introdução repetida, libera espaço para a lista.
-- Linhas de sessão têm altura mínima de 80 dp e avatar de 36 dp. Título e prévia ocupam uma linha cada, com reticências; estado e data compartilham a terceira linha. A conversa atual recebe a superfície purple_gray. Filtros Todas/Em aberto/Encerradas trabalham sobre as páginas carregadas; Em aberto inclui sessões encerrando.
-- Os filtros reutilizam `ConversationsFilter`, sem a alteração de altura visual para 48 dp. Cada filtro tem uma área de toque de pelo menos 55 dp, com estado selecionado propagado para o fundo e sem duplicar o rótulo no leitor de tela.
+- Reutiliza os tokens Astro, Montserrat, campo de busca com altura mínima de 60 dp/raio de 9 dp, botões com raio de 10 dp, margens de 30 dp, avatar do Astrinho, divisórias e navbar com Chat selecionado. Busca e ação principal usam os estilos compartilhados de `astro_components.xml`, baseados na composição das telas de acesso e nos componentes do Figma. Cabeçalho único de 64 dp, sem introdução repetida, libera espaço para a lista.
+- Linhas de sessão têm altura mínima de 80 dp e avatar de 36 dp. Título e prévia ocupam uma linha cada, com reticências; estado e data compartilham a terceira linha. A conversa atual recebe a superfície purple_gray.
+- Skeleton substitui os indicadores de carregamento na consulta inicial, abertura e paginação, sem delay artificial. Nova conversa fica abaixo do campo de pesquisa; filtros removidos por pedido em 22/10/2026.
 - Nova conversa fica junto à parte inferior da tela, com altura mínima de 60 dp, fundo `bg_login_password_button`, texto centralizado e Plus de 18 dp à esquerda, a 16 dp da borda, conforme a composição de `mobileButton`. Busca com teclado oculta o botão de nova conversa e a navbar para liberar espaço para os resultados. As alturas são mínimas para acomodar o tamanho de fonte configurado no aparelho.
 - SVG original do Figma `Hamburguer` (`1011:669`) convertido para PNG com transparência em `drawable-nodpi/ai_sessions_menu.png`. `Plus` (`1011:687`) reutiliza o recurso existente `chat_add.png`. O cabeçalho do chat usa o hambúrguer dentro de uma área de toque de 48 dp, com imagem de 20 dp. Por pedido do usuário, os ícones de atualizar foram removidos da lista e do chat; as telas consultam os dados ao entrar e mantêm as ações de recuperação em caso de erro.
 
 ### Lista e navegação
 
 - Lista com título, prévia em texto simples, data de atualização e status ativa/encerrando/encerrada. A ordem fornecida pela API é preservada; UUIDs repetidos entre páginas são deduplicados.
-- Paginação automática ao alcançar as duas últimas linhas visíveis, com indicador no rodapé e uma requisição por vez. Páginas adicionais também preenchem uma lista curta ou sem correspondências de busca/filtro, até ocupar a tela ou esgotar o cursor. O botão Carregar mais foi removido.
-- Busca local nas conversas carregadas; a API não fornece pesquisa global. Novas páginas são filtradas com a mesma busca/estado. A ausência de resultados só é exibida após esgotar as páginas disponíveis.
+- Paginação automática ao alcançar as duas últimas linhas visíveis, com skeleton no rodapé e uma requisição por vez. Páginas adicionais também preenchem uma lista curta ou sem correspondências de busca, até ocupar a tela ou esgotar o cursor. O botão Carregar mais foi removido.
+- Busca local nas conversas carregadas; a API não fornece pesquisa global. Novas páginas são filtradas com a mesma busca. A ausência de resultados só é exibida após esgotar as páginas disponíveis.
 - Atualizações incrementais com ListAdapter/DiffUtil preservam os itens e a posição de rolagem ao acrescentar uma página. Falhas interrompem a paginação automática e oferecem Tentar novamente; cursores repetidos interrompem o carregamento para evitar um ciclo de requisições.
 - A lista é atualizada ao abrir/retornar à tela e depois de enviar. Um cursor rejeitado reinicia a primeira página.
 - Selecionar uma conversa busca o histórico antes de navegar, preservando seu UUID. Ler uma conversa antiga encerrada não a reabre: o primeiro envio solicita `/iniciar` e somente após sucesso envia a mensagem para o mesmo UUID. Falhas de retomada preservam o histórico e a pergunta pendente, sem executar o envio.

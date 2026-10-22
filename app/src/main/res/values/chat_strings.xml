@@ -1,8 +1,8 @@
 <resources>
-    <string name="chat_title">SATH</string>
+    <string name="chat_title">Astrinho</string>
     <string name="chat_subtitle">IA do Astro</string>
     <string name="chat_close">Fechar conversa</string>
-    <string name="chat_welcome_title">Olá, sou o SATH, a IA do Astro, o que vamos fazer hoje?</string>
+    <string name="chat_welcome_title">Olá, sou o Astrinho, a IA do Astro, o que vamos fazer hoje?</string>
     <string name="chat_suggestion_nrs">O que são Normas Regulamentadoras?</string>
     <string name="chat_suggestion_dashboards">Quais NRs preciso cumprir?</string>
     <string name="chat_input_hint">Mensagem</string>

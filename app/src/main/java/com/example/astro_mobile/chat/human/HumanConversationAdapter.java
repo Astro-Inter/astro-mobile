@@ -12,49 +12,53 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 
-public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanConversationAdapter.Row> {
-    private final boolean manager;
-    private final View.OnClickListener openConversation;
+import java.util.Collections;
+import java.util.List;
 
-    public HumanConversationAdapter(boolean manager, View.OnClickListener openConversation) {
-        this.manager = manager;
-        this.openConversation = openConversation;
+public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanConversationAdapter.Row> {
+    public interface Listener { void open(HumanConversation conversation); }
+    private final boolean contacts;
+    private final Listener listener;
+    private List<HumanConversation> items = Collections.emptyList();
+
+    public HumanConversationAdapter(boolean contacts, Listener listener) {
+        this.contacts = contacts;
+        this.listener = listener;
     }
 
-    @NonNull
-    @Override
+    public void submit(List<HumanConversation> items) {
+        this.items = items;
+        notifyDataSetChanged();
+    }
+
+    @NonNull @Override
     public Row onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new Row(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_human_conversation, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull Row row, int position) {
-        // Cada fluxo mostra apenas um contato de exemplo, sem simular dados da API.
-        String name = row.itemView.getContext().getString(manager
-                ? R.string.human_chat_employee_name : R.string.human_chat_manager_name);
-        row.name.setText(manager ? name : Html.fromHtml(row.itemView.getContext()
-                .getString(R.string.human_conversation_manager_label, name), Html.FROM_HTML_MODE_LEGACY));
-        row.preview.setText(manager ? R.string.human_conversation_employee_preview
-                : R.string.human_conversation_manager_preview);
-        row.avatar.setImageResource(manager ? R.drawable.participant_avatar_1
-                : R.drawable.human_chat_manager_avatar);
-        row.count.setVisibility(manager ? View.GONE : View.VISIBLE);
-        row.divider.setVisibility(manager ? View.VISIBLE : View.GONE);
-        row.button.setOnClickListener(openConversation);
+    @Override public void onBindViewHolder(@NonNull Row row, int position) {
+        HumanConversation conversation = items.get(position);
+        row.name.setText(conversation.manager ? Html.fromHtml(row.itemView.getContext()
+                .getString(R.string.human_conversation_manager_label, Html.escapeHtml(conversation.name)),
+                Html.FROM_HTML_MODE_LEGACY) : conversation.name);
+        // A pesquisa mostra identificação; a lista mostra a última mensagem enviada.
+        row.preview.setText(contacts ? conversation.role : row.itemView.getContext().getString(
+                R.string.human_conversation_sent_preview,
+                conversation.messages.get(conversation.messages.size() - 1).text));
+        int[] avatars = {R.drawable.participant_avatar_1, R.drawable.participant_avatar_2,
+                R.drawable.participant_avatar_3};
+        row.avatar.setImageResource(conversation.manager ? R.drawable.human_chat_manager_avatar
+                : avatars[conversation.avatarIndex]);
+        row.button.setOnClickListener(clicked -> listener.open(conversation));
     }
 
-    @Override
-    public int getItemCount() {
-        return 1;
-    }
+    @Override public int getItemCount() { return items.size(); }
 
     static final class Row extends RecyclerView.ViewHolder {
         final TextView name;
         final TextView preview;
         final ImageView avatar;
-        final View count;
-        final View divider;
         final View button;
 
         Row(View view) {
@@ -62,8 +66,6 @@ public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanCo
             name = view.findViewById(R.id.text_human_conversation_name);
             preview = view.findViewById(R.id.text_human_conversation_preview);
             avatar = view.findViewById(R.id.image_human_conversation_avatar);
-            count = view.findViewById(R.id.text_human_conversation_count);
-            divider = view.findViewById(R.id.divider_human_conversation);
             button = view.findViewById(R.id.button_human_conversation);
         }
     }
