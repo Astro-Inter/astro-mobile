@@ -145,16 +145,20 @@ public class MainActivity extends AppCompatActivity {
     private void openPushIfReady(NavController controller) {
         String uid = getIntent().getStringExtra(PendingEventNotifications.RECIPIENT);
         if (uid == null || controller.getCurrentDestination() == null) return;
-        int destination = controller.getCurrentDestination().getId();
-        boolean authenticated = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment
-                || destination == R.id.employeeEventsFragment || destination == R.id.managerEventsFragment;
-        if (!authenticated) return;
+        int home = HomeNavigation.destination(this);
+        Bundle authenticatedArgs;
+        try {
+            // Chat, perfil e detalhes também podem estar abertos ao tocar no aviso.
+            // A Home na pilha comprova que o fluxo autenticado já foi estabelecido.
+            authenticatedArgs = controller.getBackStackEntry(home).getArguments();
+        } catch (IllegalArgumentException notAuthenticatedYet) { return; }
         getIntent().removeExtra(PendingEventNotifications.RECIPIENT);
         if (!pushRegistration.isCurrentUser(uid)) return;
-        int action = HomeNavigation.destination(this) == R.id.managerHomeFragment
+        int events = home == R.id.managerHomeFragment ? R.id.managerEventsFragment : R.id.employeeEventsFragment;
+        if (controller.getCurrentDestination().getId() == events) return;
+        int action = home == R.id.managerHomeFragment
                 ? R.id.action_global_manager_events : R.id.action_global_employee_events;
-        Bundle args = controller.getCurrentBackStackEntry() == null ? null : controller.getCurrentBackStackEntry().getArguments();
-        controller.navigate(action, AuthArgs.copy(args));
+        controller.navigate(action, AuthArgs.copy(authenticatedArgs));
     }
 
     private void configureBottomNavigation(NavController navigation, View navbar) {
