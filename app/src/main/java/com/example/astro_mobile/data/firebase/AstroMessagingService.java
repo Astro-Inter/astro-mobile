@@ -3,6 +3,8 @@ package com.example.astro_mobile.data.firebase;
 import androidx.annotation.NonNull;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.android.gms.tasks.Tasks;
+import java.util.concurrent.TimeUnit;
 import com.example.astro_mobile.shared.notifications.PendingEventNotifications;
 
 public final class AstroMessagingService extends FirebaseMessagingService {
@@ -13,7 +15,9 @@ public final class AstroMessagingService extends FirebaseMessagingService {
     }
     @Override public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
-        PushTokenRepository.initialize(this);
+        // O FCM pode iniciar um processo encerrado antes de a sessão local ser restaurada.
+        try { Tasks.await(PushTokenRepository.initialize(this).sessionInitialized(), 5, TimeUnit.SECONDS); }
+        catch (Exception unavailable) { return; }
         PendingEventNotifications.show(this, message.getData());
     }
 }

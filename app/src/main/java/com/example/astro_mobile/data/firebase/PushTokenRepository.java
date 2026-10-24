@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import com.example.astro_mobile.data.local.PushPreferences;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,12 +26,14 @@ public final class PushTokenRepository {
     private Task<Void> registration = Tasks.forResult(null);
     private Task<Void> cleanup = Tasks.forResult(null);
     private boolean resyncRequested;
+    private final TaskCompletionSource<Void> authReady = new TaskCompletionSource<>();
 
     private PushTokenRepository(Context context) {
         this.context = context.getApplicationContext();
         auth = FirebaseAuth.getInstance(); firestore = FirebaseFirestore.getInstance();
         messaging = FirebaseMessaging.getInstance(); preferences = new PushPreferences(context);
         auth.addAuthStateListener(current -> {
+            authReady.trySetResult(null);
             if (preferences.logoutPending()) completePendingLogout();
             else if (current.getCurrentUser() != null) synchronize();
         });
@@ -44,6 +47,7 @@ public final class PushTokenRepository {
         return instance;
     }
     public boolean logoutPending() { return preferences.logoutPending(); }
+    public Task<Void> sessionInitialized() { return authReady.getTask(); }
     public boolean isCurrentUser(String uid) {
         return uid != null && !preferences.logoutPending() && auth.getCurrentUser() != null
                 && uid.equals(auth.getCurrentUser().getUid());
