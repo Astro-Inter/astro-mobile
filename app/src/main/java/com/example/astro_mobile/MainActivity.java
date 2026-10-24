@@ -1,6 +1,9 @@
 package com.example.astro_mobile;
 
 import android.os.Bundle;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -9,6 +12,10 @@ import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.SystemBarStyle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -23,14 +30,21 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.chat.human.HumanConversationsViewModel;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
+import com.example.astro_mobile.shared.notifications.PendingEventNotifications;
+import com.example.astro_mobile.shared.notifications.PushRegistrationViewModel;
 
 public class MainActivity extends AppCompatActivity {
+    private PushRegistrationViewModel pushRegistration;
+    private final ActivityResultLauncher<String> notificationPermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), granted -> { if (granted) pushRegistration.synchronize(); });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Prepara a splash nativa e permite desenhar sob as barras do sistema.
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
+        pushRegistration = new ViewModelProvider(this, PushRegistrationViewModel.Factory.createDefault(this))
+                .get(PushRegistrationViewModel.class);
         EdgeToEdge.enable(
                 this,
                 SystemBarStyle.dark(getColor(R.color.purple_gray)),
@@ -53,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
             configureBottomNavigation(navController, bottomNavigation);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 int destinationId = destination.getId();
+                if (destinationId == R.id.employeeHomeFragment || destinationId == R.id.managerHomeFragment) {
+                    registerPush();
+                    // Aguarda a autenticação e a escolha do fluxo antes de abrir a lista de eventos.
+                    root.post(() -> openPushIfReady(controller));
+                }
                 if (destinationId == R.id.emailIdentificationFragment) {
                     new ViewModelProvider(this).get(HumanConversationsViewModel.class).clearSession();
                 }
@@ -104,6 +123,38 @@ public class MainActivity extends AppCompatActivity {
             updateScrimHeight(navigationBarScrim, systemBars.bottom, Gravity.BOTTOM);
             return insets;
         });
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (pushRegistration != null) pushRegistration.synchronize();
+    }
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent); setIntent(intent);
+        NavHostFragment host = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        if (host != null) openPushIfReady(host.getNavController());
+    }
+    private void registerPush() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            pushRegistration.synchronize();
+        } else if (pushRegistration.mayAskPermission()) {
+            pushRegistration.permissionRequested();
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }
+    }
+    private void openPushIfReady(NavController controller) {
+        String uid = getIntent().getStringExtra(PendingEventNotifications.RECIPIENT);
+        if (uid == null || controller.getCurrentDestination() == null) return;
+        int destination = controller.getCurrentDestination().getId();
+        boolean authenticated = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment
+                || destination == R.id.employeeEventsFragment || destination == R.id.managerEventsFragment;
+        if (!authenticated) return;
+        getIntent().removeExtra(PendingEventNotifications.RECIPIENT);
+        if (!pushRegistration.isCurrentUser(uid)) return;
+        int action = HomeNavigation.destination(this) == R.id.managerHomeFragment
+                ? R.id.action_global_manager_events : R.id.action_global_employee_events;
+        Bundle args = controller.getCurrentBackStackEntry() == null ? null : controller.getCurrentBackStackEntry().getArguments();
+        controller.navigate(action, AuthArgs.copy(args));
     }
 
     private void configureBottomNavigation(NavController navigation, View navbar) {
