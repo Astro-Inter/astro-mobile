@@ -10,6 +10,19 @@ permissions:
   contents: read
 
 jobs:
+  firestore-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '24' }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '25' }
+      - run: npm ci
+        working-directory: firebase-tests
+      - run: npm test
+        working-directory: firebase-tests
+
   build-and-test:
     runs-on: ubuntu-latest
 

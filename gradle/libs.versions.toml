@@ -40,6 +40,8 @@ markwon-tables = { group = "io.noties.markwon", name = "ext-tables", version.ref
 markwon-strikethrough = { group = "io.noties.markwon", name = "ext-strikethrough", version.ref = "markwon" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

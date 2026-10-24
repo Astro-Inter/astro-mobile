@@ -43,7 +43,8 @@ public class FirebaseAuthRepository {
 
     public void signIn(String email, String password, ResultCallback callback) {
         // O Firebase mantém a sessão; a senha não é guardada pelo aplicativo.
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+        PushTokenRepository.getInstance().completePendingLogout()
+                .onSuccessTask(unused -> auth.signInWithEmailAndPassword(email, password)).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 callback.onSuccess();
             } else {
@@ -65,7 +66,8 @@ public class FirebaseAuthRepository {
 
     public void createAccount(String email, String password, AccountCallback callback) {
         // Cria a identidade Firebase; ativar a conta Astro é uma etapa separada.
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+        PushTokenRepository.getInstance().completePendingLogout()
+                .onSuccessTask(unused -> auth.createUserWithEmailAndPassword(email, password)).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 reportAuthenticatedAccount(email, callback);
             } else if (task.getException() instanceof FirebaseAuthUserCollisionException) {
@@ -112,6 +114,11 @@ public class FirebaseAuthRepository {
     }
 
     public void checkCurrentUser(SessionCallback callback) {
+        if (PushTokenRepository.getInstance().logoutPending()) {
+            PushTokenRepository.getInstance().completePendingLogout();
+            callback.onUser(null);
+            return;
+        }
         // Aguarda a inicialização do Firebase e confere se a sessão ainda é válida.
         FirebaseAuth.AuthStateListener listener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -145,21 +152,24 @@ public class FirebaseAuthRepository {
     }
 
     public void signOut() {
-        auth.signOut();
+        // O bloqueio local é imediato; trocar de conta exige concluir a remoção/rotação.
+        PushTokenRepository.getInstance().beginLogout();
     }
 
     public boolean hasCurrentUser() {
-        return auth.getCurrentUser() != null;
+        return !PushTokenRepository.getInstance().logoutPending() && auth.getCurrentUser() != null;
     }
 
     @Nullable
     public String getCurrentEmail() {
+        if (PushTokenRepository.getInstance().logoutPending()) return null;
         FirebaseUser user = auth.getCurrentUser();
         return user == null ? null : user.getEmail();
     }
 
     @Nullable
     public String getCurrentUserId() {
+        if (PushTokenRepository.getInstance().logoutPending()) return null;
         FirebaseUser user = auth.getCurrentUser();
         return user == null ? null : user.getUid();
     }

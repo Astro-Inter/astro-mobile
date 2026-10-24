@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /fcm_tokens/{uid}/devices/{deviceId} {
+      function owner() { return request.auth != null && request.auth.uid == uid; }
+      allow read, delete: if owner();
+      allow create, update: if owner()
+        && deviceId.matches('^[a-f0-9-]{36}$')
+        && request.resource.data.keys().hasOnly(['token', 'updated_at'])
+        && request.resource.data.keys().hasAll(['token', 'updated_at'])
+        && request.resource.data.token is string
+        && request.resource.data.token.size() > 20 && request.resource.data.token.size() < 4096
+        && request.resource.data.updated_at == request.time;
+    }
+  }
+}

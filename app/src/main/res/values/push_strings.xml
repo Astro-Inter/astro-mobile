@@ -1,0 +1,4 @@
+<resources>
+    <string name="push_pending_title">Eventos pendentes</string>
+    <string name="push_pending_body">Você tem eventos pendentes. Abra o Astro para conferir.</string>
+</resources>
