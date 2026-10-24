@@ -42,6 +42,8 @@ evita a apresentação automática de mensagens da conta anterior. Um ciclo já
 exibido não aparece novamente. Tocar no aviso abre os eventos do fluxo atual.
 O título é “Eventos pendentes” e o texto é “Você tem eventos pendentes. Abra o
 Astro para conferir.”. Não são incluídos detalhes pessoais no texto.
+O aviso usa o planeta do Astro em versão monocromática na barra de status,
+o ícone colorido já existente no aplicativo como imagem e a cor roxa da marca.
 
 ## Configuração Firebase e validação
 

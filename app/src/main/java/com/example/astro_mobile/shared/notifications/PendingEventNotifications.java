@@ -5,8 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import com.example.astro_mobile.MainActivity;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.data.firebase.PushTokenRepository;
@@ -36,7 +38,10 @@ public final class PendingEventNotifications {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent open = PendingIntent.getActivity(context, 1001, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             NotificationCompat.Builder notification = new NotificationCompat.Builder(context, CHANNEL)
-                    .setSmallIcon(R.drawable.ic_push_notification).setContentTitle(context.getString(R.string.push_pending_title))
+                    .setSmallIcon(R.drawable.ic_push_notification)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.astro_app_icon))
+                    .setColor(ContextCompat.getColor(context, R.color.astro_primary_purple))
+                    .setContentTitle(context.getString(R.string.push_pending_title))
                     .setContentText(context.getString(R.string.push_pending_body)).setContentIntent(open)
                     .setAutoCancel(true).setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
             try {
