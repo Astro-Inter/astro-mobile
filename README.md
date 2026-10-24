@@ -71,3 +71,16 @@ não entram no APK; não fornecer a elas credenciais administrativas de produç�
 Nenhuma chave administrativa ou conta de serviço é incluída no Android. O remetente
 vive no [astro-notification-service](https://github.com/Astro-Inter/astro-notification-service),
 na mesma SCRUM-617; não é necessário criar uma API de cadastro de tokens.
+
+## Teste físico em 24/10/2026
+
+A atualização foi instalada por USB em um Samsung Galaxy M31 com Android 12,
+preservando os dados. Foram confirmados o login, o ACK do registro no Firestore,
+o envio pelo Worker, a apresentação do aviso e a persistência do ciclo no aparelho.
+A repetição do mesmo ciclo no remetente não criou outro aviso no Mongo nem
+reenviou pelo FCM. A versão com o planeta do Astro também foi instalada, usando
+o ícone monocromático na barra de status e a imagem colorida no aviso.
+
+O CI compilou o aplicativo, executou os testes Java e validou as regras Firestore.
+Testes com duas instalações, logout offline e os demais cenários acima continuam
+necessários antes de considerar toda a matriz de dispositivos validada.
