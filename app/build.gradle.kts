@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.astro_mobile"
-        minSdk = 33
+        minSdk = 31
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"

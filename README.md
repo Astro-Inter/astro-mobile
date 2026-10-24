@@ -7,6 +7,10 @@ O aplicativo registra os dispositivos autenticados em
 contém somente `token` e `updated_at` (timestamp do servidor). Um UUID local
 identifica a instalação; ele não usa identificadores físicos do aparelho.
 
+O app suporta Android 12 (API 31) ou superior. Em Android 13+, solicita a permissão
+`POST_NOTIFICATIONS` depois da autenticação; no Android 12, respeita a habilitação
+das notificações nos ajustes do sistema sem solicitar uma permissão inexistente.
+
 A implementação segue as camadas existentes:
 
 - `data/local/PushPreferences` e `PushSyncPolicy`: cache de UID, token e último ACK,

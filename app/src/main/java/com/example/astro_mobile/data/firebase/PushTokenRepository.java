@@ -1,9 +1,7 @@
 package com.example.astro_mobile.data.firebase;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import androidx.core.content.ContextCompat;
+import androidx.core.app.NotificationManagerCompat;
 import com.example.astro_mobile.data.local.PushPreferences;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -60,7 +58,7 @@ public final class PushTokenRepository {
         if (!registration.isComplete()) { resyncRequested = true; return registration; }
         if (preferences.logoutPending() || auth.getCurrentUser() == null) return Tasks.forResult(null);
         String uid = auth.getCurrentUser().getUid();
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
             return Tasks.forResult(null);
         }
         registration = messaging.getToken().onSuccessTask(token -> {

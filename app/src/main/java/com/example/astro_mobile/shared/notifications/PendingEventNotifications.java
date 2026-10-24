@@ -1,15 +1,12 @@
 package com.example.astro_mobile.shared.notifications;
 
-import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 import com.example.astro_mobile.MainActivity;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.data.firebase.PushTokenRepository;
@@ -34,7 +31,7 @@ public final class PendingEventNotifications {
             PushPreferences preferences = repository.preferences();
             if (!PushMessagePolicy.shouldDisplay(data.get("type"), uid, repository.isCurrentUser(uid), cycle,
                     uid == null ? 0 : preferences.lastCycle(uid))) return;
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return;
+            if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return;
             Intent intent = new Intent(context, MainActivity.class).putExtra(RECIPIENT, uid)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent open = PendingIntent.getActivity(context, 1001, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);

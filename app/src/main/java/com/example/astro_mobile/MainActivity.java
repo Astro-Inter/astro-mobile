@@ -1,6 +1,7 @@
 package com.example.astro_mobile;
 
 import android.os.Bundle;
+import android.os.Build;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -135,7 +136,8 @@ public class MainActivity extends AppCompatActivity {
         if (host != null) openPushIfReady(host.getNavController());
     }
     private void registerPush() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             pushRegistration.synchronize();
         } else if (pushRegistration.mayAskPermission()) {
             pushRegistration.permissionRequested();
