@@ -26,7 +26,12 @@ import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
+import com.example.astro_mobile.notifications.NotificationsFragment;
+import com.example.astro_mobile.notifications.NotificationTimeFormatter;
 import com.example.astro_mobile.shared.home.HomeAiBubble;
+import com.example.astro_mobile.employee.events.EmployeeEvent;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -297,13 +302,34 @@ public class EmployeeHomeFragment extends Fragment {
 
         LinearLayout events = view.findViewById(R.id.list_employee_home_events);
         events.removeAllViews();
+        Instant now = Instant.now();
+        ZoneId zone = ZoneId.systemDefault();
         for (CollaboratorHomeData.PendingEvent event : home.getPendingEvents()) {
-            if (event == null) continue;
-            View row = addRow(events, event.getTitle(), formatDeadline(event.getLimitDate()),
-                    getString(event.isViewed() ? R.string.employee_home_pending : R.string.employee_home_new),
-                    event.isViewed() ? 0 : R.drawable.home_new);
-            row.setOnClickListener(clicked -> Navigation.findNavController(clicked)
-                    .navigate(R.id.action_global_employee_events, AuthArgs.copy(getArguments())));
+            // Um item que não existe mais na lista não recebe um status inventado.
+            if (event == null || event.getEventData() == null) continue;
+            EmployeeEvent item = EmployeeEvent.fromApi(event.getEventData(), zone, now);
+            int label;
+            int eventIcon = 0;
+            boolean red = false;
+            switch (item.displayStatus) {
+                case URGENT: label = R.string.employee_events_urgent; eventIcon = R.drawable.ic_employee_event_warning; break;
+                case NEW: label = R.string.employee_events_new; eventIcon = R.drawable.ic_employee_event_new; break;
+                case DONE: label = R.string.employee_events_done; eventIcon = R.drawable.ic_employee_event_done; break;
+                case ANALYSIS: label = R.string.employee_events_review; eventIcon = R.drawable.home_clock; break;
+                case REJECTED: label = R.string.employee_events_rejected; red = true; break;
+                case CANCELLED: label = R.string.employee_events_cancelled; red = true; break;
+                case EXPIRED: label = R.string.employee_events_expired; red = true; break;
+                default: label = R.string.employee_events_pending;
+            }
+            if (red) eventIcon = R.drawable.conversations_close;
+            View row = addRow(events, event.getTitle(), formatDeadline(item.date.toString()), getString(label), eventIcon);
+            if (red) ((ImageView) row.findViewById(R.id.image_home_feed_status)).setImageTintList(
+                    ColorStateList.valueOf(requireContext().getColor(R.color.employee_event_status_red)));
+            row.setOnClickListener(clicked -> {
+                Bundle args = AuthArgs.copy(getArguments());
+                args.putLong("event_id", event.getId());
+                Navigation.findNavController(clicked).navigate(R.id.action_global_employee_event_details, args);
+            });
         }
         showFeed(view, events.getChildCount() == 0, R.id.list_employee_home_events,
                 R.id.container_employee_home_events_more, R.id.container_employee_home_events_empty);
@@ -314,11 +340,13 @@ public class EmployeeHomeFragment extends Fragment {
             if (notification == null) continue;
             long hours = Math.max(0, notification.getSentAtInHours());
             View row = addRow(notifications, notification.getTitle(), null,
-                    hours == 0 ? getString(R.string.employee_home_notification_recent)
-                            : getString(R.string.employee_home_notification_hours, hours),
+                    NotificationTimeFormatter.format(requireContext(), hours),
                     notification.isViewed() ? 0 : R.drawable.home_new);
-            row.setOnClickListener(clicked -> Navigation.findNavController(clicked)
-                    .navigate(R.id.action_global_notifications));
+            row.setOnClickListener(clicked -> {
+                Bundle args = AuthArgs.copy(getArguments());
+                args.putString(NotificationsFragment.ARG_NOTIFICATION_ID, notification.getId());
+                Navigation.findNavController(clicked).navigate(R.id.action_global_notifications, args);
+            });
         }
         showFeed(view, notifications.getChildCount() == 0, R.id.list_employee_home_notifications,
                 R.id.container_employee_home_notifications_more, R.id.container_employee_home_notifications_empty);

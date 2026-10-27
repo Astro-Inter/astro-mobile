@@ -7,6 +7,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
+import com.example.astro_mobile.employee.events.EventStatusClassifier;
+import com.example.astro_mobile.employee.events.EmployeeEvent;
+import java.time.ZoneId;
+import java.time.Instant;
 import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
 import com.example.astro_mobile.data.firebase.IdTokenProvider;
 
@@ -210,12 +215,48 @@ public final class CollaboratorHomeRepositoryTest {
         assertEquals(1, calls.get());
     }
 
+    @Test
+    public void loadsParticipationForHomeInsteadOfGuessingFromViewed() throws Exception {
+        AtomicInteger eventCalls = new AtomicInteger();
+        Result result = load(repository(chain -> response(chain, 200, SUCCESS), chain -> {
+            eventCalls.incrementAndGet();
+            assertEquals("Bearer initial-token", chain.request().header("Authorization"));
+            return response(chain, 200, EVENTS);
+        }, tokenProvider()));
+        assertNull(result.failure);
+        assertEquals(1, eventCalls.get());
+        assertEquals(CollaboratorEventData.ParticipationStatus.REJEITADO,
+                result.home.getPendingEvents().get(0).getEventData().getParticipationStatus());
+        assertEquals(EventStatusClassifier.DisplayStatus.REJECTED,
+                EmployeeEvent.fromApi(
+                        result.home.getPendingEvents().get(0).getEventData(), ZoneId.of("America/Sao_Paulo"),
+                        Instant.parse("2026-10-25T12:00:00Z")).displayStatus);
+    }
+
+    @Test
+    public void failedParticipationLookupDoesNotPublishGuessedHomeStatus() throws Exception {
+        Result result = load(repository(chain -> response(chain, 200, SUCCESS),
+                chain -> response(chain, 503, "{}"), tokenProvider()));
+        assertEquals(FailureKind.INTERNAL, result.failure);
+        assertNull(result.home);
+    }
+
     private IdTokenProvider tokenProvider() {
         return (refresh, callback) -> callback.onToken(refresh ? "refreshed-token" : "initial-token");
     }
 
+    private static final String EVENTS = "{\"success\":true,\"data\":[{\"id\":101,"
+            + "\"eventTitle\":\"Treinamento de EPI\",\"classLimitDate\":\"2026-10-19T12:00:00\","
+            + "\"viewed\":false,\"participationStatus\":\"REJEITADO\",\"eventStatus\":\"ATIVO\"}]}";
+
     private CollaboratorHomeRepository repository(Interceptor interceptor, IdTokenProvider tokens) {
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        return repository(interceptor, chain -> response(chain, 200, EVENTS), tokens);
+    }
+
+    private CollaboratorHomeRepository repository(Interceptor home, Interceptor events, IdTokenProvider tokens) {
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(chain ->
+                chain.request().url().encodedPath().equals("/events/collaborator")
+                        ? events.intercept(chain) : home.intercept(chain)).build();
         AstroApi api = new Retrofit.Builder().baseUrl("https://example.com/").client(client)
                 .callbackExecutor(Runnable::run).addConverterFactory(GsonConverterFactory.create())
                 .build().create(AstroApi.class);

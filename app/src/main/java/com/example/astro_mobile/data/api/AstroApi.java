@@ -12,6 +12,7 @@ import com.example.astro_mobile.data.api.dto.ManagerHomeData;
 import com.example.astro_mobile.data.api.dto.NotificationData;
 import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
+import com.example.astro_mobile.data.api.dto.CollaboratorEventDetailsData;
 import com.example.astro_mobile.data.api.dto.ChatConversationData;
 
 import java.util.List;
@@ -27,8 +28,17 @@ import retrofit2.http.PUT;
 import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 public interface AstroApi {
+    @GET("events/collaborator/{eventId}")
+    Call<ApiResponse<CollaboratorEventDetailsData>> getCollaboratorEvent(
+            @Header("Authorization") String authorization, @Path("eventId") long eventId);
+
+    @POST("events/{eventId}/completion")
+    Call<ApiResponse<Object>> completeCollaboratorEvent(@Header("Authorization") String authorization,
+            @Path("eventId") long eventId, @Body RequestBody body);
+
     @GET("chats")
     Call<List<ChatConversationData>> getChats(@Header("Authorization") String authorization);
 

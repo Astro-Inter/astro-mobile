@@ -6,7 +6,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.astro_mobile.data.api.CollaboratorHomeRepository;
 import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.NotificationsRepository;
 import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
+import com.example.astro_mobile.data.api.dto.NotificationData;
+
+import java.util.List;
 
 public final class EmployeeHomeViewModel extends ViewModel {
     public interface ResultCallback {
@@ -15,13 +19,20 @@ public final class EmployeeHomeViewModel extends ViewModel {
     }
 
     private final CollaboratorHomeRepository repository;
+    private final NotificationsRepository notificationsRepository;
     private CollaboratorHomeData home;
     private boolean loading;
     private int requestId;
     private ResultCallback pendingCallback;
 
     public EmployeeHomeViewModel(CollaboratorHomeRepository repository) {
+        this(repository, null);
+    }
+
+    public EmployeeHomeViewModel(CollaboratorHomeRepository repository,
+                                 NotificationsRepository notificationsRepository) {
         this.repository = repository;
+        this.notificationsRepository = notificationsRepository;
     }
 
     public CollaboratorHomeData getHome() { return home; }
@@ -36,18 +47,40 @@ public final class EmployeeHomeViewModel extends ViewModel {
         repository.load(new CollaboratorHomeRepository.ResultCallback() {
             @Override
             public void onSuccess(CollaboratorHomeData result) {
-                ResultCallback current = finishRequest(id);
-                if (current == null) return;
-                home = result;
-                current.onSuccess(result);
+                if (notificationsRepository == null) {
+                    finishHome(id, result);
+                    return;
+                }
+                notificationsRepository.load(new NotificationsRepository.ResultCallback() {
+                    @Override public void onSuccess(List<NotificationData> notifications) {
+                        if (id != requestId) return;
+                        result.setLastNotificationsFrom(notifications);
+                        finishHome(id, result);
+                    }
+
+                    @Override public void onFailure(FailureKind failure) {
+                        finishFailure(id, failure);
+                    }
+                });
             }
 
             @Override
             public void onFailure(FailureKind failure) {
-                ResultCallback current = finishRequest(id);
-                if (current != null) current.onFailure(failure);
+                finishFailure(id, failure);
             }
         });
+    }
+
+    private void finishHome(int id, CollaboratorHomeData result) {
+        ResultCallback current = finishRequest(id);
+        if (current == null) return;
+        home = result;
+        current.onSuccess(result);
+    }
+
+    private void finishFailure(int id, FailureKind failure) {
+        ResultCallback current = finishRequest(id);
+        if (current != null) current.onFailure(failure);
     }
 
     private ResultCallback finishRequest(int id) {
@@ -65,6 +98,7 @@ public final class EmployeeHomeViewModel extends ViewModel {
         loading = false;
         home = null;
         repository.cancel();
+        if (notificationsRepository != null) notificationsRepository.cancel();
     }
 
     @Override
@@ -72,11 +106,15 @@ public final class EmployeeHomeViewModel extends ViewModel {
 
     public static final class Factory implements ViewModelProvider.Factory {
         private final CollaboratorHomeRepository repository;
+        private final NotificationsRepository notificationsRepository;
 
-        public Factory(CollaboratorHomeRepository repository) { this.repository = repository; }
+        public Factory(CollaboratorHomeRepository repository, NotificationsRepository notificationsRepository) {
+            this.repository = repository;
+            this.notificationsRepository = notificationsRepository;
+        }
 
         public static Factory createDefault() {
-            return new Factory(CollaboratorHomeRepository.createDefault());
+            return new Factory(CollaboratorHomeRepository.createDefault(), NotificationsRepository.createDefault());
         }
 
         @NonNull
@@ -85,7 +123,7 @@ public final class EmployeeHomeViewModel extends ViewModel {
             if (!modelClass.isAssignableFrom(EmployeeHomeViewModel.class)) {
                 throw new IllegalArgumentException("Unknown ViewModel: " + modelClass.getName());
             }
-            return modelClass.cast(new EmployeeHomeViewModel(repository));
+            return modelClass.cast(new EmployeeHomeViewModel(repository, notificationsRepository));
         }
     }
 }

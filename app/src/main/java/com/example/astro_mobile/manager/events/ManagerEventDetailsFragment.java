@@ -36,7 +36,7 @@ public final class ManagerEventDetailsFragment extends Fragment {
         ((TextView) view.findViewById(R.id.text_manager_event_subtitle)).setText(selfDeclaration
                 ? R.string.manager_event_self_declaration : R.string.manager_event_assignment);
         ((TextView) view.findViewById(R.id.text_manager_event_mode)).setText(selfDeclaration
-                ? R.string.employee_event_completion_mode_mock : R.string.manager_event_assignment_mode);
+                ? R.string.employee_event_self_declaration : R.string.manager_event_assignment_mode);
         view.findViewById(R.id.container_manager_event_validations)
                 .setVisibility(selfDeclaration ? View.VISIBLE : View.GONE);
 

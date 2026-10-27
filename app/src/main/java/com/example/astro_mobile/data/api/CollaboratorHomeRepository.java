@@ -2,8 +2,11 @@ package com.example.astro_mobile.data.api;
 
 import com.example.astro_mobile.data.api.dto.ApiResponse;
 import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
+import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
 import com.example.astro_mobile.data.firebase.FirebaseIdTokenProvider;
 import com.example.astro_mobile.data.firebase.IdTokenProvider;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -16,6 +19,7 @@ public final class CollaboratorHomeRepository {
     }
 
     private final AstroApi api;
+    private final CollaboratorEventsRepository events;
     private final IdTokenProvider tokens;
     private Call<ApiResponse<CollaboratorHomeData>> currentCall;
     private int requestId;
@@ -23,6 +27,7 @@ public final class CollaboratorHomeRepository {
     public CollaboratorHomeRepository(AstroApi api, IdTokenProvider tokens) {
         this.api = api;
         this.tokens = tokens;
+        this.events = new CollaboratorEventsRepository(api, tokens);
     }
 
     public static CollaboratorHomeRepository createDefault() {
@@ -62,7 +67,7 @@ public final class CollaboratorHomeRepository {
                             callback.onFailure(FailureKind.INTERNAL);
                             return;
                         }
-                        callback.onSuccess(body.getData());
+                        loadEventStates(body.getData(), token, id, callback);
                     }
 
                     @Override
@@ -84,8 +89,35 @@ public final class CollaboratorHomeRepository {
         });
     }
 
+    private void loadEventStates(CollaboratorHomeData home, String token, int id, ResultCallback callback) {
+        if (home.getPendingEvents().isEmpty()) {
+            callback.onSuccess(home);
+            return;
+        }
+        // A Home só retorna viewed; a lista fornece a participação e o prazo completos.
+        events.loadAuthenticated(token, new CollaboratorEventsRepository.ResultCallback() {
+            @Override public void onSuccess(List<CollaboratorEventData> result) {
+                if (id != requestId) return;
+                for (CollaboratorHomeData.PendingEvent pending : home.getPendingEvents()) {
+                    if (pending == null) continue;
+                    for (CollaboratorEventData event : result) {
+                        if (event.getId().equals(pending.getId())) {
+                            pending.setEventData(event);
+                            break;
+                        }
+                    }
+                }
+                callback.onSuccess(home);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (id == requestId) callback.onFailure(failure);
+            }
+        });
+    }
+
     public void cancel() {
         ++requestId;
+        events.cancel();
         if (currentCall != null) {
             currentCall.cancel();
             currentCall = null;

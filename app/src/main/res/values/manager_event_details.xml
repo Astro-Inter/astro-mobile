@@ -4,7 +4,7 @@
     <string name="manager_event_self_declaration">Autodeclaração de colaborador</string>
     <string name="manager_event_assignment">Atribuição de conclusão do gestor</string>
     <string name="manager_event_assignment_mode">Atribuição</string>
-    <string name="manager_event_description_mock">Treinamento sobre o uso correto, conservação e responsabilidades relacionadas aos Equipamentos de Proteção Individual (EPI) no ambiente de trabalho.\n\nFaça o curso em anexo e anexe um print do certificado emitido ao final como evidência.</string>
+    <string name="manager_event_description_mock">Treinamento sobre o uso correto, conservação e responsabilidades relacionadas aos Equipamentos de Proteção Individual (EPI) no ambiente de trabalho.\n\nConsulte o material do evento e anexe um print do certificado emitido ao final como evidência.</string>
     <string name="manager_event_validations">Validações para esse evento</string>
     <string name="manager_event_validations_description">Você precisa validar conclusões dos colaboradores, visualize aqui o estado das suas validações</string>
     <string name="manager_event_validations_pending">Validações pendentes</string>
