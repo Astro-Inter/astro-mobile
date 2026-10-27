@@ -7,6 +7,10 @@
     <string name="notifications_empty">Nenhum alerta encontrado</string>
     <string name="notifications_recent">Há menos de 1h</string>
     <string name="notifications_hours">Há %1$dh</string>
+    <plurals name="notifications_days">
+        <item quantity="one">Há %1$d dia</item>
+        <item quantity="other">Há %1$d dias</item>
+    </plurals>
     <string name="notifications_retry">Tentar novamente</string>
     <string name="notifications_connection_error">Sem conexão. Confira sua internet e tente novamente.</string>
     <string name="notifications_access_error">Não foi possível acessar seus alertas.</string>

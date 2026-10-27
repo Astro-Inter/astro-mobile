@@ -58,13 +58,14 @@
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
 
+    <action android:id="@+id/action_global_employee_event_details" app:destination="@id/employeeEventDetailsFragment"
+        app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+        app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+
     <fragment android:id="@+id/employeeEventDetailsFragment"
         android:name="com.example.astro_mobile.employee.events.EmployeeEventDetailsFragment"
         android:label="Detalhes do evento">
-        <argument android:name="event_title" app:argType="string" />
-        <argument android:name="event_date" app:argType="string" />
-        <argument android:name="event_status" app:argType="string" />
-        <argument android:name="event_urgent" app:argType="boolean" />
+        <argument android:name="event_id" app:argType="long" />
         <action android:id="@+id/action_employee_event_details_to_confirmation"
             app:destination="@id/employeeEventConclusionFragment"
             app:popUpTo="@id/employeeEventDetailsFragment" app:popUpToInclusive="true"

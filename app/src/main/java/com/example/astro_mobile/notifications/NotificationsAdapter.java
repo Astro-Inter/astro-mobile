@@ -51,8 +51,8 @@ public final class NotificationsAdapter extends RecyclerView.Adapter<Notificatio
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         NotificationData notification = notifications.get(position);
         holder.title.setText(notification.getTitle());
-        holder.time.setText(holder.itemView.getContext().getString(notification.getHours() == 0
-                ? R.string.notifications_recent : R.string.notifications_hours, notification.getHours()));
+        holder.time.setText(NotificationTimeFormatter.format(holder.itemView.getContext(),
+                notification.getHours()));
         holder.unreadDot.setVisibility(notification.isViewed() ? View.INVISIBLE : View.VISIBLE);
         holder.itemView.findViewById(R.id.container_notification_row)
                 .setOnClickListener(clicked -> clickListener.onNotificationClick(notification));

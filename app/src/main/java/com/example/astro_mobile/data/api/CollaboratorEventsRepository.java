@@ -43,38 +43,7 @@ public final class CollaboratorEventsRepository {
             @Override
             public void onToken(String token) {
                 if (id != requestId) return;
-                currentCall = api.getCollaboratorEvents("Bearer " + token);
-                currentCall.enqueue(new Callback<ApiResponse<List<CollaboratorEventData>>>() {
-                    @Override
-                    public void onResponse(Call<ApiResponse<List<CollaboratorEventData>>> call,
-                                           Response<ApiResponse<List<CollaboratorEventData>>> response) {
-                        if (id != requestId) return;
-                        currentCall = null;
-                        if (response.code() == 401) {
-                            if (refresh) callback.onFailure(FailureKind.SESSION);
-                            else loadWithToken(true, id, callback);
-                            return;
-                        }
-                        if (response.code() == 403 || response.code() == 404) {
-                            callback.onFailure(FailureKind.BUSINESS);
-                            return;
-                        }
-                        ApiResponse<List<CollaboratorEventData>> body = response.body();
-                        if (response.code() != 200 || body == null || !body.isSuccess()
-                                || body.getData() == null || body.getData().stream().anyMatch(item -> item == null || !item.isValid())) {
-                            callback.onFailure(FailureKind.INTERNAL);
-                            return;
-                        }
-                        callback.onSuccess(body.getData());
-                    }
-
-                    @Override
-                    public void onFailure(Call<ApiResponse<List<CollaboratorEventData>>> call, Throwable error) {
-                        if (id != requestId) return;
-                        currentCall = null;
-                        callback.onFailure(ApiFailures.transport(error));
-                    }
-                });
+                request(token, refresh, id, callback);
             }
 
             @Override
@@ -83,6 +52,47 @@ public final class CollaboratorEventsRepository {
                 callback.onFailure(failure == IdTokenProvider.Failure.SESSION ? FailureKind.SESSION
                         : failure == IdTokenProvider.Failure.CONNECTION ? FailureKind.CONNECTION
                         : FailureKind.INTERNAL);
+            }
+        });
+    }
+
+    void loadAuthenticated(String token, ResultCallback callback) {
+        // A consulta complementar da Home reaproveita o token já obtido.
+        cancel();
+        request(token, false, requestId, callback);
+    }
+
+    private void request(String token, boolean refresh, int id, ResultCallback callback) {
+        currentCall = api.getCollaboratorEvents("Bearer " + token);
+        currentCall.enqueue(new Callback<ApiResponse<List<CollaboratorEventData>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CollaboratorEventData>>> call,
+                                   Response<ApiResponse<List<CollaboratorEventData>>> response) {
+                if (id != requestId) return;
+                currentCall = null;
+                if (response.code() == 401) {
+                    if (refresh) callback.onFailure(FailureKind.SESSION);
+                    else loadWithToken(true, id, callback);
+                    return;
+                }
+                if (response.code() == 403 || response.code() == 404) {
+                    callback.onFailure(FailureKind.BUSINESS);
+                    return;
+                }
+                ApiResponse<List<CollaboratorEventData>> body = response.body();
+                if (response.code() != 200 || body == null || !body.isSuccess()
+                        || body.getData() == null || body.getData().stream().anyMatch(item -> item == null || !item.isValid())) {
+                    callback.onFailure(FailureKind.INTERNAL);
+                    return;
+                }
+                callback.onSuccess(body.getData());
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<CollaboratorEventData>>> call, Throwable error) {
+                if (id != requestId) return;
+                currentCall = null;
+                callback.onFailure(ApiFailures.transport(error));
             }
         });
     }

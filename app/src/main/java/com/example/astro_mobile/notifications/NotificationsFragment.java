@@ -29,18 +29,19 @@ import com.example.astro_mobile.data.api.NotificationsRepository;
 import com.example.astro_mobile.data.api.dto.NotificationData;
 import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 import com.example.astro_mobile.data.local.FlowPreferences;
-import com.example.astro_mobile.employee.events.EmployeeEvent;
 import com.example.astro_mobile.manager.events.ManagerEvent;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public final class NotificationsFragment extends Fragment {
+    public static final String ARG_NOTIFICATION_ID = "notification_id";
+
     private NotificationsViewModel state;
     private NotificationsAdapter adapter;
     private Dialog detailDialog;
     private boolean managerFlow;
+    private String initialNotificationId;
 
     public NotificationsFragment() {
         super(R.layout.fragment_notifications);
@@ -51,6 +52,8 @@ public final class NotificationsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         state = new ViewModelProvider(this, NotificationsViewModel.Factory.createDefault())
                 .get(NotificationsViewModel.class);
+        initialNotificationId = getArguments() == null ? null
+                : getArguments().getString(ARG_NOTIFICATION_ID);
         managerFlow = FlowPreferences.wasManagerFlow(requireContext());
         adapter = new NotificationsAdapter(managerFlow, this::showDetails);
 
@@ -104,6 +107,7 @@ public final class NotificationsFragment extends Fragment {
                 view.findViewById(R.id.skeleton_notifications).setVisibility(View.GONE);
                 view.findViewById(R.id.scroll_notifications_content).setVisibility(View.VISIBLE);
                 renderNotifications(view);
+                openInitialNotification();
             }
 
             @Override
@@ -127,6 +131,18 @@ public final class NotificationsFragment extends Fragment {
         boolean empty = visible.isEmpty();
         view.findViewById(R.id.container_notifications_empty).setVisibility(empty ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.list_notifications).setVisibility(empty ? View.GONE : View.VISIBLE);
+    }
+
+    private void openInitialNotification() {
+        String notificationId = initialNotificationId;
+        initialNotificationId = null;
+        if (notificationId == null) return;
+        for (NotificationData notification : state.getNotifications()) {
+            if (notificationId.equals(notification.getId())) {
+                showDetails(notification);
+                return;
+            }
+        }
     }
 
     // Abre o popup centralizado do Figma e busca a mensagem completa.
@@ -213,16 +229,12 @@ public final class NotificationsFragment extends Fragment {
     }
 
     private void openEvent(long eventId) {
-        // Preserva o ID real; os demais dados são do protótipo até integrar o detalhe.
+        // Colaborador abre o detalhe real pelo ID; o detalhe administrativo segue na sua tarefa.
         Bundle args = AuthArgs.copy(getArguments());
         args.putLong("event_id", eventId);
-        args.putString("event_title", getString(R.string.employee_home_training));
         if (managerFlow) {
+            args.putString("event_title", getString(R.string.employee_home_training));
             args.putString("event_completion_mode", ManagerEvent.CompletionMode.SELF_DECLARATION.name());
-        } else {
-            args.putString("event_date", LocalDate.now().plusDays(1).toString());
-            args.putString("event_status", EmployeeEvent.Status.PENDING.name());
-            args.putBoolean("event_urgent", false);
         }
         Navigation.findNavController(requireView()).navigate(managerFlow
                 ? R.id.action_notifications_to_manager_event : R.id.action_notifications_to_employee_event, args);

@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,8 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
@@ -240,8 +241,10 @@ public class EmployeeEventsFragment extends Fragment {
     }
 
     private void openDetails(EmployeeEvent event) {
-        // Não mistura um evento real com descrição, anexos ou conclusão fictícios da SCRUM-282.
-        Toast.makeText(requireContext(), R.string.employee_events_details_pending, Toast.LENGTH_SHORT).show();
+        if (daySheet != null) daySheet.dismiss();
+        Bundle args = AuthArgs.copy(getArguments());
+        args.putLong(EmployeeEventDetailsFragment.EVENT_ID, event.id);
+        NavHostFragment.findNavController(this).navigate(R.id.action_employee_events_to_details, args);
     }
 
     @Override

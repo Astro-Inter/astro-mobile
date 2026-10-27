@@ -27,7 +27,7 @@ public final class EmployeeEventsViewModel extends ViewModel {
     private final CollaboratorEventsRepository repository;
     private List<CollaboratorEventData> events = Collections.emptyList();
     private YearMonth month = YearMonth.now();
-    private EmployeeEvent.Status filter;
+    private EmployeeEvent.Status filter = EmployeeEvent.Status.PENDING;
     private String query = "";
     private boolean loading;
     private ResultCallback pendingCallback;
@@ -75,23 +75,10 @@ public final class EmployeeEventsViewModel extends ViewModel {
         for (CollaboratorEventData item : events) {
             LocalDate date = item.getDeadline().toLocalDate();
             if (!YearMonth.from(date).equals(month) || !normalize(item.getEventTitle()).contains(search)) continue;
-            EventStatusClassifier.DisplayStatus display = EventStatusClassifier.classify(
-                    item.getEventStatus() == CollaboratorEventData.EventStatus.CANCELADO,
-                    participation(item.getParticipationStatus()), item.isViewed(),
-                    item.getDeadline().atZone(zone).toInstant(), now);
-            EmployeeEvent event = new EmployeeEvent(item.getId(), item.getEventTitle(), date, display);
+            EmployeeEvent event = EmployeeEvent.fromApi(item, zone, now);
             if (filter == null || event.status == filter) result.add(event);
         }
         return result;
-    }
-
-    private EventStatusClassifier.Participation participation(CollaboratorEventData.ParticipationStatus status) {
-        switch (status) {
-            case EM_ANALISE: return EventStatusClassifier.Participation.AWAITING_APPROVAL;
-            case CONCLUIDO: return EventStatusClassifier.Participation.APPROVED;
-            case REJEITADO: return EventStatusClassifier.Participation.REJECTED;
-            default: return EventStatusClassifier.Participation.NOT_SUBMITTED;
-        }
     }
 
     private String normalize(String value) {

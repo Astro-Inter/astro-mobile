@@ -6,6 +6,4 @@
     <string name="employee_home_under_analysis">Você tem eventos em análise!</string>
     <string name="employee_home_deadline">Data limite: %1$s</string>
     <string name="employee_home_no_deadline">Sem data limite</string>
-    <string name="employee_home_notification_recent">Há menos de 1h</string>
-    <string name="employee_home_notification_hours">Há %1$dh</string>
 </resources>

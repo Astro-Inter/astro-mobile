@@ -75,8 +75,10 @@
                         <TextView style="@style/EmployeeEventDetailsText" android:text="@string/employee_event_about" />
                         <TextView android:id="@+id/text_employee_event_description" style="@style/EmployeeEventDetailsText"
                             android:layout_marginTop="5dp" android:textColor="@color/astro_input_hint"
-                            tools:text="Treinamento sobre o uso correto, conservação e responsabilidades relacionadas aos Equipamentos de Proteção Individual (EPI) no ambiente de trabalho.&#10;&#10;Faça o curso em anexo e anexe um print do certificado emitido ao final como evidência." />
+                            tools:text="Treinamento sobre o uso correto, conservação e responsabilidades relacionadas aos Equipamentos de Proteção Individual (EPI) no ambiente de trabalho.&#10;&#10;Consulte o material do evento e anexe um print do certificado emitido ao final como evidência." />
                     </LinearLayout>
+                    <LinearLayout android:id="@+id/container_employee_event_material"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                     <TextView style="@style/EmployeeEventDetailsText" android:textSize="24sp"
                         android:layout_marginTop="10dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
                         android:text="@string/employee_event_attachments" />
@@ -89,6 +91,7 @@
                             android:src="@drawable/employee_event_link" android:contentDescription="@null"
                             android:importantForAccessibility="no" android:scaleType="fitCenter" />
                     </FrameLayout>
+                    </LinearLayout>
                     <View style="@style/EmployeeEventDetailsDivider" />
                     <LinearLayout style="@style/EmployeeEventDetailsRow">
                         <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/home_calendar" />
@@ -105,14 +108,16 @@
                     <LinearLayout style="@style/EmployeeEventDetailsRow">
                         <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/employee_event_notes" />
                         <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_completion_mode_label" />
-                        <TextView style="@style/EmployeeEventDetailsValue" android:text="@string/employee_event_completion_mode_mock" />
+                        <TextView android:id="@+id/text_employee_event_completion_mode" style="@style/EmployeeEventDetailsValue" tools:text="Autodeclaração" />
                     </LinearLayout>
                     <View style="@style/EmployeeEventDetailsDivider" />
                     <LinearLayout style="@style/EmployeeEventDetailsRow">
                         <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/employee_event_user" />
                         <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_sender_label" />
-                        <TextView style="@style/EmployeeEventDetailsValue" android:text="@string/employee_event_sender_mock" />
+                        <TextView android:id="@+id/text_employee_event_sender" style="@style/EmployeeEventDetailsValue" tools:text="Tyler, the Creator" />
                     </LinearLayout>
+                    <LinearLayout android:id="@+id/list_employee_event_evidences"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
                     <LinearLayout android:id="@+id/container_employee_event_completion"
                         android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
                         <View style="@style/EmployeeEventDetailsDivider" />
@@ -120,14 +125,13 @@
                             android:layout_marginHorizontal="30dp" android:layout_marginTop="20dp" android:layout_marginBottom="10dp"
                             android:background="@drawable/bg_flow_choice_secondary_button">
                             <TextView android:id="@+id/button_employee_event_evidence" style="@style/EmployeeEventDetailsButton"
-                                android:background="?attr/selectableItemBackground" android:text="@string/employee_event_evidence_filename" />
-                            <ImageButton android:id="@+id/button_employee_event_remove_evidence"
-                                android:layout_width="48dp" android:layout_height="48dp"
-                                android:layout_gravity="end|center_vertical" android:layout_marginEnd="2dp"
-                                android:background="@drawable/bg_home_icon_ripple" android:padding="15dp"
-                                android:src="@drawable/employee_event_close" android:scaleType="fitCenter"
-                                android:contentDescription="@string/employee_event_remove_evidence" />
+                                android:background="?attr/selectableItemBackground" android:text="@string/employee_event_add_evidence" />
                         </FrameLayout>
+                        <LinearLayout android:id="@+id/list_employee_event_selected_files"
+                            android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                        <TextView android:id="@+id/text_employee_event_evidence_error" style="@style/EmployeeEventDetailsText"
+                            android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp"
+                            android:textColor="@color/employee_event_status_red" android:visibility="gone" />
                         <View style="@style/EmployeeEventDetailsDivider" />
                         <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:layout_marginTop="10dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
@@ -137,7 +141,7 @@
                     </LinearLayout>
                 </LinearLayout>
             </ScrollView>
-            <!-- Oculto no XML para o editor mostrar a tela real; só aparece no loading mock. -->
+            <!-- A prévia XML mostra o conteúdo; em execução o skeleton acompanha a API. -->
             <include android:id="@+id/skeleton_employee_event_details" layout="@layout/view_employee_event_details_skeleton"
                 android:layout_width="match_parent" android:layout_height="match_parent"
                 android:visibility="gone" tools:visibility="gone" />

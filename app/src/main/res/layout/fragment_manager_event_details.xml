@@ -132,7 +132,7 @@
                     <ImageView style="@style/ManagerEventDetailsIcon" android:src="@drawable/employee_event_notes" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/employee_event_completion_mode_label" />
                     <TextView android:id="@+id/text_manager_event_mode" style="@style/ManagerEventDetailsValue"
-                        android:text="@string/employee_event_completion_mode_mock" />
+                        android:text="@string/employee_event_self_declaration" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout style="@style/ManagerEventDetailsRow">
