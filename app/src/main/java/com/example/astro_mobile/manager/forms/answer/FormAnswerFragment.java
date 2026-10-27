@@ -100,6 +100,11 @@ public final class FormAnswerFragment extends Fragment {
         view.findViewById(R.id.button_form_answer_attach).setOnClickListener(clicked -> openCamera());
         view.findViewById(R.id.button_form_answer_location_retry).setOnClickListener(clicked -> retryLocation());
         view.findViewById(R.id.button_form_answer_complete).setOnClickListener(clicked -> {
+            // O envio real pertence à SCRUM-275; um UUID da API nunca recebe sucesso simulado.
+            if (args.containsKey("form_id")) {
+                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable, Toast.LENGTH_LONG).show();
+                return;
+            }
             if (state.canSubmit()) requestLocation(true);
         });
         renderEvidences(view);
@@ -217,10 +222,9 @@ public final class FormAnswerFragment extends Fragment {
         // Sem painel de depuração: só mostra uma falha ou a conclusão local.
         view.findViewById(R.id.container_form_answer_location).setVisibility(
                 failure != null || state.isCompleted() ? View.VISIBLE : View.GONE);
-        boolean error = failure != null;
-        message.setTextColor(ContextCompat.getColor(requireContext(), error ? R.color.astro_error : R.color.astro_light_background));
+        message.setTextColor(ContextCompat.getColor(requireContext(), R.color.astro_light_background));
         view.findViewById(R.id.container_form_answer_location).setBackgroundResource(state.isCompleted()
-                ? R.drawable.bg_home_positive_message : R.drawable.bg_profile_panel);
+                ? R.drawable.bg_home_positive_message : R.drawable.bg_form_location_error);
         retry.setVisibility(failure != null && !state.isBusy() ? View.VISIBLE : View.GONE);
         retry.setText(failure == FormLocationRepository.Failure.UNAVAILABLE
                 ? R.string.form_answer_location_retry : R.string.form_answer_location_settings);

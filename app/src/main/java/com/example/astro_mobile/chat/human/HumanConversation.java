@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class HumanConversation {
+    public String conversationId;
+    public String profilePhotoUrl;
+    public String avatarInitials;
+    public String lastMessageText;
+    public boolean lastMessageSent;
+    public int unreadCount;
     public final String name;
     public final String role;
     public final boolean manager;

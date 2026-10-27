@@ -1,6 +1,7 @@
 package com.example.astro_mobile.data.api;
 
 import com.example.astro_mobile.data.api.dto.ActivateRequest;
+import com.example.astro_mobile.data.api.dto.ReceivedFormDetails;
 import com.example.astro_mobile.data.api.dto.ApiResponse;
 import com.example.astro_mobile.data.api.dto.VerifyEmailData;
 import com.example.astro_mobile.data.api.dto.VerifyEmailRequest;
@@ -12,6 +13,7 @@ import com.example.astro_mobile.data.api.dto.NotificationData;
 import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventDetailsData;
+import com.example.astro_mobile.data.api.dto.ChatConversationData;
 
 import java.util.List;
 
@@ -37,6 +39,9 @@ public interface AstroApi {
     Call<ApiResponse<Object>> completeCollaboratorEvent(@Header("Authorization") String authorization,
             @Path("eventId") long eventId, @Body RequestBody body);
 
+    @GET("chats")
+    Call<List<ChatConversationData>> getChats(@Header("Authorization") String authorization);
+
     @GET("notifications/{notificationId}")
     Call<ApiResponse<NotificationDetailsData>> getNotification(
             @Header("Authorization") String authorization, @Path("notificationId") String id);
@@ -60,6 +65,10 @@ public interface AstroApi {
     @GET("home/collaborator")
     Call<ApiResponse<CollaboratorHomeData>> getCollaboratorHome(
             @Header("Authorization") String authorization);
+
+    @GET("forms/received/{id}")
+    Call<ApiResponse<ReceivedFormDetails>> getReceivedForm(
+            @Header("Authorization") String authorization, @Path("id") String id);
 
     @GET("user/me")
     Call<ApiResponse<UserProfileData>> getProfile(@Header("Authorization") String authorization);
