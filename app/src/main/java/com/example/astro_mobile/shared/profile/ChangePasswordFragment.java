@@ -53,7 +53,8 @@ public final class ChangePasswordFragment extends Fragment {
                 @Override
                 public void onFailure(AuthFailureKind kind) {
                     if (getView() != view || !isAdded()) return;
-                    navigation.navigate(R.id.action_change_password_to_generic_error);
+                    navigation.navigate(kind == AuthFailureKind.CONNECTION
+                            ? R.id.connectionErrorFragment : R.id.action_change_password_to_generic_error);
                 }
             });
         });

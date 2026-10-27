@@ -112,7 +112,8 @@ public final class ProfileFragment extends Fragment {
             public void onFailure(FailureKind failure) {
                 if (getView() != view || !isAdded()) return;
                 if (failure == FailureKind.SESSION) SessionNavigation.signOut(ProfileFragment.this);
-                else navigation.navigate(R.id.action_profile_to_generic_error);
+                else navigation.navigate(failure == FailureKind.CONNECTION
+                        ? R.id.connectionErrorFragment : R.id.action_profile_to_generic_error);
             }
         });
     }
@@ -168,7 +169,8 @@ public final class ProfileFragment extends Fragment {
                                 if (getView() != view || !isAdded()) return;
                                 setPhotoBusy(view, false);
                                 if (failure == FailureKind.SESSION) SessionNavigation.signOut(ProfileFragment.this);
-                                else Toast.makeText(requireContext(), R.string.profile_photo_refresh_error, Toast.LENGTH_LONG).show();
+                                else NavHostFragment.findNavController(ProfileFragment.this).navigate(failure == FailureKind.CONNECTION
+                                        ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
                             }
                         });
                     }
@@ -178,8 +180,10 @@ public final class ProfileFragment extends Fragment {
                         if (getView() != view || !isAdded()) return;
                         setPhotoBusy(view, false);
                         if (failure == FailureKind.SESSION) SessionNavigation.signOut(ProfileFragment.this);
-                        else Toast.makeText(requireContext(), failure == FailureKind.BUSINESS
-                                ? R.string.profile_photo_invalid : R.string.profile_photo_error, Toast.LENGTH_LONG).show();
+                        else if (failure == FailureKind.BUSINESS) {
+                            Toast.makeText(requireContext(), R.string.profile_photo_invalid, Toast.LENGTH_LONG).show();
+                        } else NavHostFragment.findNavController(ProfileFragment.this).navigate(failure == FailureKind.CONNECTION
+                                ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
                     }
                 });
     }

@@ -32,12 +32,17 @@ public final class ManagerFormsAdapter extends RecyclerView.Adapter<ManagerForms
 
     @Override
     public void onBindViewHolder(@NonNull Row row, int position) {
-        // Cada item exibe os dados de prazo, NR e estado definidos no mock.
+        // Exibe o estado da resposta sem confundir envio com aprovação.
         ManagerForm form = forms.get(position);
         row.title.setText(form.title);
+        row.deadline.setVisibility(form.deadline.isEmpty() ? View.GONE : View.VISIBLE);
+        row.nr.setVisibility(form.nr.isEmpty() ? View.GONE : View.VISIBLE);
         row.deadline.setText(row.itemView.getContext().getString(R.string.manager_forms_deadline, form.deadline));
         row.nr.setText(form.nr);
         row.status.setText(statusLabel(form.status));
+        row.icon.setImageTintList(form.status == ManagerForm.Status.REJECTED
+                ? android.content.res.ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red))
+                : null);
         int icon = statusIcon(form.status);
         row.icon.setVisibility(icon == 0 ? View.INVISIBLE : View.VISIBLE);
         if (icon != 0) row.icon.setImageResource(icon);
@@ -49,18 +54,20 @@ public final class ManagerFormsAdapter extends RecyclerView.Adapter<ManagerForms
 
     private int statusLabel(ManagerForm.Status status) {
         switch (status) {
-            case URGENT: return R.string.manager_forms_urgent;
             case NEW: return R.string.manager_forms_new;
-            case FINISHED: return R.string.manager_forms_finished;
+            case ANALYSIS: return R.string.manager_forms_analysis;
+            case APPROVED: return R.string.manager_forms_approved;
+            case REJECTED: return R.string.manager_forms_rejected;
             default: return R.string.manager_forms_pending;
         }
     }
 
     private int statusIcon(ManagerForm.Status status) {
         switch (status) {
-            case URGENT: return R.drawable.ic_employee_event_warning;
             case NEW: return R.drawable.ic_employee_event_new;
-            case FINISHED: return R.drawable.ic_employee_event_done;
+            case ANALYSIS: return R.drawable.home_clock;
+            case APPROVED: return R.drawable.ic_employee_event_done;
+            case REJECTED: return R.drawable.conversations_close;
             default: return 0;
         }
     }

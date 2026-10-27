@@ -30,7 +30,6 @@ public final class ManagerHomeViewModel extends ViewModel {
     public void load(ResultCallback callback) {
         if (loading) return;
         loading = true;
-        home = null;
         pendingCallback = callback;
         int id = ++requestId;
         repository.load(new ManagerHomeRepository.ResultCallback() {
@@ -45,7 +44,9 @@ public final class ManagerHomeViewModel extends ViewModel {
             @Override
             public void onFailure(FailureKind failure) {
                 ResultCallback current = finishRequest(id);
-                if (current != null) current.onFailure(failure);
+                if (current == null) return;
+                if (failure == FailureKind.SESSION) home = null;
+                current.onFailure(failure);
             }
         });
     }
@@ -60,15 +61,14 @@ public final class ManagerHomeViewModel extends ViewModel {
 
     public void cancel() {
         ++requestId;
-        // Libera o callback da View antes de cancelar token/HTTP e descarta dados da entrada anterior.
+        // Libera a View e cancela a consulta, preservando a última Home carregada nesta sessão.
         pendingCallback = null;
         loading = false;
-        home = null;
         repository.cancel();
     }
 
     @Override
-    protected void onCleared() { cancel(); }
+    protected void onCleared() { cancel(); home = null; }
 
     public static final class Factory implements ViewModelProvider.Factory {
         private final ManagerHomeRepository repository;

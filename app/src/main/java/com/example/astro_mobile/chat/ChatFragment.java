@@ -126,7 +126,8 @@ public final class ChatFragment extends Fragment {
                     && navigation.getCurrentDestination().getId() == R.id.chatFragment) {
                 if (state.failure == ChatFailure.SESSION) {
                     com.example.astro_mobile.auth.SessionNavigation.signOut(this);
-                } else navigation.navigate(R.id.genericErrorFragment);
+                } else navigation.navigate(state.failure == ChatFailure.CONNECTION
+                        ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
                 return;
             }
             boolean atBottom = !messages.canScrollVertically(1);

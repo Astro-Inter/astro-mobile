@@ -5,7 +5,8 @@ import androidx.annotation.NonNull;
 import com.example.astro_mobile.data.firebase.FirebaseIdTokenProvider;
 import com.example.astro_mobile.data.firebase.IdTokenProvider;
 
-import java.io.IOException;
+import com.example.astro_mobile.data.api.ApiFailures;
+import com.example.astro_mobile.data.api.FailureKind;
 import java.io.InterruptedIOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -131,7 +132,7 @@ public final class AiChatRepository {
             public void onFailure(@NonNull Call<ChatResponse> call, @NonNull Throwable error) {
                 if (call.isCanceled()) return;
                 fail(operation, callback, error instanceof InterruptedIOException
-                        ? ChatFailure.TIMEOUT : error instanceof IOException
+                        ? ChatFailure.TIMEOUT : ApiFailures.transport(error) == FailureKind.CONNECTION
                         ? ChatFailure.CONNECTION : ChatFailure.INVALID_RESPONSE);
             }
         });
