@@ -19,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.bumptech.glide.Glide;
 import com.example.astro_mobile.data.local.FlowPreferences;
 
 public final class HumanChatFragment extends Fragment {
@@ -26,6 +27,7 @@ public final class HumanChatFragment extends Fragment {
     public static final String PEER_ROLE = "human_peer_role";
     public static final String PEER_AVATAR_INDEX = "human_peer_avatar_index";
     public static final String PEER_IS_MANAGER = "human_peer_is_manager";
+    public static final String CONVERSATION_ID = "human_conversation_id";
     private HumanConversationsViewModel state;
     private HumanConversation conversation;
     private Runnable finishLoading;
@@ -40,14 +42,25 @@ public final class HumanChatFragment extends Fragment {
 
         // Pesquisa e detalhe do funcionário recuperam o mesmo histórico durante a sessão.
         Bundle args = requireArguments();
-        conversation = state.open(args.getString(PEER_NAME), args.getString(PEER_ROLE),
-                args.getBoolean(PEER_IS_MANAGER, !manager), args.getInt(PEER_AVATAR_INDEX));
+        String id = args.getString(CONVERSATION_ID);
+        conversation = id == null ? state.open(args.getString(PEER_NAME), args.getString(PEER_ROLE),
+                args.getBoolean(PEER_IS_MANAGER, !manager), args.getInt(PEER_AVATAR_INDEX)) : state.find(id);
+        if (conversation == null) {
+            NavHostFragment.findNavController(this).popBackStack();
+            return;
+        }
         ((TextView) view.findViewById(R.id.text_human_chat_name)).setText(conversation.name);
         ((TextView) view.findViewById(R.id.text_human_chat_role)).setText(conversation.role);
         int[] avatars = {R.drawable.participant_avatar_1, R.drawable.participant_avatar_2, R.drawable.participant_avatar_3};
         int avatar = conversation.manager ? R.drawable.human_chat_manager_avatar : avatars[conversation.avatarIndex];
         ImageView peer = view.findViewById(R.id.image_human_chat_peer);
         peer.setImageResource(avatar);
+        if (conversation.conversationId != null) {
+            Glide.with(this).load(conversation.profilePhotoUrl).circleCrop()
+                    .placeholder(R.drawable.profile_avatar_placeholder)
+                    .fallback(R.drawable.profile_avatar_placeholder)
+                    .error(R.drawable.profile_avatar_placeholder).into(peer);
+        }
         ViewGroup.LayoutParams peerSize = peer.getLayoutParams();
         peerSize.width = peerSize.height = Math.round((manager ? 48 : 50) * getResources().getDisplayMetrics().density);
         peer.setLayoutParams(peerSize);
@@ -92,7 +105,11 @@ public final class HumanChatFragment extends Fragment {
     }
 
     private void send(EditText input, RecyclerView messages, HumanMessagesAdapter adapter) {
-        // A mensagem aparece somente nesta demonstração, sem chamar o chatbot ou enviar à rede.
+        // A lista real não simula envio nem transforma sua prévia em histórico completo.
+        if (conversation.conversationId != null) {
+            Toast.makeText(requireContext(), R.string.human_chat_integration_pending, Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (!state.send(conversation)) return;
         int last = conversation.messages.size() - 1;
         adapter.notifyItemInserted(last);

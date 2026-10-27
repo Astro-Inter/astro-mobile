@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="human_chat_integration_pending">O envio de mensagens ainda não está disponível.</string>
+    <plurals name="human_conversation_unread">
+        <item quantity="one">%1$d mensagem não lida</item>
+        <item quantity="other">%1$d mensagens não lidas</item>
+    </plurals>
     <string name="human_chat_attachment_pending">Anexos ainda não estão disponíveis nesta demonstração.</string>
     <string name="human_conversation_manager_label">&lt;b>Gestor - &lt;/b>%1$s</string>
     <string name="human_conversation_sent_preview">Você: %1$s</string>

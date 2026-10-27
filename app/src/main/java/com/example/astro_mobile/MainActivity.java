@@ -23,7 +23,6 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.splashscreen.SplashScreen;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
@@ -98,18 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            boolean hasKeyboardInput = navController != null && navController.getCurrentDestination() != null
-                    && (navController.getCurrentDestination().getId() == R.id.chatFragment
-                    || navController.getCurrentDestination().getId() == R.id.humanChatFragment
-                    || navController.getCurrentDestination().getId() == R.id.conversationsFragment
-                    || navController.getCurrentDestination().getId() == R.id.newConversationFragment
-                    || navController.getCurrentDestination().getId() == R.id.employeeEventsFragment
-                    || navController.getCurrentDestination().getId() == R.id.managerEventsFragment
-                    || navController.getCurrentDestination().getId() == R.id.managerFormsFragment
-                    || navController.getCurrentDestination().getId() == R.id.eventParticipantsFragment
-                    || navController.getCurrentDestination().getId() == R.id.aiSessionsFragment);
-            int bottom = hasKeyboardInput ? Math.max(systemBars.bottom,
-                    insets.getInsets(WindowInsetsCompat.Type.ime()).bottom) : systemBars.bottom;
+            // Todo campo recebe espaço para o teclado, sem depender de uma lista de telas.
+            int bottom = Math.max(systemBars.bottom, insets.getInsets(WindowInsetsCompat.Type.ime()).bottom);
             content.setPadding(
                     systemBars.left,
                     systemBars.top,
@@ -202,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateBottomNavigation(View navbar, int destination, WindowInsetsCompat insets) {
-        // Só o conteúdo muda nas telas com navbar. No chat, ela se oculta durante o teclado.
+        // O teclado oculta a navbar em qualquer tela; ao fechar, ela volta à posição original.
         boolean home = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment;
         boolean conversations = destination == R.id.conversationsFragment || destination == R.id.chatFragment
                 || destination == R.id.newConversationFragment
@@ -218,8 +207,7 @@ public class MainActivity extends AppCompatActivity {
         navbar.setVisibility((home || conversations || profile || events || notifications
                 || destination == R.id.staffFragment || destination == R.id.staffDetailsFragment
                 || destination == R.id.staffEventsFragment || destination == R.id.managerFormsFragment)
-                && !((destination == R.id.chatFragment || destination == R.id.aiSessionsFragment
-                        || destination == R.id.humanChatFragment) && keyboard)
+                && !keyboard
                 ? View.VISIBLE : View.GONE);
         navbar.findViewById(R.id.button_conversations_nav_home).setSelected(home);
         navbar.findViewById(R.id.button_conversations_nav_chat).setSelected(conversations);
