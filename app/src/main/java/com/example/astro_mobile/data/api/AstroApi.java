@@ -27,6 +27,8 @@ import retrofit2.http.Part;
 import retrofit2.http.PUT;
 import retrofit2.http.PATCH;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+import com.example.astro_mobile.data.api.dto.ReceivedFormsPage;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
@@ -41,6 +43,10 @@ public interface AstroApi {
 
     @GET("chats")
     Call<List<ChatConversationData>> getChats(@Header("Authorization") String authorization);
+    @GET("forms/received")
+    Call<ApiResponse<ReceivedFormsPage>> getReceivedForms(
+            @Header("Authorization") String authorization, @Query("page") int page,
+            @Query("size") int size);
 
     @GET("notifications/{notificationId}")
     Call<ApiResponse<NotificationDetailsData>> getNotification(

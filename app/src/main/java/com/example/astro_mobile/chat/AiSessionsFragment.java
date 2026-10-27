@@ -148,7 +148,8 @@ public final class AiSessionsFragment extends Fragment {
             com.example.astro_mobile.auth.SessionNavigation.signOut(this);
             return;
         }
-        navigation.navigate(R.id.genericErrorFragment, args);
+        navigation.navigate(failure == com.example.astro_mobile.data.ai.ChatFailure.CONNECTION
+                ? R.id.connectionErrorFragment : R.id.genericErrorFragment, args);
     }
 
     @Override public void onResume() {

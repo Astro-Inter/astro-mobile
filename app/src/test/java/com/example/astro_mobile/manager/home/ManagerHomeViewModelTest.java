@@ -96,19 +96,28 @@ public final class ManagerHomeViewModelTest {
     }
 
     @Test
-    public void cancelAndReloadDoNotRetainPreviousAccountData() throws Exception {
+    public void failedReloadAndCancellationPreserveLastSuccessUntilViewModelIsCleared() throws Exception {
         Fixture fixture = new Fixture();
         Result first = new Result();
         fixture.model.load(first);
         fixture.tokens.get(0).onToken("token");
         first.await();
         assertNotNull(fixture.model.getHome());
+        fixture.code = 503;
+        Result failed = new Result();
+        fixture.model.load(failed);
+        assertSame(first.home, fixture.model.getHome());
+        fixture.tokens.get(1).onToken("token");
+        failed.await();
+        assertEquals(FailureKind.INTERNAL, failed.failure);
+        assertSame(first.home, fixture.model.getHome());
         fixture.model.load(new Result());
-        assertNull(fixture.model.getHome());
         assertTrue(fixture.model.isLoading());
         fixture.model.cancel();
-        assertNull(fixture.model.getHome());
+        assertSame(first.home, fixture.model.getHome());
         assertFalse(fixture.model.isLoading());
+        fixture.model.onCleared();
+        assertNull(fixture.model.getHome());
     }
 
     @Test

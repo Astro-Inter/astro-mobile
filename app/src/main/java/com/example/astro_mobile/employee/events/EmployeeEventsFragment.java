@@ -108,7 +108,8 @@ public class EmployeeEventsFragment extends Fragment {
                     return;
                 }
                 // Usa a tela de erro do app; ao tentar novamente, retorna e repete a consulta.
-                Navigation.findNavController(view).navigate(R.id.genericErrorFragment);
+                Navigation.findNavController(view).navigate(failure == FailureKind.CONNECTION
+                                ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
             }
         });
     }

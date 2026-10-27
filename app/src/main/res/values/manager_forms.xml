@@ -2,17 +2,15 @@
 <resources>
     <string name="manager_forms_title">Formulários</string>
     <string name="manager_forms_search_hint">Pesquisar em formulários</string>
-    <string name="manager_forms_filter_nr">Filtrar por NR</string>
-    <string name="manager_forms_all_nrs">Todas as NRs</string>
-    <string name="manager_forms_nr_5">NR - 5</string>
     <string name="manager_forms_in_progress">Em andamento</string>
     <string name="manager_forms_finished_filter">Finalizados</string>
-    <string name="manager_forms_urgent">Urgente</string>
     <string name="manager_forms_new">Novo</string>
     <string name="manager_forms_pending">Pendente</string>
-    <string name="manager_forms_finished">Concluído</string>
     <string name="manager_forms_empty">Nenhum formulário encontrado</string>
     <string name="manager_forms_deadline">Data limite: %1$s</string>
     <style name="ManagerFormsText" parent="ManagerEventsText" />
     <style name="ManagerFormsCaption" parent="ManagerEventsCaption" />
+    <string name="manager_forms_analysis">Em análise</string>
+    <string name="manager_forms_approved">Aprovado</string>
+    <string name="manager_forms_rejected">Reprovado</string>
 </resources>

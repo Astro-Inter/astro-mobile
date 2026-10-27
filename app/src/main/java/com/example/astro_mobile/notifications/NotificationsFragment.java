@@ -40,6 +40,7 @@ public final class NotificationsFragment extends Fragment {
     private NotificationsViewModel state;
     private NotificationsAdapter adapter;
     private Dialog detailDialog;
+    private NotificationData retryDetail;
     private boolean managerFlow;
     private String initialNotificationId;
 
@@ -107,7 +108,13 @@ public final class NotificationsFragment extends Fragment {
                 view.findViewById(R.id.skeleton_notifications).setVisibility(View.GONE);
                 view.findViewById(R.id.scroll_notifications_content).setVisibility(View.VISIBLE);
                 renderNotifications(view);
-                openInitialNotification();
+                if (retryDetail != null) {
+                    NotificationData notification = retryDetail;
+                    retryDetail = null;
+                    showDetails(notification);
+                } else {
+                    openInitialNotification();
+                }
             }
 
             @Override
@@ -119,7 +126,8 @@ public final class NotificationsFragment extends Fragment {
                     return;
                 }
                 androidx.navigation.fragment.NavHostFragment.findNavController(NotificationsFragment.this)
-                        .navigate(R.id.genericErrorFragment);
+                        .navigate(failure == FailureKind.CONNECTION
+                                ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
             }
         });
     }
@@ -205,7 +213,7 @@ public final class NotificationsFragment extends Fragment {
             }
             @Override public void onFailure(FailureKind failure) {
                 if (!isDetailActive(dialog)) return;
-                showDetailError(sheet, failure, R.string.notification_detail_load_error,
+                showDetailError(sheet, notification, failure,
                         () -> loadDetail(dialog, sheet, notification));
             }
         });
@@ -222,7 +230,7 @@ public final class NotificationsFragment extends Fragment {
             }
             @Override public void onFailure(FailureKind failure) {
                 if (!isDetailActive(dialog)) return;
-                showDetailError(sheet, failure, R.string.notification_detail_read_error,
+                showDetailError(sheet, notification, failure,
                         () -> markViewed(dialog, sheet, notification));
             }
         });
@@ -240,16 +248,22 @@ public final class NotificationsFragment extends Fragment {
                 ? R.id.action_notifications_to_manager_event : R.id.action_notifications_to_employee_event, args);
     }
 
-    private void showDetailError(View sheet, FailureKind failure, int message, Runnable retry) {
+    private void showDetailError(View sheet, NotificationData notification, FailureKind failure, Runnable retry) {
         sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.GONE);
         if (failure == FailureKind.SESSION) {
             detailDialog.dismiss();
             SessionNavigation.signOut(this);
             return;
         }
+        if (failure != FailureKind.BUSINESS) {
+            retryDetail = notification;
+            detailDialog.dismiss();
+            Navigation.findNavController(requireView()).navigate(failure == FailureKind.CONNECTION
+                    ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
+            return;
+        }
         TextView error = sheet.findViewById(R.id.text_notification_detail_error);
-        error.setText(failure == FailureKind.CONNECTION ? R.string.notifications_connection_error
-                : failure == FailureKind.BUSINESS ? R.string.notifications_access_error : message);
+        error.setText(R.string.notifications_access_error);
         error.setVisibility(View.VISIBLE);
         View button = sheet.findViewById(R.id.button_notification_detail_retry);
         button.setVisibility(View.VISIBLE);

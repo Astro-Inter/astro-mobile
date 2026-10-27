@@ -24,6 +24,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.manager.forms.details.FormDetailsFragment;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.ManagerHomeData;
@@ -171,7 +172,22 @@ public final class ManagerHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadHome();
+        Boolean restore = androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                .getCurrentBackStackEntry().getSavedStateHandle().remove(HomeNavigation.RESTORE_LOADED_HOME);
+        // Voltar de um erro restaura o último sucesso sem outra requisição ou skeleton.
+        if (Boolean.TRUE.equals(restore) && model.getHome() != null) {
+            bindHome(requireView(), model.getHome());
+            restoreLoadedHome();
+        } else loadHome();
+    }
+
+    private void restoreLoadedHome() {
+        loaded = true;
+        stopSkeletonPulse();
+        content.setAlpha(1f);
+        content.setVisibility(View.VISIBLE);
+        skeleton.setVisibility(View.GONE);
+        aiBubble.showTemporarily();
     }
 
     private void loadHome() {
@@ -203,7 +219,8 @@ public final class ManagerHomeFragment extends Fragment {
                     return;
                 }
                 androidx.navigation.fragment.NavHostFragment.findNavController(ManagerHomeFragment.this)
-                        .navigate(R.id.genericErrorFragment);
+                        .navigate(failure == FailureKind.CONNECTION
+                                ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
             }
         });
     }

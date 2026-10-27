@@ -3,7 +3,8 @@ package com.example.astro_mobile.data.ai;
 import androidx.annotation.NonNull;
 import com.example.astro_mobile.data.firebase.FirebaseIdTokenProvider;
 import com.example.astro_mobile.data.firebase.IdTokenProvider;
-import java.io.IOException;
+import com.example.astro_mobile.data.api.ApiFailures;
+import com.example.astro_mobile.data.api.FailureKind;
 import java.io.InterruptedIOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -83,7 +84,7 @@ public final class AiSessionsRepository {
                     }
                     @Override public void onFailure(@NonNull Call<T> call, @NonNull Throwable error) {
                         if (!call.isCanceled()) fail(operation, callback, error instanceof InterruptedIOException
-                                ? ChatFailure.TIMEOUT : error instanceof IOException ? ChatFailure.CONNECTION : ChatFailure.INVALID_RESPONSE);
+                                ? ChatFailure.TIMEOUT : ApiFailures.transport(error) == FailureKind.CONNECTION ? ChatFailure.CONNECTION : ChatFailure.INVALID_RESPONSE);
                     }
                 });
             }

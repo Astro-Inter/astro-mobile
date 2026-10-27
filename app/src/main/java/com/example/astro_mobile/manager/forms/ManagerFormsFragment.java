@@ -7,8 +7,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.SessionNavigation;
+import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.manager.forms.details.FormDetailsFragment;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
@@ -28,19 +28,18 @@ public final class ManagerFormsFragment extends Fragment {
     private final int[] filterIds = {R.id.filter_manager_forms_all,
             R.id.filter_manager_forms_progress, R.id.filter_manager_forms_finished};
     private ManagerFormsViewModel state;
-    private Runnable finishLoading;
+
 
     public ManagerFormsFragment() { super(R.layout.fragment_manager_forms); }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        state = new ViewModelProvider(this).get(ManagerFormsViewModel.class);
+        state = new ViewModelProvider(this, new ManagerFormsViewModel.Factory()).get(ManagerFormsViewModel.class);
         View.OnClickListener returnHome = clicked -> NavHostFragment.findNavController(this)
                 .popBackStack(HomeNavigation.destination(requireContext()), false);
         view.findViewById(R.id.button_manager_forms_back).setOnClickListener(returnHome);
         view.findViewById(R.id.button_manager_forms_close).setOnClickListener(returnHome);
-        view.findViewById(R.id.button_manager_forms_nr_filter).setOnClickListener(clicked -> showNrFilters(view, clicked));
         for (int index = 0; index < filterIds.length; index++) {
             ManagerFormsViewModel.Filter filter = ManagerFormsViewModel.Filter.values()[index];
             view.findViewById(filterIds[index]).setOnClickListener(clicked -> {
@@ -68,32 +67,33 @@ public final class ManagerFormsFragment extends Fragment {
         });
         render(view);
 
-        // O atraso de 1s representa a espera pelos dados enquanto a API não está integrada.
-        if (!state.isLoaded()) {
-            View content = view.findViewById(R.id.container_manager_forms_content);
-            View skeleton = view.findViewById(R.id.skeleton_manager_forms);
-            content.setVisibility(View.INVISIBLE);
-            skeleton.setVisibility(View.VISIBLE);
-            finishLoading = () -> {
-                state.markLoaded();
-                skeleton.setVisibility(View.GONE);
-                content.setVisibility(View.VISIBLE);
-                finishLoading = null;
-            };
-            view.postDelayed(finishLoading, 1_000L);
-        }
     }
 
-    private void showNrFilters(View view, View anchor) {
-        PopupMenu menu = new PopupMenu(requireContext(), anchor);
-        menu.getMenu().add(0, 0, 0, R.string.manager_forms_all_nrs);
-        menu.getMenu().add(0, 1, 1, R.string.manager_forms_nr_5);
-        menu.setOnMenuItemClickListener(item -> {
-            state.setSelectedNr(item.getItemId() == 0 ? "" : "NR - 5");
-            render(view);
-            return true;
+    @Override public void onResume() {
+        super.onResume();
+        loadForms();
+    }
+
+    private void loadForms() {
+        View view = getView();
+        if (view == null || state.isLoading()) return;
+        view.findViewById(R.id.container_manager_forms_content).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.skeleton_manager_forms).setVisibility(View.VISIBLE);
+        state.load(new ManagerFormsViewModel.ResultCallback() {
+            @Override public void onSuccess() {
+                if (getView() != view || !isResumed()) return;
+                view.findViewById(R.id.skeleton_manager_forms).setVisibility(View.GONE);
+                view.findViewById(R.id.container_manager_forms_content).setVisibility(View.VISIBLE);
+                render(view);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (getView() != view || !isResumed()) return;
+                view.findViewById(R.id.skeleton_manager_forms).setVisibility(View.GONE);
+                if (failure == FailureKind.SESSION) SessionNavigation.signOut(ManagerFormsFragment.this);
+                else NavHostFragment.findNavController(ManagerFormsFragment.this).navigate(failure == FailureKind.CONNECTION
+                                ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
+            }
         });
-        menu.show();
     }
 
     private void render(View view) {
@@ -105,24 +105,20 @@ public final class ManagerFormsFragment extends Fragment {
         for (int index = 0; index < filterIds.length; index++) {
             view.findViewById(filterIds[index]).setSelected(index == state.getFilter().ordinal());
         }
-        TextView nrFilter = view.findViewById(R.id.button_manager_forms_nr_filter);
-        nrFilter.setText(state.getSelectedNr().isEmpty() ? R.string.manager_forms_filter_nr
-                : R.string.manager_forms_nr_5);
     }
 
     private void openDetails(ManagerForm form) {
         // Leva o formulário selecionado e informa se ele exige um endereço específico.
         Bundle args = AuthArgs.copy(getArguments());
+        args.putString("form_id", form.id);
         args.putString(FormDetailsFragment.FORM_TITLE, form.title);
         args.putString(FormDetailsFragment.DEADLINE, form.deadline);
         args.putBoolean(FormDetailsFragment.REQUIRES_UNIT_LOCATION, form.requiresUnitLocation);
         NavHostFragment.findNavController(this).navigate(R.id.action_manager_forms_to_details, args);
     }
 
-    @Override
-    public void onDestroyView() {
-        if (finishLoading != null && getView() != null) getView().removeCallbacks(finishLoading);
-        finishLoading = null;
-        super.onDestroyView();
+    @Override public void onPause() {
+        state.cancel();
+        super.onPause();
     }
 }

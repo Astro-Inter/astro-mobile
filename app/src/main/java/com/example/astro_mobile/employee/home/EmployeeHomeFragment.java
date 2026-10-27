@@ -23,6 +23,7 @@ import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.CollaboratorHomeData;
@@ -100,7 +101,13 @@ public class EmployeeHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadHome();
+        Boolean restore = androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                .getCurrentBackStackEntry().getSavedStateHandle().remove(HomeNavigation.RESTORE_LOADED_HOME);
+        // Voltar de um erro restaura o último sucesso sem outra requisição ou skeleton.
+        if (Boolean.TRUE.equals(restore) && model.getHome() != null) {
+            bindHome(requireView(), model.getHome());
+            restoreLoadedHome();
+        } else loadHome();
     }
 
     @Override
@@ -132,6 +139,15 @@ public class EmployeeHomeFragment extends Fragment {
         super.onDestroyView();
     }
 
+    private void restoreLoadedHome() {
+        homeReady = true;
+        stopSkeletonPulse();
+        homeContent.setAlpha(1f);
+        homeContent.setVisibility(View.VISIBLE);
+        homeSkeleton.setVisibility(View.GONE);
+        assistant.showTemporarily();
+    }
+
     private void loadHome() {
         View view = getView();
         if (view == null || model.isLoading()) return;
@@ -161,7 +177,8 @@ public class EmployeeHomeFragment extends Fragment {
                     return;
                 }
                 androidx.navigation.fragment.NavHostFragment.findNavController(EmployeeHomeFragment.this)
-                        .navigate(R.id.genericErrorFragment);
+                        .navigate(failure == FailureKind.CONNECTION
+                                ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
             }
         });
     }

@@ -7,6 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -68,8 +69,7 @@ public class ErrorFragment extends Fragment {
             });
             TextView back = view.findViewById(R.id.button_email_error_start);
             back.setText(R.string.profile_retry_back);
-            back.setOnClickListener(clicked -> navController.popBackStack(
-                    HomeNavigation.destination(requireContext()), false));
+            configureBack(view, () -> HomeNavigation.returnToLoadedHome(this));
             return;
         }
         // Erros do perfil não retomam a identificação de e-mail nem a recuperação do login.
@@ -279,12 +279,14 @@ public class ErrorFragment extends Fragment {
 
     private void configureProfileError(View view, NavController navigation, int source) {
         showCopy(view.findViewById(R.id.text_email_error_title),
-                view.findViewById(R.id.text_email_error_body), false);
+                view.findViewById(R.id.text_email_error_body),
+                    NavHostFragment.findNavController(this).getCurrentDestination().getId() == R.id.connectionErrorFragment);
         TextView back = view.findViewById(R.id.button_email_error_start);
         back.setText(R.string.profile_retry_back);
-        back.setOnClickListener(clicked -> navigation.popBackStack(
-                source == R.id.profileFragment ? HomeNavigation.destination(requireContext())
-                        : R.id.changePasswordFragment, false));
+        configureBack(view, () -> {
+            if (source == R.id.profileFragment) HomeNavigation.returnToLoadedHome(this);
+            else navigation.popBackStack(R.id.changePasswordFragment, false);
+        });
         View retry = view.findViewById(R.id.button_email_error_retry);
         retry.setOnClickListener(clicked -> {
             if (source == R.id.profileFragment) {
@@ -317,9 +319,20 @@ public class ErrorFragment extends Fragment {
                     retry.setEnabled(true);
                     view.findViewById(R.id.text_email_error_retry).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.progress_email_error_retry).setVisibility(View.GONE);
+                    showCopy(view.findViewById(R.id.text_email_error_title),
+                            view.findViewById(R.id.text_email_error_body), kind == AuthFailureKind.CONNECTION);
                 }
             });
         });
+    }
+
+    private void configureBack(View view, Runnable back) {
+        view.findViewById(R.id.button_email_error_start).setOnClickListener(clicked -> back.run());
+        // O gesto e o botão Voltar têm o mesmo destino; só Tentar novamente repete a operação.
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
+                new OnBackPressedCallback(true) {
+                    @Override public void handleOnBackPressed() { back.run(); }
+                });
     }
 
     private void retryAccessKey(View view, View button, TextView label, ProgressBar progress,
