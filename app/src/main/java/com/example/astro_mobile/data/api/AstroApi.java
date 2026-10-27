@@ -11,6 +11,7 @@ import com.example.astro_mobile.data.api.dto.ManagerHomeData;
 import com.example.astro_mobile.data.api.dto.NotificationData;
 import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
+import com.example.astro_mobile.data.api.dto.ChatConversationData;
 
 import java.util.List;
 
@@ -27,6 +28,9 @@ import retrofit2.http.Path;
 import okhttp3.MultipartBody;
 
 public interface AstroApi {
+    @GET("chats")
+    Call<List<ChatConversationData>> getChats(@Header("Authorization") String authorization);
+
     @GET("notifications/{notificationId}")
     Call<ApiResponse<NotificationDetailsData>> getNotification(
             @Header("Authorization") String authorization, @Path("notificationId") String id);

@@ -9,20 +9,40 @@
         android:paddingHorizontal="30dp" android:paddingVertical="20dp"
         android:background="@drawable/bg_home_row_ripple"
         android:clickable="true" android:focusable="true">
-        <ImageView android:id="@+id/image_human_conversation_avatar"
+        <FrameLayout
             android:layout_width="44dp" android:layout_height="44dp"
-            android:layout_marginEnd="20dp" android:scaleType="fitCenter"
-            android:contentDescription="@null" android:src="@drawable/human_chat_manager_avatar" />
+            android:layout_marginEnd="20dp" android:background="@drawable/bg_profile_avatar"
+            android:clipToOutline="true">
+            <TextView android:id="@+id/text_human_conversation_initials"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_family" android:gravity="center"
+                android:includeFontPadding="false" android:importantForAccessibility="no"
+                android:textColor="@color/astro_light_background" android:textSize="16sp"
+                android:visibility="gone" />
+            <ImageView android:id="@+id/image_human_conversation_avatar"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:scaleType="fitCenter" android:contentDescription="@null"
+                android:src="@drawable/human_chat_manager_avatar" />
+        </FrameLayout>
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_weight="1" android:orientation="vertical">
             <TextView android:id="@+id/text_human_conversation_name"
                 style="@style/ManagerEventsText"
-                android:layout_width="match_parent" android:layout_height="wrap_content" />
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:maxLines="1" android:ellipsize="end" />
             <TextView android:id="@+id/text_human_conversation_preview"
                 style="@style/ManagerEventsCaption"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:maxLines="1" android:ellipsize="end" />
         </LinearLayout>
+        <TextView android:id="@+id/text_human_conversation_unread"
+            android:layout_width="wrap_content" android:layout_height="30dp"
+            android:minWidth="30dp" android:layout_marginStart="12dp"
+            android:paddingHorizontal="7dp" android:gravity="center"
+            android:fontFamily="@font/montserrat_family" android:includeFontPadding="false"
+            android:background="@drawable/bg_conversation_unread"
+            android:textColor="@color/astro_light_background" android:textSize="18sp"
+            android:visibility="gone" />
     </LinearLayout>
     <View android:id="@+id/divider_human_conversation"
         android:layout_width="match_parent" android:layout_height="21dp"
