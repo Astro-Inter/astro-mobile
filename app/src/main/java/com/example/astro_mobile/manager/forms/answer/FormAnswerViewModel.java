@@ -34,6 +34,7 @@ public final class FormAnswerViewModel extends ViewModel {
     private boolean outside;
     private boolean completed;
     private Location reference;
+    private boolean apiReference;
     private FormLocationRepository.Failure failure;
 
     public FormAnswerViewModel(FormLocationRepository locations, FormEvidenceRepository photos) {
@@ -87,19 +88,37 @@ public final class FormAnswerViewModel extends ViewModel {
                 && canStart();
     }
 
+    public void setUnitReference(boolean required, Double latitude, Double longitude) {
+        apiReference = true;
+        reference = null;
+        if (required && latitude != null && longitude != null) {
+            reference = new Location("unit");
+            reference.setLatitude(latitude);
+            reference.setLongitude(longitude);
+        }
+        failure = null;
+        outside = false;
+        readings.clear();
+    }
+
     public boolean canStart() {
         return !readings.isEmpty() && failure == null && !busy && !outside && !completed;
     }
 
     public void requestLocation(boolean finish, boolean requiresUnitLocation, Runnable onChanged) {
         if (busy || completed) return;
+        if (requiresUnitLocation && apiReference && reference == null) {
+            failure = FormLocationRepository.Failure.UNAVAILABLE;
+            onChanged.run();
+            return;
+        }
         busy = true;
         locations.requestCurrent(new FormLocationRepository.Callback() {
             @Override public void onLocation(Location location) {
                 busy = false;
                 failure = null;
-                // Mock autorizado: fixa a posição ao abrir os detalhes; a API fornecerá a unidade depois.
-                if (reference == null) reference = new Location(location);
+                // A referência provisória existe apenas no protótipo sem ID; formulário real usa a unidade da API.
+                if (!apiReference && reference == null) reference = new Location(location);
                 readings.add(new Location(location));
                 outside = requiresUnitLocation && reference.distanceTo(location) > ALLOWED_RADIUS_METERS;
                 if (finish && canSubmit()) completed = true;

@@ -1,6 +1,7 @@
 package com.example.astro_mobile.data.api;
 
 import com.example.astro_mobile.data.api.dto.ActivateRequest;
+import com.example.astro_mobile.data.api.dto.ReceivedFormDetails;
 import com.example.astro_mobile.data.api.dto.ApiResponse;
 import com.example.astro_mobile.data.api.dto.VerifyEmailData;
 import com.example.astro_mobile.data.api.dto.VerifyEmailRequest;
@@ -54,6 +55,10 @@ public interface AstroApi {
     @GET("home/collaborator")
     Call<ApiResponse<CollaboratorHomeData>> getCollaboratorHome(
             @Header("Authorization") String authorization);
+
+    @GET("forms/received/{id}")
+    Call<ApiResponse<ReceivedFormDetails>> getReceivedForm(
+            @Header("Authorization") String authorization, @Path("id") String id);
 
     @GET("user/me")
     Call<ApiResponse<UserProfileData>> getProfile(@Header("Authorization") String authorization);

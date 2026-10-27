@@ -50,7 +50,8 @@ public class ErrorFragment extends Fragment {
         if (source == R.id.employeeEventsFragment || source == R.id.employeeHomeFragment
                 || source == R.id.managerHomeFragment || source == R.id.notificationsFragment
                 || source == R.id.aiSessionsFragment || source == R.id.chatFragment
-                || source == R.id.conversationsFragment) {
+                || source == R.id.conversationsFragment || source == R.id.managerFormsFragment
+                || source == R.id.formDetailsFragment) {
             // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
             showCopy(view.findViewById(R.id.text_email_error_title),
                     view.findViewById(R.id.text_email_error_body), errorDestination == R.id.connectionErrorFragment);

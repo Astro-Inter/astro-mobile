@@ -22,6 +22,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.manager.forms.details.FormDetailsFragment;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -105,7 +106,15 @@ public final class ManagerHomeFragment extends Fragment {
             int icon = days != null && days <= 2 ? R.drawable.home_warning
                     : form.isViewed() ? 0 : R.drawable.home_new;
             View row = addRow(forms, form.getTitle(), null, formatDeadline(days), icon);
-            row.setOnClickListener(clicked -> openForms());
+            row.setOnClickListener(clicked -> {
+                if (form.getId() == null || form.getId().isEmpty()) {
+                    NavHostFragment.findNavController(this).navigate(R.id.genericErrorFragment);
+                    return;
+                }
+                Bundle args = AuthArgs.copy(getArguments());
+                args.putString(FormDetailsFragment.FORM_ID, form.getId());
+                NavHostFragment.findNavController(this).navigate(R.id.formDetailsFragment, args);
+            });
         }
         showFeed(view, forms.getChildCount() == 0, R.id.list_manager_home_forms,
                 R.id.button_manager_home_forms_more, R.id.text_manager_home_forms_empty);
