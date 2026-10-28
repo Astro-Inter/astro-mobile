@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -109,11 +110,12 @@ public final class FormAnswerFragment extends Fragment {
     private void openSubmittedImage(Long questionId, String imageId) {
         ImageView image = new ImageView(requireContext());
         int size = (int) (320 * getResources().getDisplayMetrics().density);
-        image.setLayoutParams(new ViewGroup.LayoutParams(size, size));
         image.setScaleType(ImageView.ScaleType.FIT_CENTER);
         image.setBackgroundColor(Color.BLACK);
+        FrameLayout imageContainer = new FrameLayout(requireContext());
+        imageContainer.addView(image, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, size));
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.form_answer_photo_title).setView(image)
+                .setTitle(R.string.form_answer_photo_title).setView(imageContainer)
                 .setNegativeButton(android.R.string.cancel, null).create();
         dialog.show();
         state.getImageUrl(imageId, new FormResponseRepository.ImageUrlCallback() {

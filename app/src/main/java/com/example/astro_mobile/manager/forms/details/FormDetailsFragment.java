@@ -243,6 +243,7 @@ public final class FormDetailsFragment extends Fragment {
         if (formId != null) {
             if (state.getData() == null) return;
             boolean completed = "CONCLUIDO".equals(state.getData().form.status);
+            view.findViewById(R.id.divider_form_details_location).setVisibility(completed ? View.GONE : View.VISIBLE);
             view.findViewById(R.id.container_form_details_consent).setVisibility(
                     completed || !requiresUnitLocation ? View.GONE : View.VISIBLE);
             TextView answerButton = view.findViewById(R.id.button_form_details_answer);
