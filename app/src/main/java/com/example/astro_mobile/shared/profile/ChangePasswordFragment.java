@@ -3,6 +3,7 @@ package com.example.astro_mobile.shared.profile;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,6 +54,16 @@ public final class ChangePasswordFragment extends Fragment {
                 @Override
                 public void onFailure(AuthFailureKind kind) {
                     if (getView() != view || !isAdded()) return;
+                    if (kind == AuthFailureKind.RATE_LIMIT || kind == AuthFailureKind.INVALID_CREDENTIALS) {
+                        button.setEnabled(true);
+                        view.findViewById(R.id.text_profile_password_send).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.progress_profile_password_send).setVisibility(View.GONE);
+                        String message = kind == AuthFailureKind.RATE_LIMIT
+                                ? getString(R.string.password_reset_rate_limit, model.getRetrySeconds())
+                                : getString(R.string.password_reset_account_email_invalid);
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     navigation.navigate(kind == AuthFailureKind.CONNECTION
                             ? R.id.connectionErrorFragment : R.id.action_change_password_to_generic_error);
                 }
@@ -62,7 +73,7 @@ public final class ChangePasswordFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        // O SDK pode terminar o envio, mas não atualiza uma tela que já foi fechada.
+        // O retorno não atualiza uma tela que já foi fechada.
         model.clearRequest();
         super.onDestroyView();
     }

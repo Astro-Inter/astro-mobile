@@ -28,6 +28,6 @@
     <string name="profile_retry_back">Voltar</string>
     <string name="profile_change_password_description">Enviaremos um link para %1$s com as instruções para você criar uma nova senha.</string>
     <string name="profile_change_password_send">Enviar link</string>
-    <string name="profile_change_password_sent_description">Enviamos um link para %1$s. Abra o e-mail e siga as instruções para alterar sua senha.</string>
+    <string name="profile_change_password_sent_description">Se houver uma conta ativa vinculada a %1$s, você receberá um link para alterar sua senha.</string>
     <string name="profile_back">Voltar ao perfil</string>
 </resources>

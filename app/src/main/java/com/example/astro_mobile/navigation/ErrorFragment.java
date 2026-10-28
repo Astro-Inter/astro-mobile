@@ -120,12 +120,14 @@ public class ErrorFragment extends Fragment {
                     retryButton.setEnabled(true);
                     retryLabel.setVisibility(View.VISIBLE);
                     progress.setVisibility(View.GONE);
-                    if (kind == AuthFailureKind.INVALID_CREDENTIALS
-                            || kind == AuthFailureKind.DISABLED) {
-                        showResetConfirmation(view, navController);
-                    } else {
-                        showCopy(title, body, kind == AuthFailureKind.CONNECTION);
-                    }
+                    if (kind == AuthFailureKind.INVALID_CREDENTIALS) {
+                        navController.getBackStackEntry(R.id.passwordResetRequestFragment)
+                                .getSavedStateHandle().set("password_reset_invalid_email", true);
+                        navController.popBackStack(R.id.passwordResetRequestFragment, false);
+                    } else if (kind == AuthFailureKind.RATE_LIMIT) {
+                        Toast.makeText(requireContext(), getString(R.string.password_reset_rate_limit,
+                                resetViewModel.getRetrySeconds()), Toast.LENGTH_LONG).show();
+                    } else showCopy(title, body, kind == AuthFailureKind.CONNECTION);
                 }
             };
             ((TextView) view.findViewById(R.id.button_email_error_start))
@@ -321,6 +323,13 @@ public class ErrorFragment extends Fragment {
                     retry.setEnabled(true);
                     view.findViewById(R.id.text_email_error_retry).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.progress_email_error_retry).setVisibility(View.GONE);
+                    if (kind == AuthFailureKind.RATE_LIMIT || kind == AuthFailureKind.INVALID_CREDENTIALS) {
+                        String message = kind == AuthFailureKind.RATE_LIMIT
+                                ? getString(R.string.password_reset_rate_limit, resetViewModel.getRetrySeconds())
+                                : getString(R.string.password_reset_account_email_invalid);
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     showCopy(view.findViewById(R.id.text_email_error_title),
                             view.findViewById(R.id.text_email_error_body), kind == AuthFailureKind.CONNECTION);
                 }

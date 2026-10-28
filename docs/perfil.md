@@ -80,7 +80,7 @@ Firebase atual, sem input editável.
 **Segunda tela**
 
 - Título: Confira seu e-mail
-- Texto: Enviamos um link para {email}. Abra o e-mail e siga as instruções para alterar sua senha.
+- Texto: Se houver uma conta ativa vinculada a {email}, você receberá um link para alterar sua senha.
 - Botão: Voltar ao perfil
 
 Somente o sucesso do SDK abre a confirmação. Falha usa o erro genérico e retry

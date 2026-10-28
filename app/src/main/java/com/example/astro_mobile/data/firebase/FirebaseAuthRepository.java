@@ -53,17 +53,6 @@ public class FirebaseAuthRepository {
         });
     }
 
-    public void sendPasswordResetEmail(String email, ResultCallback callback) {
-        // A recuperação usa o e-mail já identificado, sem armazenar a senha no app.
-        auth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                callback.onSuccess();
-            } else {
-                callback.onFailure(classify(task.getException()));
-            }
-        });
-    }
-
     public void createAccount(String email, String password, AccountCallback callback) {
         // Cria a identidade Firebase; ativar a conta Astro é uma etapa separada.
         PushTokenRepository.getInstance().completePendingLogout()

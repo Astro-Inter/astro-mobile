@@ -35,6 +35,8 @@
     <string name="password_reset_title">Redefinir senha</string>
     <string name="password_reset_description">Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.</string>
     <string name="password_reset_email_empty_error">Informe seu e-mail.</string>
+    <string name="password_reset_rate_limit">Aguarde %1$d segundos antes de tentar novamente.</string>
+    <string name="password_reset_account_email_invalid">O e-mail da sua conta é inválido. Verifique seus dados.</string>
     <string name="password_reset_send">Enviar link</string>
     <string name="password_reset_back_description">Voltar</string>
     <string name="password_reset_confirmation_title">Confira seu e-mail</string>

@@ -4,6 +4,7 @@ public enum AuthFailureKind {
     INVALID_CREDENTIALS,
     WEAK_PASSWORD,
     DISABLED,
+    RATE_LIMIT,
     CONNECTION,
     INTERNAL
 }
