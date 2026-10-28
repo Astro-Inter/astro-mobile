@@ -26,6 +26,5 @@
     <string name="form_details_approved">Resposta aprovada</string>
     <string name="form_details_rejected">Resposta reprovada. Não é possível enviar novamente.</string>
     <string name="form_details_analysis">Resposta enviada. Aguardando análise.</string>
-    <string name="form_details_answer_integration_pending">O preenchimento das perguntas reais será disponibilizado na próxima etapa de integração.</string>
     <string name="form_details_review_reason">%1$s\n%2$s</string>
 </resources>

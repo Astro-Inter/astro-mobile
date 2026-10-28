@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="form_answer_helmets">1. Qual estado atual dos capacetes?</string>
-    <string name="form_answer_boots">2. Qual estado atual das botas?</string>
-    <string name="form_answer_gloves">3. Qual estado atual das luvas?</string>
-    <string name="form_answer_ok" tools:ignore="Typos,ButtonCase">Ok</string>
-    <string name="form_answer_problematic">Problemático</string>
-    <string name="form_answer_risks">4. Informe qualquer risco observado durante a inspeção.</string>
     <string name="form_answer_input_hint">Insira sua resposta</string>
-    <string name="form_answer_date">5. Insira uma sugestão de data para a próxima inspeção.</string>
     <string name="form_answer_date_hint">dd/mm/aaaa</string>
-    <string name="form_answer_evidence">6. Se alguma irregularidade foi encontrada, registre aqui</string>
-    <string name="form_answer_attach">Anexar evidências</string>
-    <string name="form_answer_evidence_count">Fotos: %1$d/3</string>
-    <string name="form_answer_evidence_name">Foto %1$d</string>
-    <string name="form_answer_remove_evidence">Remover foto</string>
-    <string name="form_answer_camera_error">Não foi possível abrir a câmera ou salvar a foto. Tente novamente.</string>
     <string name="form_answer_complete">Concluir formulário</string>
-    <string name="form_answer_required">Todos os campos são obrigatórios, incluindo ao menos uma foto de evidência.</string>
+    <string name="form_answer_required">Preencha os campos marcados com * para concluir.</string>
     <string name="form_answer_locating">Obtendo localização precisa…</string>
     <string name="form_answer_location_permission">Permita a localização precisa nas configurações para continuar. A localização aproximada não é suficiente.</string>
     <string name="form_answer_location_disabled">Ative a localização do celular para continuar.</string>
@@ -24,8 +11,26 @@
     <string name="form_answer_location_retry">Tentar novamente</string>
     <string name="form_answer_location_settings">Abrir configurações</string>
     <string name="form_outside_location">Você não está no local correto para responder esse formulário, retorne para a localização para continuar.</string>
-    <string name="form_answer_completed">Formulário concluído neste protótipo. As respostas não foram enviadas à API e o GPS foi interrompido.</string>
-    <string name="form_answer_completed_button">Concluído (mock)</string>
+    <string name="form_answer_completed">Respostas enviadas com sucesso! Aguarde a análise.</string>
+    <string name="form_answer_completed_button">Enviado</string>
+    <string name="form_answer_read_only">Este formulário já foi respondido. As respostas não podem ser alteradas.</string>
+    <string name="form_answer_other_hint">Descreva sua resposta</string>
+    <string name="form_answer_other_label">Outros</string>
+    <string name="form_answer_question_label">%1$d. %2$s%3$s</string>
+    <string name="form_answer_photo_take">Tirar foto</string>
+    <string name="form_answer_photo_remove">Remover</string>
+    <string name="form_answer_photo_limits">Adicione até %1$d foto(s). Cada imagem pode ter até %2$d MB.</string>
+    <string name="form_answer_photo_invalid">A foto excede o limite permitido ou não está em um formato válido. Tente novamente.</string>
+    <string name="form_answer_photo_unavailable">Não foi possível abrir a câmera neste dispositivo.</string>
+    <string name="form_answer_photo_title">Foto enviada</string>
+    <string name="form_answer_unknown_question">Este tipo de pergunta ainda não é suportado.</string>
+    <string name="form_answer_no_questions">Não há perguntas disponíveis neste formulário.</string>
+    <string name="form_answer_check_submission">Conferir situação do envio</string>
+    <string name="form_answer_submission_uncertain">Não foi possível confirmar o envio. Confira a situação antes de tentar novamente.</string>
+    <string name="form_answer_submission_not_found">O envio não foi registrado. Você pode tentar novamente.</string>
+    <string name="form_answer_send_error">Não foi possível enviar. Confira as respostas e tente novamente.</string>
+    <string name="form_answer_sending">Enviando…</string>
+    <string name="form_answer_read_responses">Visualizar respostas</string>
     <style name="FormAnswerQuestion" parent="ManagerFormsText">
         <item name="android:minHeight">80dp</item>
         <item name="android:gravity">center_vertical</item>

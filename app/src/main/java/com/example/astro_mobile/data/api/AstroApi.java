@@ -30,6 +30,8 @@ import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import com.example.astro_mobile.data.api.dto.ReceivedFormsPage;
+import com.example.astro_mobile.data.api.dto.FormResponseRequest;
+import com.example.astro_mobile.data.api.dto.FormImageUrl;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
@@ -79,6 +81,26 @@ public interface AstroApi {
     @GET("forms/received/{id}")
     Call<ApiResponse<ReceivedFormDetails>> getReceivedForm(
             @Header("Authorization") String authorization, @Path("id") String id);
+
+    @POST("forms/{id}/responses")
+    Call<ApiResponse<ReceivedFormDetails>> submitFormResponse(
+            @Header("Authorization") String authorization, @Path("id") String id,
+            @Body FormResponseRequest request);
+
+    @Multipart
+    @POST("forms/{id}/responses")
+    Call<ApiResponse<ReceivedFormDetails>> submitFormResponseWithFiles(
+            @Header("Authorization") String authorization, @Path("id") String id,
+            @Part("response") RequestBody response, @Part List<MultipartBody.Part> files);
+
+    @GET("forms/{id}/responses")
+    Call<ApiResponse<ReceivedFormDetails>> getFormResponses(
+            @Header("Authorization") String authorization, @Path("id") String id);
+
+    @GET("forms/{id}/images/{imageId}")
+    Call<ApiResponse<FormImageUrl>> getFormImageUrl(
+            @Header("Authorization") String authorization, @Path("id") String formId,
+            @Path("imageId") String imageId);
 
     @GET("user/me")
     Call<ApiResponse<UserProfileData>> getProfile(@Header("Authorization") String authorization);
