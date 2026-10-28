@@ -17,10 +17,15 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.chat.human.HumanChatFragment;
-import com.example.astro_mobile.manager.staff.mock.StaffSamples;
+import com.bumptech.glide.Glide;
 
 public final class StaffDetailsFragment extends Fragment {
-    public static final String ARG_SAMPLE_INDEX = "staff_sample_index";
+    public static final String ARG_COLLABORATOR_ID = "staff_collaborator_id";
+    public static final String ARG_NAME = "staff_name";
+    public static final String ARG_ROLE = "staff_role";
+    public static final String ARG_EMAIL = "staff_email";
+    public static final String ARG_UNIT = "staff_unit";
+    public static final String ARG_PHOTO_URL = "staff_photo_url";
     private StaffDetailsViewModel state;
     private Runnable finishLoading;
 
@@ -31,17 +36,27 @@ public final class StaffDetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         state = new ViewModelProvider(this).get(StaffDetailsViewModel.class);
 
-        // O índice identifica somente o exemplo local escolhido na lista, não um usuário real.
-        int index = requireArguments().getInt(ARG_SAMPLE_INDEX);
-        StaffMember member = StaffSamples.members().get(index);
-        int[] avatars = {R.drawable.participant_avatar_1, R.drawable.participant_avatar_2,
-                R.drawable.participant_avatar_3};
-        ((ImageView) view.findViewById(R.id.image_staff_details_avatar)).setImageResource(avatars[member.avatarIndex]);
-        ((TextView) view.findViewById(R.id.text_staff_details_name)).setText(member.name);
-        ((TextView) view.findViewById(R.id.text_staff_details_role)).setText(member.role);
-        ((TextView) view.findViewById(R.id.text_staff_details_pending)).setText(String.valueOf(member.pendingCount));
+        Bundle args = requireArguments();
+        String name = args.getString(ARG_NAME, "");
+        String role = args.getString(ARG_ROLE, "");
+        String email = args.getString(ARG_EMAIL);
+        String unit = args.getString(ARG_UNIT);
+        String photoUrl = args.getString(ARG_PHOTO_URL);
+        ((TextView) view.findViewById(R.id.text_staff_details_name)).setText(name);
+        ((TextView) view.findViewById(R.id.text_staff_details_role)).setText(role);
+        ((TextView) view.findViewById(R.id.text_staff_details_email)).setText(valueOrUnavailable(email));
+        ((TextView) view.findViewById(R.id.text_staff_details_unit)).setText(valueOrUnavailable(unit));
+        // A API de listagem ainda não fornece modalidade nem contagem de pendências.
+        ((TextView) view.findViewById(R.id.text_staff_details_modality)).setText(R.string.staff_detail_value_unavailable);
+        ((TextView) view.findViewById(R.id.text_staff_details_pending)).setText(R.string.staff_detail_value_unavailable);
         ((TextView) view.findViewById(R.id.text_staff_details_nrs_title)).setText(
-                Html.fromHtml(getString(R.string.staff_detail_nrs, member.name), Html.FROM_HTML_MODE_LEGACY));
+                Html.fromHtml(getString(R.string.staff_detail_nrs, name), Html.FROM_HTML_MODE_LEGACY));
+        ImageView avatar = view.findViewById(R.id.image_staff_details_avatar);
+        avatar.setImageResource(R.drawable.profile_avatar_placeholder);
+        if (photoUrl != null && !photoUrl.trim().isEmpty()) {
+            Glide.with(this).load(photoUrl).circleCrop().placeholder(R.drawable.profile_avatar_placeholder)
+                    .error(R.drawable.profile_avatar_placeholder).into(avatar);
+        }
 
         // Voltar retorna à lista; o X fecha o fluxo interno e retorna à Home do Gestor.
         view.findViewById(R.id.button_staff_details_back).setOnClickListener(clicked ->
@@ -49,15 +64,14 @@ public final class StaffDetailsFragment extends Fragment {
         view.findViewById(R.id.button_staff_details_close).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack(R.id.managerHomeFragment, false));
 
-        // Leva somente a identidade do exemplo à conversa humana, sem abrir o chatbot.
+        // Leva a identidade da pessoa selecionada à conversa humana.
         view.findViewById(R.id.button_staff_details_chat).setOnClickListener(clicked -> {
             Bundle chatArgs = AuthArgs.copy(getArguments());
-            chatArgs.putString(HumanChatFragment.PEER_NAME, member.name);
-            chatArgs.putString(HumanChatFragment.PEER_ROLE, member.role);
-            chatArgs.putInt(HumanChatFragment.PEER_AVATAR_INDEX, member.avatarIndex);
+            chatArgs.putString(HumanChatFragment.PEER_NAME, name);
+            chatArgs.putString(HumanChatFragment.PEER_ROLE, role);
             NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_human_chat, chatArgs);
         });
-        // Abre os eventos mantendo o funcionário escolhido na lista.
+        // Abre os eventos mock mantendo a identidade do colaborador selecionado.
         view.findViewById(R.id.button_staff_details_pending).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_events,
                         AuthArgs.copy(getArguments())));
@@ -77,6 +91,11 @@ public final class StaffDetailsFragment extends Fragment {
             };
             view.postDelayed(finishLoading, 1_000L);
         }
+    }
+
+    private String valueOrUnavailable(String value) {
+        return value == null || value.trim().isEmpty()
+                ? getString(R.string.staff_detail_value_unavailable) : value;
     }
 
     private void showNrs(LinearLayout container) {

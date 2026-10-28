@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.manager.staff.StaffDetailsFragment;
-import com.example.astro_mobile.manager.staff.mock.StaffSamples;
 
 public final class StaffEventsFragment extends Fragment {
     private final int[] filterLabels = {R.string.employee_events_all, R.string.employee_events_pending,
@@ -31,9 +30,8 @@ public final class StaffEventsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         state = new ViewModelProvider(this).get(StaffEventsViewModel.class);
 
-        // Mantém a identidade do exemplo selecionado, sem consultar uma conta real.
-        int index = requireArguments().getInt(StaffDetailsFragment.ARG_SAMPLE_INDEX);
-        String name = StaffSamples.members().get(index).name;
+        // Mantém o nome real selecionado na lista; os eventos seguem mockados nesta tarefa.
+        String name = requireArguments().getString(StaffDetailsFragment.ARG_NAME, "");
         ((TextView) view.findViewById(R.id.text_staff_events_heading)).setText(
                 Html.fromHtml(getString(R.string.staff_events_heading, name), Html.FROM_HTML_MODE_LEGACY));
 

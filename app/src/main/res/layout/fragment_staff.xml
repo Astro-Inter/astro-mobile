@@ -72,11 +72,11 @@
                 tools:listitem="@layout/item_staff_member" tools:itemCount="3" />
             <TextView android:id="@+id/text_staff_empty" style="@style/ManagerEventsText"
                 android:layout_width="0dp" android:minHeight="80dp" android:gravity="center"
-                android:padding="30dp" android:text="@string/staff_empty_mock" android:visibility="gone"
+                android:padding="30dp" android:text="@string/staff_empty" android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/divider_staff_top"
                 app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-        <!-- A prévia mostra a lista; o skeleton aparece somente na espera mock. -->
+        <!-- A prévia XML mostra os itens de exemplo; em execução o skeleton cobre a requisição. -->
         <include android:id="@+id/skeleton_staff" layout="@layout/view_staff_skeleton"
             android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" tools:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/header_staff" app:layout_constraintBottom_toBottomOf="parent"
