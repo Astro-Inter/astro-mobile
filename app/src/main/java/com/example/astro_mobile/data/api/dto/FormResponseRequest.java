@@ -10,6 +10,7 @@ public final class FormResponseRequest {
         public final Long questionId;
         public String text, otherText, date;
         public List<Long> optionIds;
+        public List<Integer> fileIndexes;
         public Answer(Long questionId) { this.questionId = questionId; }
     }
 }

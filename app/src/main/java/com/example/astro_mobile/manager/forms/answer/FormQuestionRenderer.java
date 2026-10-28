@@ -1,6 +1,8 @@
 package com.example.astro_mobile.manager.forms.answer;
 
 import android.app.DatePickerDialog;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -9,15 +11,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.data.camera.FormEvidenceRepository;
 import com.example.astro_mobile.data.api.dto.FormResponseRequest;
 import com.example.astro_mobile.data.api.dto.ReceivedFormDetails;
+import com.google.gson.JsonElement;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /** Cria os campos de resposta a partir das perguntas retornadas pela API. */
@@ -26,11 +33,21 @@ final class FormQuestionRenderer {
     private final LayoutInflater inflater;
     private final FormAnswerViewModel state;
     private final Runnable changed;
+    private final Consumer<Long> capturePhoto;
+    private final BiConsumer<Long, Uri> removePhoto;
+    private final BiConsumer<Long, String> openImage;
+    private final FormEvidenceRepository evidence;
 
-    FormQuestionRenderer(LayoutInflater inflater, FormAnswerViewModel state, Runnable changed) {
+    FormQuestionRenderer(LayoutInflater inflater, FormAnswerViewModel state, Runnable changed,
+                         Consumer<Long> capturePhoto, BiConsumer<Long, Uri> removePhoto,
+                         BiConsumer<Long, String> openImage, FormEvidenceRepository evidence) {
         this.inflater = inflater;
         this.state = state;
         this.changed = changed;
+        this.capturePhoto = capturePhoto;
+        this.removePhoto = removePhoto;
+        this.openImage = openImage;
+        this.evidence = evidence;
     }
 
     View create(ViewGroup parent, ReceivedFormDetails.Question question, int index) {
@@ -51,9 +68,7 @@ final class FormQuestionRenderer {
                 renderDate(row, answer);
                 break;
             case "foto":
-                TextView photoNotice = row.findViewById(R.id.text_form_question_notice);
-                photoNotice.setVisibility(View.VISIBLE);
-                photoNotice.setText(R.string.form_answer_photo_pending);
+                renderPhotos(row, question);
                 break;
             default:
                 TextView unsupported = row.findViewById(R.id.text_form_question_notice);
@@ -61,6 +76,82 @@ final class FormQuestionRenderer {
                 unsupported.setText(R.string.form_answer_unknown_question);
         }
         return row;
+    }
+
+    private void renderPhotos(View row, ReceivedFormDetails.Question question) {
+        LinearLayout container = row.findViewById(R.id.container_form_question_photos);
+        LinearLayout previews = row.findViewById(R.id.list_form_question_photos);
+        container.setVisibility(View.VISIBLE);
+        previews.removeAllViews();
+        TextView notice = row.findViewById(R.id.text_form_question_notice);
+        notice.setVisibility(View.VISIBLE);
+        if (!state.isCompleted()) {
+            int limit = question.maxFiles == null ? 1 : Math.min(10, Math.max(1, question.maxFiles));
+            int maxSize = question.maxFileSizeMb == null ? 10
+                    : Math.min(50, Math.max(1, question.maxFileSizeMb));
+            notice.setText(row.getContext().getString(R.string.form_answer_photo_limits, limit, maxSize));
+            for (Uri photo : state.photos(question.id)) addLocalPhoto(row, previews, question.id, photo);
+            View button = container.findViewById(R.id.button_form_question_take_photo);
+            button.setVisibility(View.VISIBLE);
+            button.setEnabled(state.canAddPhoto(question));
+            button.setOnClickListener(clicked -> capturePhoto.accept(question.id));
+            return;
+        }
+
+        container.findViewById(R.id.button_form_question_take_photo).setVisibility(View.GONE);
+        notice.setText(R.string.form_answer_read_only);
+        if (question.answer == null) return;
+        for (JsonElement image : question.answer) {
+            if (!image.isJsonObject()) continue;
+            String id = image.getAsJsonObject().has("id")
+                    ? image.getAsJsonObject().get("id").getAsString() : null;
+            String name = image.getAsJsonObject().has("name")
+                    ? image.getAsJsonObject().get("name").getAsString() : "Imagem";
+            if (id == null) continue;
+            TextView item = new TextView(row.getContext());
+            item.setId(R.id.form_answer_submitted_photo);
+            item.setText(name);
+            item.setTextColor(row.getResources().getColor(R.color.astro_light_background, null));
+            item.setTextSize(14);
+            item.setMinHeight((int) (48 * row.getResources().getDisplayMetrics().density));
+            item.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            item.setBackgroundResource(R.drawable.bg_home_row_ripple);
+            item.setPadding(12, 4, 12, 4);
+            item.setOnClickListener(clicked -> openImage.accept(question.id, id));
+            previews.addView(item, new LinearLayout.LayoutParams(-1, -2));
+        }
+    }
+
+    private void addLocalPhoto(View row, LinearLayout previews, Long questionId, Uri photo) {
+        LinearLayout item = new LinearLayout(row.getContext());
+        item.setOrientation(LinearLayout.VERTICAL);
+        item.setGravity(android.view.Gravity.CENTER);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                (int) (88 * row.getResources().getDisplayMetrics().density), -2);
+        params.setMarginEnd((int) (10 * row.getResources().getDisplayMetrics().density));
+        ImageView thumbnail = new ImageView(row.getContext());
+        int size = (int) (76 * row.getResources().getDisplayMetrics().density);
+        thumbnail.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        try {
+            Bitmap bitmap = evidence.preview(photo);
+            thumbnail.setImageBitmap(bitmap);
+        } catch (java.io.IOException error) {
+            thumbnail.setContentDescription(row.getContext().getString(R.string.form_answer_photo_invalid));
+        }
+        item.addView(thumbnail);
+        TextView remove = new TextView(row.getContext());
+        remove.setText(R.string.form_answer_photo_remove);
+        remove.setTextColor(row.getResources().getColor(R.color.astro_error, null));
+        remove.setTextSize(12);
+        remove.setGravity(android.view.Gravity.CENTER);
+        remove.setMinHeight((int) (40 * row.getResources().getDisplayMetrics().density));
+        remove.setOnClickListener(clicked -> {
+            removePhoto.accept(questionId, photo);
+            changed.run();
+        });
+        item.addView(remove);
+        previews.addView(item, params);
     }
 
     private void input(EditText field, String initial, int maxLength, Consumer<String> update) {

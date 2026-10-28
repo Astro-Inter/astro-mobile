@@ -17,7 +17,12 @@
     <string name="form_answer_other_hint">Descreva sua resposta</string>
     <string name="form_answer_other_label">Outros</string>
     <string name="form_answer_question_label">%1$d. %2$s%3$s</string>
-    <string name="form_answer_photo_pending">O envio de fotos será disponibilizado na próxima etapa.</string>
+    <string name="form_answer_photo_take">Tirar foto</string>
+    <string name="form_answer_photo_remove">Remover</string>
+    <string name="form_answer_photo_limits">Adicione até %1$d foto(s). Cada imagem pode ter até %2$d MB.</string>
+    <string name="form_answer_photo_invalid">A foto excede o limite permitido ou não está em um formato válido. Tente novamente.</string>
+    <string name="form_answer_photo_unavailable">Não foi possível abrir a câmera neste dispositivo.</string>
+    <string name="form_answer_photo_title">Foto enviada</string>
     <string name="form_answer_unknown_question">Este tipo de pergunta ainda não é suportado.</string>
     <string name="form_answer_no_questions">Não há perguntas disponíveis neste formulário.</string>
     <string name="form_answer_check_submission">Conferir situação do envio</string>
