@@ -7,6 +7,7 @@
     <string name="manager_events_in_progress">Em andamento</string>
     <string name="manager_events_finished">Finalizados</string>
     <string name="manager_events_finished_status">Finalizado</string>
+    <string name="manager_events_cancelled">Cancelado</string>
     <string name="manager_events_pending_count">Validações pendentes: %1$d</string>
     <string name="manager_events_validation_pending">Validação pendente</string>
     <string name="manager_events_assign_hint">Você precisa atribuir conclusões!</string>

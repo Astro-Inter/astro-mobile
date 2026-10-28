@@ -1,6 +1,7 @@
 package com.example.astro_mobile.manager.events;
 
 import android.view.LayoutInflater;
+import android.content.res.ColorStateList;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,7 +35,10 @@ public final class ManagerEventsAdapter extends RecyclerView.Adapter<ManagerEven
         // Cada estado usa o texto e o ícone do seu exemplo no Figma.
         ManagerEvent event = events.get(position);
         row.title.setText(event.title);
+        row.subtitle.setVisibility(event.status == ManagerEvent.Status.CANCELLED ? View.GONE : View.VISIBLE);
         row.icon.setVisibility(View.VISIBLE);
+        row.icon.setImageTintList(event.status == ManagerEvent.Status.CANCELLED
+                ? ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red)) : null);
         switch (event.status) {
             case VALIDATION_PENDING:
                 row.subtitle.setText(row.itemView.getContext().getString(
@@ -56,6 +60,10 @@ public final class ManagerEventsAdapter extends RecyclerView.Adapter<ManagerEven
                 row.subtitle.setText(R.string.manager_events_finished_status);
                 row.status.setText(R.string.manager_events_finished_status);
                 row.icon.setImageResource(R.drawable.ic_employee_event_done);
+                break;
+            case CANCELLED:
+                row.status.setText(R.string.manager_events_cancelled);
+                row.icon.setImageResource(R.drawable.conversations_close);
                 break;
         }
         // O caderno ocupa 20dp; os demais preservam a geometria de 18dp do design.
