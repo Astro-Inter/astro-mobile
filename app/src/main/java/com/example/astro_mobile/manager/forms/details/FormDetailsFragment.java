@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -85,8 +84,13 @@ public final class FormDetailsFragment extends Fragment {
             } else checkLocation(false);
         });
         view.findViewById(R.id.button_form_details_answer).setOnClickListener(clicked -> {
+            if (formId != null && state.getData() != null
+                    && "CONCLUIDO".equals(state.getData().form.status)) {
+                openAnswer();
+                return;
+            }
             if (formId != null && !requiresUnitLocation) {
-                showAnswerIntegrationPending();
+                openAnswer();
                 return;
             }
             // Revalida a posição no toque: uma leitura antiga não autoriza iniciar fora do raio.
@@ -147,6 +151,7 @@ public final class FormDetailsFragment extends Fragment {
                 answer.setUnitReference(requiresUnitLocation,
                         missingCoordinates || location == null ? null : location.latitude,
                         missingCoordinates || location == null ? null : location.longitude);
+                answer.initialize(details);
                 ((TextView) view.findViewById(R.id.text_form_details_title)).setText(details.form.title);
                 ((TextView) view.findViewById(R.id.text_form_details_description)).setText(details.form.description);
                 view.findViewById(R.id.text_form_details_description).setVisibility(
@@ -182,11 +187,6 @@ public final class FormDetailsFragment extends Fragment {
         });
     }
 
-    private void showAnswerIntegrationPending() {
-        // O próximo card integra as perguntas: não conclui um formulário real usando as respostas do mock.
-        Toast.makeText(requireContext(), R.string.form_details_answer_integration_pending, Toast.LENGTH_LONG).show();
-    }
-
     private void onConsentClick(CheckBox checkbox) {
         // O toque sozinho não marca o checkbox: primeiro é preciso confirmar a permissão precisa.
         checkbox.setChecked(false);
@@ -218,17 +218,25 @@ public final class FormDetailsFragment extends Fragment {
     }
 
     private void checkLocation(boolean openAnswer) {
-        if (formId != null && (state.getData() == null || missingCoordinates || !requiresUnitLocation
+        if (formId != null && (state.getData() == null || missingCoordinates
                 || "CONCLUIDO".equals(state.getData().form.status))) return;
-        answer.requestLocation(false, requiresUnitLocation, () -> {
+        if (!requiresUnitLocation) {
+            if (openAnswer) openAnswer();
+            return;
+        }
+        answer.requestLocation(() -> {
             if (getView() == null || !isResumed()) return;
             renderConsent(requireView());
             if (openAnswer && state.isConsentAccepted() && hasPreciseLocation() && answer.canStart()) {
-                if (formId != null) showAnswerIntegrationPending();
-                else NavHostFragment.findNavController(this).navigate(R.id.action_form_details_to_answer, getArguments());
+                openAnswer();
             }
         });
         renderConsent(requireView());
+    }
+
+    private void openAnswer() {
+        if (formId != null && state.getData() != null) answer.initialize(state.getData());
+        NavHostFragment.findNavController(this).navigate(R.id.action_form_details_to_answer, getArguments());
     }
 
     private void renderConsent(View view) {
@@ -237,7 +245,10 @@ public final class FormDetailsFragment extends Fragment {
             boolean completed = "CONCLUIDO".equals(state.getData().form.status);
             view.findViewById(R.id.container_form_details_consent).setVisibility(
                     completed || !requiresUnitLocation ? View.GONE : View.VISIBLE);
-            view.findViewById(R.id.button_form_details_answer).setVisibility(completed ? View.GONE : View.VISIBLE);
+            TextView answerButton = view.findViewById(R.id.button_form_details_answer);
+            answerButton.setVisibility(View.VISIBLE);
+            answerButton.setText(completed ? R.string.form_answer_read_responses : R.string.form_details_answer);
+            answerButton.setEnabled(completed);
             view.findViewById(R.id.container_form_details_location_message).setVisibility(completed ? View.GONE : View.VISIBLE);
             view.findViewById(R.id.container_form_details_location_notice).setVisibility(completed || !requiresUnitLocation ? View.GONE : View.VISIBLE);
             view.findViewById(R.id.button_form_details_location_retry).setVisibility(View.GONE);
@@ -247,7 +258,7 @@ public final class FormDetailsFragment extends Fragment {
                         missingCoordinates ? R.string.form_details_unit_location_unavailable : R.string.form_details_no_specific_address,
                         missingCoordinates ? R.drawable.conversations_close : R.drawable.form_location_check,
                         missingCoordinates ? R.drawable.bg_form_location_error : R.drawable.bg_home_positive_message);
-                view.findViewById(R.id.button_form_details_answer).setEnabled(!missingCoordinates);
+                answerButton.setEnabled(!missingCoordinates || completed);
                 view.findViewById(R.id.container_form_details_consent).setVisibility(View.GONE);
                 TextView retry = view.findViewById(R.id.button_form_details_location_retry);
                 retry.setVisibility(missingCoordinates ? View.VISIBLE : View.GONE);

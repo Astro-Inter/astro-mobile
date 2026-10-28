@@ -63,6 +63,7 @@ public final class ReceivedFormDetailsRepository {
                         if (response.code() != 200 || body == null || !body.isSuccess()
                                 || body.getData() == null || body.getData().form == null
                                 || !formId.equals(body.getData().form.id) || body.getData().form.title == null
+                                || body.getData().form.questions == null
                                 || !("PENDENTE".equals(body.getData().form.status) || "CONCLUIDO".equals(body.getData().form.status))) {
                             callback.onFailure(FailureKind.INTERNAL);
                             return;

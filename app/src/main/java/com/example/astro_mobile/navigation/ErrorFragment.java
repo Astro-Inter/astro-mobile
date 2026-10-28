@@ -53,6 +53,7 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.aiSessionsFragment || source == R.id.chatFragment
                 || source == R.id.employeeEventDetailsFragment || source == R.id.conversationsFragment
                 || source == R.id.managerFormsFragment || source == R.id.formDetailsFragment
+                || source == R.id.formAnswerFragment
                 || source == R.id.managerEventsFragment) {
             // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
             showCopy(view.findViewById(R.id.text_email_error_title),

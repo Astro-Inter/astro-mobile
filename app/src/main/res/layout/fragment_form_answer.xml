@@ -36,50 +36,15 @@
                     <TextView style="@style/ManagerFormsText" android:layout_marginTop="5dp"
                         android:textColor="@color/astro_input_hint" android:text="@string/form_details_subtitle" />
                 </LinearLayout>
-                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_helmets" />
-                <include android:id="@+id/group_form_answer_helmets" layout="@layout/view_form_answer_choices" />
-                <View style="@style/ManagerEventDetailsDivider" />
-                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_boots" />
-                <include android:id="@+id/group_form_answer_boots" layout="@layout/view_form_answer_choices" />
-                <View style="@style/ManagerEventDetailsDivider" />
-                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_gloves" />
-                <include android:id="@+id/group_form_answer_gloves" layout="@layout/view_form_answer_choices" />
-                <View style="@style/ManagerEventDetailsDivider" />
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
-                    <TextView style="@style/ManagerFormsText" android:text="@string/form_answer_risks" />
-                    <EditText android:id="@+id/input_form_answer_risks" style="@style/FormAnswerInput"
-                        android:layout_marginTop="10dp" android:hint="@string/form_answer_input_hint"
-                        android:inputType="textCapSentences|textMultiLine" android:gravity="top|start"
-                        android:importantForAutofill="no" />
-                </LinearLayout>
-                <View style="@style/ManagerEventDetailsDivider" />
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
-                    <TextView style="@style/ManagerFormsText" android:text="@string/form_answer_date" />
-                    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
-                        <TextView android:id="@+id/button_form_answer_date" style="@style/FormAnswerInput"
-                            android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="52dp"
-                            android:hint="@string/form_answer_date_hint" android:clickable="true" android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground" />
-                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
-                            android:layout_gravity="end|center_vertical" android:layout_marginEnd="16dp"
-                            android:src="@drawable/home_calendar" android:scaleType="fitCenter"
-                            android:contentDescription="@null" android:importantForAccessibility="no" />
-                    </FrameLayout>
-                </LinearLayout>
-                <View style="@style/ManagerEventDetailsDivider" />
-                <TextView style="@style/FormAnswerQuestion" android:text="@string/form_answer_evidence" />
-                <TextView android:id="@+id/button_form_answer_attach" style="@style/EmployeeEventDetailsButton"
-                    android:layout_width="match_parent" android:layout_marginHorizontal="30dp"
-                    android:layout_marginVertical="10dp" android:text="@string/form_answer_attach" />
-                <LinearLayout android:id="@+id/list_form_answer_evidences" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"
-                    android:orientation="vertical" />
-                <TextView android:id="@+id/text_form_answer_evidence_count" style="@style/ManagerFormsCaption"
-                    android:layout_marginHorizontal="30dp" android:layout_marginTop="8dp"
-                    tools:text="Fotos: 0/3" />
+                <LinearLayout android:id="@+id/list_form_answer_questions" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical"
+                    tools:ignore="UselessLeaf" />
+                <TextView android:id="@+id/text_form_answer_error" style="@style/ManagerFormsText"
+                    android:layout_marginHorizontal="30dp" android:textColor="@color/astro_error"
+                    android:visibility="gone" />
+                <TextView android:id="@+id/button_form_answer_check_submission" style="@style/EmployeeEventDetailsButton"
+                    android:layout_marginHorizontal="30dp" android:layout_marginTop="10dp"
+                    android:text="@string/form_answer_check_submission" android:visibility="gone" />
                 <!-- Apenas falhas de localização e a conclusão precisam de mensagem na resposta. -->
                 <LinearLayout android:id="@+id/container_form_answer_location" android:layout_width="match_parent"
                     android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"

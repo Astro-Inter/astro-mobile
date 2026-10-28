@@ -30,6 +30,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import com.example.astro_mobile.data.api.dto.ReceivedFormsPage;
+import com.example.astro_mobile.data.api.dto.FormResponseRequest;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
@@ -78,6 +79,15 @@ public interface AstroApi {
 
     @GET("forms/received/{id}")
     Call<ApiResponse<ReceivedFormDetails>> getReceivedForm(
+            @Header("Authorization") String authorization, @Path("id") String id);
+
+    @POST("forms/{id}/responses")
+    Call<ApiResponse<ReceivedFormDetails>> submitFormResponse(
+            @Header("Authorization") String authorization, @Path("id") String id,
+            @Body FormResponseRequest request);
+
+    @GET("forms/{id}/responses")
+    Call<ApiResponse<ReceivedFormDetails>> getFormResponses(
             @Header("Authorization") String authorization, @Path("id") String id);
 
     @GET("user/me")
