@@ -3,9 +3,13 @@
     <string name="staff_title">Colaboradores</string>
     <string name="staff_with_pending">Com pendências</string>
     <string name="staff_no_pending">Sem pendências</string>
+    <string name="staff_empty">Nenhum colaborador encontrado</string>
+    <string name="staff_no_search_results">Nenhum colaborador corresponde à sua pesquisa</string>
+    <string name="staff_no_filter_results">Nenhum colaborador encontrado para os filtros selecionados</string>
+    <string name="staff_pending_unknown">—</string>
     <plurals name="staff_pending_count">
-        <item quantity="one">%1$d Pendência</item>
-        <item quantity="other">%1$d Pendências</item>
+        <item quantity="one">%d pendência</item>
+        <item quantity="other">%d pendências</item>
     </plurals>
-    <string name="staff_empty_mock">Nenhum colaborador encontrado</string>
+    <string name="staff_pending_filter_unavailable">Indisponível até a API informar a contagem de pendências</string>
 </resources>

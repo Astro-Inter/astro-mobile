@@ -15,6 +15,7 @@ import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventDetailsData;
 import com.example.astro_mobile.data.api.dto.ChatConversationData;
 import com.example.astro_mobile.data.api.dto.ManagerEventData;
+import com.example.astro_mobile.data.api.dto.CollaboratorSummaryData;
 
 import java.util.List;
 
@@ -50,6 +51,9 @@ public interface AstroApi {
     Call<ApiResponse<ReceivedFormsPage>> getReceivedForms(
             @Header("Authorization") String authorization, @Query("page") int page,
             @Query("size") int size);
+    @GET("collaborators/pending-count")
+    Call<ApiResponse<List<CollaboratorSummaryData>>> getCollaborators(
+            @Header("Authorization") String authorization);
 
     @GET("notifications/{notificationId}")
     Call<ApiResponse<NotificationDetailsData>> getNotification(

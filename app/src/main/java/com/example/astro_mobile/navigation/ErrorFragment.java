@@ -53,8 +53,8 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.aiSessionsFragment || source == R.id.chatFragment
                 || source == R.id.employeeEventDetailsFragment || source == R.id.conversationsFragment
                 || source == R.id.managerFormsFragment || source == R.id.formDetailsFragment
-                || source == R.id.formAnswerFragment
-                || source == R.id.managerEventsFragment) {
+                || source == R.id.formAnswerFragment || source == R.id.managerEventsFragment
+                || source == R.id.staffFragment) {
             // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
             showCopy(view.findViewById(R.id.text_email_error_title),
                     view.findViewById(R.id.text_email_error_body),
@@ -66,6 +66,10 @@ public class ErrorFragment extends Fragment {
                             .set("retry_ai_conversation", conversation);
                 } else if (source == R.id.conversationsFragment) {
                     previous.getSavedStateHandle().set("retry_human_chat_list", true);
+                }
+                if (source == R.id.staffFragment) {
+                    navController.getBackStackEntry(source).getSavedStateHandle()
+                            .set("retry_staff_list", true);
                 }
                 navController.popBackStack(source, false);
             });

@@ -64,20 +64,23 @@
                     <ImageView android:layout_width="20dp" android:layout_height="18.2dp" android:layout_marginEnd="20dp"
                         android:src="@drawable/profile_building" android:contentDescription="@null" android:scaleType="fitCenter" />
                     <TextView style="@style/StaffDetailLabel" android:text="@string/profile_unit" />
-                    <TextView style="@style/StaffDetailValue" android:text="@string/staff_detail_unit_mock" />
+                    <TextView android:id="@+id/text_staff_details_unit" style="@style/StaffDetailValue"
+                        android:text="@string/staff_detail_value_unavailable" />
                 </LinearLayout>
                 <View style="@style/StaffDetailDivider" />
                 <LinearLayout style="@style/StaffDetailField">
                     <ImageView style="@style/ProfileFieldIcon" android:src="@drawable/profile_tag" android:contentDescription="@null" />
                     <TextView style="@style/StaffDetailLabel" android:text="@string/profile_modality" />
-                    <TextView style="@style/StaffDetailValue" android:text="@string/staff_detail_modality_mock" />
+                    <TextView android:id="@+id/text_staff_details_modality" style="@style/StaffDetailValue"
+                        android:text="@string/staff_detail_value_unavailable" />
                 </LinearLayout>
                 <View style="@style/StaffDetailDivider" />
                 <LinearLayout style="@style/StaffDetailField">
                     <androidx.appcompat.widget.AppCompatImageView style="@style/ProfileFieldIcon"
                         android:src="@drawable/ic_email_closed" app:tint="@color/astro_primary_purple" android:contentDescription="@null" />
                     <TextView style="@style/StaffDetailLabel" android:text="@string/profile_email" />
-                    <TextView style="@style/StaffDetailValue" android:text="@string/staff_detail_email_mock" />
+                    <TextView android:id="@+id/text_staff_details_email" style="@style/StaffDetailValue"
+                        android:text="@string/staff_detail_value_unavailable" />
                 </LinearLayout>
                 <View style="@style/StaffDetailDivider" />
                 <LinearLayout style="@style/StaffDetailField">
