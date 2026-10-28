@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 import com.example.astro_mobile.data.firebase.FirebaseAuthRepository;
+import com.example.astro_mobile.data.api.PasswordResetRepository;
 
 // Guarda o e-mail para a confirmação e uma possível nova tentativa.
 public class PasswordResetViewModel extends ViewModel {
@@ -15,13 +16,15 @@ public class PasswordResetViewModel extends ViewModel {
         void onFailure(AuthFailureKind kind);
     }
 
-    private final FirebaseAuthRepository repository;
+    private final FirebaseAuthRepository auth;
+    private final PasswordResetRepository repository;
     private boolean loading;
     private int requestId;
     private String lastEmail;
     private ResultCallback callback;
 
-    public PasswordResetViewModel(FirebaseAuthRepository repository) {
+    public PasswordResetViewModel(FirebaseAuthRepository auth, PasswordResetRepository repository) {
+        this.auth = auth;
         this.repository = repository;
     }
 
@@ -35,8 +38,10 @@ public class PasswordResetViewModel extends ViewModel {
 
     public String getCurrentEmail() {
         // No perfil, o destinatário é a conta autenticada e não um campo editável.
-        return repository.getCurrentEmail();
+        return auth.getCurrentEmail();
     }
+
+    public long getRetrySeconds() { return repository.getRetrySeconds(); }
 
     public void sendPasswordResetEmail(String email, ResultCallback callback) {
         if (loading) {
@@ -46,7 +51,7 @@ public class PasswordResetViewModel extends ViewModel {
         loading = true;
         this.callback = callback;
         int id = ++requestId;
-        repository.sendPasswordResetEmail(email, new FirebaseAuthRepository.ResultCallback() {
+        repository.request(email, new PasswordResetRepository.ResultCallback() {
             @Override
             public void onSuccess() {
                 finish(id, null);
@@ -77,7 +82,7 @@ public class PasswordResetViewModel extends ViewModel {
     }
 
     public void clearRequest() {
-        // O SDK pode concluir a operação, mas uma tela fechada não recebe seu retorno.
+        // Uma tela fechada não recebe o retorno da solicitação em andamento.
         ++requestId;
         callback = null;
         loading = false;
@@ -89,14 +94,16 @@ public class PasswordResetViewModel extends ViewModel {
     }
 
     public static class Factory implements ViewModelProvider.Factory {
-        private final FirebaseAuthRepository repository;
+        private final FirebaseAuthRepository auth;
+        private final PasswordResetRepository repository;
 
-        public Factory(FirebaseAuthRepository repository) {
+        public Factory(FirebaseAuthRepository auth, PasswordResetRepository repository) {
+            this.auth = auth;
             this.repository = repository;
         }
 
         public static Factory createDefault() {
-            return new Factory(FirebaseAuthRepository.createDefault());
+            return new Factory(FirebaseAuthRepository.createDefault(), PasswordResetRepository.createDefault());
         }
 
         @NonNull
@@ -105,7 +112,7 @@ public class PasswordResetViewModel extends ViewModel {
             if (!modelClass.isAssignableFrom(PasswordResetViewModel.class)) {
                 throw new IllegalArgumentException("Unknown ViewModel: " + modelClass.getName());
             }
-            return modelClass.cast(new PasswordResetViewModel(repository));
+            return modelClass.cast(new PasswordResetViewModel(auth, repository));
         }
     }
 }

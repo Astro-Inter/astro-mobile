@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,8 +50,13 @@ public class PasswordResetRequestFragment extends Fragment {
             emailInput.setText(initialEmail);
         }
         setLoading(emailInput, sendButton, sendLabel, progress, resetViewModel.isLoading());
+        Boolean invalidEmail = NavHostFragment.findNavController(this).getCurrentBackStackEntry()
+                .getSavedStateHandle().remove("password_reset_invalid_email");
+        if (Boolean.TRUE.equals(invalidEmail)) {
+            showError(inputContainer, error, R.string.email_identification_invalid_error);
+        }
 
-        // Valida o endereço no aparelho antes de chamar o Firebase.
+        // Valida o endereço antes de solicitar o link ao serviço.
         sendButton.setOnClickListener(clickedView -> {
             if (resetViewModel.isLoading()) {
                 return;
@@ -106,10 +112,13 @@ public class PasswordResetRequestFragment extends Fragment {
                     return;
                 }
                 setLoading(emailInput, sendButton, sendLabel, progress, false);
-                if (kind == AuthFailureKind.INVALID_CREDENTIALS
-                        || kind == AuthFailureKind.DISABLED) {
-                    // Mantém a resposta neutra para não revelar contas cadastradas.
-                    showConfirmation(view);
+                if (kind == AuthFailureKind.INVALID_CREDENTIALS) {
+                    showError(inputContainer, error, R.string.email_identification_invalid_error);
+                    return;
+                }
+                if (kind == AuthFailureKind.RATE_LIMIT) {
+                    Toast.makeText(requireContext(), getString(R.string.password_reset_rate_limit,
+                            resetViewModel.getRetrySeconds()), Toast.LENGTH_LONG).show();
                     return;
                 }
                 NavController navController = NavHostFragment.findNavController(

@@ -18,6 +18,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_BASE_URL", "\"https://c0zpv0w3o7.execute-api.us-east-1.amazonaws.com/\"")
+        buildConfigField("String", "PASSWORD_RESET_API_BASE_URL", "\"https://astro-password-reset.app-4str0.workers.dev/\"")
         buildConfigField("String", "AI_API_BASE_URL", "\"https://astro-ai-api-qq6l.onrender.com/\"")
     }
 
