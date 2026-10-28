@@ -92,7 +92,7 @@
                     android:minHeight="48dp" android:gravity="center_vertical" android:paddingVertical="10dp"
                     android:background="@drawable/bg_home_row_ripple" android:clickable="true" android:focusable="true"
                     android:text="@string/form_details_check_location" android:visibility="gone" />
-                <View style="@style/ManagerEventDetailsDivider" />
+                <View android:id="@+id/divider_form_details_location" style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout android:id="@+id/container_form_details_consent" android:layout_width="match_parent"
                     android:layout_height="wrap_content" android:layout_marginHorizontal="30dp"
                     android:orientation="vertical">

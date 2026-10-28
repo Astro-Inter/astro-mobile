@@ -1,14 +1,21 @@
 package com.example.astro_mobile.manager.forms.answer;
 
 import android.content.Intent;
+import android.content.ActivityNotFoundException;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -20,11 +27,23 @@ import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.FormResponseRepository;
 import com.example.astro_mobile.data.api.dto.ReceivedFormDetails;
+import com.example.astro_mobile.data.camera.FormEvidenceRepository;
 import com.example.astro_mobile.data.location.FormLocationRepository;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 public final class FormAnswerFragment extends Fragment {
     private FormAnswerViewModel state;
+    private FormEvidenceRepository evidence;
+    private final ActivityResultLauncher<Uri> camera = registerForActivityResult(
+            new ActivityResultContracts.TakePicture(), captured -> {
+                if (state == null || getView() == null) return;
+                if (!state.finishPhotoCapture(captured) && captured) {
+                    Toast.makeText(requireContext(), R.string.form_answer_photo_invalid, Toast.LENGTH_LONG).show();
+                }
+                renderQuestions(requireView());
+            });
     private final Runnable locationTick = new Runnable() {
         @Override public void run() {
             if (getView() == null || !isResumed() || state.isCompleted() || !state.requiresLocation()) return;
@@ -39,6 +58,7 @@ public final class FormAnswerFragment extends Fragment {
         state = new ViewModelProvider(NavHostFragment.findNavController(this)
                 .getBackStackEntry(R.id.formDetailsFragment), FormAnswerViewModel.factory(requireContext()))
                 .get(FormAnswerViewModel.class);
+        evidence = new FormEvidenceRepository(requireContext());
         view.findViewById(R.id.button_form_answer_back).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).navigateUp());
         view.findViewById(R.id.button_form_answer_close).setOnClickListener(clicked ->
@@ -54,13 +74,62 @@ public final class FormAnswerFragment extends Fragment {
         ((TextView) view.findViewById(R.id.text_form_answer_title)).setText(state.getDetails().form.title);
         LinearLayout questions = view.findViewById(R.id.list_form_answer_questions);
         questions.removeAllViews();
-        FormQuestionRenderer renderer = new FormQuestionRenderer(getLayoutInflater(), state, () -> renderControls(view));
+        FormQuestionRenderer renderer = new FormQuestionRenderer(getLayoutInflater(), state,
+                () -> renderControls(view), this::takePhoto, state::removePhoto,
+                this::openSubmittedImage, evidence);
         if (state.getDetails().form.questions != null) {
             for (int index = 0; index < state.getDetails().form.questions.size(); index++)
                 questions.addView(renderer.create(questions, state.getDetails().form.questions.get(index), index));
         }
         if (questions.getChildCount() == 0) showInline(getString(R.string.form_answer_no_questions));
         renderControls(view);
+    }
+
+    private void takePhoto(Long questionId) {
+        ReceivedFormDetails.Question question = null;
+        for (ReceivedFormDetails.Question item : state.getDetails().form.questions) {
+            if (item.id.equals(questionId)) { question = item; break; }
+        }
+        if (question == null || !state.canAddPhoto(question)) return;
+        Uri photo;
+        try {
+            photo = evidence.createCapture();
+        } catch (java.io.IOException error) {
+            Toast.makeText(requireContext(), R.string.form_answer_photo_unavailable, Toast.LENGTH_LONG).show();
+            return;
+        }
+        state.beginPhotoCapture(questionId, photo);
+        try {
+            camera.launch(photo);
+        } catch (ActivityNotFoundException | IllegalStateException error) {
+            state.finishPhotoCapture(false);
+            Toast.makeText(requireContext(), R.string.form_answer_photo_unavailable, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void openSubmittedImage(Long questionId, String imageId) {
+        ImageView image = new ImageView(requireContext());
+        int size = (int) (320 * getResources().getDisplayMetrics().density);
+        image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        image.setBackgroundColor(Color.BLACK);
+        FrameLayout imageContainer = new FrameLayout(requireContext());
+        imageContainer.addView(image, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, size));
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.form_answer_photo_title).setView(imageContainer)
+                .setNegativeButton(android.R.string.cancel, null).create();
+        dialog.show();
+        state.getImageUrl(imageId, new FormResponseRepository.ImageUrlCallback() {
+            @Override public void onSuccess(String url) {
+                if (dialog.isShowing()) Glide.with(FormAnswerFragment.this).load(url).fitCenter()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .error(android.R.drawable.ic_menu_report_image).into(image);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (dialog.isShowing()) dialog.dismiss();
+                if (getView() != null && isResumed()) showFailure(failure);
+            }
+        });
     }
     private void refresh() {
         View view = requireView();
@@ -136,6 +205,15 @@ public final class FormAnswerFragment extends Fragment {
         View questionsView = view.findViewById(R.id.list_form_answer_questions);
         boolean fieldsEnabled = !state.isCompleted() && !state.isLoading() && !state.isOutside();
         setFieldsEnabled(questionsView, fieldsEnabled);
+        if (state.getDetails().form.questions != null) {
+            for (int index = 0; index < state.getDetails().form.questions.size(); index++) {
+                ReceivedFormDetails.Question question = state.getDetails().form.questions.get(index);
+                if (!"foto".equals(question.type) || index >= ((ViewGroup) questionsView).getChildCount()) continue;
+                View button = ((ViewGroup) questionsView).getChildAt(index)
+                        .findViewById(R.id.button_form_question_take_photo);
+                if (button != null) button.setEnabled(fieldsEnabled && state.canAddPhoto(question));
+            }
+        }
         TextView button = view.findViewById(R.id.button_form_answer_complete);
         button.setEnabled(state.canSubmit());
         button.setText(state.isCompleted() ? R.string.form_answer_completed_button
@@ -145,7 +223,14 @@ public final class FormAnswerFragment extends Fragment {
         renderLocation(view);
     }
     private void setFieldsEnabled(View view, boolean enabled) {
-        view.setEnabled(enabled);
+        boolean photoContainer = view.getId() == R.id.container_form_question_photos
+                || view.getId() == R.id.list_form_question_photos;
+        boolean submittedPhoto = view.getId() == R.id.form_answer_submitted_photo;
+        view.setEnabled(submittedPhoto || photoContainer && state.isCompleted() || enabled);
+        if (submittedPhoto) {
+            view.setClickable(true);
+            view.setFocusable(true);
+        }
         if (view instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) view;
             for (int index = 0; index < group.getChildCount(); index++) setFieldsEnabled(group.getChildAt(index), enabled);
