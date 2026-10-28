@@ -14,6 +14,7 @@ import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventDetailsData;
 import com.example.astro_mobile.data.api.dto.ChatConversationData;
+import com.example.astro_mobile.data.api.dto.ManagerEventData;
 
 import java.util.List;
 
@@ -67,6 +68,9 @@ public interface AstroApi {
     @GET("home/manager")
     Call<ApiResponse<ManagerHomeData>> getManagerHome(
             @Header("Authorization") String authorization);
+
+    @GET("events/my-events")
+    Call<ApiResponse<List<ManagerEventData>>> getManagerEvents(@Header("Authorization") String authorization);
 
     @GET("home/collaborator")
     Call<ApiResponse<CollaboratorHomeData>> getCollaboratorHome(

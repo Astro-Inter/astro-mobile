@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.SessionNavigation;
+import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 import java.util.List;
@@ -29,14 +31,13 @@ public final class ManagerEventsFragment extends Fragment {
     private final int[] filterLabels = {R.string.employee_events_all,
             R.string.manager_events_in_progress, R.string.manager_events_finished};
     private ManagerEventsViewModel state;
-    private Runnable finishLoading;
 
     public ManagerEventsFragment() { super(R.layout.fragment_manager_events); }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        state = new ViewModelProvider(this).get(ManagerEventsViewModel.class);
+        state = new ViewModelProvider(this, new ManagerEventsViewModel.Factory()).get(ManagerEventsViewModel.class);
 
         // Voltar e fechar retornam à Home, sem mudar o fluxo ativo da conta.
         View.OnClickListener returnHome = clicked -> NavHostFragment.findNavController(this)
@@ -70,20 +71,38 @@ public final class ManagerEventsFragment extends Fragment {
         });
         render(view);
 
-        // Simula um segundo de espera sem bloquear a interface; o XML mantém a prévia real.
-        if (!state.isLoaded()) {
-            View content = view.findViewById(R.id.container_manager_events_content);
-            View skeleton = view.findViewById(R.id.skeleton_manager_events);
-            content.setVisibility(View.INVISIBLE);
-            skeleton.setVisibility(View.VISIBLE);
-            finishLoading = () -> {
-                state.markLoaded();
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        if (!state.isLoaded() && !state.isLoading()) loadEvents();
+    }
+
+    // Exibe o skeleton enquanto a lista é consultada e encaminha falhas à tela adequada.
+    private void loadEvents() {
+        View view = getView();
+        if (view == null) return;
+        View content = view.findViewById(R.id.container_manager_events_content);
+        View skeleton = view.findViewById(R.id.skeleton_manager_events);
+        content.setVisibility(View.INVISIBLE);
+        skeleton.setVisibility(View.VISIBLE);
+        state.load(new ManagerEventsViewModel.ResultCallback() {
+            @Override public void onSuccess() {
+                if (getView() != view || !isResumed()) return;
                 skeleton.setVisibility(View.GONE);
                 content.setVisibility(View.VISIBLE);
-                finishLoading = null;
-            };
-            view.postDelayed(finishLoading, 1_000L);
-        }
+                render(view);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (getView() != view || !isResumed()) return;
+                if (failure == FailureKind.SESSION) {
+                    SessionNavigation.signOut(ManagerEventsFragment.this);
+                } else {
+                    NavHostFragment.findNavController(ManagerEventsFragment.this).navigate(
+                            failure == FailureKind.CONNECTION ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
+                }
+            }
+        });
     }
 
     private void showFilters(View view, View anchor) {
@@ -121,16 +140,14 @@ public final class ManagerEventsFragment extends Fragment {
     private void openDetails(ManagerEvent event) {
         // Leva o evento e seu modo ao detalhe, preservando o contexto da conta.
         Bundle args = AuthArgs.copy(getArguments());
+        args.putLong("event_id", event.id);
         args.putString(ManagerEventDetailsFragment.EVENT_TITLE, event.title);
         args.putString(ManagerEventDetailsFragment.COMPLETION_MODE, event.completionMode.name());
         NavHostFragment.findNavController(this).navigate(R.id.action_manager_events_to_details, args);
     }
 
-    @Override
-    public void onDestroyView() {
-        // Descarta o carregamento mock se a tela for fechada antes de completar a espera.
-        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
-        finishLoading = null;
-        super.onDestroyView();
+    @Override public void onPause() {
+        state.cancel();
+        super.onPause();
     }
 }
