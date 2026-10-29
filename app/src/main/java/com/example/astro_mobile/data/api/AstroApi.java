@@ -58,6 +58,10 @@ public interface AstroApi {
     Call<ApiResponse<ManagerEventDetailsData>> getManagerSelfDeclarationDetails(
             @Header("Authorization") String authorization, @Path("eventId") long id);
 
+    @GET("events/details/{eventId}/manager-conclusion")
+    Call<ApiResponse<ManagerEventDetailsData>> getManagerAssignmentDetails(
+            @Header("Authorization") String authorization, @Path("eventId") long id);
+
     @GET("events/{eventId}/participants")
     Call<ApiResponse<List<EventParticipantData>>> getEventParticipants(
             @Header("Authorization") String authorization, @Path("eventId") long eventId);

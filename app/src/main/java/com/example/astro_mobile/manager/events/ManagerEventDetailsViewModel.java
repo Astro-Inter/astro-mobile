@@ -9,15 +9,13 @@ import com.example.astro_mobile.data.api.dto.ManagerEventDetailsData;
 public final class ManagerEventDetailsViewModel extends ViewModel {
     private final ManagerEventDetailsRepository repository = ManagerEventDetailsRepository.createDefault();
     private ManagerEventDetailsData details;
-    private boolean loaded, loading;
+    private boolean loading;
     public interface Callback { void onSuccess(); void onFailure(FailureKind failure); }
-    public boolean isLoaded() { return loaded; }
-    public void markLoaded() { loaded = true; }
     public ManagerEventDetailsData getDetails() { return details; }
-    public void load(long id, Callback callback) {
+    public void load(long id, boolean selfDeclaration, Callback callback) {
         if (loading) return;
         loading = true;
-        repository.load(id, new ManagerEventDetailsRepository.ResultCallback() {
+        repository.load(id, selfDeclaration, new ManagerEventDetailsRepository.ResultCallback() {
             @Override public void onSuccess(ManagerEventDetailsData data) { loading = false; details = data; callback.onSuccess(); }
             @Override public void onFailure(FailureKind failure) { loading = false; callback.onFailure(failure); }
         });

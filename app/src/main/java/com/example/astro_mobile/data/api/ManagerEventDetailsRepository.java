@@ -13,7 +13,7 @@ import retrofit2.Response;
 /** Consulta o evento autorizado e renova o token uma vez após 401. */
 public final class ManagerEventDetailsRepository {
     public interface ResultCallback {
-        void onSuccess(ManagerEventDetailsData profile);
+        void onSuccess(ManagerEventDetailsData details);
         void onFailure(FailureKind failure);
     }
 
@@ -31,16 +31,18 @@ public final class ManagerEventDetailsRepository {
         return new ManagerEventDetailsRepository(AstroApiClient.getApi(), FirebaseIdTokenProvider.createDefault());
     }
 
-    public void load(long eventId, ResultCallback callback) {
+    public void load(long eventId, boolean selfDeclaration, ResultCallback callback) {
         cancel();
-        loadWithToken(eventId, false, requestId, callback);
+        loadWithToken(eventId, selfDeclaration, false, requestId, callback);
     }
 
-    private void loadWithToken(long eventId, boolean refresh, int id, ResultCallback callback) {
+    private void loadWithToken(long eventId, boolean selfDeclaration, boolean refresh, int id, ResultCallback callback) {
         tokens.getToken(refresh, new IdTokenProvider.Callback() {
             @Override public void onToken(String token) {
                 if (id != requestId) return;
-                currentCall = api.getManagerSelfDeclarationDetails("Bearer " + token, eventId);
+                currentCall = selfDeclaration
+                        ? api.getManagerSelfDeclarationDetails("Bearer " + token, eventId)
+                        : api.getManagerAssignmentDetails("Bearer " + token, eventId);
                 currentCall.enqueue(new retrofit2.Callback<ApiResponse<ManagerEventDetailsData>>() {
                     @Override public void onResponse(
                             @NonNull Call<ApiResponse<ManagerEventDetailsData>> call,
@@ -50,7 +52,7 @@ public final class ManagerEventDetailsRepository {
                         if (response.errorBody() != null) response.errorBody().close();
                         if (response.code() == 401) {
                             if (refresh) callback.onFailure(FailureKind.SESSION);
-                            else loadWithToken(eventId, true, id, callback);
+                            else loadWithToken(eventId, selfDeclaration, true, id, callback);
                             return;
                         }
                         ApiResponse<ManagerEventDetailsData> body = response.body();
