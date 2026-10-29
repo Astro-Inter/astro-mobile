@@ -35,7 +35,6 @@ public final class EventParticipantsFragment extends Fragment {
     private EventParticipantsViewModel state;
     private String eventTitle;
     private ManagerEvent.CompletionMode completionMode;
-    private Runnable finishLoading;
 
     public EventParticipantsFragment() { super(R.layout.fragment_event_participants); }
 
@@ -47,7 +46,6 @@ public final class EventParticipantsFragment extends Fragment {
         completionMode = ManagerEvent.CompletionMode.valueOf(args.getString("event_completion_mode"));
         boolean selfDeclaration = completionMode == ManagerEvent.CompletionMode.SELF_DECLARATION;
         state = new ViewModelProvider(this).get(EventParticipantsViewModel.class);
-        state.initialize(completionMode);
 
         // O evento e o modo são os mesmos do detalhe que abriu esta tela.
         String description = getString(R.string.participants_description, eventTitle);
@@ -92,34 +90,15 @@ public final class EventParticipantsFragment extends Fragment {
             return true;
         });
         render(view);
-        if (selfDeclaration) {
-            if (state.isLoaded()) showContent(view);
-            else loadParticipants(view);
-            return;
-        }
-
-        // Simula um segundo de espera; o skeleton fica oculto no editor de XML.
-        if (!state.isLoaded()) {
-            View content = view.findViewById(R.id.container_participants_content);
-            View skeleton = view.findViewById(R.id.skeleton_event_participants);
-            skeleton.findViewById(R.id.skeleton_participants_assignment_notice)
-                    .setVisibility(selfDeclaration ? View.GONE : View.VISIBLE);
-            content.setVisibility(View.INVISIBLE);
-            skeleton.setVisibility(View.VISIBLE);
-            finishLoading = () -> {
-                state.markLoaded();
-                skeleton.setVisibility(View.GONE);
-                content.setVisibility(View.VISIBLE);
-                finishLoading = null;
-            };
-            view.postDelayed(finishLoading, 1_000L);
-        }
+        if (state.isLoaded()) showContent(view);
+        else loadParticipants(view);
     }
 
     private void loadParticipants(View view) {
         view.findViewById(R.id.container_participants_content).setVisibility(View.INVISIBLE);
         View skeleton = view.findViewById(R.id.skeleton_event_participants);
-        skeleton.findViewById(R.id.skeleton_participants_assignment_notice).setVisibility(View.GONE);
+        skeleton.findViewById(R.id.skeleton_participants_assignment_notice).setVisibility(
+                completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT ? View.VISIBLE : View.GONE);
         skeleton.setVisibility(View.VISIBLE);
         long eventId = requireArguments().getLong("event_id");
         state.load(eventId, new EventParticipantsViewModel.Callback() {
@@ -177,9 +156,6 @@ public final class EventParticipantsFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        // Descarta a espera quando a tela é fechada antes do carregamento mock terminar.
-        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
-        finishLoading = null;
         if (state != null) state.cancel();
         super.onDestroyView();
     }
