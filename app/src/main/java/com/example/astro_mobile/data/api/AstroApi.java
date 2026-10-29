@@ -62,6 +62,15 @@ public interface AstroApi {
     Call<ApiResponse<ManagerEventDetailsData>> getManagerAssignmentDetails(
             @Header("Authorization") String authorization, @Path("eventId") long id);
 
+    @GET("events/participant/{participantId}/manager-conclusion/{eventId}")
+    Call<ApiResponse<com.example.astro_mobile.data.api.dto.EventAssignmentData>> getEventAssignment(
+            @Header("Authorization") String authorization, @Path("participantId") long participantId,
+            @Path("eventId") long eventId);
+
+    @POST("events/{eventId}/participants/{participantId}/manager-conclusion")
+    Call<ApiResponse<Object>> assignEventConclusion(@Header("Authorization") String authorization,
+            @Path("eventId") long eventId, @Path("participantId") long participantId);
+
     @GET("events/{eventId}/participants")
     Call<ApiResponse<List<EventParticipantData>>> getEventParticipants(
             @Header("Authorization") String authorization, @Path("eventId") long eventId);

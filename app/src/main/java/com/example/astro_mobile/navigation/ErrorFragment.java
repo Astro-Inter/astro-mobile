@@ -55,7 +55,8 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.managerFormsFragment || source == R.id.formDetailsFragment
                 || source == R.id.formAnswerFragment || source == R.id.managerEventsFragment
                 || source == R.id.staffFragment || source == R.id.staffDetailsFragment
-                || source == R.id.eventParticipantsFragment || source == R.id.managerEventDetailsFragment) {
+                || source == R.id.eventParticipantsFragment || source == R.id.managerEventDetailsFragment
+                || source == R.id.eventAssignmentFragment) {
             // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
             showCopy(view.findViewById(R.id.text_email_error_title),
                     view.findViewById(R.id.text_email_error_body),
@@ -81,6 +82,9 @@ public class ErrorFragment extends Fragment {
                 if (source == R.id.managerEventDetailsFragment) {
                     previous.getSavedStateHandle().set("retry_manager_event_details", true);
                 }
+                if (source == R.id.eventAssignmentFragment && getArguments() != null) {
+                    previous.getSavedStateHandle().set("retry_event_assignment", getArguments().getString("retry_event_assignment"));
+                }
                 navController.popBackStack(source, false);
             });
             TextView back = view.findViewById(R.id.button_email_error_start);
@@ -89,6 +93,7 @@ public class ErrorFragment extends Fragment {
                 if (source == R.id.staffDetailsFragment) navController.popBackStack(R.id.staffFragment, false);
                 else if (source == R.id.eventParticipantsFragment) navController.popBackStack(R.id.managerEventDetailsFragment, false);
                 else if (source == R.id.managerEventDetailsFragment) navController.popBackStack(R.id.managerEventDetailsFragment, true);
+                else if (source == R.id.eventAssignmentFragment) navController.popBackStack(R.id.eventAssignmentFragment, true);
                 else HomeNavigation.returnToLoadedHome(this);
             });
             return;

@@ -8,5 +8,6 @@
     <string name="event_assignment_deadline_label">Data de término:</string>
     <string name="event_assignment_deadline_mock">30/08/2026</string>
     <string name="event_assignment_submit">Atribuir conclusão</string>
-    <string name="event_assignment_action_pending">A atribuição de conclusão ainda não está disponível nesta versão.</string>
+    <string name="event_assignment_sending">Atribuindo...</string>
+    <string name="event_assignment_success">Conclusão atribuída com sucesso!</string>
 </resources>
