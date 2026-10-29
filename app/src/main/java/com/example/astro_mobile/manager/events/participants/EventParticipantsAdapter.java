@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.bumptech.glide.Glide;
+import android.content.res.ColorStateList;
 
 import java.util.List;
 
@@ -45,21 +47,35 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
         EventParticipant participant = participants.get(position);
         row.name.setText(participant.name);
         row.event.setText(eventTitle);
-        row.avatar.setImageResource(avatars[participant.avatarIndex]);
+        if (participant.id != null) {
+            Glide.with(row.itemView).load(participant.photoUrl).circleCrop()
+                    .placeholder(R.drawable.profile_avatar_placeholder)
+                    .fallback(R.drawable.profile_avatar_placeholder)
+                    .error(R.drawable.profile_avatar_placeholder).into(row.avatar);
+        } else {
+            Glide.with(row.itemView).clear(row.avatar);
+            row.avatar.setImageResource(avatars[participant.avatarIndex]);
+        }
+        row.icon.setImageTintList(null);
         boolean validationPending = participant.status == EventParticipant.Status.VALIDATION_PENDING;
         row.icon.setVisibility(View.VISIBLE);
         switch (participant.status) {
             case VALIDATION_PENDING:
-                row.status.setText(R.string.manager_events_validation_pending);
-                row.icon.setImageResource(R.drawable.home_new);
+                row.status.setText(participant.id == null ? R.string.manager_events_validation_pending : R.string.employee_events_review);
+                row.icon.setImageResource(participant.id == null ? R.drawable.home_new : R.drawable.home_clock);
                 break;
             case AWAITING_COMPLETION:
-                row.status.setText(R.string.participants_awaiting_completion);
+                row.status.setText(participant.id == null ? R.string.participants_awaiting_completion : R.string.employee_events_pending);
                 row.icon.setVisibility(View.INVISIBLE);
                 break;
             case VALIDATED:
                 row.status.setText(R.string.participants_validated_status);
                 row.icon.setImageResource(R.drawable.ic_employee_event_done);
+                break;
+            case REJECTED:
+                row.status.setText(R.string.employee_events_rejected);
+                row.icon.setImageResource(R.drawable.conversations_close);
+                row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red)));
                 break;
             case ASSIGNED:
                 row.status.setText(R.string.participants_assigned_status);

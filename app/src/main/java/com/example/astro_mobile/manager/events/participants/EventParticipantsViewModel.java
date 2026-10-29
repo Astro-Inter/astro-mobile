@@ -3,6 +3,9 @@ package com.example.astro_mobile.manager.events.participants;
 import androidx.lifecycle.ViewModel;
 
 import com.example.astro_mobile.manager.events.ManagerEvent;
+import com.example.astro_mobile.data.api.EventParticipantsRepository;
+import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.dto.EventParticipantData;
 import com.example.astro_mobile.manager.events.participants.mock.ParticipantSamples;
 
 import java.text.Normalizer;
@@ -17,10 +20,13 @@ public final class EventParticipantsViewModel extends ViewModel {
     private Filter filter = Filter.ALL;
     private String query = "";
     private boolean loaded;
+    private boolean loading;
+    private final EventParticipantsRepository repository = EventParticipantsRepository.createDefault();
+    public interface Callback { void onSuccess(); void onFailure(FailureKind failure); }
 
     public void initialize(ManagerEvent.CompletionMode mode) {
         // Guarda os mocks uma vez, mantendo pesquisa e filtro ao recriar as Views.
-        if (participants == null) participants = ParticipantSamples.forMode(mode);
+        if (participants == null && mode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT) participants = ParticipantSamples.forMode(mode);
     }
 
     public Filter getFilter() { return filter; }
@@ -29,11 +35,28 @@ public final class EventParticipantsViewModel extends ViewModel {
     public void setQuery(String query) { this.query = query; }
     public boolean isLoaded() { return loaded; }
     public void markLoaded() { loaded = true; }
+    public void load(long eventId, Callback callback) {
+        if (loading) return;
+        loading = true;
+        repository.load(eventId, new EventParticipantsRepository.ResultCallback() {
+            @Override public void onSuccess(List<EventParticipantData> data) {
+                loading = false;
+                List<EventParticipant> result = new ArrayList<>();
+                try { for (EventParticipantData item : data) result.add(new EventParticipant(item)); }
+                catch (IllegalArgumentException error) { callback.onFailure(FailureKind.INTERNAL); return; }
+                participants = result; loaded = true; callback.onSuccess();
+            }
+            @Override public void onFailure(FailureKind failure) { loading = false; callback.onFailure(failure); }
+        });
+    }
+    public void cancel() { repository.cancel(); loading = false; }
+    @Override protected void onCleared() { cancel(); }
 
     public List<EventParticipant> visibleParticipants() {
         // Combina os filtros somente nos exemplos locais; não define regras do backend.
         List<EventParticipant> result = new ArrayList<>();
         String search = normalize(query.trim());
+        if (participants == null) return result;
         for (EventParticipant participant : participants) {
             boolean finished = participant.status == EventParticipant.Status.VALIDATED
                     || participant.status == EventParticipant.Status.ASSIGNED;
