@@ -28,7 +28,6 @@ import java.time.format.DateTimeParseException;
 public final class ManagerEventDetailsFragment extends Fragment {
     static final String EVENT_TITLE = "event_title";
     static final String COMPLETION_MODE = "event_completion_mode";
-    private Runnable finishLoading;
     private ManagerEventDetailsViewModel state;
     private boolean selfDeclaration;
 
@@ -52,28 +51,17 @@ public final class ManagerEventDetailsFragment extends Fragment {
         view.findViewById(R.id.button_manager_event_close).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack(HomeNavigation.destination(requireContext()), false));
         view.findViewById(R.id.button_manager_event_attachment).setOnClickListener(clicked -> {
-            if (selfDeclaration) openMaterial(state.getDetails().externalLink);
-            else Toast.makeText(requireContext(), R.string.employee_event_attachment_mock, Toast.LENGTH_SHORT).show();
+            openMaterial(state.getDetails().externalLink);
         });
         view.findViewById(R.id.button_manager_event_participants).setOnClickListener(clicked -> {
             Bundle participantArgs = AuthArgs.copy(getArguments());
-            if (selfDeclaration && state.getDetails() != null) {
+            if (state.getDetails() != null) {
                 participantArgs.putString(EVENT_TITLE, state.getDetails().eventTitle);
             }
             NavHostFragment.findNavController(this).navigate(R.id.action_manager_event_details_to_participants, participantArgs);
         });
-        if (selfDeclaration) {
-            if (state.getDetails() == null) loadDetails(view);
-            else render(view, state.getDetails());
-        } else if (!state.isLoaded()) {
-            showLoading(view);
-            finishLoading = () -> {
-                state.markLoaded();
-                showContent(view);
-                finishLoading = null;
-            };
-            view.postDelayed(finishLoading, 1_000L);
-        }
+        if (state.getDetails() == null) loadDetails(view);
+        else render(view, state.getDetails());
     }
 
     // Enquanto os dados chegam, mantém o skeleton da modalidade correspondente.
@@ -92,7 +80,7 @@ public final class ManagerEventDetailsFragment extends Fragment {
 
     private void loadDetails(View view) {
         showLoading(view);
-        state.load(requireArguments().getLong("event_id"), new ManagerEventDetailsViewModel.Callback() {
+        state.load(requireArguments().getLong("event_id"), selfDeclaration, new ManagerEventDetailsViewModel.Callback() {
             @Override public void onSuccess() {
                 if (getView() != view || !isAdded()) return;
                 render(view, state.getDetails());
@@ -111,9 +99,11 @@ public final class ManagerEventDetailsFragment extends Fragment {
         setValue(view, R.id.text_manager_event_title, data.eventTitle);
         setValue(view, R.id.text_manager_event_description, data.eventDescription);
         setValue(view, R.id.text_manager_event_sender, data.managerName);
-        setValue(view, R.id.text_manager_event_pending_count, data.pendingValidationCount);
-        setValue(view, R.id.text_manager_event_done_count, data.validatedCount);
-        setValue(view, R.id.text_manager_event_not_submitted_count, data.notSubmittedCount);
+        if (selfDeclaration) {
+            setValue(view, R.id.text_manager_event_pending_count, data.pendingValidationCount);
+            setValue(view, R.id.text_manager_event_done_count, data.validatedCount);
+            setValue(view, R.id.text_manager_event_not_submitted_count, data.notSubmittedCount);
+        }
         setValue(view, R.id.text_manager_event_participant_count, data.participantCount);
         String deadline = data.lastClassLimitDate;
         if (deadline != null) {
@@ -153,8 +143,6 @@ public final class ManagerEventDetailsFragment extends Fragment {
     }
 
     @Override public void onDestroyView() {
-        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
-        finishLoading = null;
         state.cancel();
         super.onDestroyView();
     }
