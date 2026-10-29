@@ -6,6 +6,9 @@
     <string name="staff_detail_nrs">NR’s de &lt;b>%1$s&lt;/b></string>
     <string name="staff_detail_nrs_description">Visualize quais NR’s devem ser cumpridas</string>
     <string name="staff_detail_view_pending">Ver pendências</string>
+    <string name="staff_detail_work_presencial">Presencial</string>
+    <string name="staff_detail_work_hybrid">Híbrido</string>
+    <string name="staff_detail_work_remote">Remoto</string>
     <string name="staff_detail_value_unavailable">Não informado</string>
     <string name="staff_detail_nr_mock">NR-06 - &lt;font color="#B3B1C1">Validade: 21/12/1002&lt;/font></string>
     <string name="staff_detail_nr_content_pending">O conteúdo desta NR será definido na integração. Exemplo apenas visual.</string>
