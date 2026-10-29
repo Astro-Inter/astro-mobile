@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="event_evidence_title">Evidência</string>
-    <string name="event_evidence_image_description">Imagem de evidência de exemplo</string>
-    <string name="event_evidence_page_one">1</string>
-    <string name="event_evidence_page_two">2</string>
-    <string name="event_evidence_page_three">3</string>
+    <string name="event_evidence_image_description">Imagem de evidência enviada</string>
+    <string name="event_evidence_load_error">Não foi possível carregar a imagem.</string>
     <style name="EventEvidencePage">
         <item name="android:layout_width">65dp</item>
         <item name="android:layout_height">65dp</item>
