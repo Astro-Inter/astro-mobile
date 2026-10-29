@@ -20,8 +20,6 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
         void onClick(EventParticipant participant);
     }
 
-    private final int[] avatars = {R.drawable.participant_avatar_1,
-            R.drawable.participant_avatar_2, R.drawable.participant_avatar_3};
     private final List<EventParticipant> participants;
     private final String eventTitle;
     private final boolean assignmentMode;
@@ -43,43 +41,34 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
 
     @Override
     public void onBindViewHolder(@NonNull Row row, int position) {
-        // Mantém os textos, retratos e indicadores de cada exemplo do Figma.
+        // Exibe os dados e indicadores da modalidade selecionada.
         EventParticipant participant = participants.get(position);
         row.name.setText(participant.name);
         row.event.setText(eventTitle);
-        if (participant.id != null) {
-            Glide.with(row.itemView).load(participant.photoUrl).circleCrop()
-                    .placeholder(R.drawable.profile_avatar_placeholder)
-                    .fallback(R.drawable.profile_avatar_placeholder)
-                    .error(R.drawable.profile_avatar_placeholder).into(row.avatar);
-        } else {
-            Glide.with(row.itemView).clear(row.avatar);
-            row.avatar.setImageResource(avatars[participant.avatarIndex]);
-        }
+        Glide.with(row.itemView).load(participant.photoUrl).circleCrop()
+                .placeholder(R.drawable.profile_avatar_placeholder)
+                .fallback(R.drawable.profile_avatar_placeholder)
+                .error(R.drawable.profile_avatar_placeholder).into(row.avatar);
         row.icon.setImageTintList(null);
         boolean validationPending = participant.status == EventParticipant.Status.VALIDATION_PENDING;
         row.icon.setVisibility(View.VISIBLE);
         switch (participant.status) {
             case VALIDATION_PENDING:
-                row.status.setText(participant.id == null ? R.string.manager_events_validation_pending : R.string.employee_events_review);
-                row.icon.setImageResource(participant.id == null ? R.drawable.home_new : R.drawable.home_clock);
+                row.status.setText(R.string.employee_events_review);
+                row.icon.setImageResource(R.drawable.home_clock);
                 break;
             case AWAITING_COMPLETION:
-                row.status.setText(participant.id == null ? R.string.participants_awaiting_completion : R.string.employee_events_pending);
+                row.status.setText(assignmentMode ? R.string.participants_awaiting_completion : R.string.employee_events_pending);
                 row.icon.setVisibility(View.INVISIBLE);
                 break;
             case VALIDATED:
-                row.status.setText(R.string.participants_validated_status);
+                row.status.setText(assignmentMode ? R.string.participants_assigned_status : R.string.participants_validated_status);
                 row.icon.setImageResource(R.drawable.ic_employee_event_done);
                 break;
             case REJECTED:
                 row.status.setText(R.string.employee_events_rejected);
                 row.icon.setImageResource(R.drawable.conversations_close);
                 row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red)));
-                break;
-            case ASSIGNED:
-                row.status.setText(R.string.participants_assigned_status);
-                row.icon.setImageResource(R.drawable.ic_employee_event_done);
                 break;
         }
         // Preserva o tamanho de raiz do ponto vermelho e do check dentro do slot de 38dp.
@@ -88,9 +77,10 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
         iconParams.width = Math.round((validationPending ? 22f : 18.2f) * density);
         iconParams.height = Math.round((validationPending ? 22f : 18f) * density);
         row.icon.setLayoutParams(iconParams);
-        // No modo Atribuição, os exemplos ainda não concluídos abrem a tela do participante.
-        boolean actionable = validationPending || (assignmentMode
-                && participant.status == EventParticipant.Status.AWAITING_COMPLETION);
+        // Cada modalidade abre somente os participantes que precisam de ação.
+        boolean actionable = assignmentMode
+                ? participant.status == EventParticipant.Status.AWAITING_COMPLETION
+                : validationPending;
         row.button.setOnClickListener(actionable ? clicked -> participantClick.onClick(participant) : null);
         row.button.setClickable(actionable);
         row.button.setFocusable(actionable);

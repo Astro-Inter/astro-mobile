@@ -2,11 +2,9 @@ package com.example.astro_mobile.manager.events.participants;
 
 import androidx.lifecycle.ViewModel;
 
-import com.example.astro_mobile.manager.events.ManagerEvent;
 import com.example.astro_mobile.data.api.EventParticipantsRepository;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.EventParticipantData;
-import com.example.astro_mobile.manager.events.participants.mock.ParticipantSamples;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -24,17 +22,11 @@ public final class EventParticipantsViewModel extends ViewModel {
     private final EventParticipantsRepository repository = EventParticipantsRepository.createDefault();
     public interface Callback { void onSuccess(); void onFailure(FailureKind failure); }
 
-    public void initialize(ManagerEvent.CompletionMode mode) {
-        // Guarda os mocks uma vez, mantendo pesquisa e filtro ao recriar as Views.
-        if (participants == null && mode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT) participants = ParticipantSamples.forMode(mode);
-    }
-
     public Filter getFilter() { return filter; }
     public void setFilter(Filter filter) { this.filter = filter; }
     public String getQuery() { return query; }
     public void setQuery(String query) { this.query = query; }
     public boolean isLoaded() { return loaded; }
-    public void markLoaded() { loaded = true; }
     public void load(long eventId, Callback callback) {
         if (loading) return;
         loading = true;
@@ -53,13 +45,12 @@ public final class EventParticipantsViewModel extends ViewModel {
     @Override protected void onCleared() { cancel(); }
 
     public List<EventParticipant> visibleParticipants() {
-        // Combina os filtros somente nos exemplos locais; não define regras do backend.
+        // Combina a busca e os filtros sobre os participantes recebidos.
         List<EventParticipant> result = new ArrayList<>();
         String search = normalize(query.trim());
         if (participants == null) return result;
         for (EventParticipant participant : participants) {
-            boolean finished = participant.status == EventParticipant.Status.VALIDATED
-                    || participant.status == EventParticipant.Status.ASSIGNED;
+            boolean finished = participant.status == EventParticipant.Status.VALIDATED;
             if (filter == Filter.FINISHED && !finished) continue;
             if (filter == Filter.NOT_FINISHED && finished) continue;
             if (normalize(participant.name).contains(search)) result.add(participant);
