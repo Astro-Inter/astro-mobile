@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.astro_mobile.R;
 import com.bumptech.glide.Glide;
@@ -73,6 +74,15 @@ public final class HumanChatFragment extends Fragment {
         RecyclerView messages = view.findViewById(R.id.list_human_chat_messages);
         HumanMessagesAdapter adapter = new HumanMessagesAdapter(conversation.messages, avatar, manager);
         messages.setAdapter(adapter);
+        LinearLayoutManager layoutManager = (LinearLayoutManager) messages.getLayoutManager();
+        messages.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (layoutManager != null && layoutManager.findFirstVisibleItemPosition() == 0
+                        && dy < 0 && conversation.hasMore && !conversation.loadingOlder) {
+                    loadOlder(messages, layoutManager, adapter);
+                }
+            }
+        });
         EditText input = view.findViewById(R.id.input_human_chat_message);
         input.setText(conversation.draft);
         input.addTextChangedListener(new TextWatcher() {
@@ -87,12 +97,13 @@ public final class HumanChatFragment extends Fragment {
             return true;
         });
 
-        // Mostra um segundo de skeleton no protótipo; a prévia XML permanece visível.
-        if (!conversation.loaded) {
+        if (conversation.conversationId != null) {
+            if (!conversation.loaded) showSkeleton(view, messages);
+            startHistoryLoad(view, messages, adapter);
+        } else if (!conversation.loaded) {
+            // Contatos ainda sem conversa usam o skeleton do protótipo visual.
+            showSkeleton(view, messages);
             View skeleton = view.findViewById(R.id.skeleton_human_chat);
-            messages.setVisibility(View.INVISIBLE);
-            skeleton.setVisibility(View.VISIBLE);
-            view.findViewById(R.id.container_human_chat_composer).setVisibility(View.INVISIBLE);
             finishLoading = () -> {
                 conversation.loaded = true;
                 skeleton.setVisibility(View.GONE);
@@ -101,6 +112,75 @@ public final class HumanChatFragment extends Fragment {
                 finishLoading = null;
             };
             view.postDelayed(finishLoading, 1_000L);
+        }
+    }
+
+    private void showSkeleton(View view, RecyclerView messages) {
+        messages.setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.skeleton_human_chat).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.container_human_chat_composer).setVisibility(View.INVISIBLE);
+    }
+
+    private void startHistoryLoad(View view, RecyclerView messages, HumanMessagesAdapter adapter) {
+        if (view == null || !isAdded()) return;
+        int previousCount = conversation.messages.size();
+        state.loadHistory(conversation, new HumanConversationsViewModel.HistoryCallback() {
+            @Override public void onChanged() {
+                if (getView() != view) return;
+                adapter.notifyHistoryReplaced(previousCount);
+                view.findViewById(R.id.skeleton_human_chat).setVisibility(View.GONE);
+                messages.setVisibility(View.VISIBLE);
+                view.findViewById(R.id.container_human_chat_composer).setVisibility(View.VISIBLE);
+                if (!conversation.messages.isEmpty()) messages.scrollToPosition(conversation.messages.size() - 1);
+            }
+
+            @Override public void onFailure(com.example.astro_mobile.data.api.FailureKind failure) {
+                showHistoryFailure(failure, view);
+            }
+        });
+    }
+
+    private void loadOlder(RecyclerView messages, LinearLayoutManager layoutManager,
+                           HumanMessagesAdapter adapter) {
+        int firstVisible = layoutManager.findFirstVisibleItemPosition();
+        View firstChild = layoutManager.findViewByPosition(firstVisible);
+        int offset = firstChild == null ? 0 : firstChild.getTop();
+        int previousCount = conversation.messages.size();
+        state.loadOlder(conversation, new HumanConversationsViewModel.HistoryCallback() {
+            @Override public void onChanged() {
+                if (getView() == null) return;
+                int inserted = conversation.messages.size() - previousCount;
+                if (inserted > 0) adapter.notifyItemRangeInserted(0, inserted);
+                layoutManager.scrollToPositionWithOffset(firstVisible + inserted, offset);
+            }
+
+            @Override public void onFailure(com.example.astro_mobile.data.api.FailureKind failure) {
+                showHistoryFailure(failure, getView());
+            }
+        });
+    }
+
+    private void showHistoryFailure(com.example.astro_mobile.data.api.FailureKind failure, View view) {
+        if (view == null || !isAdded()) return;
+        if (failure == com.example.astro_mobile.data.api.FailureKind.SESSION) {
+            com.example.astro_mobile.auth.SessionNavigation.signOut(this);
+            return;
+        }
+        NavHostFragment.findNavController(this).navigate(
+                failure == com.example.astro_mobile.data.api.FailureKind.CONNECTION
+                        ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        if (getView() == null || conversation == null || conversation.conversationId == null) return;
+        androidx.navigation.NavBackStackEntry entry = NavHostFragment.findNavController(this)
+                .getCurrentBackStackEntry();
+        Boolean retry = entry.getSavedStateHandle().get("retry_human_chat_history");
+        if (Boolean.TRUE.equals(retry)) {
+            entry.getSavedStateHandle().remove("retry_human_chat_history");
+            RecyclerView messages = getView().findViewById(R.id.list_human_chat_messages);
+            startHistoryLoad(getView(), messages, (HumanMessagesAdapter) messages.getAdapter());
         }
     }
 
@@ -119,8 +199,11 @@ public final class HumanChatFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
+        if (finishLoading != null && getView() != null) getView().removeCallbacks(finishLoading);
         finishLoading = null;
+        if (conversation != null && conversation.conversationId != null && state != null) {
+            state.cancelHistory(conversation);
+        }
         super.onDestroyView();
     }
 }
