@@ -1,18 +1,25 @@
 package com.example.astro_mobile.manager.staff;
 
 import androidx.lifecycle.ViewModel;
+import com.example.astro_mobile.data.api.CollaboratorProfileRepository;
+import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.dto.CollaboratorProfileData;
 
+/** Mantém o perfil carregado enquanto o gestor navega nas telas internas. */
 public final class StaffDetailsViewModel extends ViewModel {
-    private final boolean[] expandedNrs = new boolean[3];
-    private boolean loaded;
-
-    public boolean isLoaded() { return loaded; }
-    public void markLoaded() { loaded = true; }
-
-    public boolean isExpanded(int index) { return expandedNrs[index]; }
-
-    public void toggleNr(int index) {
-        // Cada NR guarda seu próprio estado, sem fechar ou sobrepor as demais.
-        expandedNrs[index] = !expandedNrs[index];
+    private final CollaboratorProfileRepository repository = CollaboratorProfileRepository.createDefault();
+    private CollaboratorProfileData profile;
+    private boolean loading;
+    public interface Callback { void onSuccess(); void onFailure(FailureKind failure); }
+    public CollaboratorProfileData getProfile() { return profile; }
+    public void load(long id, Callback callback) {
+        if (loading) return;
+        loading = true;
+        repository.load(id, new CollaboratorProfileRepository.ResultCallback() {
+            @Override public void onSuccess(CollaboratorProfileData data) { loading = false; profile = data; callback.onSuccess(); }
+            @Override public void onFailure(FailureKind failure) { loading = false; callback.onFailure(failure); }
+        });
     }
+    public void cancel() { repository.cancel(); loading = false; }
+    @Override protected void onCleared() { cancel(); }
 }

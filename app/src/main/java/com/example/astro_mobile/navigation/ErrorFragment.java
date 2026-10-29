@@ -54,7 +54,7 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.employeeEventDetailsFragment || source == R.id.conversationsFragment
                 || source == R.id.managerFormsFragment || source == R.id.formDetailsFragment
                 || source == R.id.formAnswerFragment || source == R.id.managerEventsFragment
-                || source == R.id.staffFragment) {
+                || source == R.id.staffFragment || source == R.id.staffDetailsFragment) {
             // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
             showCopy(view.findViewById(R.id.text_email_error_title),
                     view.findViewById(R.id.text_email_error_body),
@@ -71,11 +71,17 @@ public class ErrorFragment extends Fragment {
                     navController.getBackStackEntry(source).getSavedStateHandle()
                             .set("retry_staff_list", true);
                 }
+                if (source == R.id.staffDetailsFragment) {
+                    previous.getSavedStateHandle().set("retry_staff_details", true);
+                }
                 navController.popBackStack(source, false);
             });
             TextView back = view.findViewById(R.id.button_email_error_start);
             back.setText(R.string.profile_retry_back);
-            configureBack(view, () -> HomeNavigation.returnToLoadedHome(this));
+            configureBack(view, () -> {
+                if (source == R.id.staffDetailsFragment) navController.popBackStack(R.id.staffFragment, false);
+                else HomeNavigation.returnToLoadedHome(this);
+            });
             return;
         }
         // Erros do perfil não retomam a identificação de e-mail nem a recuperação do login.
