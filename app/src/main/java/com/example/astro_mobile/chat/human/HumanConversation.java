@@ -5,6 +5,7 @@ import java.util.List;
 
 public final class HumanConversation {
     public String conversationId;
+    public Long participantId;
     public String profilePhotoUrl;
     public String avatarInitials;
     public String lastMessageText;
@@ -17,6 +18,10 @@ public final class HumanConversation {
     public final List<HumanMessage> messages = new ArrayList<>();
     public String draft = "";
     public boolean loaded;
+    public boolean historyLoading;
+    public boolean loadingOlder;
+    public boolean hasMore;
+    public String nextCursor;
 
     public HumanConversation(String name, String role, boolean manager, int avatarIndex) {
         this.name = name;

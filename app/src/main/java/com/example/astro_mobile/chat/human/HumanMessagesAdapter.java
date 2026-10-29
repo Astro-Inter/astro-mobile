@@ -60,6 +60,18 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
 
     @Override public int getItemCount() { return messages.size(); }
 
+    public void notifyHistoryReplaced(int previousCount) {
+        int currentCount = messages.size();
+        if (previousCount > currentCount) {
+            notifyItemRangeRemoved(currentCount, previousCount - currentCount);
+        } else if (currentCount > previousCount) {
+            if (previousCount > 0) notifyItemRangeChanged(0, previousCount);
+            notifyItemRangeInserted(previousCount, currentCount - previousCount);
+            return;
+        }
+        if (currentCount > 0) notifyItemRangeChanged(0, currentCount);
+    }
+
     static final class Row extends RecyclerView.ViewHolder {
         final ImageView avatar;
         final View bubble;

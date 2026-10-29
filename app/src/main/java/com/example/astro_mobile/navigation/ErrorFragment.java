@@ -52,6 +52,7 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.managerHomeFragment || source == R.id.notificationsFragment
                 || source == R.id.aiSessionsFragment || source == R.id.chatFragment
                 || source == R.id.employeeEventDetailsFragment || source == R.id.conversationsFragment
+                || source == R.id.humanChatFragment
                 || source == R.id.managerFormsFragment || source == R.id.formDetailsFragment
                 || source == R.id.formAnswerFragment || source == R.id.managerEventsFragment
                 || source == R.id.staffFragment || source == R.id.staffDetailsFragment
@@ -68,6 +69,8 @@ public class ErrorFragment extends Fragment {
                             .set("retry_ai_conversation", conversation);
                 } else if (source == R.id.conversationsFragment) {
                     previous.getSavedStateHandle().set("retry_human_chat_list", true);
+                } else if (source == R.id.humanChatFragment) {
+                    previous.getSavedStateHandle().set("retry_human_chat_history", true);
                 }
                 if (source == R.id.staffFragment) {
                     navController.getBackStackEntry(source).getSavedStateHandle()
@@ -98,6 +101,7 @@ public class ErrorFragment extends Fragment {
                 else if (source == R.id.managerEventDetailsFragment) navController.popBackStack(R.id.managerEventDetailsFragment, true);
                 else if (source == R.id.eventAssignmentFragment) navController.popBackStack(R.id.eventAssignmentFragment, true);
                 else if (source == R.id.eventValidationFragment) navController.popBackStack(R.id.eventValidationFragment, false);
+                else if (source == R.id.humanChatFragment) navController.popBackStack(R.id.conversationsFragment, false);
                 else HomeNavigation.returnToLoadedHome(this);
             });
             return;

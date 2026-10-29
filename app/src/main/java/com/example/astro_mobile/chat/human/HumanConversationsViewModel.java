@@ -5,10 +5,16 @@ import androidx.lifecycle.ViewModel;
 import com.example.astro_mobile.chat.human.mock.HumanChatSamples;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.HumanChatRepository;
+import com.example.astro_mobile.data.api.HumanChatHistoryRepository;
 import com.example.astro_mobile.data.api.dto.ChatConversationData;
+import com.example.astro_mobile.data.api.dto.ChatMessageData;
+import com.example.astro_mobile.data.api.dto.ChatMessagePageData;
 
 import java.text.Normalizer;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +22,7 @@ import java.util.Locale;
 
 public final class HumanConversationsViewModel extends ViewModel {
     private final HumanChatRepository repository = HumanChatRepository.createDefault();
+    private final HumanChatHistoryRepository historyRepository = HumanChatHistoryRepository.createDefault();
     private final List<HumanConversation> conversations = new ArrayList<>();
     private final List<HumanConversation> contacts = new ArrayList<>(HumanChatSamples.contacts());
     private boolean loading;
@@ -40,6 +47,7 @@ public final class HumanConversationsViewModel extends ViewModel {
                     HumanConversation conversation = new HumanConversation(data.participant.name,
                             manager ? "Gestor" : "Colaborador", manager, 0);
                     conversation.conversationId = data.id;
+                    conversation.participantId = data.participant.id;
                     conversation.profilePhotoUrl = data.participant.profilePhotoUrl;
                     conversation.avatarInitials = data.participant.avatarInitials;
                     conversation.lastMessageText = data.lastMessage.content;
@@ -63,6 +71,82 @@ public final class HumanConversationsViewModel extends ViewModel {
     public void cancelLoad() {
         repository.cancel();
         loading = false;
+    }
+
+    public interface HistoryCallback {
+        void onChanged();
+        void onFailure(FailureKind failure);
+    }
+
+    public void loadHistory(HumanConversation conversation, HistoryCallback callback) {
+        if (conversation == null || conversation.conversationId == null || conversation.historyLoading) return;
+        conversation.historyLoading = true;
+        historyRepository.loadConversation(conversation.conversationId, new HumanChatHistoryRepository.ResultCallback() {
+            @Override public void onMarkedRead() {
+                conversation.unreadCount = 0;
+            }
+
+            @Override public void onSuccess(ChatMessagePageData page) {
+                conversation.messages.clear();
+                for (ChatMessageData message : page.messages) conversation.messages.add(toMessage(conversation, message));
+                conversation.nextCursor = page.nextCursor;
+                conversation.hasMore = page.hasMore;
+                conversation.loaded = true;
+                conversation.historyLoading = false;
+                conversation.loadingOlder = false;
+                callback.onChanged();
+            }
+
+            @Override public void onFailure(FailureKind failure) {
+                conversation.historyLoading = false;
+                callback.onFailure(failure);
+            }
+        });
+    }
+
+    public void loadOlder(HumanConversation conversation, HistoryCallback callback) {
+        if (conversation == null || conversation.conversationId == null || conversation.loadingOlder
+                || !conversation.hasMore || conversation.nextCursor == null) return;
+        conversation.loadingOlder = true;
+        historyRepository.loadOlder(conversation.conversationId, conversation.nextCursor,
+                new HumanChatHistoryRepository.ResultCallback() {
+                    @Override public void onMarkedRead() { }
+
+                    @Override public void onSuccess(ChatMessagePageData page) {
+                        List<HumanMessage> older = new ArrayList<>();
+                        for (ChatMessageData message : page.messages) older.add(toMessage(conversation, message));
+                        conversation.messages.addAll(0, older);
+                        conversation.nextCursor = page.nextCursor;
+                        conversation.hasMore = page.hasMore;
+                        conversation.loadingOlder = false;
+                        callback.onChanged();
+                    }
+
+                    @Override public void onFailure(FailureKind failure) {
+                        conversation.loadingOlder = false;
+                        callback.onFailure(failure);
+                    }
+                });
+    }
+
+    public void cancelHistory(HumanConversation conversation) {
+        historyRepository.cancel();
+        if (conversation != null) {
+            conversation.historyLoading = false;
+            conversation.loadingOlder = false;
+        }
+    }
+
+    private static HumanMessage toMessage(HumanConversation conversation, ChatMessageData data) {
+        String time;
+        try {
+            time = OffsetDateTime.parse(data.createdAt).atZoneSameInstant(ZoneId.systemDefault())
+                    .format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()));
+        } catch (DateTimeParseException error) {
+            time = data.createdAt;
+        }
+        boolean sent = conversation.participantId == null || !conversation.participantId.equals(data.senderId);
+        return new HumanMessage(data.content, time, sent);
     }
 
     public HumanConversation find(String id) {
@@ -106,6 +190,7 @@ public final class HumanConversationsViewModel extends ViewModel {
     public void clearSession() {
         // Descarta mensagens e rascunhos ao voltar à identificação, inclusive após logout.
         cancelLoad();
+        historyRepository.cancel();
         conversations.clear();
         contacts.clear();
         contacts.addAll(HumanChatSamples.contacts());
@@ -124,5 +209,6 @@ public final class HumanConversationsViewModel extends ViewModel {
 
     @Override protected void onCleared() {
         repository.cancel();
+        historyRepository.cancel();
     }
 }
