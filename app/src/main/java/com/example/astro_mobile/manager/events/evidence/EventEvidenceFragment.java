@@ -1,72 +1,64 @@
 package com.example.astro_mobile.manager.events.evidence;
 
-import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.astro_mobile.R;
+import java.util.ArrayList;
 
+/** Abre as imagens reais enviadas como evidência. */
 public final class EventEvidenceFragment extends Fragment {
-    private Runnable finishLoading;
-
-    public EventEvidenceFragment() {
-        super(R.layout.fragment_event_evidence);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    private ArrayList<String> images;
+    public EventEvidenceFragment() { super(R.layout.fragment_event_evidence); }
+    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        view.findViewById(R.id.button_event_evidence_back).setOnClickListener(clicked ->
-                NavHostFragment.findNavController(this).popBackStack());
-
-        // Mantém o recorte do Figma em qualquer largura, sem modificar a imagem original.
-        ImageView image = view.findViewById(R.id.image_event_evidence);
-        image.addOnLayoutChangeListener((changed, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-            float width = right - left;
-            float scale = (width * 1.4695f) / image.getDrawable().getIntrinsicWidth();
-            Matrix crop = new Matrix();
-            crop.setScale(scale, scale);
-            // No frame, a imagem começa sob o cabeçalho e ocupa 146,95% da largura.
-            crop.postTranslate(-0.2452f * width, -(130f / 430f) * width);
-            image.setImageMatrix(crop);
-        });
-
-        // Os três números usam a mesma imagem no mock, conforme aprovado pelo solicitante.
-        int[] pages = {R.id.button_event_evidence_page_one,
-                R.id.button_event_evidence_page_two, R.id.button_event_evidence_page_three};
-        view.findViewById(pages[0]).setSelected(true);
-        for (int page : pages) {
-            view.findViewById(page).setOnClickListener(clicked -> {
-                for (int candidate : pages) {
-                    view.findViewById(candidate).setSelected(candidate == clicked.getId());
-                }
-            });
+        view.findViewById(R.id.button_event_evidence_back).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack());
+        images = requireArguments().getStringArrayList("evidence_images");
+        if (images == null || images.isEmpty()) {
+            view.findViewById(R.id.progress_event_evidence).setVisibility(View.GONE);
+            view.findViewById(R.id.text_event_evidence_error).setVisibility(View.VISIBLE);
+            return;
         }
-
-        // Simula um segundo de carregamento sem bloquear a interface ou a seta de voltar.
-        View content = view.findViewById(R.id.scroll_event_evidence);
-        View skeleton = view.findViewById(R.id.skeleton_event_evidence);
-        content.setVisibility(View.INVISIBLE);
-        skeleton.setVisibility(View.VISIBLE);
-        finishLoading = () -> {
-            skeleton.setVisibility(View.GONE);
-            content.setVisibility(View.VISIBLE);
-            finishLoading = null;
-        };
-        view.postDelayed(finishLoading, 1_000L);
+        LinearLayout pages = view.findViewById(R.id.container_event_evidence_pages);
+        pages.setVisibility(images.size() > 1 ? View.VISIBLE : View.GONE);
+        for (int i = 0; i < images.size(); i++) {
+            final int page = i;
+            TextView button = new TextView(requireContext(), null, 0, R.style.EventEvidencePage);
+            int size = Math.round(65 * getResources().getDisplayMetrics().density);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
+            if (i > 0) params.setMarginStart(Math.round(10 * getResources().getDisplayMetrics().density));
+            button.setLayoutParams(params); button.setText(String.valueOf(i + 1));
+            button.setOnClickListener(clicked -> showImage(view, page)); pages.addView(button);
+        }
+        int selected = requireArguments().getInt("evidence_selected", 0);
+        showImage(view, selected >= 0 && selected < images.size() ? selected : 0);
     }
-
-    @Override
-    public void onDestroyView() {
-        // Cancela a espera ao sair para não atualizar uma interface que foi fechada.
-        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
-        finishLoading = null;
-        super.onDestroyView();
+    private void showImage(View view, int page) {
+        LinearLayout pages = view.findViewById(R.id.container_event_evidence_pages);
+        for (int i = 0; i < pages.getChildCount(); i++) pages.getChildAt(i).setSelected(i == page);
+        view.findViewById(R.id.progress_event_evidence).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.text_event_evidence_error).setVisibility(View.GONE);
+        Glide.with(this).load(images.get(page)).listener(new RequestListener<Drawable>() {
+            @Override public boolean onLoadFailed(@Nullable GlideException error, Object model, Target<Drawable> target, boolean first) {
+                if (getView() == view) { view.findViewById(R.id.progress_event_evidence).setVisibility(View.GONE); view.findViewById(R.id.text_event_evidence_error).setVisibility(View.VISIBLE); }
+                return false;
+            }
+            @Override public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource source, boolean first) {
+                if (getView() == view) view.findViewById(R.id.progress_event_evidence).setVisibility(View.GONE);
+                return false;
+            }
+        }).into((ImageView) view.findViewById(R.id.image_event_evidence));
     }
 }

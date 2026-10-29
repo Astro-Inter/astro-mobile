@@ -52,7 +52,7 @@
                                 android:layout_marginEnd="10dp" android:src="@drawable/profile_user_group"
                                 app:tint="@color/astro_input_hint" android:scaleType="fitCenter"
                                 android:contentDescription="@null" android:importantForAccessibility="no" />
-                            <TextView style="@style/ManagerEventsText" android:layout_width="0dp" android:layout_weight="1"
+                            <TextView android:id="@+id/text_validation_role" style="@style/ManagerEventsText" android:layout_width="0dp" android:layout_weight="1"
                                 android:textColor="@color/astro_input_hint" android:textStyle="bold"
                                 android:text="@string/event_validation_job_mock" />
                         </LinearLayout>
@@ -72,14 +72,14 @@
                     <androidx.appcompat.widget.AppCompatImageView style="@style/ManagerEventDetailsIcon" android:layout_width="20dp"
                         android:layout_height="18.2dp" android:src="@drawable/profile_building" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/profile_unit" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_unit_mock" />
+                    <TextView android:id="@+id/text_validation_unit" style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_unit_mock" />
                 </LinearLayout>
                 <View style="@style/EventValidationDivider" />
                 <LinearLayout style="@style/EventValidationRow" android:paddingVertical="10dp">
                     <androidx.appcompat.widget.AppCompatImageView style="@style/ManagerEventDetailsIcon" android:layout_width="18.2dp"
                         android:layout_height="18.2dp" android:src="@drawable/event_completion_calendar" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/event_validation_completion_label" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_completion_mock" />
+                    <TextView android:id="@+id/text_validation_completion" style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_completion_mock" />
                 </LinearLayout>
                 <View style="@style/EventValidationDivider" />
                 <TextView style="@style/EventValidationHeading" android:text="@string/manager_event_information" />
@@ -87,14 +87,14 @@
                     <androidx.appcompat.widget.AppCompatImageView style="@style/ManagerEventDetailsIcon" android:layout_width="20dp"
                         android:layout_height="18.2dp" android:src="@drawable/event_assignment_clock" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/event_validation_deadline_label" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_deadline_mock" />
+                    <TextView android:id="@+id/text_validation_deadline" style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_deadline_mock" />
                 </LinearLayout>
                 <View style="@style/EventValidationDivider" />
                 <LinearLayout style="@style/EventValidationRow" android:paddingVertical="10dp">
                     <androidx.appcompat.widget.AppCompatImageView style="@style/ManagerEventDetailsIcon" android:layout_width="18.2dp"
                         android:layout_height="18.2dp" android:src="@drawable/employee_event_link" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/event_validation_evidence_required" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_evidence_yes" />
+                    <TextView android:id="@+id/text_validation_evidence_required" style="@style/ManagerEventDetailsValue" android:text="@string/event_validation_evidence_yes" />
                 </LinearLayout>
                 <View style="@style/EventValidationDivider" />
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -106,18 +106,11 @@
                         android:textColor="@color/astro_input_hint"
                         android:text="@string/event_validation_evidence_description" />
                 </LinearLayout>
-                <FrameLayout android:id="@+id/button_validation_evidence" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:minHeight="60dp"
-                    android:layout_marginHorizontal="30dp" android:layout_marginTop="14dp" android:layout_marginBottom="10dp"
-                    android:background="@drawable/bg_flow_choice_secondary_button" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
-                        android:layout_gravity="start|center_vertical" android:layout_marginStart="15dp"
-                        android:src="@drawable/event_evidence_open" android:scaleType="fitCenter"
-                        android:contentDescription="@null" android:importantForAccessibility="no" />
-                    <TextView android:id="@+id/text_validation_evidence" style="@style/EmployeeEventDetailsButton"
-                        android:background="@null" android:clickable="false" android:focusable="false"
-                        android:text="@string/employee_event_evidence_filename" />
-                </FrameLayout>
+                <LinearLayout android:id="@+id/list_validation_evidence" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical" />
+                <TextView android:id="@+id/text_validation_evidence_empty" style="@style/ManagerEventsText"
+                    android:paddingHorizontal="30dp" android:paddingVertical="10dp"
+                    android:text="@string/event_validation_no_evidence" android:visibility="gone" />
                 <View style="@style/EventValidationDivider" />
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="4dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
@@ -130,7 +123,7 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
-        <!-- O editor mostra a tela real; o skeleton aparece somente durante a espera mock. -->
+        <!-- O skeleton fica oculto na prévia do editor. -->
         <include android:id="@+id/skeleton_event_validation" layout="@layout/view_event_validation_skeleton"
             android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" tools:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/header_event_validation"

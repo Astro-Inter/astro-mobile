@@ -56,7 +56,7 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.formAnswerFragment || source == R.id.managerEventsFragment
                 || source == R.id.staffFragment || source == R.id.staffDetailsFragment
                 || source == R.id.eventParticipantsFragment || source == R.id.managerEventDetailsFragment
-                || source == R.id.eventAssignmentFragment) {
+                || source == R.id.eventAssignmentFragment || source == R.id.eventValidationFragment) {
             // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
             showCopy(view.findViewById(R.id.text_email_error_title),
                     view.findViewById(R.id.text_email_error_body),
@@ -85,6 +85,9 @@ public class ErrorFragment extends Fragment {
                 if (source == R.id.eventAssignmentFragment && getArguments() != null) {
                     previous.getSavedStateHandle().set("retry_event_assignment", getArguments().getString("retry_event_assignment"));
                 }
+                if (source == R.id.eventValidationFragment && getArguments() != null) {
+                    previous.getSavedStateHandle().set("retry_event_validation", getArguments().getString("retry_event_validation"));
+                }
                 navController.popBackStack(source, false);
             });
             TextView back = view.findViewById(R.id.button_email_error_start);
@@ -94,6 +97,7 @@ public class ErrorFragment extends Fragment {
                 else if (source == R.id.eventParticipantsFragment) navController.popBackStack(R.id.managerEventDetailsFragment, false);
                 else if (source == R.id.managerEventDetailsFragment) navController.popBackStack(R.id.managerEventDetailsFragment, true);
                 else if (source == R.id.eventAssignmentFragment) navController.popBackStack(R.id.eventAssignmentFragment, true);
+                else if (source == R.id.eventValidationFragment) navController.popBackStack(R.id.eventValidationFragment, false);
                 else HomeNavigation.returnToLoadedHome(this);
             });
             return;

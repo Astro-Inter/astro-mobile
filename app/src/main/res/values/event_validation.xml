@@ -17,6 +17,10 @@
     <string name="event_validation_reject">Rejeitar</string>
     <string name="event_validation_reason_label">Justificativa</string>
     <string name="event_validation_reason_hint">Insira uma Justificativa para rejeitar uma validação</string>
+    <string name="event_validation_no_evidence">Nenhuma evidência enviada.</string>
+    <string name="event_validation_not_required">Não</string>
+    <string name="event_validation_rejected_confirmation">Você rejeitou uma conclusão!</string>
+    <string name="event_validation_sending">Enviando...</string>
     <string name="event_validation_confirmation">Você validou uma conclusão!</string>
 
     <style name="EventValidationRow" parent="ManagerEventDetailsRow">

@@ -71,6 +71,20 @@ public interface AstroApi {
     Call<ApiResponse<Object>> assignEventConclusion(@Header("Authorization") String authorization,
             @Path("eventId") long eventId, @Path("participantId") long participantId);
 
+    @GET("events/participant/{participantId}/collaborator-conclusion/{eventId}")
+    Call<ApiResponse<com.example.astro_mobile.data.api.dto.EventValidationData>> getEventValidation(
+            @Header("Authorization") String authorization, @Path("participantId") long participantId,
+            @Path("eventId") long eventId);
+
+    @PATCH("events/{eventId}/participants/{participantId}/collaborator-conclusion/approval")
+    Call<ApiResponse<Object>> approveEventConclusion(@Header("Authorization") String authorization,
+            @Path("eventId") long eventId, @Path("participantId") long participantId);
+
+    @PATCH("events/{eventId}/participants/{participantId}/rejection")
+    Call<ApiResponse<Object>> rejectEventConclusion(@Header("Authorization") String authorization,
+            @Path("eventId") long eventId, @Path("participantId") long participantId,
+            @Body com.example.astro_mobile.data.api.dto.EventRejectionRequest request);
+
     @GET("events/{eventId}/participants")
     Call<ApiResponse<List<EventParticipantData>>> getEventParticipants(
             @Header("Authorization") String authorization, @Path("eventId") long eventId);
