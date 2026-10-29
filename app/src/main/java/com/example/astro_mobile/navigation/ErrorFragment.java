@@ -56,6 +56,7 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.managerFormsFragment || source == R.id.formDetailsFragment
                 || source == R.id.formAnswerFragment || source == R.id.managerEventsFragment
                 || source == R.id.staffFragment || source == R.id.staffDetailsFragment
+                || source == R.id.staffEventsFragment
                 || source == R.id.eventParticipantsFragment || source == R.id.managerEventDetailsFragment
                 || source == R.id.eventAssignmentFragment || source == R.id.eventValidationFragment) {
             // Retoma a consulta da tela autenticada, sem repetir a identificação de e-mail.
@@ -79,6 +80,9 @@ public class ErrorFragment extends Fragment {
                 if (source == R.id.staffDetailsFragment) {
                     previous.getSavedStateHandle().set("retry_staff_details", true);
                 }
+                if (source == R.id.staffEventsFragment) {
+                    previous.getSavedStateHandle().set("retry_staff_events", true);
+                }
                 if (source == R.id.eventParticipantsFragment) {
                     previous.getSavedStateHandle().set("retry_event_participants", true);
                 }
@@ -97,6 +101,7 @@ public class ErrorFragment extends Fragment {
             back.setText(R.string.profile_retry_back);
             configureBack(view, () -> {
                 if (source == R.id.staffDetailsFragment) navController.popBackStack(R.id.staffFragment, false);
+                else if (source == R.id.staffEventsFragment) navController.popBackStack(R.id.staffDetailsFragment, false);
                 else if (source == R.id.eventParticipantsFragment) navController.popBackStack(R.id.managerEventDetailsFragment, false);
                 else if (source == R.id.managerEventDetailsFragment) navController.popBackStack(R.id.managerEventDetailsFragment, true);
                 else if (source == R.id.eventAssignmentFragment) navController.popBackStack(R.id.eventAssignmentFragment, true);
