@@ -52,10 +52,10 @@
                     android:paddingHorizontal="30dp" android:paddingVertical="20dp" android:background="@drawable/bg_profile_panel">
                     <TextView style="@style/ManagerEventsText" android:text="@string/employee_event_about" />
                     <TextView style="@style/ManagerEventsText" android:layout_marginTop="5dp"
-                        android:textColor="@color/astro_input_hint" android:text="@string/manager_event_description_mock" />
+                        android:textColor="@color/astro_input_hint" android:id="@+id/text_manager_event_description" android:text="@string/manager_event_description_mock" />
                 </LinearLayout>
-                <TextView style="@style/ManagerEventDetailsHeading" android:text="@string/employee_event_attachments" />
-                <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                <TextView android:id="@+id/heading_manager_event_material" style="@style/ManagerEventDetailsHeading" android:text="@string/employee_event_attachments" />
+                <FrameLayout android:id="@+id/container_manager_event_material" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp">
                     <TextView android:id="@+id/button_manager_event_attachment" style="@style/EmployeeEventDetailsButton"
                         android:text="@string/employee_event_view_attachment" />
@@ -81,7 +81,7 @@
                         <LinearLayout style="@style/ManagerEventValidationCard">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                                 android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false">
-                                <TextView style="@style/ManagerEventValidationCount" android:text="@string/manager_event_validations_pending_mock" />
+                                <TextView style="@style/ManagerEventValidationCount" android:id="@+id/text_manager_event_pending_count" android:text="@string/manager_event_validations_pending_mock" />
                                 <ImageView style="@style/ManagerEventValidationIcon" android:layout_width="20dp"
                                     android:src="@drawable/manager_event_eye" android:contentDescription="@null" />
                             </LinearLayout>
@@ -90,7 +90,7 @@
                         <LinearLayout style="@style/ManagerEventValidationCard" android:layout_marginStart="10dp">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                                 android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false">
-                                <TextView style="@style/ManagerEventValidationCount" android:text="@string/manager_event_validations_done_mock" />
+                                <TextView style="@style/ManagerEventValidationCount" android:id="@+id/text_manager_event_done_count" android:text="@string/manager_event_validations_done_mock" />
                                 <ImageView style="@style/ManagerEventValidationIcon" android:layout_width="20dp"
                                     android:layout_height="20dp" android:src="@drawable/home_check" android:contentDescription="@null" />
                             </LinearLayout>
@@ -99,7 +99,7 @@
                         <LinearLayout style="@style/ManagerEventValidationCard" android:layout_marginStart="10dp">
                             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                                 android:orientation="horizontal" android:gravity="center_vertical" android:baselineAligned="false">
-                                <TextView style="@style/ManagerEventValidationCount" android:text="@string/manager_event_conclusion_pending_mock" />
+                                <TextView style="@style/ManagerEventValidationCount" android:id="@+id/text_manager_event_not_submitted_count" android:text="@string/manager_event_conclusion_pending_mock" />
                                 <ImageView style="@style/ManagerEventValidationIcon" android:src="@drawable/manager_event_hourglass"
                                     android:contentDescription="@null" />
                             </LinearLayout>
@@ -112,20 +112,20 @@
                     <ImageView style="@style/ManagerEventDetailsIcon" android:layout_width="20dp" android:layout_height="18dp"
                         android:src="@drawable/profile_user_group" app:tint="@color/astro_light_background" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/manager_event_participants_label" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/manager_event_participants_mock" />
+                    <TextView style="@style/ManagerEventDetailsValue" android:id="@+id/text_manager_event_participant_count" android:text="@string/manager_event_participants_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
                 <TextView style="@style/ManagerEventDetailsHeading" android:text="@string/manager_event_information" />
                 <LinearLayout style="@style/ManagerEventDetailsRow">
                     <ImageView style="@style/ManagerEventDetailsIcon" android:src="@drawable/home_calendar" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/employee_event_deadline_label" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/manager_event_deadline_mock" />
+                    <TextView style="@style/ManagerEventDetailsValue" android:id="@+id/text_manager_event_deadline" android:text="@string/manager_event_deadline_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout style="@style/ManagerEventDetailsRow">
                     <ImageView style="@style/ManagerEventDetailsIcon" android:src="@drawable/home_clock" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/employee_event_validity_label" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/manager_event_validity_mock" />
+                    <TextView style="@style/ManagerEventDetailsValue" android:id="@+id/text_manager_event_validity" android:text="@string/manager_event_validity_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout style="@style/ManagerEventDetailsRow" android:minHeight="80dp">
@@ -139,7 +139,7 @@
                     <ImageView style="@style/ManagerEventDetailsIcon" android:layout_width="18dp" android:layout_height="18dp"
                         android:src="@drawable/employee_event_user" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/employee_event_sender_label" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:text="@string/manager_event_sender_mock" />
+                    <TextView style="@style/ManagerEventDetailsValue" android:id="@+id/text_manager_event_sender" android:text="@string/manager_event_sender_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
                 <View style="@style/ManagerEventDetailsDivider" />
