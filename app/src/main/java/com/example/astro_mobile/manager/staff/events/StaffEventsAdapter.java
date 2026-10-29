@@ -1,5 +1,6 @@
 package com.example.astro_mobile.manager.staff.events;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +15,14 @@ import com.example.astro_mobile.R;
 import java.util.List;
 
 public final class StaffEventsAdapter extends RecyclerView.Adapter<StaffEventsAdapter.Row> {
-    private final List<StaffEvent> events;
-    private final View.OnClickListener onPendingClick;
+    public interface Listener { void onClick(StaffEvent event); }
 
-    public StaffEventsAdapter(List<StaffEvent> events, View.OnClickListener onPendingClick) {
+    private final List<StaffEvent> events;
+    private final Listener listener;
+
+    public StaffEventsAdapter(List<StaffEvent> events, Listener listener) {
         this.events = events;
-        this.onPendingClick = onPendingClick;
+        this.listener = listener;
     }
 
     @NonNull
@@ -35,11 +38,12 @@ public final class StaffEventsAdapter extends RecyclerView.Adapter<StaffEventsAd
         row.title.setText(event.title);
         row.deadline.setText(row.itemView.getContext().getString(R.string.employee_events_due, event.deadline));
         row.status.setTextColor(row.itemView.getContext().getColor(R.color.astro_tertiary_light_text));
-        boolean pending = event.status == StaffEvent.Status.PENDING;
-        row.icon.setVisibility(pending ? View.INVISIBLE : View.VISIBLE);
+        row.icon.setImageTintList(null);
+        row.icon.setVisibility(View.VISIBLE);
         switch (event.status) {
             case PENDING:
                 row.status.setText(R.string.employee_events_pending);
+                row.icon.setVisibility(View.INVISIBLE);
                 break;
             case DONE:
                 row.status.setText(R.string.employee_events_done);
@@ -49,6 +53,20 @@ public final class StaffEventsAdapter extends RecyclerView.Adapter<StaffEventsAd
                 row.status.setText(R.string.staff_events_expired);
                 row.icon.setImageResource(R.drawable.staff_event_expired);
                 break;
+            case ANALYSIS:
+                row.status.setText(R.string.employee_events_review);
+                row.icon.setImageResource(R.drawable.home_clock);
+                row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext()
+                        .getColor(R.color.astro_light_background)));
+                break;
+            case REJECTED:
+            case CANCELLED:
+                row.status.setText(event.status == StaffEvent.Status.REJECTED
+                        ? R.string.employee_events_rejected : R.string.employee_events_cancelled);
+                row.icon.setImageResource(R.drawable.conversations_close);
+                row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext()
+                        .getColor(R.color.employee_event_status_red)));
+                break;
         }
         // O check tem raiz 18.2×18; o X preserva a raiz quadrada de 18dp.
         ViewGroup.LayoutParams params = row.icon.getLayoutParams();
@@ -57,10 +75,8 @@ public final class StaffEventsAdapter extends RecyclerView.Adapter<StaffEventsAd
         params.height = Math.round(18f * density);
         row.icon.setLayoutParams(params);
 
-        // Só o exemplo pendente é um link no frame; os demais são informativos.
-        row.button.setOnClickListener(pending ? onPendingClick : null);
-        row.button.setClickable(pending);
-        row.button.setFocusable(pending);
+        // Cada linha leva o ID e a modalidade do próprio evento.
+        row.button.setOnClickListener(clicked -> listener.onClick(event));
     }
 
     @Override public int getItemCount() { return events.size(); }

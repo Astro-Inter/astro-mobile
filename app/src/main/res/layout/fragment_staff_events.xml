@@ -61,8 +61,14 @@
                 app:layout_constraintTop_toBottomOf="@id/divider_staff_events_top" app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
                 tools:listitem="@layout/item_manager_event" tools:itemCount="3" />
+            <TextView android:id="@+id/text_staff_events_empty" style="@style/ManagerEventsText"
+                android:layout_width="0dp" android:layout_height="wrap_content" android:gravity="center"
+                android:paddingHorizontal="30dp" android:visibility="gone" android:text="@string/employee_home_no_events"
+                app:layout_constraintTop_toBottomOf="@id/divider_staff_events_top"
+                app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-        <!-- O conteúdo real fica visível na prévia; o skeleton só aparece na espera local. -->
+        <!-- O conteúdo fica visível na prévia; o skeleton acompanha a requisição. -->
         <include android:id="@+id/skeleton_staff_events" layout="@layout/view_staff_events_skeleton"
             android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" tools:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/header_staff_events" app:layout_constraintBottom_toBottomOf="parent"

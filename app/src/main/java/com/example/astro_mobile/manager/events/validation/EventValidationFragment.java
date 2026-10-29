@@ -182,6 +182,13 @@ public final class EventValidationFragment extends Fragment {
                 state.setReason("");
                 NavController nav = NavHostFragment.findNavController(EventValidationFragment.this);
                 nav.getBackStackEntry(R.id.eventParticipantsFragment).getSavedStateHandle().set("retry_event_participants", true);
+                // Ao voltar, reflete a decisão na lista do funcionário, caso esteja na pilha.
+                try {
+                    nav.getBackStackEntry(R.id.staffEventsFragment).getSavedStateHandle()
+                            .set("retry_staff_events", true);
+                } catch (IllegalArgumentException noStaffEvents) {
+                    // A validação também pode ter sido aberta pela lista geral de eventos.
+                }
                 Bundle args = new Bundle(); args.putBoolean("validation_rejected", reject);
                 nav.navigate(R.id.action_event_validation_to_confirmation, args);
             }

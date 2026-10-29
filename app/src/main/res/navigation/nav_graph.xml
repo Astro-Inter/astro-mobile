@@ -532,7 +532,11 @@
     </fragment>
     <fragment android:id="@+id/staffEventsFragment"
         android:name="com.example.astro_mobile.manager.staff.events.StaffEventsFragment"
-        android:label="Eventos do funcionário" />
+        android:label="Eventos do funcionário">
+        <action android:id="@+id/action_staff_events_to_details" app:destination="@id/managerEventDetailsFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
     <fragment android:id="@+id/humanChatFragment"
         android:name="com.example.astro_mobile.chat.human.HumanChatFragment"
         android:label="Conversa" />

@@ -82,6 +82,13 @@ public final class EventAssignmentFragment extends Fragment {
                         if (getView() != view || !isAdded()) return;
                         NavController nav = NavHostFragment.findNavController(EventAssignmentFragment.this);
                         nav.getBackStackEntry(R.id.eventParticipantsFragment).getSavedStateHandle().set("retry_event_participants", true);
+                        // Se a lista do funcionário ainda estiver aberta, atualiza-a ao retornar.
+                        try {
+                            nav.getBackStackEntry(R.id.staffEventsFragment).getSavedStateHandle()
+                                    .set("retry_staff_events", true);
+                        } catch (IllegalArgumentException noStaffEvents) {
+                            // A ação também pode ser aberta diretamente pela lista geral de eventos.
+                        }
                         nav.navigate(R.id.action_assignment_to_confirmation);
                     }
                     @Override public void onFailure(FailureKind failure) {

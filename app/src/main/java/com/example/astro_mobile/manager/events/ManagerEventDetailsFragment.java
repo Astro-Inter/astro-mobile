@@ -26,8 +26,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public final class ManagerEventDetailsFragment extends Fragment {
-    static final String EVENT_TITLE = "event_title";
-    static final String COMPLETION_MODE = "event_completion_mode";
+    public static final String EVENT_TITLE = "event_title";
+    public static final String COMPLETION_MODE = "event_completion_mode";
     private ManagerEventDetailsViewModel state;
     private boolean selfDeclaration;
 
