@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
+import com.example.astro_mobile.auth.SessionNavigation;
+import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.manager.events.ManagerEvent;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
@@ -90,6 +92,11 @@ public final class EventParticipantsFragment extends Fragment {
             return true;
         });
         render(view);
+        if (selfDeclaration) {
+            if (state.isLoaded()) showContent(view);
+            else loadParticipants(view);
+            return;
+        }
 
         // Simula um segundo de espera; o skeleton fica oculto no editor de XML.
         if (!state.isLoaded()) {
@@ -107,6 +114,39 @@ public final class EventParticipantsFragment extends Fragment {
             };
             view.postDelayed(finishLoading, 1_000L);
         }
+    }
+
+    private void loadParticipants(View view) {
+        view.findViewById(R.id.container_participants_content).setVisibility(View.INVISIBLE);
+        View skeleton = view.findViewById(R.id.skeleton_event_participants);
+        skeleton.findViewById(R.id.skeleton_participants_assignment_notice).setVisibility(View.GONE);
+        skeleton.setVisibility(View.VISIBLE);
+        long eventId = requireArguments().getLong("event_id");
+        state.load(eventId, new EventParticipantsViewModel.Callback() {
+            @Override public void onSuccess() {
+                if (getView() != view || !isAdded()) return;
+                showContent(view);
+                render(view);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (getView() != view || !isAdded()) return;
+                if (failure == FailureKind.SESSION) SessionNavigation.signOut(EventParticipantsFragment.this);
+                else NavHostFragment.findNavController(EventParticipantsFragment.this).navigate(
+                        failure == FailureKind.CONNECTION ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
+            }
+        });
+    }
+
+    private void showContent(View view) {
+        view.findViewById(R.id.skeleton_event_participants).setVisibility(View.GONE);
+        view.findViewById(R.id.container_participants_content).setVisibility(View.VISIBLE);
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        Boolean retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry()
+                .getSavedStateHandle().remove("retry_event_participants");
+        if (Boolean.TRUE.equals(retry) && getView() != null) loadParticipants(getView());
     }
 
     private void render(View view) {
@@ -128,6 +168,7 @@ public final class EventParticipantsFragment extends Fragment {
         Bundle args = AuthArgs.copy(getArguments());
         args.putString("event_title", eventTitle);
         args.putString("participant_name", participant.name);
+        if (participant.id != null) args.putLong("participant_id", participant.id);
         args.putInt("participant_avatar_index", participant.avatarIndex);
         int action = completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT
                 ? R.id.action_event_participants_to_assignment : R.id.action_event_participants_to_validation;
@@ -139,6 +180,7 @@ public final class EventParticipantsFragment extends Fragment {
         // Descarta a espera quando a tela é fechada antes do carregamento mock terminar.
         if (finishLoading != null) requireView().removeCallbacks(finishLoading);
         finishLoading = null;
+        if (state != null) state.cancel();
         super.onDestroyView();
     }
 }

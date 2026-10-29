@@ -17,6 +17,7 @@ import com.example.astro_mobile.data.api.dto.ChatConversationData;
 import com.example.astro_mobile.data.api.dto.ManagerEventData;
 import com.example.astro_mobile.data.api.dto.CollaboratorSummaryData;
 import com.example.astro_mobile.data.api.dto.CollaboratorProfileData;
+import com.example.astro_mobile.data.api.dto.EventParticipantData;
 
 import java.util.List;
 
@@ -52,6 +53,10 @@ public interface AstroApi {
     Call<ApiResponse<ReceivedFormsPage>> getReceivedForms(
             @Header("Authorization") String authorization, @Query("page") int page,
             @Query("size") int size);
+    @GET("events/{eventId}/participants")
+    Call<ApiResponse<List<EventParticipantData>>> getEventParticipants(
+            @Header("Authorization") String authorization, @Path("eventId") long eventId);
+
     @GET("collaborators/{collaboratorId}/profile")
     Call<ApiResponse<CollaboratorProfileData>> getCollaboratorProfile(
             @Header("Authorization") String authorization, @Path("collaboratorId") long id);
