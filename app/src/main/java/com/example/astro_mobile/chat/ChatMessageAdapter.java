@@ -77,7 +77,7 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
             holder.text.setMovementMethod(null);
             holder.text.setText(message.getText());
         } else {
-            ChatMarkdownContent.render(holder.content, markdown, message.getText());
+            ChatStructuredContent.render(holder.content, markdown, message.getText(), message.getBlocks());
         }
     }
 

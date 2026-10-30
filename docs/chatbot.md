@@ -98,3 +98,15 @@ Os commits correspondem às subtarefas `SCRUM-419` (conexão), `SCRUM-420` (envi
 - O estado e a navbar do chat estão vinculados a `employeeHomeFragment`; o logout também usa esse destino no `popUpTo`. O fluxo do Gestor ainda é mock em `FlowChoiceFragment`, portanto o chat não está pronto para ser aberto pela futura Home do Gestor sem ajustar esse vínculo.
 - No Figma, as listagens de Gestor (`3272:11270`) e Colaborador (`3326:5570`) compartilham estrutura e filtros, mas dizem, respectivamente, “Acesse aqui as suas conversas com os colaboradores” e “Acesse aqui as suas conversas com os gestores”. A implementação atual tem apenas o texto do Colaborador. A escolha deve seguir o fluxo ativo, não somente o tipo da conta, pois um Gestor pode atuar como Colaborador.
 - `ConversationsFragment` ainda é apenas UI: nenhuma conversa humana fictícia, requisição, busca ou filtro real foi implementado. A integração de conversas humanas deve permanecer separada do contrato da IA. Não há razão para adicionar um loading artificial ao chatbot; o skeleton da listagem está preparado para a futura requisição.
+
+
+## Blocos visuais do chat
+
+O chatbot interpreta `blocos` do envio e do histórico, preservando a ordem de
+texto, gráficos de barras/linhas/setores, tabela e galeria. O texto `resposta`
+continua sendo o fallback quando a lista está vazia, inválida ou contém um tipo ou
+versão desconhecidos. Os gráficos incluem valores textuais para acessibilidade;
+as tabelas têm rolagem horizontal. As imagens aceitam somente HTTPS R2 e exibem
+um ícone se estiverem ausentes ou indisponíveis; o aplicativo não grava a URL
+assinada no cache de imagens. O backend controla autenticação e escopo das fotos.
+O suporte depende da API de IA que retorna o novo contrato.
