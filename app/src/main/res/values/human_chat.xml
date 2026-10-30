@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="human_reply_action">Responder</string>
-    <string name="human_reply_copy">Copiar texto</string>
+    <string name="human_message_copy">Copiar mensagem</string>
+    <string name="human_message_copied">Mensagem copiada</string>
     <string name="human_reply_cancel">Cancelar resposta</string>
     <string name="human_reply_you">Você</string>
     <string name="human_reply_to">Respondendo a %1$s</string>
     <string name="human_reply_missing">Mensagem anterior não carregada</string>
     <string name="human_reply_load_older">Carregue as mensagens anteriores para ver a citação.</string>
-    <string name="human_reply_accessibility">Mensagem de %1$s, %2$s: %3$s. Toque para ver as opções.</string>
+    <string name="human_reply_accessibility">Mensagem de %1$s, %2$s: %3$s. Segure para copiar a mensagem.</string>
     <string name="human_chat_connecting">Conectando…</string>
     <string name="human_chat_reconnecting">Reconectando… Seu rascunho está preservado.</string>
     <string name="human_chat_disconnected">Sem conexão com o chat. Toque para tentar novamente.</string>
@@ -20,7 +21,6 @@
         <item quantity="one">%1$d mensagem não lida</item>
         <item quantity="other">%1$d mensagens não lidas</item>
     </plurals>
-    <string name="human_chat_attachment_pending">Anexos ainda não estão disponíveis.</string>
     <string name="human_conversation_manager_label">&lt;b>Gestor - &lt;/b>%1$s</string>
     <string name="human_conversation_sent_preview">Você: %1$s</string>
 </resources>

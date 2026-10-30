@@ -229,6 +229,32 @@ citação mantêm largura proporcional ao conteúdo. Tipografia de 17sp, padding
 de 21dp/18dp e margem lateral seguem o chatbot existente e as telas Figma
 3272:11287 (conversa) e 3272:11334 (Astrinho), no arquivo qdCrRXAVuiNhNkBuim95zz.
 O teste inclui resposta "Oi" citando mensagem própria, largura normal e 320dp.
+
+O chat também permite arrastar uma mensagem para a direita e soltar para
+selecionar Responder. O deslocamento fica limitado a 72dp; ao ultrapassar 64dp,
+o indicador confirma o gesto com feedback tátil. A mensagem retorna à posição
+original e a seleção abre a citação e o teclado, mantendo
+o rascunho. A ação vale para mensagens próprias e recebidas com ID persistido,
+sem remover linhas ou alterar a operação de envio pendente. O helper é removido
+ao destruir a view.
+HumanMessageSwipeTest cobre gestos em mensagens enviadas/recebidas, deslocamento
+curto, sentido contrário e envio pendente. Esses testes instrumentados foram
+compilados; a execução no aparelho foi deixada para o usuário.
+
+Segurar o balão copia diretamente somente o texto literal da mensagem, sem
+autor, horário ou citação. Não há ícone de copiar nem menu de opções ao tocar.
+Android 12 confirma por Toast e Android 13+ usa o aviso do sistema. O horário
+fica em uma linha compacta abaixo do conteúdo. As citações usam fundo levemente
+mais claro, com texto de maior contraste, e a prévia no compositor oferece um
+ícone de fechar que cancela a resposta mantendo o rascunho.
+
+A lista usa stackFromEnd para acompanhar o redimensionamento causado pelo
+teclado. HumanMessageLayoutTest verifica o espaçamento, respostas curtas e cópia
+por toque longo sem ação de cópia ao tocar. Não há alteração no contrato da API.
+Validação dos ajustes: 156 testes unitários, assembleDebug,
+assembleDebugAndroidTest e lintDebug aprovados. APK atualizado instalado no M31;
+interações e recebimento de notificações reais ficam para validação do usuário.
+
 Validação de 30/10/2026: 153 testes unitários aprovados, `assembleDebug`,
 `assembleDebugAndroidTest` e `lintDebug` aprovados. O teste de layout passou no
 M31 em 2,141s e a captura foi inspecionada. A versão foi instalada no aparelho.

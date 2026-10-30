@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -84,10 +83,6 @@ public final class ChatFragment extends Fragment {
                 model.send(getString(R.string.chat_suggestion_nrs)));
         view.findViewById(R.id.button_chat_suggestion_dashboards).setOnClickListener(clicked ->
                 model.send(getString(R.string.chat_suggestion_dashboards)));
-        // O Figma mostra anexos, mas seu envio ainda não foi implementado.
-        view.findViewById(R.id.button_chat_add).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable,
-                        Toast.LENGTH_SHORT).show());
         view.findViewById(R.id.button_chat_close).setOnClickListener(clicked -> {
             if (ViewCompat.getWindowInsetsController(view) != null) {
                 ViewCompat.getWindowInsetsController(view).hide(WindowInsetsCompat.Type.ime());

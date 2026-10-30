@@ -14,8 +14,8 @@ import java.util.List;
 
 public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessagesAdapter.Row> {
     public interface Listener {
-        void onOptions(HumanMessage message, View anchor);
         void onQuote(String messageId);
+        void onCopy(HumanMessage message);
     }
     private final HumanConversation conversation;
     private final List<HumanMessage> messages;
@@ -58,8 +58,9 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
                 ? row.itemView.getContext().getString(R.string.human_reply_you) : conversation.name);
         row.quoteContent.setText(quoted == null ? row.itemView.getContext().getString(R.string.human_reply_missing) : quoted.text);
         row.quote.setOnClickListener(view -> listener.onQuote(message.replyToMessageId));
-        row.bubble.setOnClickListener(view -> listener.onOptions(message, row.bubble));
-        row.bubble.setOnLongClickListener(view -> { listener.onOptions(message, row.bubble); return true; });
+        View.OnLongClickListener copyMessage = view -> { listener.onCopy(message); return true; };
+        row.bubble.setOnLongClickListener(copyMessage);
+        row.quote.setOnLongClickListener(copyMessage);
         row.bubble.setContentDescription(row.itemView.getContext().getString(R.string.human_reply_accessibility,
                 message.sent ? row.itemView.getContext().getString(R.string.human_reply_you) : conversation.name, message.time, message.text));
     }
