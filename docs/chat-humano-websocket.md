@@ -222,6 +222,13 @@ sem criar um endpoint ou fabricar o conteúdo original.
 
 `HumanMessageLayoutTest` verifica a geometria de texto/horário, alinhamento,
 avatares e citação com dados locais; não envia mensagens ao servidor.
+Na correção das citações curtas, os balões passaram a reservar a largura disponível
+para a referência, evitando a medição circular entre wrap_content e filhos com
+peso. O autor ocupa uma linha e a prévia continua limitada a duas. Mensagens sem
+citação mantêm largura proporcional ao conteúdo. Tipografia de 17sp, padding
+de 21dp/18dp e margem lateral seguem o chatbot existente e as telas Figma
+3272:11287 (conversa) e 3272:11334 (Astrinho), no arquivo qdCrRXAVuiNhNkBuim95zz.
+O teste inclui resposta "Oi" citando mensagem própria, largura normal e 320dp.
 Validação de 30/10/2026: 153 testes unitários aprovados, `assembleDebug`,
 `assembleDebugAndroidTest` e `lintDebug` aprovados. O teste de layout passou no
 M31 em 2,141s e a captura foi inspecionada. A versão foi instalada no aparelho.

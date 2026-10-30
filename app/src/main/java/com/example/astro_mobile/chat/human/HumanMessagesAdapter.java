@@ -43,12 +43,16 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
                 .error(R.drawable.profile_avatar_placeholder).into(row.avatar);
         row.avatar.setVisibility(message.sent || sameNext ? View.GONE : View.VISIBLE);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) row.bubble.getLayoutParams();
+        boolean hasQuote = message.replyToMessageId != null;
+        params.width = hasQuote ? 0 : ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.constrainedWidth = !hasQuote;
+        params.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_SPREAD;
         params.horizontalBias = message.sent ? 1f : 0f;
-        params.setMarginStart(Math.round((message.sent ? 48 : 45) * density));
-        params.setMarginEnd(Math.round((message.sent ? 0 : 28) * density));
+        params.setMarginStart(Math.round((message.sent ? 52 : 45) * density));
+        params.setMarginEnd(Math.round((message.sent ? 0 : 12) * density));
         row.bubble.setLayoutParams(params);
         HumanMessage quoted = conversation.findMessage(message.replyToMessageId);
-        row.quote.setVisibility(message.replyToMessageId == null ? View.GONE : View.VISIBLE);
+        row.quote.setVisibility(hasQuote ? View.VISIBLE : View.GONE);
         row.quoteAuthor.setText(R.string.human_reply_action);
         if (quoted != null) row.quoteAuthor.setText(quoted.sent
                 ? row.itemView.getContext().getString(R.string.human_reply_you) : conversation.name);

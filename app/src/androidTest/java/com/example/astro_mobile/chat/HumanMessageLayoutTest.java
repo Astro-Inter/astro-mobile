@@ -23,6 +23,14 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public final class HumanMessageLayoutTest {
     @Test public void messagesSeparateTimeAndShowQuoteWithoutOverlap() throws Exception {
+        verifyLayout(0);
+    }
+
+    @Test public void shortRepliesStayReadableOnCompactWidth() throws Exception {
+        verifyLayout(320);
+    }
+
+    private void verifyLayout(int widthDp) throws Exception {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             AtomicReference<RecyclerView> list = new AtomicReference<>();
             scenario.onActivity(activity -> {
@@ -31,9 +39,13 @@ public final class HumanMessageLayoutTest {
                 original.id = "original"; original.createdAt = "2026-10-30T12:41:00Z";
                 HumanMessage response = new HumanMessage("Sim! Finalizei o treinamento e já encaminhei o comprovante.", "09:42", true);
                 response.id = "response"; response.createdAt = "2026-10-30T12:42:00Z"; response.replyToMessageId = original.id;
-                HumanMessage shortMessage = new HumanMessage("Obrigada!", "09:43", false);
+                HumanMessage shortMessage = new HumanMessage("Obrigada!", "09:43", true);
                 shortMessage.id = "last"; shortMessage.createdAt = "2026-10-30T12:43:00Z";
                 conversation.messages.add(original); conversation.messages.add(response); conversation.messages.add(shortMessage);
+                HumanMessage shortReply = new HumanMessage("Oi", "09:44", true);
+                shortReply.id = "short-reply"; shortReply.createdAt = "2026-10-30T12:44:00Z";
+                shortReply.replyToMessageId = shortMessage.id;
+                conversation.messages.add(shortReply);
                 FrameLayout frame = new FrameLayout(activity);
                 frame.setBackgroundColor(activity.getColor(R.color.chat_surface));
                 RecyclerView messages = new RecyclerView(activity);
@@ -44,7 +56,11 @@ public final class HumanMessageLayoutTest {
                     @Override public void onOptions(HumanMessage message, View anchor) { }
                     @Override public void onQuote(String id) { }
                 }));
-                frame.addView(messages); activity.setContentView(frame); list.set(messages);
+                int width = widthDp == 0 ? FrameLayout.LayoutParams.MATCH_PARENT
+                        : Math.round(widthDp * activity.getResources().getDisplayMetrics().density);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, FrameLayout.LayoutParams.MATCH_PARENT);
+                params.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+                frame.addView(messages, params); activity.setContentView(frame); list.set(messages);
             });
             InstrumentationRegistry.getInstrumentation().waitForIdleSync();
             scenario.onActivity(activity -> {
@@ -60,6 +76,16 @@ public final class HumanMessageLayoutTest {
                         > received.findViewById(R.id.container_human_message).getRight());
                 assertEquals(View.GONE, sent.findViewById(R.id.image_human_message_avatar).getVisibility());
                 assertEquals(View.VISIBLE, received.findViewById(R.id.image_human_message_avatar).getVisibility());
+                View reply = list.get().findViewHolderForAdapterPosition(3).itemView;
+                TextView author = reply.findViewById(R.id.text_human_quote_author);
+                TextView quote = reply.findViewById(R.id.text_human_quote_content);
+                assertEquals("Você", author.getText().toString());
+                assertEquals(1, author.getLineCount());
+                assertEquals(1, ((TextView) reply.findViewById(R.id.text_human_message_content)).getLineCount());
+                float density = activity.getResources().getDisplayMetrics().density;
+                assertTrue("Short replies must reserve readable space for the quote", quote.getWidth() >= 120 * density);
+                assertTrue(reply.findViewById(R.id.text_human_message_time).getTop()
+                        >= reply.findViewById(R.id.text_human_message_content).getBottom());
             });
             Bitmap screenshot = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
             File output = new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir(), "human-message-layout.png");
