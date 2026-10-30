@@ -19,6 +19,11 @@ segunda conexão WebSocket, nem acrescenta mensagens ao histórico a partir do p
   rede ou foto ausente mantém as iniciais. A atualização da imagem é silenciosa
   e só ocorre se o aviso ainda existe, pertence à mesma conta/mensagem e o app
   continua em segundo plano; não recria aviso dispensado nem repete mensagens.
+- A foto é carregada por ChatNotificationAvatarWorker (WorkManager), com rede
+  disponível, trabalho único por conta/conversa e até três tentativas. A consulta
+  usa o repository e a sessão Firebase existentes; somente identificadores são
+  persistidos no trabalho, sem token ou prévia. Ao chegar outra mensagem, a foto
+  do mesmo remetente no aviso ativo é preservada enquanto a nova busca ocorre.
 - Não adiciona ações de responder, marcar como lida ou silenciar; desabilita
   sugestões contextuais automáticas. A aparência final depende do Android e do
   fabricante. A versão pública da tela bloqueada continua genérica, sem avatar
@@ -69,10 +74,11 @@ podem atrasar ou impedir o aviso. Aceite FCM não é confirmação de leitura.
 
 ## Diagnóstico em aparelho — 30/10/2026
 
-HumanChatPushDeviceTest é opt-in: requer as duas contas autorizadas em fixture
-privada no aparelho, preserva a sessão padrão, envia uma mensagem identificada
-como teste e aguarda um aviso Android por até 45s. A fixture é removida ao terminar.
-O resultado não contém tokens ou senhas.
+O diagnóstico local opt-in (não incluído nesta PR) utilizou duas contas
+expressamente autorizadas e fixture privada no aparelho, preservando a sessão
+padrão. Enviou uma mensagem identificada como teste e aguardou um aviso Android
+por até 45s. A fixture foi removida ao terminar; o resultado não contém tokens
+ou senhas.
 
 No M31, a permissão de notificações e a sincronização do cadastro passaram.
 A conta remetente Rosa enviou para a conta Lucas, após validação de contatos
