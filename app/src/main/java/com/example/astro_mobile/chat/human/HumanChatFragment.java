@@ -75,7 +75,31 @@ public final class HumanChatFragment extends Fragment {
                 Toast.makeText(requireContext(), R.string.human_chat_attachment_pending, Toast.LENGTH_SHORT).show());
 
         RecyclerView messages = view.findViewById(R.id.list_human_chat_messages);
-        HumanMessagesAdapter adapter = new HumanMessagesAdapter(conversation.messages, avatar, manager, conversation.profilePhotoUrl);
+        HumanMessagesAdapter adapter = new HumanMessagesAdapter(conversation, new HumanMessagesAdapter.Listener() {
+            @Override public void onOptions(HumanMessage message, View anchor) {
+                android.widget.PopupMenu menu = new android.widget.PopupMenu(requireContext(), anchor);
+                if (conversation.pending == null && message.id != null) menu.getMenu().add(0, 1, 0, R.string.human_reply_action);
+                menu.getMenu().add(0, 2, 1, R.string.human_reply_copy);
+                menu.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == 1) {
+                        conversation.replyToMessageId = message.id;
+                        renderReply(view);
+                        view.findViewById(R.id.input_human_chat_message).requestFocus();
+                    } else {
+                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager)
+                                requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("", message.text));
+                    }
+                    return true;
+                });
+                menu.show();
+            }
+            @Override public void onQuote(String id) {
+                HumanMessage target = conversation.findMessage(id);
+                if (target != null) messages.smoothScrollToPosition(conversation.messages.indexOf(target));
+                else Toast.makeText(requireContext(), R.string.human_reply_load_older, Toast.LENGTH_SHORT).show();
+            }
+        });
         messages.setAdapter(adapter);
         LinearLayoutManager layoutManager = (LinearLayoutManager) messages.getLayoutManager();
         messages.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -88,6 +112,12 @@ public final class HumanChatFragment extends Fragment {
         });
         EditText input = view.findViewById(R.id.input_human_chat_message);
         input.setText(conversation.draft);
+        view.findViewById(R.id.button_human_reply_cancel).setOnClickListener(clicked -> {
+            if (conversation.pending != null) return;
+            conversation.replyToMessageId = null;
+            renderReply(view);
+        });
+        renderReply(view);
         input.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) { conversation.draft = s.toString(); }
@@ -117,6 +147,7 @@ public final class HumanChatFragment extends Fragment {
                 view.findViewById(R.id.container_human_chat_composer).setVisibility(View.VISIBLE);
             }
             renderConnection(view, input);
+            renderReply(view);
         });
         state.connectionState().observe(getViewLifecycleOwner(), value -> {
             if (value == com.example.astro_mobile.data.chat.ChatConnectionState.SESSION_EXPIRED) {
@@ -139,6 +170,7 @@ public final class HumanChatFragment extends Fragment {
             @Override public void onChanged() {
                 if (getView() != view) return;
                 adapter.notifyHistoryReplaced(previousCount);
+                renderReply(view);
                 view.findViewById(R.id.skeleton_human_chat).setVisibility(View.GONE);
                 messages.setVisibility(View.VISIBLE);
                 view.findViewById(R.id.container_human_chat_composer).setVisibility(View.VISIBLE);
@@ -161,7 +193,8 @@ public final class HumanChatFragment extends Fragment {
             @Override public void onChanged() {
                 if (getView() == null) return;
                 int inserted = conversation.messages.size() - previousCount;
-                if (inserted > 0) adapter.notifyItemRangeInserted(0, inserted);
+                adapter.notifyDataSetChanged();
+                renderReply(getView());
                 layoutManager.scrollToPositionWithOffset(firstVisible + inserted, offset);
             }
 
@@ -218,6 +251,21 @@ public final class HumanChatFragment extends Fragment {
         view.findViewById(R.id.button_human_chat_send).setEnabled(
                 connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTED
                         && (conversation.pending == null || !conversation.pending.awaiting));
+    }
+
+    private void renderReply(View view) {
+        HumanMessage target = conversation.findMessage(conversation.replyToMessageId);
+        view.findViewById(R.id.container_human_reply).setVisibility(conversation.replyToMessageId == null ? View.GONE : View.VISIBLE);
+        view.findViewById(R.id.button_human_reply_cancel).setEnabled(conversation.pending == null);
+        if (conversation.replyToMessageId == null) return;
+        if (target == null) {
+            ((TextView) view.findViewById(R.id.text_human_reply_author)).setText(R.string.human_reply_action);
+            ((TextView) view.findViewById(R.id.text_human_reply_content)).setText(R.string.human_reply_missing);
+            return;
+        }
+        ((TextView) view.findViewById(R.id.text_human_reply_author)).setText(getString(R.string.human_reply_to,
+                target.sent ? getString(R.string.human_reply_you) : conversation.name));
+        ((TextView) view.findViewById(R.id.text_human_reply_content)).setText(target.text);
     }
 
     @Override public void onStart() {

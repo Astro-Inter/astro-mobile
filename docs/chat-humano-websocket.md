@@ -43,7 +43,8 @@ O Firebase ID token vai somente no cabeçalho `Authorization: Bearer ...` do
 CONNECT STOMP. Os destinos são `/app/chat.send`, `/user/queue/messages` e
 `/user/queue/errors`. O envio contém `content`, `clientMessageId` UUID e exatamente
 um entre `recipientId` numérico ou `conversationId` UUID. O cliente não fornece
-remetente, workspace ou timestamp. Reply não está exposto pela interface atual.
+remetente, workspace ou timestamp. A ação Responder envia `replyToMessageId`;
+o backend exige que a referência pertença à mesma conversa.
 
 O servidor permite COLABORADOR → GESTOR/GESTOR_WORKSPACE e os três tipos
 operacionais como destinatários de gestores. Ambos precisam estar ativos,
@@ -167,7 +168,7 @@ HTTPS; não desative TLS para contornar falhas de rede.
 
 ## Limites e pendências
 
-Anexos, respostas a mensagens e comprovantes individuais de leitura não fazem
+Anexos e comprovantes individuais de leitura não fazem
 parte da interface/contrato implementados aqui. Rascunhos e operações pendentes
 vivem no ViewModel: o encerramento do processo não recupera uma operação incerta.
 Após reiniciar, consulte o histórico antes de digitar uma nova cópia do envio.
@@ -200,6 +201,32 @@ e um teste de sessão com duração superior a três ciclos. Depois de publicado
 o mobile pode voltar a oferecer `10000,10000`. Esta entrega não altera astro-api.
 
 ## Resultado da execução local
+
+### Hierarquia e respostas citadas
+
+Referências visuais consultadas: Figma `3272:11287` (gestor) e `3326:5594`
+(colaborador), no arquivo `qdCrRXAVuiNhNkBuim95zz`. Foram preservados a paleta
+`#1c1839`/`#362361`/`#5b4a82`, Montserrat, cantos de 16dp e fotos dinâmicas.
+O chat humano passou a usar `item_human_message.xml`, com texto e horário em
+linhas distintas, alinhamento por remetente e espaçamento reduzido entre
+mensagens consecutivas do mesmo autor. O layout da IA permanece independente.
+
+Toque ou pressione um balão para abrir Responder/Copiar texto. A resposta
+selecionada aparece acima do campo, pode ser cancelada e é mantida enquanto o
+envio aguarda confirmação. O payload mantém a mesma referência nas tentativas
+manuais. Histórico e eventos STOMP preservam `replyToMessageId` no modelo visual.
+O balão da resposta mostra autor e trecho original; tocar na citação navega
+até a mensagem já carregada. Se ela estiver fora da página atual, aparece
+"Mensagem anterior não carregada" e a orientação para carregar o histórico,
+sem criar um endpoint ou fabricar o conteúdo original.
+
+`HumanMessageLayoutTest` verifica a geometria de texto/horário, alinhamento,
+avatares e citação com dados locais; não envia mensagens ao servidor.
+Validação de 30/10/2026: 153 testes unitários aprovados, `assembleDebug`,
+`assembleDebugAndroidTest` e `lintDebug` aprovados. O teste de layout passou no
+M31 em 2,141s e a captura foi inspecionada. A versão foi instalada no aparelho.
+O envio de uma resposta citada entre contas reais ainda não foi exercitado nesta
+etapa; contrato, preservação do ID em retry e renderização foram verificados.
 
 Em 29/10/2026, o teste do computador validou HTTPS das novas APIs e handshake
 WebSocket HTTP 101 sem Origin, mantendo a verificação de certificados. A primeira

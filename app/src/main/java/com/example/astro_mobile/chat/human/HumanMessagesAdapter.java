@@ -5,87 +5,80 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.astro_mobile.R;
 import com.bumptech.glide.Glide;
-
 import java.util.List;
 
 public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessagesAdapter.Row> {
+    public interface Listener {
+        void onOptions(HumanMessage message, View anchor);
+        void onQuote(String messageId);
+    }
+    private final HumanConversation conversation;
     private final List<HumanMessage> messages;
-    private final int avatar;
-    private final boolean manager;
-    private final String profilePhotoUrl;
+    private final Listener listener;
 
-    public HumanMessagesAdapter(List<HumanMessage> messages, int avatar, boolean manager, String profilePhotoUrl) {
-        this.messages = messages;
-        this.avatar = avatar;
-        this.manager = manager;
-        this.profilePhotoUrl = profilePhotoUrl;
+    public HumanMessagesAdapter(HumanConversation conversation, Listener listener) {
+        this.conversation = conversation;
+        this.messages = conversation.messages;
+        this.listener = listener;
     }
-
-    @NonNull @Override
-    public Row onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Reutiliza a composição visual; nenhum estado ou serviço do chatbot é usado.
-        return new Row(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_message, parent, false));
+    @NonNull @Override public Row onCreateViewHolder(@NonNull ViewGroup parent, int type) {
+        return new Row(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_human_message, parent, false));
     }
-
-    @Override
-    public void onBindViewHolder(@NonNull Row row, int position) {
+    @Override public void onBindViewHolder(@NonNull Row row, int position) {
         HumanMessage message = messages.get(position);
         row.text.setText(message.text);
-        row.text.setTextSize(manager ? 17f : 16f);
-        row.text.setTextColor(row.itemView.getContext().getColor(manager
-                ? R.color.chat_text : R.color.astro_light_background));
         row.time.setText(message.time);
-        Glide.with(row.avatar).load(profilePhotoUrl).circleCrop().placeholder(avatar).fallback(avatar).error(avatar).into(row.avatar);
-        row.avatar.setVisibility(message.sent ? View.GONE : View.VISIBLE);
         row.bubble.setBackgroundResource(message.sent ? R.drawable.bg_chat_user : R.drawable.bg_chat_assistant);
-
-        // Balões acompanham o texto e quebram linhas sem encobrir o horário ou ultrapassar a tela.
         float density = row.itemView.getResources().getDisplayMetrics().density;
-        float avatarSize = manager ? 37f : 41f;
-        ViewGroup.LayoutParams avatarParams = row.avatar.getLayoutParams();
-        avatarParams.width = avatarParams.height = Math.round(avatarSize * density);
-        row.avatar.setLayoutParams(avatarParams);
-        ConstraintLayout.LayoutParams bubbleParams = (ConstraintLayout.LayoutParams) row.bubble.getLayoutParams();
-        bubbleParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        bubbleParams.constrainedWidth = true;
-        bubbleParams.horizontalBias = message.sent ? 1f : 0f;
-        bubbleParams.setMarginStart(Math.round((message.sent ? 48f : avatarSize + 8f) * density));
-        bubbleParams.setMarginEnd(0);
-        row.bubble.setLayoutParams(bubbleParams);
+        boolean sameNext = position + 1 < messages.size() && messages.get(position + 1).sent == message.sent
+                && sameDay(message, messages.get(position + 1));
+        row.itemView.setPadding(0, 0, 0, Math.round((sameNext ? 6 : 16) * density));
+        Glide.with(row.avatar).load(conversation.profilePhotoUrl).circleCrop()
+                .placeholder(R.drawable.profile_avatar_placeholder).fallback(R.drawable.profile_avatar_placeholder)
+                .error(R.drawable.profile_avatar_placeholder).into(row.avatar);
+        row.avatar.setVisibility(message.sent || sameNext ? View.GONE : View.VISIBLE);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) row.bubble.getLayoutParams();
+        params.horizontalBias = message.sent ? 1f : 0f;
+        params.setMarginStart(Math.round((message.sent ? 48 : 45) * density));
+        params.setMarginEnd(Math.round((message.sent ? 0 : 28) * density));
+        row.bubble.setLayoutParams(params);
+        HumanMessage quoted = conversation.findMessage(message.replyToMessageId);
+        row.quote.setVisibility(message.replyToMessageId == null ? View.GONE : View.VISIBLE);
+        row.quoteAuthor.setText(R.string.human_reply_action);
+        if (quoted != null) row.quoteAuthor.setText(quoted.sent
+                ? row.itemView.getContext().getString(R.string.human_reply_you) : conversation.name);
+        row.quoteContent.setText(quoted == null ? row.itemView.getContext().getString(R.string.human_reply_missing) : quoted.text);
+        row.quote.setOnClickListener(view -> listener.onQuote(message.replyToMessageId));
+        row.bubble.setOnClickListener(view -> listener.onOptions(message, row.bubble));
+        row.bubble.setOnLongClickListener(view -> { listener.onOptions(message, row.bubble); return true; });
+        row.bubble.setContentDescription(row.itemView.getContext().getString(R.string.human_reply_accessibility,
+                message.sent ? row.itemView.getContext().getString(R.string.human_reply_you) : conversation.name, message.time, message.text));
     }
-
+    private static boolean sameDay(HumanMessage first, HumanMessage second) {
+        return first.createdAt != null && second.createdAt != null
+                && java.time.Instant.parse(first.createdAt).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                .equals(java.time.Instant.parse(second.createdAt).atZone(java.time.ZoneId.systemDefault()).toLocalDate());
+    }
     @Override public int getItemCount() { return messages.size(); }
-
-    public void notifyHistoryReplaced(int previousCount) {
-        int currentCount = messages.size();
-        if (previousCount > currentCount) {
-            notifyItemRangeRemoved(currentCount, previousCount - currentCount);
-        } else if (currentCount > previousCount) {
-            if (previousCount > 0) notifyItemRangeChanged(0, previousCount);
-            notifyItemRangeInserted(previousCount, currentCount - previousCount);
-            return;
-        }
-        if (currentCount > 0) notifyItemRangeChanged(0, currentCount);
-    }
-
+    public void notifyHistoryReplaced(int previousCount) { notifyDataSetChanged(); }
     static final class Row extends RecyclerView.ViewHolder {
         final ImageView avatar;
-        final View bubble;
-        final TextView text, time;
-
+        final View bubble, quote;
+        final TextView text, time, quoteAuthor, quoteContent;
         Row(View view) {
             super(view);
-            avatar = view.findViewById(R.id.image_chat_avatar);
-            bubble = view.findViewById(R.id.container_chat_message);
-            text = view.findViewById(R.id.text_chat_message);
-            time = view.findViewById(R.id.text_chat_time);
+            avatar = view.findViewById(R.id.image_human_message_avatar);
+            bubble = view.findViewById(R.id.container_human_message);
+            text = view.findViewById(R.id.text_human_message_content);
+            time = view.findViewById(R.id.text_human_message_time);
+            quote = view.findViewById(R.id.container_human_quote);
+            quoteAuthor = view.findViewById(R.id.text_human_quote_author);
+            quoteContent = view.findViewById(R.id.text_human_quote_content);
         }
     }
 }
