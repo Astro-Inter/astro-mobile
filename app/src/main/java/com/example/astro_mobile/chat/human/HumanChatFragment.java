@@ -33,6 +33,8 @@ public final class HumanChatFragment extends Fragment {
     private HumanConversationsViewModel state;
     private HumanConversation conversation;
     private HumanMessageSwipeToReply swipeToReply;
+    private HumanTypingAdapter typingAdapter;
+    private HumanMessagesAdapter messagesAdapter;
 
     public HumanChatFragment() { super(R.layout.fragment_human_chat); }
 
@@ -82,7 +84,9 @@ public final class HumanChatFragment extends Fragment {
             }
             @Override public void onCopy(HumanMessage message) { copyMessage(message); }
         });
-        messages.setAdapter(adapter);
+        messagesAdapter = adapter;
+        typingAdapter = new HumanTypingAdapter();
+        messages.setAdapter(new androidx.recyclerview.widget.ConcatAdapter(adapter, typingAdapter));
         swipeToReply = new HumanMessageSwipeToReply(conversation, message -> selectReply(view, message));
         swipeToReply.attach(messages);
         LinearLayoutManager layoutManager = (LinearLayoutManager) messages.getLayoutManager();
@@ -105,7 +109,10 @@ public final class HumanChatFragment extends Fragment {
         renderReply(view);
         input.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { conversation.draft = s.toString(); }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                conversation.draft = s.toString();
+                state.draftChanged(conversation);
+            }
             @Override public void afterTextChanged(Editable s) { }
         });
         view.findViewById(R.id.button_human_chat_send).setOnClickListener(clicked -> state.send(conversation));
@@ -138,6 +145,11 @@ public final class HumanChatFragment extends Fragment {
             if (value == com.example.astro_mobile.data.chat.ChatConnectionState.SESSION_EXPIRED) {
                 com.example.astro_mobile.auth.SessionNavigation.signOut(this);
             } else renderConnection(view);
+        });
+        state.peerTyping().observe(getViewLifecycleOwner(), typing -> {
+            boolean atEnd = !messages.canScrollVertically(1);
+            typingAdapter.setTyping(Boolean.TRUE.equals(typing));
+            if (atEnd && Boolean.TRUE.equals(typing)) messages.scrollToPosition(conversation.messages.size());
         });
         view.findViewById(R.id.text_human_chat_connection).setOnClickListener(clicked -> state.retryConnection());
     }
@@ -209,7 +221,7 @@ public final class HumanChatFragment extends Fragment {
         if (Boolean.TRUE.equals(retry)) {
             entry.getSavedStateHandle().remove("retry_human_chat_history");
             RecyclerView messages = getView().findViewById(R.id.list_human_chat_messages);
-            startHistoryLoad(getView(), messages, (HumanMessagesAdapter) messages.getAdapter());
+            startHistoryLoad(getView(), messages, messagesAdapter);
         }
     }
 
@@ -279,12 +291,15 @@ public final class HumanChatFragment extends Fragment {
     }
 
     @Override public void onStop() {
+        if (typingAdapter != null) typingAdapter.setTyping(false);
         if (state != null) state.setActiveConversation(null);
         super.onStop();
     }
 
     @Override
     public void onDestroyView() {
+        if (typingAdapter != null) { typingAdapter.setTyping(false); typingAdapter = null; }
+        messagesAdapter = null;
         if (swipeToReply != null) {
             swipeToReply.detach();
             swipeToReply = null;

@@ -285,3 +285,29 @@ histórico na tela, botão de envio habilitado, rascunho após recriação da Ac
 e retorno do segundo plano. A compilação debug, o APK de testes e `lintDebug`
 também passaram; o lint não apontou erros, mantendo 141 avisos no projeto.
 As duas rodadas do teste de envio persistiram seis mensagens únicas ao todo.
+
+
+## Digitação em tempo real (SCRUM-261)
+
+A conexão STOMP existente negocia suporte pelo cabeçalho `astro-typing:1` do
+`CONNECTED`. Sem ele, não assina filas novas nem publica eventos de digitação,
+preservando compatibilidade com a API ainda não atualizada.
+
+`ChatTypingRequest` e `ChatTypingData` seguem o contrato da API: envio em
+`/app/chat.typing`, recebimento em `/user/queue/typing`, com identificador da
+conversa, remetente autenticado e expiração. Não trafega o rascunho digitado.
+`ChatTypingSession` limita os sinais a cada dois segundos e envia encerramento
+após 2,5 segundos de inatividade. O indicador expira em até cinco segundos e é
+limpo em envio, mensagem recebida, troca de conversa, logout ou perda da conexão.
+Eventos temporários não são reenviados após reconectar.
+
+`HumanTypingAdapter` é concatenado ao adapter de mensagens: exibe somente os
+três pontinhos animados depois da última mensagem recebida, na mesma paleta.
+Não altera o histórico, não pode ser respondido/copiar e não desloca quem está
+lendo mensagens antigas. A animação para ao sair da tela e respeita animações
+desativadas no sistema. O cabeçalho mantém o nome e o cargo originais.
+
+Testes cobrem limitação de sinais, encerramento e expiração, isolamento ao mudar
+de conversa, reconexão sem replay e compatibilidade com servidor antigo. O teste
+ponta a ponta entre dois usuários depende de publicar a API com esse contrato;
+instalar apenas o APK não habilita o indicador no servidor antigo.

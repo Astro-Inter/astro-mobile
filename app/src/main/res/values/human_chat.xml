@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="human_chat_typing">Digitando…</string>
     <string name="human_reply_action">Responder</string>
     <string name="human_message_copy">Copiar mensagem</string>
     <string name="human_message_copied">Mensagem copiada</string>
