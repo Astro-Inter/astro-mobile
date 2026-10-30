@@ -240,6 +240,17 @@ ao destruir a view. O menu continua disponível para toque e acessibilidade.
 HumanMessageSwipeTest cobre gestos em mensagens enviadas/recebidas, deslocamento
 curto, sentido contrário e envio pendente. Esses testes instrumentados foram
 compilados; a execução no aparelho foi deixada para o usuário.
+
+Cada balão possui um botão de copiar no rodapé, ao lado do horário. O ícone
+Copy de 20x20 vem do Figma qdCrRXAVuiNhNkBuim95zz, nó 1011:639, da página
+de ícones indicada (1011:560). O SVG original foi convertido para VectorDrawable
+preservando o path, o traço e as dimensões, sem URL temporária em runtime.
+Usa a cor chat_muted, desenho de 20dp e alvo de toque de 48dp, com descrição e
+tooltip "Copiar mensagem". O botão e o menu chamam a mesma ação: copiam somente
+o texto literal da mensagem, sem autor, horário ou citação. Android 12 confirma
+por Toast e Android 13+ usa o aviso do sistema. Não há alteração no contrato da API.
+O teste de layout verifica a ação da mensagem citada curta e o alvo acessível;
+os testes instrumentados são compilados, sem execução no aparelho nesta etapa.
 Validação de 30/10/2026: 153 testes unitários aprovados, `assembleDebug`,
 `assembleDebugAndroidTest` e `lintDebug` aprovados. O teste de layout passou no
 M31 em 2,141s e a captura foi inspecionada. A versão foi instalada no aparelho.

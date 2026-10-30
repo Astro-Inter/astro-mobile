@@ -33,6 +33,7 @@ public final class HumanMessageLayoutTest {
     private void verifyLayout(int widthDp) throws Exception {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             AtomicReference<RecyclerView> list = new AtomicReference<>();
+            AtomicReference<String> copied = new AtomicReference<>();
             scenario.onActivity(activity -> {
                 HumanConversation conversation = new HumanConversation("Contato", "Gestor", true, 0);
                 HumanMessage original = new HumanMessage("Você concluiu o treinamento de segurança?", "09:41", false);
@@ -55,6 +56,7 @@ public final class HumanMessageLayoutTest {
                 messages.setAdapter(new HumanMessagesAdapter(conversation, new HumanMessagesAdapter.Listener() {
                     @Override public void onOptions(HumanMessage message, View anchor) { }
                     @Override public void onQuote(String id) { }
+                    @Override public void onCopy(HumanMessage message) { copied.set(message.text); }
                 }));
                 int width = widthDp == 0 ? FrameLayout.LayoutParams.MATCH_PARENT
                         : Math.round(widthDp * activity.getResources().getDisplayMetrics().density);
@@ -68,7 +70,7 @@ public final class HumanMessageLayoutTest {
                 View sent = list.get().findViewHolderForAdapterPosition(1).itemView;
                 View text = sent.findViewById(R.id.text_human_message_content);
                 View time = sent.findViewById(R.id.text_human_message_time);
-                assertTrue(time.getTop() >= text.getBottom());
+                assertTrue(time.getTop() + ((View) time.getParent()).getTop() >= text.getBottom());
                 assertEquals(View.VISIBLE, sent.findViewById(R.id.container_human_quote).getVisibility());
                 assertEquals("Você concluiu o treinamento de segurança?",
                         ((TextView) sent.findViewById(R.id.text_human_quote_content)).getText().toString());
@@ -84,8 +86,15 @@ public final class HumanMessageLayoutTest {
                 assertEquals(1, ((TextView) reply.findViewById(R.id.text_human_message_content)).getLineCount());
                 float density = activity.getResources().getDisplayMetrics().density;
                 assertTrue("Short replies must reserve readable space for the quote", quote.getWidth() >= 120 * density);
-                assertTrue(reply.findViewById(R.id.text_human_message_time).getTop()
+                View replyTime = reply.findViewById(R.id.text_human_message_time);
+                assertTrue(replyTime.getTop() + ((View) replyTime.getParent()).getTop()
                         >= reply.findViewById(R.id.text_human_message_content).getBottom());
+                View copy = reply.findViewById(R.id.button_human_message_copy);
+                assertEquals(activity.getString(R.string.human_message_copy), copy.getContentDescription());
+                assertTrue(copy.getWidth() >= 48 * density);
+                copy.performClick();
+                assertEquals("Oi", copied.get());
+                assertEquals(4, list.get().getAdapter().getItemCount());
             });
             Bitmap screenshot = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
             File output = new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir(), "human-message-layout.png");

@@ -85,9 +85,7 @@ public final class HumanChatFragment extends Fragment {
                     if (item.getItemId() == 1) {
                         selectReply(view, message);
                     } else {
-                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager)
-                                requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-                        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("", message.text));
+                        copyMessage(message);
                     }
                     return true;
                 });
@@ -98,6 +96,7 @@ public final class HumanChatFragment extends Fragment {
                 if (target != null) messages.smoothScrollToPosition(conversation.messages.indexOf(target));
                 else Toast.makeText(requireContext(), R.string.human_reply_load_older, Toast.LENGTH_SHORT).show();
             }
+            @Override public void onCopy(HumanMessage message) { copyMessage(message); }
         });
         messages.setAdapter(adapter);
         swipeToReply = new HumanMessageSwipeToReply(conversation, message -> selectReply(view, message));
@@ -252,6 +251,14 @@ public final class HumanChatFragment extends Fragment {
         view.findViewById(R.id.button_human_chat_send).setEnabled(
                 connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTED
                         && (conversation.pending == null || !conversation.pending.awaiting));
+    }
+
+    private void copyMessage(HumanMessage message) {
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager)
+                requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        clipboard.setPrimaryClip(android.content.ClipData.newPlainText(getString(R.string.human_message_copy), message.text));
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU)
+            Toast.makeText(requireContext(), R.string.human_message_copied, Toast.LENGTH_SHORT).show();
     }
 
     private void selectReply(View view, HumanMessage message) {

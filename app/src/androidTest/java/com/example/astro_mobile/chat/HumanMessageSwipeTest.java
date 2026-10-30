@@ -58,6 +58,7 @@ public final class HumanMessageSwipeTest {
                 messages.setAdapter(new HumanMessagesAdapter(model, new HumanMessagesAdapter.Listener() {
                     @Override public void onOptions(HumanMessage message, View anchor) { }
                     @Override public void onQuote(String id) { }
+                    @Override public void onCopy(HumanMessage message) { }
                 }));
                 HumanMessageSwipeToReply swipe = new HumanMessageSwipeToReply(model, message -> {
                     model.replyToMessageId = message.id;

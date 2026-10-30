@@ -16,6 +16,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
     public interface Listener {
         void onOptions(HumanMessage message, View anchor);
         void onQuote(String messageId);
+        void onCopy(HumanMessage message);
     }
     private final HumanConversation conversation;
     private final List<HumanMessage> messages;
@@ -33,6 +34,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
         HumanMessage message = messages.get(position);
         row.text.setText(message.text);
         row.time.setText(message.time);
+        row.copy.setOnClickListener(view -> listener.onCopy(message));
         row.bubble.setBackgroundResource(message.sent ? R.drawable.bg_chat_user : R.drawable.bg_chat_assistant);
         float density = row.itemView.getResources().getDisplayMetrics().density;
         boolean sameNext = position + 1 < messages.size() && messages.get(position + 1).sent == message.sent
@@ -72,7 +74,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
     public void notifyHistoryReplaced(int previousCount) { notifyDataSetChanged(); }
     static final class Row extends RecyclerView.ViewHolder {
         final ImageView avatar;
-        final View bubble, quote;
+        final View bubble, quote, copy;
         final TextView text, time, quoteAuthor, quoteContent;
         Row(View view) {
             super(view);
@@ -80,6 +82,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
             bubble = view.findViewById(R.id.container_human_message);
             text = view.findViewById(R.id.text_human_message_content);
             time = view.findViewById(R.id.text_human_message_time);
+            copy = view.findViewById(R.id.button_human_message_copy);
             quote = view.findViewById(R.id.container_human_quote);
             quoteAuthor = view.findViewById(R.id.text_human_quote_author);
             quoteContent = view.findViewById(R.id.text_human_quote_content);

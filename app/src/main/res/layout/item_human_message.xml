@@ -27,8 +27,15 @@
         <TextView android:id="@+id/text_human_message_content" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_family" android:textSize="17sp" android:textColor="@color/chat_text"
             android:lineSpacingExtra="3dp" android:includeFontPadding="false" />
-        <TextView android:id="@+id/text_human_message_time" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_gravity="end" android:layout_marginTop="7dp" android:fontFamily="@font/montserrat_family"
-            android:textSize="12sp" android:textColor="@color/chat_muted" android:includeFontPadding="false" />
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="48dp"
+            android:layout_gravity="end" android:gravity="center_vertical" android:orientation="horizontal">
+            <ImageButton android:id="@+id/button_human_message_copy" android:layout_width="48dp" android:layout_height="48dp"
+                android:background="@drawable/bg_login_icon_button" android:padding="14dp" android:scaleType="centerInside"
+                android:src="@drawable/ic_human_message_copy" app:tint="@color/chat_muted"
+                android:contentDescription="@string/human_message_copy" android:tooltipText="@string/human_message_copy" />
+            <TextView android:id="@+id/text_human_message_time" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginStart="4dp" android:fontFamily="@font/montserrat_family"
+                android:textSize="12sp" android:textColor="@color/chat_muted" android:includeFontPadding="false" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
