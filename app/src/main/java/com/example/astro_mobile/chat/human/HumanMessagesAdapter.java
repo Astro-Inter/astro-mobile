@@ -1,8 +1,6 @@
 package com.example.astro_mobile.chat.human;
 
-import android.graphics.Rect;
 import android.view.LayoutInflater;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,7 +14,6 @@ import java.util.List;
 
 public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessagesAdapter.Row> {
     public interface Listener {
-        void onOptions(HumanMessage message, View anchor);
         void onQuote(String messageId);
         void onCopy(HumanMessage message);
     }
@@ -36,7 +33,6 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
         HumanMessage message = messages.get(position);
         row.text.setText(message.text);
         row.time.setText(message.time);
-        row.copy.setOnClickListener(view -> listener.onCopy(message));
         row.bubble.setBackgroundResource(message.sent ? R.drawable.bg_chat_user : R.drawable.bg_chat_assistant);
         float density = row.itemView.getResources().getDisplayMetrics().density;
         boolean sameNext = position + 1 < messages.size() && messages.get(position + 1).sent == message.sent
@@ -62,8 +58,9 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
                 ? row.itemView.getContext().getString(R.string.human_reply_you) : conversation.name);
         row.quoteContent.setText(quoted == null ? row.itemView.getContext().getString(R.string.human_reply_missing) : quoted.text);
         row.quote.setOnClickListener(view -> listener.onQuote(message.replyToMessageId));
-        row.bubble.setOnClickListener(view -> listener.onOptions(message, row.bubble));
-        row.bubble.setOnLongClickListener(view -> { listener.onOptions(message, row.bubble); return true; });
+        View.OnLongClickListener copyMessage = view -> { listener.onCopy(message); return true; };
+        row.bubble.setOnLongClickListener(copyMessage);
+        row.quote.setOnLongClickListener(copyMessage);
         row.bubble.setContentDescription(row.itemView.getContext().getString(R.string.human_reply_accessibility,
                 message.sent ? row.itemView.getContext().getString(R.string.human_reply_you) : conversation.name, message.time, message.text));
     }
@@ -76,7 +73,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
     public void notifyHistoryReplaced(int previousCount) { notifyDataSetChanged(); }
     static final class Row extends RecyclerView.ViewHolder {
         final ImageView avatar;
-        final View bubble, quote, copy;
+        final View bubble, quote;
         final TextView text, time, quoteAuthor, quoteContent;
         Row(View view) {
             super(view);
@@ -84,17 +81,6 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
             bubble = view.findViewById(R.id.container_human_message);
             text = view.findViewById(R.id.text_human_message_content);
             time = view.findViewById(R.id.text_human_message_time);
-            copy = view.findViewById(R.id.button_human_message_copy);
-            bubble.addOnLayoutChangeListener((changed, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-                // Extend into the footer margin and bottom padding, preserving a 48dp touch target.
-                float density = view.getResources().getDisplayMetrics().density;
-                Rect target = new Rect();
-                copy.getDrawingRect(target);
-                ((ViewGroup) bubble).offsetDescendantRectToMyCoords(copy, target);
-                target.top -= Math.round(2 * density);
-                target.bottom = target.top + Math.round(48 * density);
-                bubble.setTouchDelegate(new TouchDelegate(target, copy));
-            });
             quote = view.findViewById(R.id.container_human_quote);
             quoteAuthor = view.findViewById(R.id.text_human_quote_author);
             quoteContent = view.findViewById(R.id.text_human_quote_content);

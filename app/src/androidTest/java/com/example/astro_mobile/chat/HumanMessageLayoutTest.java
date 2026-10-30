@@ -54,7 +54,6 @@ public final class HumanMessageLayoutTest {
                 messages.setPadding(padding, padding, padding, padding);
                 messages.setLayoutManager(new LinearLayoutManager(activity));
                 messages.setAdapter(new HumanMessagesAdapter(conversation, new HumanMessagesAdapter.Listener() {
-                    @Override public void onOptions(HumanMessage message, View anchor) { }
                     @Override public void onQuote(String id) { }
                     @Override public void onCopy(HumanMessage message) { copied.set(message.text); }
                 }));
@@ -70,7 +69,7 @@ public final class HumanMessageLayoutTest {
                 View sent = list.get().findViewHolderForAdapterPosition(1).itemView;
                 View text = sent.findViewById(R.id.text_human_message_content);
                 View time = sent.findViewById(R.id.text_human_message_time);
-                assertTrue(time.getTop() + ((View) time.getParent()).getTop() >= text.getBottom());
+                assertTrue(time.getTop() >= text.getBottom());
                 assertEquals(View.VISIBLE, sent.findViewById(R.id.container_human_quote).getVisibility());
                 assertEquals("Você concluiu o treinamento de segurança?",
                         ((TextView) sent.findViewById(R.id.text_human_quote_content)).getText().toString());
@@ -85,17 +84,20 @@ public final class HumanMessageLayoutTest {
                 assertEquals(1, author.getLineCount());
                 assertEquals(1, ((TextView) reply.findViewById(R.id.text_human_message_content)).getLineCount());
                 float density = activity.getResources().getDisplayMetrics().density;
-                int timeGap = time.getTop() + ((View) time.getParent()).getTop() - text.getBottom();
+                int timeGap = time.getTop() - text.getBottom();
                 assertTrue("Timestamp must stay close to the message", timeGap <= 12 * density);
                 assertTrue("Short replies must reserve readable space for the quote", quote.getWidth() >= 120 * density);
                 View replyTime = reply.findViewById(R.id.text_human_message_time);
-                assertTrue(replyTime.getTop() + ((View) replyTime.getParent()).getTop()
+                assertTrue(replyTime.getTop()
                         >= reply.findViewById(R.id.text_human_message_content).getBottom());
-                View copy = reply.findViewById(R.id.button_human_message_copy);
-                assertEquals(activity.getString(R.string.human_message_copy), copy.getContentDescription());
-                assertTrue(copy.getWidth() >= 48 * density);
-                assertNotNull(reply.findViewById(R.id.container_human_message).getTouchDelegate());
-                copy.performClick();
+                View bubble = reply.findViewById(R.id.container_human_message);
+                bubble.performClick();
+                assertNull("A tap must not copy the message", copied.get());
+                assertFalse("A tap must not open an options menu", bubble.hasOnClickListeners());
+                assertTrue(bubble.performLongClick());
+                assertEquals("Oi", copied.get());
+                copied.set(null);
+                assertTrue(reply.findViewById(R.id.container_human_quote).performLongClick());
                 assertEquals("Oi", copied.get());
                 assertEquals(4, list.get().getAdapter().getItemCount());
             });

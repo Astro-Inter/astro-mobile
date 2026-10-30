@@ -77,20 +77,6 @@ public final class HumanChatFragment extends Fragment {
 
         RecyclerView messages = view.findViewById(R.id.list_human_chat_messages);
         HumanMessagesAdapter adapter = new HumanMessagesAdapter(conversation, new HumanMessagesAdapter.Listener() {
-            @Override public void onOptions(HumanMessage message, View anchor) {
-                android.widget.PopupMenu menu = new android.widget.PopupMenu(requireContext(), anchor);
-                if (conversation.pending == null && message.id != null) menu.getMenu().add(0, 1, 0, R.string.human_reply_action);
-                menu.getMenu().add(0, 2, 1, R.string.human_reply_copy);
-                menu.setOnMenuItemClickListener(item -> {
-                    if (item.getItemId() == 1) {
-                        selectReply(view, message);
-                    } else {
-                        copyMessage(message);
-                    }
-                    return true;
-                });
-                menu.show();
-            }
             @Override public void onQuote(String id) {
                 HumanMessage target = conversation.findMessage(id);
                 if (target != null) messages.smoothScrollToPosition(conversation.messages.indexOf(target));

@@ -56,7 +56,6 @@ public final class HumanMessageSwipeTest {
                 messages.setId(R.id.list_human_chat_messages);
                 messages.setLayoutManager(new LinearLayoutManager(activity));
                 messages.setAdapter(new HumanMessagesAdapter(model, new HumanMessagesAdapter.Listener() {
-                    @Override public void onOptions(HumanMessage message, View anchor) { }
                     @Override public void onQuote(String id) { }
                     @Override public void onCopy(HumanMessage message) { }
                 }));
