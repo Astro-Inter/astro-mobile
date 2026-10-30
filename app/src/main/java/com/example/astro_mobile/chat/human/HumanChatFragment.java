@@ -32,6 +32,7 @@ public final class HumanChatFragment extends Fragment {
     public static final String CONVERSATION_ID = "human_conversation_id";
     private HumanConversationsViewModel state;
     private HumanConversation conversation;
+    private HumanMessageSwipeToReply swipeToReply;
 
     public HumanChatFragment() { super(R.layout.fragment_human_chat); }
 
@@ -82,9 +83,7 @@ public final class HumanChatFragment extends Fragment {
                 menu.getMenu().add(0, 2, 1, R.string.human_reply_copy);
                 menu.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == 1) {
-                        conversation.replyToMessageId = message.id;
-                        renderReply(view);
-                        view.findViewById(R.id.input_human_chat_message).requestFocus();
+                        selectReply(view, message);
                     } else {
                         android.content.ClipboardManager clipboard = (android.content.ClipboardManager)
                                 requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
@@ -101,6 +100,8 @@ public final class HumanChatFragment extends Fragment {
             }
         });
         messages.setAdapter(adapter);
+        swipeToReply = new HumanMessageSwipeToReply(conversation, message -> selectReply(view, message));
+        swipeToReply.attach(messages);
         LinearLayoutManager layoutManager = (LinearLayoutManager) messages.getLayoutManager();
         messages.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -253,6 +254,17 @@ public final class HumanChatFragment extends Fragment {
                         && (conversation.pending == null || !conversation.pending.awaiting));
     }
 
+    private void selectReply(View view, HumanMessage message) {
+        if (conversation.pending != null || message.id == null || getView() != view) return;
+        conversation.replyToMessageId = message.id;
+        renderReply(view);
+        EditText input = view.findViewById(R.id.input_human_chat_message);
+        input.requestFocus();
+        android.view.inputmethod.InputMethodManager keyboard = (android.view.inputmethod.InputMethodManager)
+                requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        keyboard.showSoftInput(input, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+    }
+
     private void renderReply(View view) {
         HumanMessage target = conversation.findMessage(conversation.replyToMessageId);
         view.findViewById(R.id.container_human_reply).setVisibility(conversation.replyToMessageId == null ? View.GONE : View.VISIBLE);
@@ -280,6 +292,10 @@ public final class HumanChatFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (swipeToReply != null) {
+            swipeToReply.detach();
+            swipeToReply = null;
+        }
         if (conversation != null && conversation.conversationId != null && state != null) {
             state.cancelHistory(conversation);
         }

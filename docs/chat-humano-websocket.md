@@ -229,6 +229,17 @@ citação mantêm largura proporcional ao conteúdo. Tipografia de 17sp, padding
 de 21dp/18dp e margem lateral seguem o chatbot existente e as telas Figma
 3272:11287 (conversa) e 3272:11334 (Astrinho), no arquivo qdCrRXAVuiNhNkBuim95zz.
 O teste inclui resposta "Oi" citando mensagem própria, largura normal e 320dp.
+
+O chat também permite arrastar uma mensagem para a direita e soltar para
+selecionar Responder. O deslocamento fica limitado a 72dp; ao ultrapassar 64dp,
+o indicador confirma o gesto com feedback tátil. A mensagem retorna à posição
+original e a mesma seleção usada pelo menu abre a citação e o teclado, mantendo
+o rascunho. A ação vale para mensagens próprias e recebidas com ID persistido,
+sem remover linhas ou alterar a operação de envio pendente. O helper é removido
+ao destruir a view. O menu continua disponível para toque e acessibilidade.
+HumanMessageSwipeTest cobre gestos em mensagens enviadas/recebidas, deslocamento
+curto, sentido contrário e envio pendente. Esses testes instrumentados foram
+compilados; a execução no aparelho foi deixada para o usuário.
 Validação de 30/10/2026: 153 testes unitários aprovados, `assembleDebug`,
 `assembleDebugAndroidTest` e `lintDebug` aprovados. O teste de layout passou no
 M31 em 2,141s e a captura foi inspecionada. A versão foi instalada no aparelho.
