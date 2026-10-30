@@ -138,16 +138,51 @@ public final class StompChatClientTest {
         assertEquals(1, f.transport.listeners.size());
     }
 
+    @Test public void typingIsNegotiatedAndNeverSentToLegacyBackend() {
+        Fixture legacy = new Fixture(); legacy.start();
+        assertFalse(legacy.client.sendTyping(new com.example.astro_mobile.data.api.dto.ChatTypingRequest(2L, null, true)));
+        assertFalse(legacy.transport.frames.stream().anyMatch(frame -> frame.contains("queue/typing")));
+        Fixture f = new Fixture(); f.client.setActive(true); f.transport.listener().onOpen();
+        f.transport.listener().onText("CONNECTED\nversion:1.2\nheart-beat:0,0\nastro-typing:1\n\n\0");
+        assertEquals(1, f.transport.frames.stream().filter(frame -> frame.contains("destination:/user/queue/typing")).count());
+        assertTrue(f.client.sendTyping(new com.example.astro_mobile.data.api.dto.ChatTypingRequest(2L, CONVERSATION, true)));
+        String sent = f.transport.frames.get(f.transport.frames.size() - 1);
+        assertTrue(sent.contains("destination:/app/chat.typing"));
+        assertTrue(sent.contains("\"typing\":true"));
+        assertFalse(sent.contains("recipientId"));
+        f.transport.listener().onText("MESSAGE\nsubscription:private-typing\n\n{\"conversationId\":\"" + CONVERSATION
+                + "\",\"senderId\":2,\"typing\":true,\"expiresAt\":\"2026-10-30T18:00:00Z\"}\0");
+        assertEquals(1, f.typing.size());
+        f.transport.listener().onText("MESSAGE\nsubscription:private-typing\n\ninvalid-json\0");
+        assertEquals(ChatConnectionState.CONNECTED, f.client.getState());
+        f.client.setActive(false);
+        assertTrue(f.transport.frames.stream().anyMatch(frame -> frame.startsWith("UNSUBSCRIBE") && frame.contains("private-typing")));
+        assertFalse(f.client.sendTyping(new com.example.astro_mobile.data.api.dto.ChatTypingRequest(2L, null, true)));
+    }
+
+    @Test public void typingSubscriptionsReturnAfterReconnectWithoutReplayingEvents() {
+        Fixture f = new Fixture(); f.client.setActive(true); f.transport.listener().onOpen();
+        String connected = "CONNECTED\nversion:1.2\nheart-beat:0,0\nastro-typing:1\n\n\0";
+        f.transport.listener().onText(connected);
+        f.client.sendTyping(new com.example.astro_mobile.data.api.dto.ChatTypingRequest(2L, null, true));
+        f.transport.listener().onClosed(); f.clock.advance(1000);
+        f.transport.listener().onOpen(); f.transport.listener().onText(connected);
+        assertEquals(2, f.transport.frames.stream().filter(frame -> frame.contains("destination:/user/queue/typing")).count());
+        assertEquals(1, f.transport.frames.stream().filter(frame -> frame.contains("destination:/app/chat.typing")).count());
+    }
+
     private static final class Fixture {
         final FakeTransport transport = new FakeTransport();
         final FakeClock clock = new FakeClock();
         final List<Boolean> refreshes = new ArrayList<>();
         final List<ChatSendResponse> messages = new ArrayList<>();
         final List<ChatSendError> errors = new ArrayList<>();
+        final List<com.example.astro_mobile.data.api.dto.ChatTypingData> typing = new ArrayList<>();
         final StompChatClient.Listener listener = new StompChatClient.Listener() {
             @Override public void onState(ChatConnectionState state) { }
             @Override public void onMessage(ChatSendResponse message) { messages.add(message); }
             @Override public void onError(ChatSendError error) { errors.add(error); }
+            @Override public void onTyping(com.example.astro_mobile.data.api.dto.ChatTypingData event) { typing.add(event); }
         };
         final StompChatClient client = new StompChatClient(transport, (refresh, cb) -> {
             refreshes.add(refresh); cb.onToken("token-" + refreshes.size());

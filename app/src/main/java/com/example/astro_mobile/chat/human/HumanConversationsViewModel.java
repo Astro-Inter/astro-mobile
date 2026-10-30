@@ -44,6 +44,8 @@ public final class HumanConversationsViewModel extends ViewModel {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final java.util.Map<HumanConversation, Runnable> confirmations = new java.util.HashMap<>();
     private final AndroidChatConnection connection;
+    private final com.example.astro_mobile.data.chat.ChatTypingSession typingSession;
+    private final MutableLiveData<Boolean> peerTyping = new MutableLiveData<>(false);
     private HumanConversation activeConversation;
     private boolean contactsLoading, contactsLoaded;
     private boolean loading;
@@ -51,10 +53,18 @@ public final class HumanConversationsViewModel extends ViewModel {
     private FailureKind failure;
 
     public HumanConversationsViewModel(Context application) {
+        typingSession = new com.example.astro_mobile.data.chat.ChatTypingSession(new com.example.astro_mobile.data.chat.ChatScheduler() {
+            @Override public Task after(long delay, Runnable action) {
+                handler.postDelayed(action, delay);
+                return () -> handler.removeCallbacks(action);
+            }
+            @Override public long now() { return android.os.SystemClock.elapsedRealtime(); }
+        }, this::publishTyping, this::typingChanged);
         connection = new AndroidChatConnection(application, new StompChatClient.Listener() {
             @Override public void onState(ChatConnectionState value) {
                 connectionState.setValue(value);
                 if (value != ChatConnectionState.CONNECTED) {
+                    typingSession.reset();
                     for (HumanConversation conversation : allConversations()) {
                         if (conversation.pending != null) conversation.pending.awaiting = false;
                     }
@@ -68,6 +78,12 @@ public final class HumanConversationsViewModel extends ViewModel {
                 notifyChanged();
             }
             @Override public void onMessage(ChatSendResponse event) { receive(event); }
+            @Override public void onTyping(com.example.astro_mobile.data.api.dto.ChatTypingData event) {
+                if (activeConversation == null || !event.senderId.equals(activeConversation.participantId)) return;
+                if (activeConversation.conversationId != null && !activeConversation.conversationId.equals(event.conversationId)) return;
+                long remaining = java.time.Duration.between(java.time.Instant.now(), java.time.Instant.parse(event.expiresAt)).toMillis();
+                typingSession.receive(event.typing, remaining);
+            }
             @Override public void onError(ChatSendError error) {
                 for (HumanConversation conversation : allConversations()) {
                     if (conversation.pending == null || !conversation.pending.request.clientMessageId.equals(error.clientMessageId)) continue;
@@ -88,9 +104,24 @@ public final class HumanConversationsViewModel extends ViewModel {
 
     public LiveData<Long> changes() { return changes; }
     public LiveData<ChatConnectionState> connectionState() { return connectionState; }
-    public void setForeground(boolean value) { connection.setForeground(value); }
+    public void setForeground(boolean value) {
+        if (!value) typingSession.reset();
+        connection.setForeground(value);
+    }
+    public LiveData<Boolean> peerTyping() { return peerTyping; }
+    private void typingChanged() { peerTyping.setValue(typingSession.isRemoteTyping()); }
+    private boolean publishTyping(com.example.astro_mobile.data.api.dto.ChatTypingRequest request) {
+        return connection != null && connection.client().sendTyping(request);
+    }
+    public void draftChanged(HumanConversation conversation) {
+        if (conversation == activeConversation) typingSession.edit(conversation.draft);
+    }
     public void retryConnection() { connection.request(); connection.client().retry(); }
     public void setActiveConversation(HumanConversation conversation) {
+        if (conversation != activeConversation) {
+            if (conversation == null) typingSession.close();
+            else typingSession.open(conversation.participantId, conversation.conversationId);
+        }
         activeConversation = conversation;
         if (conversation != null) connection.request();
         else readRepository.cancel();
@@ -309,6 +340,7 @@ public final class HumanConversationsViewModel extends ViewModel {
     }
 
     public boolean send(HumanConversation conversation) {
+        typingSession.stopLocal();
         if (connection.client().getState() != ChatConnectionState.CONNECTED) return false;
         if (conversation.pending != null && conversation.pending.awaiting) return false;
         if (conversation.pending == null) {
@@ -340,6 +372,10 @@ public final class HumanConversationsViewModel extends ViewModel {
     }
 
     private void receive(ChatSendResponse event) {
+        if (activeConversation != null && event.senderId.equals(activeConversation.participantId)
+                && (activeConversation.conversationId == null || activeConversation.conversationId.equals(event.conversationId))) {
+            typingSession.clearRemote();
+        }
         HumanConversation conversation = find(event.conversationId);
         if (conversation == null) {
             conversation = allConversations().stream().filter(item -> item.pending != null
@@ -387,6 +423,7 @@ public final class HumanConversationsViewModel extends ViewModel {
     }
 
     public void clearSession() {
+        typingSession.close();
         // Descarta mensagens e rascunhos ao voltar à identificação, inclusive após logout.
         cancelLoad();
         historyRepository.cancel();
@@ -421,6 +458,7 @@ public final class HumanConversationsViewModel extends ViewModel {
     }
 
     @Override protected void onCleared() {
+        typingSession.close();
         repository.cancel();
         historyRepository.cancel();
         readRepository.cancel();
