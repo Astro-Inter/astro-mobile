@@ -24,6 +24,13 @@ segunda conexão WebSocket, nem acrescenta mensagens ao histórico a partir do p
   usa o repository e a sessão Firebase existentes; somente identificadores são
   persistidos no trabalho, sem token ou prévia. Ao chegar outra mensagem, a foto
   do mesmo remetente no aviso ativo é preservada enquanto a nova busca ocorre.
+- A atualização da foto reconstrói o aviso com um builder novo, copiando somente
+  os identificadores internos, histórico e destino de abertura. Isso evita
+  reaproveitar metadados antigos do estilo nativo ao trocar as iniciais pela foto.
+- A chave visual do Person inclui uma impressão do conteúdo do avatar. Isso
+  invalida a representação anterior quando a foto muda, preservando a mesma
+  chave enquanto a imagem permanece igual. A identidade e a autorização do
+  remetente continuam usando o identificador da API.
 - Não adiciona ações de responder, marcar como lida ou silenciar; desabilita
   sugestões contextuais automáticas. A aparência final depende do Android e do
   fabricante. A versão pública da tela bloqueada continua genérica, sem avatar
@@ -65,8 +72,12 @@ ChatPushPolicyTest cobre primeiro plano, UID, duplicata, formato, limites Unicod
 e validade. Testes de repository/STOMP existentes também executados.
 ChatNotificationFactoryTest verifica estilo de conversa, avatar, ausência de
 ações, privacidade, limite e ordem das cinco prévias, atualização silenciosa sem
-duplicar mensagens e isolamento entre contas. O teste instrumentado foi
-compilado; a execução/inspeção da nova aparência no aparelho ficou para o usuário.
+duplicar mensagens e isolamento entre contas. Os cinco casos passaram no M31,
+incluindo a verificação do avatar no Person nativo do Android. O diagnóstico
+opt-in ChatNotificationAvatarDeviceTest passou consultando o remetente autorizado
+pela API e baixando sua foto HTTPS no aparelho, sem enviar mensagens ou publicar
+notificações. Ele requer o argumento avatar_sender_id; sem esse argumento,
+é ignorado. O teste não registra tokens, URL da imagem ou conteúdo da conversa.
 Sem aparelho conectado nesta etapa: entrega FCM real, toque, processo encerrado
 e comportamento visual do Android ainda dependem da instalação e do serviço ativo.
 Não há garantia de entrega/exibição: FCM, permissão, rede e sistema operacional

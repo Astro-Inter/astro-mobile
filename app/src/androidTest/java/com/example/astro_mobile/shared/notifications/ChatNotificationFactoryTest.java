@@ -70,6 +70,14 @@ public final class ChatNotificationFactoryTest {
         NotificationCompat.MessagingStyle style = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(updated);
         assertEquals(1, style.getMessages().size());
         assertTrue(photo.sameAs(senderPhoto(style, 0)));
+        assertNotEquals(NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(original)
+                .getMessages().get(0).getPerson().getKey(), style.getMessages().get(0).getPerson().getKey());
+        java.util.List<Notification.MessagingStyle.Message> nativeMessages = Notification.MessagingStyle.Message.getMessagesFromBundleArray(
+                updated.extras.getParcelableArray(Notification.EXTRA_MESSAGES));
+        assertEquals(1, nativeMessages.size());
+        android.graphics.drawable.Drawable nativeIcon = nativeMessages.get(0).getSenderPerson().getIcon().loadDrawable(context);
+        assertTrue(nativeIcon instanceof android.graphics.drawable.BitmapDrawable);
+        assertTrue(photo.sameAs(((android.graphics.drawable.BitmapDrawable) nativeIcon).getBitmap()));
         assertEquals("Olá", style.getMessages().get(0).getText().toString());
         assertTrue(ChatNotificationFactory.isLatest(updated, data));
         assertTrue(updated.actions == null || updated.actions.length == 0);

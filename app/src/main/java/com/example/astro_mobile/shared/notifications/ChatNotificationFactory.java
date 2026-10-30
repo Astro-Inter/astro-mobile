@@ -47,14 +47,14 @@ final class ChatNotificationFactory {
             NotificationCompat.MessagingStyle prior = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(previous);
             if (prior != null && !prior.getMessages().isEmpty()) {
                 Person lastSender = prior.getMessages().get(prior.getMessages().size() - 1).getPerson();
-                if (lastSender != null && Long.toString(message.senderId).equals(lastSender.getKey()) && lastSender.getIcon() != null) {
+                if (lastSender != null && matchesSender(lastSender.getKey(), message.senderId) && lastSender.getIcon() != null) {
                     Drawable retained = lastSender.getIcon().loadDrawable(context);
                     if (retained instanceof BitmapDrawable) avatar = ((BitmapDrawable) retained).getBitmap();
                 }
             }
         }
         if (avatar == null) avatar = initials(context, message.senderName);
-        Person sender = new Person.Builder().setName(message.senderName).setKey(Long.toString(message.senderId))
+        Person sender = new Person.Builder().setName(message.senderName).setKey(avatarKey(Long.toString(message.senderId), avatar))
                 .setIcon(IconCompat.createWithBitmap(avatar)).build();
         Person self = new Person.Builder().setName(context.getString(R.string.human_reply_you)).setKey(message.uid).build();
         NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(self).setGroupConversation(false);
@@ -77,10 +77,16 @@ final class ChatNotificationFactory {
         extras.putString(LAST_MESSAGE, message.messageId);
         extras.putString(ChatPushNotifications.CONVERSATION, message.conversationId);
         long timestamp = messages.isEmpty() ? message.createdAt.toEpochMilli() : messages.get(messages.size() - 1).getTimestamp();
+        return build(context, message.senderName, message.preview, timestamp, open, extras, style, avatar, avatarUpdate);
+    }
+
+    private static Notification build(Context context, CharSequence title, CharSequence text, long timestamp,
+                                      PendingIntent open, Bundle extras, NotificationCompat.MessagingStyle style,
+                                      Bitmap avatar, boolean avatarUpdate) {
         return new NotificationCompat.Builder(context, ChatPushNotifications.CHANNEL)
                 .setSmallIcon(R.drawable.ic_push_notification).setLargeIcon(avatar)
                 .setColor(context.getColor(R.color.astro_primary_purple))
-                .setContentTitle(message.senderName).setContentText(message.preview)
+                .setContentTitle(title).setContentText(text)
                 .setStyle(style).setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setWhen(timestamp).setShowWhen(true).setContentIntent(open).setAutoCancel(true)
                 .setOnlyAlertOnce(avatarUpdate).setAllowSystemGeneratedContextualActions(false)
@@ -98,11 +104,35 @@ final class ChatNotificationFactory {
                 .setGroupConversation(false);
         for (NotificationCompat.MessagingStyle.Message item : prior.getMessages()) {
             Person sender = item.getPerson();
-            if (sender != null) sender = sender.toBuilder().setIcon(IconCompat.createWithBitmap(photo)).build();
+            if (sender != null) sender = sender.toBuilder()
+                    .setKey(avatarKey(sender.getKey(), photo)).setIcon(IconCompat.createWithBitmap(photo)).build();
             style.addMessage(new NotificationCompat.MessagingStyle.Message(item.getText(), item.getTimestamp(), sender));
         }
-        return new NotificationCompat.Builder(context, previous).setLargeIcon(photo).setStyle(style)
-                .setOnlyAlertOnce(true).build();
+        // Copy only application metadata. Recovered notification extras may retain the
+        // previous framework MessagingStyle/avatars used by the system notification view.
+        Bundle extras = new Bundle();
+        extras.putString(RECIPIENT, previous.extras.getString(RECIPIENT));
+        extras.putString(LAST_MESSAGE, previous.extras.getString(LAST_MESSAGE));
+        extras.putString(ChatPushNotifications.CONVERSATION,
+                previous.extras.getString(ChatPushNotifications.CONVERSATION));
+        return build(context, previous.extras.getCharSequence(Notification.EXTRA_TITLE),
+                previous.extras.getCharSequence(Notification.EXTRA_TEXT), previous.when,
+                previous.contentIntent, extras, style, photo, true);
+    }
+
+    private static boolean matchesSender(String key, long senderId) {
+        String id = Long.toString(senderId);
+        return id.equals(key) || (key != null && key.startsWith(id + "#avatar:"));
+    }
+
+    private static String avatarKey(String sender, Bitmap photo) {
+        int separator = sender.indexOf("#avatar:");
+        String identity = separator < 0 ? sender : sender.substring(0, separator);
+        int[] pixels = new int[photo.getWidth() * photo.getHeight()];
+        photo.getPixels(pixels, 0, photo.getWidth(), 0, 0, photo.getWidth(), photo.getHeight());
+        // Some system notification views retain a sender avatar while its Person key
+        // stays unchanged. Version the presentation by image content, not by message.
+        return identity + "#avatar:" + Integer.toHexString(java.util.Arrays.hashCode(pixels));
     }
 
     private static Bitmap initials(Context context, String name) {
