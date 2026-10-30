@@ -102,6 +102,7 @@ public final class HumanChatFragment extends Fragment {
             if (conversation.pending != null) return;
             conversation.replyToMessageId = null;
             renderReply(view);
+            input.requestFocus();
         });
         renderReply(view);
         input.addTextChangedListener(new TextWatcher() {
