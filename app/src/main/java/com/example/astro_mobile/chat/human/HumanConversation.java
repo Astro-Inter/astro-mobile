@@ -22,11 +22,22 @@ public final class HumanConversation {
     public boolean loadingOlder;
     public boolean hasMore;
     public String nextCursor;
+    public HumanPendingSend pending;
+    public String sendErrorCode;
+    public long revision;
 
     public HumanConversation(String name, String role, boolean manager, int avatarIndex) {
         this.name = name;
         this.role = role;
         this.manager = manager;
         this.avatarIndex = avatarIndex;
+    }
+
+    public boolean addMessage(HumanMessage message) {
+        if (messages.stream().anyMatch(item -> message.id.equals(item.id))) return false;
+        messages.add(message);
+        messages.sort(java.util.Comparator.comparing((HumanMessage item) -> java.time.Instant.parse(item.createdAt))
+                .thenComparing(item -> item.id));
+        return true;
     }
 }

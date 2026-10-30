@@ -27,8 +27,6 @@ import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 public final class ConversationsFragment extends Fragment {
     private String query = "";
-    private Runnable finishLoading;
-    private boolean contactsLoaded;
     private boolean contacts;
     private boolean loadRequested;
     private HumanConversationsViewModel state;
@@ -41,7 +39,7 @@ public final class ConversationsFragment extends Fragment {
         NavController navigation = NavHostFragment.findNavController(this);
         contacts = navigation.getCurrentDestination().getId() == R.id.newConversationFragment;
         boolean manager = FlowPreferences.wasManagerFlow(requireContext());
-        state = new ViewModelProvider(requireActivity())
+        state = new ViewModelProvider(requireActivity(), HumanConversationsViewModel.Factory.createDefault(requireContext()))
                 .get(HumanConversationsViewModel.class);
 
         // Os dois destinos compartilham o layout; a pesquisa não tem introdução nem IA fixada.
@@ -66,6 +64,7 @@ public final class ConversationsFragment extends Fragment {
             args.putString(HumanChatFragment.PEER_ROLE, conversation.role);
             args.putInt(HumanChatFragment.PEER_AVATAR_INDEX, conversation.avatarIndex);
             args.putBoolean(HumanChatFragment.PEER_IS_MANAGER, conversation.manager);
+            if (conversation.participantId != null) args.putLong(HumanChatFragment.PEER_ID, conversation.participantId);
             if (conversation.conversationId != null) {
                 args.putString(HumanChatFragment.CONVERSATION_ID, conversation.conversationId);
             }
@@ -84,13 +83,12 @@ public final class ConversationsFragment extends Fragment {
                     getString(R.string.conversations_ai_title), query);
             view.findViewById(R.id.button_conversations_ai).setVisibility(showAi ? View.VISIBLE : View.GONE);
             view.findViewById(R.id.divider_conversations_ai).setVisibility(showAi ? View.VISIBLE : View.GONE);
-            if (!contacts) {
-                boolean firstLoad = state.isLoading() && !state.isLoaded();
-                view.findViewById(R.id.container_conversations_skeleton)
-                        .setVisibility(firstLoad ? View.VISIBLE : View.GONE);
-                list.setVisibility(firstLoad ? View.INVISIBLE : View.VISIBLE);
-                showLoadError();
-            }
+            boolean firstLoad = contacts ? state.isContactsLoading() && !state.isContactsLoaded()
+                    : state.isLoading() && !state.isLoaded();
+            view.findViewById(R.id.container_conversations_skeleton)
+                    .setVisibility(firstLoad ? View.VISIBLE : View.GONE);
+            list.setVisibility(firstLoad ? View.INVISIBLE : View.VISIBLE);
+            showLoadError();
         };
         // Cada edição atualiza a lista imediatamente, sem timer ou botão de pesquisa.
         search.addTextChangedListener(new TextWatcher() {
@@ -102,32 +100,22 @@ public final class ConversationsFragment extends Fragment {
             @Override public void afterTextChanged(Editable s) { }
         });
         renderList.run();
-
-        // Apenas a pesquisa de contatos simula a futura carga com um segundo de skeleton.
-        if (contacts && !contactsLoaded) {
-            View skeleton = view.findViewById(R.id.container_conversations_skeleton);
-            list.setVisibility(View.INVISIBLE);
-            skeleton.setVisibility(View.VISIBLE);
-            finishLoading = () -> {
-                contactsLoaded = true;
-                skeleton.setVisibility(View.GONE);
-                list.setVisibility(View.VISIBLE);
-                finishLoading = null;
-            };
-            view.postDelayed(finishLoading, 1_000L);
-        }
+        state.changes().observe(getViewLifecycleOwner(), ignored -> renderList.run());
+        state.connectionState().observe(getViewLifecycleOwner(), value -> {
+            if (value == com.example.astro_mobile.data.chat.ChatConnectionState.SESSION_EXPIRED) SessionNavigation.signOut(this);
+        });
     }
 
     @Override public void onResume() {
         super.onResume();
-        if (contacts) return;
         NavController navigation = NavHostFragment.findNavController(this);
         boolean retry = navigation.getCurrentBackStackEntry().getSavedStateHandle()
                 .remove("retry_human_chat_list") != null;
         // Voltar do erro ou do chat conserva os dados; só uma nova entrada ou retry consulta a API.
         if (retry || !loadRequested) {
             loadRequested = true;
-            state.loadConversations(renderList);
+            if (contacts) state.loadContacts(renderList);
+            else state.loadConversations(renderList);
         } else renderList.run();
     }
 
@@ -141,9 +129,10 @@ public final class ConversationsFragment extends Fragment {
     }
 
     @Override public void onDestroyView() {
-        if (finishLoading != null) requireView().removeCallbacks(finishLoading);
-        finishLoading = null;
-        if (!contacts) {
+        if (contacts) {
+            if (state.isContactsLoading()) loadRequested = false;
+            state.cancelContacts();
+        } else {
             if (state.isLoading()) loadRequested = false;
             state.cancelLoad();
         }

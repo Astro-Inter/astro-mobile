@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     root.post(() -> openPushIfReady(controller));
                 }
                 if (destinationId == R.id.emailIdentificationFragment) {
-                    new ViewModelProvider(this).get(HumanConversationsViewModel.class).clearSession();
+                    humanConversations().clearSession();
                 }
                 boolean isAuthenticationScreen = destinationId == R.id.emailIdentificationFragment
                         || destinationId == R.id.accessKeyInformationFragment
@@ -115,9 +115,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override protected void onStart() {
+        super.onStart();
+        humanConversations().setForeground(true);
+    }
+
+    @Override protected void onStop() {
+        humanConversations().setForeground(false);
+        super.onStop();
+    }
+
     @Override protected void onResume() {
         super.onResume();
         if (pushRegistration != null) pushRegistration.synchronize();
+    }
+    private HumanConversationsViewModel humanConversations() {
+        return new ViewModelProvider(this, HumanConversationsViewModel.Factory.createDefault(this))
+                .get(HumanConversationsViewModel.class);
     }
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent); setIntent(intent);

@@ -25,6 +25,10 @@
                     tools:text="Eletricista" />
             </LinearLayout>
         </LinearLayout>
+        <TextView android:id="@+id/text_human_chat_connection" style="@style/ManagerEventsCaption"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="48dp" android:gravity="center_vertical" android:paddingHorizontal="30dp"
+            android:accessibilityLiveRegion="polite" android:text="@string/human_chat_connecting" />
         <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_human_chat_messages"
                 android:layout_width="match_parent" android:layout_height="match_parent"
@@ -51,6 +55,7 @@
                     android:fontFamily="@font/montserrat_family" android:textSize="16sp" android:hint="@string/chat_input_hint"
                     android:textColor="@color/chat_text" android:textColorHint="@color/chat_muted"
                     android:inputType="textCapSentences|textMultiLine" android:imeOptions="actionSend"
+                    android:maxLength="4000"
                     android:importantForAutofill="no" android:saveEnabled="false" />
                 <ImageButton android:id="@+id/button_human_chat_send" android:layout_width="48dp" android:layout_height="48dp"
                     android:layout_gravity="end|center_vertical" android:layout_marginEnd="2dp"

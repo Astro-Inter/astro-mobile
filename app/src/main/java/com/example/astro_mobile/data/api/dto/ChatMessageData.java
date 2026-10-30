@@ -9,7 +9,10 @@ public final class ChatMessageData {
     public String createdAt;
 
     public boolean isValid(String expectedConversationId) {
-        return id != null && !id.isEmpty() && expectedConversationId.equals(conversationId)
-                && senderId != null && content != null && createdAt != null && !createdAt.isEmpty();
+        try {
+            java.time.Instant.parse(createdAt);
+            return id != null && !id.isEmpty() && expectedConversationId.equals(conversationId)
+                    && senderId != null && content != null;
+        } catch (RuntimeException invalid) { return false; }
     }
 }

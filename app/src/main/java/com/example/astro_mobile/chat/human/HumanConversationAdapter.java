@@ -47,8 +47,6 @@ public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanCo
         row.preview.setText(contacts ? conversation.role : conversation.lastMessageSent
                 ? row.itemView.getContext().getString(R.string.human_conversation_sent_preview,
                         conversation.lastMessageText) : conversation.lastMessageText);
-        int[] avatars = {R.drawable.participant_avatar_1, R.drawable.participant_avatar_2,
-                R.drawable.participant_avatar_3};
         Glide.with(row.avatar).clear(row.avatar);
         boolean remote = conversation.conversationId != null;
         row.initials.setVisibility(remote ? View.VISIBLE : View.GONE);
@@ -59,8 +57,7 @@ public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanCo
                     .placeholder(android.R.color.transparent).fallback(android.R.color.transparent)
                     .error(android.R.color.transparent).into(row.avatar);
         } else {
-            row.avatar.setImageResource(conversation.manager ? R.drawable.human_chat_manager_avatar
-                    : avatars[conversation.avatarIndex]);
+            row.avatar.setImageResource(R.drawable.profile_avatar_placeholder);
         }
         row.unread.setVisibility(!contacts && conversation.unreadCount > 0 ? View.VISIBLE : View.GONE);
         row.unread.setText(String.valueOf(conversation.unreadCount));

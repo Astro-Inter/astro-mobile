@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -18,11 +19,13 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
     private final List<HumanMessage> messages;
     private final int avatar;
     private final boolean manager;
+    private final String profilePhotoUrl;
 
-    public HumanMessagesAdapter(List<HumanMessage> messages, int avatar, boolean manager) {
+    public HumanMessagesAdapter(List<HumanMessage> messages, int avatar, boolean manager, String profilePhotoUrl) {
         this.messages = messages;
         this.avatar = avatar;
         this.manager = manager;
+        this.profilePhotoUrl = profilePhotoUrl;
     }
 
     @NonNull @Override
@@ -39,7 +42,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
         row.text.setTextColor(row.itemView.getContext().getColor(manager
                 ? R.color.chat_text : R.color.astro_light_background));
         row.time.setText(message.time);
-        row.avatar.setImageResource(avatar);
+        Glide.with(row.avatar).load(profilePhotoUrl).circleCrop().placeholder(avatar).fallback(avatar).error(avatar).into(row.avatar);
         row.avatar.setVisibility(message.sent ? View.GONE : View.VISIBLE);
         row.bubble.setBackgroundResource(message.sent ? R.drawable.bg_chat_user : R.drawable.bg_chat_assistant);
 
