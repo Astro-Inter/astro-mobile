@@ -85,6 +85,8 @@ public final class HumanMessageLayoutTest {
                 assertEquals(1, author.getLineCount());
                 assertEquals(1, ((TextView) reply.findViewById(R.id.text_human_message_content)).getLineCount());
                 float density = activity.getResources().getDisplayMetrics().density;
+                int timeGap = time.getTop() + ((View) time.getParent()).getTop() - text.getBottom();
+                assertTrue("Timestamp must stay close to the message", timeGap <= 12 * density);
                 assertTrue("Short replies must reserve readable space for the quote", quote.getWidth() >= 120 * density);
                 View replyTime = reply.findViewById(R.id.text_human_message_time);
                 assertTrue(replyTime.getTop() + ((View) replyTime.getParent()).getTop()
@@ -92,6 +94,7 @@ public final class HumanMessageLayoutTest {
                 View copy = reply.findViewById(R.id.button_human_message_copy);
                 assertEquals(activity.getString(R.string.human_message_copy), copy.getContentDescription());
                 assertTrue(copy.getWidth() >= 48 * density);
+                assertNotNull(reply.findViewById(R.id.container_human_message).getTouchDelegate());
                 copy.performClick();
                 assertEquals("Oi", copied.get());
                 assertEquals(4, list.get().getAdapter().getItemCount());

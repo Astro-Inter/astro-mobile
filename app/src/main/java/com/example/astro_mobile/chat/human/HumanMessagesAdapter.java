@@ -1,6 +1,8 @@
 package com.example.astro_mobile.chat.human;
 
+import android.graphics.Rect;
 import android.view.LayoutInflater;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -83,6 +85,16 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
             text = view.findViewById(R.id.text_human_message_content);
             time = view.findViewById(R.id.text_human_message_time);
             copy = view.findViewById(R.id.button_human_message_copy);
+            bubble.addOnLayoutChangeListener((changed, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+                // Extend into the footer margin and bottom padding, preserving a 48dp touch target.
+                float density = view.getResources().getDisplayMetrics().density;
+                Rect target = new Rect();
+                copy.getDrawingRect(target);
+                ((ViewGroup) bubble).offsetDescendantRectToMyCoords(copy, target);
+                target.top -= Math.round(2 * density);
+                target.bottom = target.top + Math.round(48 * density);
+                bubble.setTouchDelegate(new TouchDelegate(target, copy));
+            });
             quote = view.findViewById(R.id.container_human_quote);
             quoteAuthor = view.findViewById(R.id.text_human_quote_author);
             quoteContent = view.findViewById(R.id.text_human_quote_content);
