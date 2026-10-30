@@ -6,7 +6,6 @@
     <string name="chat_suggestion_nrs">O que são Normas Regulamentadoras?</string>
     <string name="chat_suggestion_dashboards">Quais NRs preciso cumprir?</string>
     <string name="chat_input_hint">Mensagem</string>
-    <string name="chat_add_attachment">Adicionar anexo</string>
     <string name="chat_send">Enviar mensagem</string>
     <string name="chat_loading">Astro está preparando a resposta…</string>
     <string name="chat_generic_error">Não foi possível receber a resposta. Tente novamente.</string>

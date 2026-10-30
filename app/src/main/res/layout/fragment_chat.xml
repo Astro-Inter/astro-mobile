@@ -188,21 +188,10 @@
             android:baselineAligned="false"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingStart="16dp"
+            android:paddingStart="30dp"
             android:paddingEnd="30dp"
             android:paddingVertical="20dp"
             android:layout_marginBottom="8dp">
-
-            <ImageButton
-                android:id="@+id/button_chat_add"
-                android:layout_width="44dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/bg_login_icon_button"
-                android:contentDescription="@string/chat_add_attachment"
-                android:padding="13dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/chat_add" />
 
             <FrameLayout
                 android:layout_width="0dp"
