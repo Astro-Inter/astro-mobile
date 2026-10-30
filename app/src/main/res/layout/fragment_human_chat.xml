@@ -33,7 +33,7 @@
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_human_chat_messages"
                 android:layout_width="match_parent" android:layout_height="match_parent"
                 android:clipToPadding="false" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" app:stackFromEnd="true"
                 tools:listitem="@layout/item_chat_message" tools:itemCount="2" />
             <include android:id="@+id/skeleton_human_chat" layout="@layout/view_human_chat_skeleton"
                 android:visibility="gone" tools:visibility="gone" />
