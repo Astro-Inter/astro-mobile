@@ -87,6 +87,8 @@ primeiro envio confirmado.
 - Logout ou mudança de identidade encerra inscrições e transporte, cancela
   consultas/timers e apaga mensagens, rascunhos e operações da sessão anterior.
 - O balão enviado aparece apenas após a confirmação privada do servidor.
+  O status normal de conexão fica oculto; avisos de conexão, falha e envio
+  pendente aparecem somente enquanto necessários, sem reservar espaço no estado normal.
   A confirmação comprova persistência, contagem e publicação no backend; não é
   um comprovante de recebimento no outro aparelho ou de leitura.
 - Confirmação ausente por 20s, desconexão ou erros de infraestrutura deixam a

@@ -61,7 +61,7 @@ public final class HumanChatUiDeviceTest {
             });
             await(() -> conversation.loaded && !conversation.historyLoading
                     && model.get().connectionState().getValue() == ChatConnectionState.CONNECTED);
-            onView(withId(R.id.text_human_chat_connection)).check(matches(withText(R.string.human_chat_connected)));
+            onView(withId(R.id.text_human_chat_connection)).check(matches(withEffectiveVisibility(Visibility.GONE)));
             onView(withId(R.id.list_human_chat_messages)).check(matches(isDisplayed()));
             onView(withId(R.id.button_human_chat_send)).check(matches(isEnabled()));
             assertFalse(conversation.messages.isEmpty());
@@ -76,7 +76,7 @@ public final class HumanChatUiDeviceTest {
                 scenario.moveToState(Lifecycle.State.RESUMED);
                 await(() -> model.get().connectionState().getValue() == ChatConnectionState.CONNECTED && !conversation.historyLoading);
                 onView(withId(R.id.input_human_chat_message)).check(matches(withText("Rascunho de teste sem envio")));
-                onView(withId(R.id.text_human_chat_connection)).check(matches(withText(R.string.human_chat_connected)));
+                onView(withId(R.id.text_human_chat_connection)).check(matches(withEffectiveVisibility(Visibility.GONE)));
             } finally {
                 onMain(() -> conversation.draft = original);
             }

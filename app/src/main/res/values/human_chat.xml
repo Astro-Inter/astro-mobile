@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="human_chat_connected">Conectado</string>
     <string name="human_chat_connecting">Conectando…</string>
     <string name="human_chat_reconnecting">Reconectando… Seu rascunho está preservado.</string>
     <string name="human_chat_disconnected">Sem conexão com o chat. Toque para tentar novamente.</string>

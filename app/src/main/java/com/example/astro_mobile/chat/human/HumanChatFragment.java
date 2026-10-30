@@ -200,7 +200,7 @@ public final class HumanChatFragment extends Fragment {
         int label;
         if (connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTED) {
             label = conversation.pending == null ? (conversation.sendErrorCode == null
-                    ? R.string.human_chat_connected : R.string.human_chat_send_error)
+                    ? 0 : R.string.human_chat_send_error)
                     : conversation.pending.awaiting ? R.string.human_chat_sending : R.string.human_chat_uncertain;
         } else if (connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTING) {
             label = R.string.human_chat_connecting;
@@ -211,7 +211,9 @@ public final class HumanChatFragment extends Fragment {
         } else if (connection == com.example.astro_mobile.data.chat.ChatConnectionState.TLS_FAILED) {
             label = R.string.human_chat_tls_failed;
         } else label = R.string.human_chat_disconnected;
-        ((TextView) view.findViewById(R.id.text_human_chat_connection)).setText(label);
+        TextView status = view.findViewById(R.id.text_human_chat_connection);
+        status.setVisibility(label == 0 ? View.GONE : View.VISIBLE);
+        if (label != 0) status.setText(label);
         input.setEnabled(conversation.pending == null);
         view.findViewById(R.id.button_human_chat_send).setEnabled(
                 connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTED
