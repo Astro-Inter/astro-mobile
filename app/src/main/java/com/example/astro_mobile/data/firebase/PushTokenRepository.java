@@ -83,6 +83,7 @@ public final class PushTokenRepository {
     public synchronized Task<Void> beginLogout() {
         String uid = auth.getCurrentUser() == null ? preferences.uid() : auth.getCurrentUser().getUid();
         preferences.beginLogout(uid);
+        com.example.astro_mobile.shared.notifications.ChatPushNotifications.clear(context);
         androidx.core.app.NotificationManagerCompat.from(context).cancel("astro_pending_events", 1001);
         return completePendingLogout();
     }

@@ -18,6 +18,8 @@ public final class AstroMessagingService extends FirebaseMessagingService {
         // O FCM pode iniciar um processo encerrado antes de a sessão local ser restaurada.
         try { Tasks.await(PushTokenRepository.initialize(this).sessionInitialized(), 5, TimeUnit.SECONDS); }
         catch (Exception unavailable) { return; }
-        PendingEventNotifications.show(this, message.getData());
+        if ("chat_message".equals(message.getData().get("type"))) {
+            com.example.astro_mobile.shared.notifications.ChatPushNotifications.show(this, message.getData());
+        } else PendingEventNotifications.show(this, message.getData());
     }
 }
