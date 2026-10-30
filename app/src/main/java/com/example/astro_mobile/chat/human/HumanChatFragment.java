@@ -131,13 +131,13 @@ public final class HumanChatFragment extends Fragment {
                 messages.setVisibility(View.VISIBLE);
                 view.findViewById(R.id.container_human_chat_composer).setVisibility(View.VISIBLE);
             }
-            renderConnection(view, input);
+            renderConnection(view);
             renderReply(view);
         });
         state.connectionState().observe(getViewLifecycleOwner(), value -> {
             if (value == com.example.astro_mobile.data.chat.ChatConnectionState.SESSION_EXPIRED) {
                 com.example.astro_mobile.auth.SessionNavigation.signOut(this);
-            } else renderConnection(view, input);
+            } else renderConnection(view);
         });
         view.findViewById(R.id.text_human_chat_connection).setOnClickListener(clicked -> state.retryConnection());
     }
@@ -213,7 +213,7 @@ public final class HumanChatFragment extends Fragment {
         }
     }
 
-    private void renderConnection(View view, EditText input) {
+    private void renderConnection(View view) {
         com.example.astro_mobile.data.chat.ChatConnectionState connection = state.connectionState().getValue();
         int label;
         if (connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTED) {
@@ -232,7 +232,8 @@ public final class HumanChatFragment extends Fragment {
         TextView status = view.findViewById(R.id.text_human_chat_connection);
         status.setVisibility(label == 0 ? View.GONE : View.VISIBLE);
         if (label != 0) status.setText(label);
-        input.setEnabled(conversation.pending == null);
+        // Keep the editor focused while the server acknowledges the current send.
+        // The pending request owns its content; edits remain the next draft.
         view.findViewById(R.id.button_human_chat_send).setEnabled(
                 connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTED
                         && (conversation.pending == null || !conversation.pending.awaiting));

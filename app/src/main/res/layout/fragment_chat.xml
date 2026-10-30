@@ -223,6 +223,7 @@
 
                 <ImageButton
                     android:id="@+id/button_chat_send"
+                    android:focusable="false"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="end|center_vertical"
