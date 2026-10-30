@@ -50,6 +50,14 @@ public final class HumanChatHistoryRepository {
 
     private interface ReadCallback { void onComplete(FailureKind failure); }
 
+    public void markAsRead(String conversationId, ResultCallback callback) {
+        cancel();
+        markRead(conversationId, false, requestId, failure -> {
+            if (failure == null) callback.onMarkedRead();
+            else callback.onFailure(failure);
+        });
+    }
+
     private void markRead(String conversationId, boolean refreshed, int id, ReadCallback callback) {
         getToken(refreshed, id, (token, tokenFailure) -> {
             if (id != requestId) return;

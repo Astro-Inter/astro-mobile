@@ -15,6 +15,7 @@ import com.example.astro_mobile.data.api.dto.CollaboratorEventData;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventDetailsData;
 import com.example.astro_mobile.data.api.dto.ChatConversationData;
 import com.example.astro_mobile.data.api.dto.ChatMessagePageData;
+import com.example.astro_mobile.data.api.dto.ChatContactData;
 import com.example.astro_mobile.data.api.dto.ManagerEventData;
 import com.example.astro_mobile.data.api.dto.CollaboratorSummaryData;
 import com.example.astro_mobile.data.api.dto.CollaboratorProfileData;
@@ -52,6 +53,10 @@ public interface AstroApi {
 
     @GET("chats")
     Call<List<ChatConversationData>> getChats(@Header("Authorization") String authorization);
+
+    @GET("chats/contacts")
+    Call<ApiResponse<List<ChatContactData>>> getChatContacts(
+            @Header("Authorization") String authorization);
 
     @GET("chats/{conversationId}/messages")
     Call<ApiResponse<ChatMessagePageData>> getChatMessages(

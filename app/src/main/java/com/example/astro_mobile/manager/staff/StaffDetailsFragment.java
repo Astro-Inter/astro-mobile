@@ -87,6 +87,8 @@ public final class StaffDetailsFragment extends Fragment {
             Bundle args = AuthArgs.copy(getArguments());
             args.putString(HumanChatFragment.PEER_NAME, data.name);
             args.putString(HumanChatFragment.PEER_ROLE, data.roleName);
+            args.putLong(HumanChatFragment.PEER_ID, data.id);
+            args.putBoolean(HumanChatFragment.PEER_IS_MANAGER, false);
             NavHostFragment.findNavController(this).navigate(R.id.action_staff_details_to_human_chat, args);
         });
         view.findViewById(R.id.button_staff_details_pending).setOnClickListener(v ->

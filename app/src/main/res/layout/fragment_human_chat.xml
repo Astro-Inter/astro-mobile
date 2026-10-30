@@ -25,6 +25,10 @@
                     tools:text="Eletricista" />
             </LinearLayout>
         </LinearLayout>
+        <TextView android:id="@+id/text_human_chat_connection" style="@style/ManagerEventsCaption"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="48dp" android:gravity="center_vertical" android:paddingHorizontal="30dp"
+            android:accessibilityLiveRegion="polite" android:text="@string/human_chat_connecting" />
         <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_human_chat_messages"
                 android:layout_width="match_parent" android:layout_height="match_parent"
@@ -34,6 +38,20 @@
             <include android:id="@+id/skeleton_human_chat" layout="@layout/view_human_chat_skeleton"
                 android:visibility="gone" tools:visibility="gone" />
         </FrameLayout>
+        <LinearLayout android:id="@+id/container_human_reply" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@drawable/bg_chat_input" android:paddingStart="16dp" android:visibility="gone">
+            <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                android:orientation="vertical" android:paddingVertical="12dp">
+                <TextView android:id="@+id/text_human_reply_author" style="@style/ManagerEventsCaption"
+                    android:textColor="@color/chat_link" android:textStyle="bold" />
+                <TextView android:id="@+id/text_human_reply_content" style="@style/ManagerEventsCaption"
+                    android:layout_marginTop="4dp" android:maxLines="2" android:ellipsize="end" />
+            </LinearLayout>
+            <Button android:id="@+id/button_human_reply_cancel" android:layout_width="48dp" android:layout_height="48dp"
+                android:text="×" android:textSize="24sp" android:textColor="@color/chat_text" android:background="@drawable/bg_login_icon_button"
+                android:contentDescription="@string/human_reply_cancel" />
+        </LinearLayout>
         <LinearLayout android:id="@+id/container_human_chat_composer" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:minHeight="100dp" android:orientation="horizontal"
             android:gravity="center_vertical" android:baselineAligned="false" android:paddingStart="16dp"
@@ -51,6 +69,7 @@
                     android:fontFamily="@font/montserrat_family" android:textSize="16sp" android:hint="@string/chat_input_hint"
                     android:textColor="@color/chat_text" android:textColorHint="@color/chat_muted"
                     android:inputType="textCapSentences|textMultiLine" android:imeOptions="actionSend"
+                    android:maxLength="4000"
                     android:importantForAutofill="no" android:saveEnabled="false" />
                 <ImageButton android:id="@+id/button_human_chat_send" android:layout_width="48dp" android:layout_height="48dp"
                     android:layout_gravity="end|center_vertical" android:layout_marginEnd="2dp"

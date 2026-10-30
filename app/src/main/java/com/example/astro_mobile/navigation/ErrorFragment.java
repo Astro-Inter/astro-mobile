@@ -52,7 +52,7 @@ public class ErrorFragment extends Fragment {
                 || source == R.id.managerHomeFragment || source == R.id.notificationsFragment
                 || source == R.id.aiSessionsFragment || source == R.id.chatFragment
                 || source == R.id.employeeEventDetailsFragment || source == R.id.conversationsFragment
-                || source == R.id.humanChatFragment
+                || source == R.id.humanChatFragment || source == R.id.newConversationFragment
                 || source == R.id.managerFormsFragment || source == R.id.formDetailsFragment
                 || source == R.id.formAnswerFragment || source == R.id.managerEventsFragment
                 || source == R.id.staffFragment || source == R.id.staffDetailsFragment
@@ -68,7 +68,7 @@ public class ErrorFragment extends Fragment {
                 if (source == R.id.aiSessionsFragment && conversation != null) {
                     navController.getBackStackEntry(source).getSavedStateHandle()
                             .set("retry_ai_conversation", conversation);
-                } else if (source == R.id.conversationsFragment) {
+                } else if (source == R.id.conversationsFragment || source == R.id.newConversationFragment) {
                     previous.getSavedStateHandle().set("retry_human_chat_list", true);
                 } else if (source == R.id.humanChatFragment) {
                     previous.getSavedStateHandle().set("retry_human_chat_history", true);

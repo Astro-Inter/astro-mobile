@@ -8,6 +8,7 @@ public final class AstroApplication extends Application {
     @Override public void onCreate() {
         super.onCreate();
         PendingEventNotifications.createChannel(this);
+        com.example.astro_mobile.shared.notifications.ChatPushNotifications.createChannel(this);
         PushTokenRepository.initialize(this);
     }
 }

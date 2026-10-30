@@ -89,6 +89,7 @@
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
 
+    <action android:id="@+id/action_global_human_chat" app:destination="@id/humanChatFragment" app:launchSingleTop="true" />
     <action android:id="@+id/action_global_conversations" app:destination="@id/conversationsFragment"
         app:launchSingleTop="true"
         app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"

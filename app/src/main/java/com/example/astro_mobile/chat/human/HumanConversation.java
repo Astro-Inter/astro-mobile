@@ -17,16 +17,34 @@ public final class HumanConversation {
     public final int avatarIndex;
     public final List<HumanMessage> messages = new ArrayList<>();
     public String draft = "";
+    public String replyToMessageId;
+
+    public HumanMessage findMessage(String id) {
+        if (id == null) return null;
+        for (HumanMessage message : messages) if (id.equals(message.id)) return message;
+        return null;
+    }
     public boolean loaded;
     public boolean historyLoading;
     public boolean loadingOlder;
     public boolean hasMore;
     public String nextCursor;
+    public HumanPendingSend pending;
+    public String sendErrorCode;
+    public long revision;
 
     public HumanConversation(String name, String role, boolean manager, int avatarIndex) {
         this.name = name;
         this.role = role;
         this.manager = manager;
         this.avatarIndex = avatarIndex;
+    }
+
+    public boolean addMessage(HumanMessage message) {
+        if (messages.stream().anyMatch(item -> message.id.equals(item.id))) return false;
+        messages.add(message);
+        messages.sort(java.util.Comparator.comparing((HumanMessage item) -> java.time.Instant.parse(item.createdAt))
+                .thenComparing(item -> item.id));
+        return true;
     }
 }

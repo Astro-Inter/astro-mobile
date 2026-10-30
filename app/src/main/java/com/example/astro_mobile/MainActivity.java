@@ -1,5 +1,13 @@
 package com.example.astro_mobile;
 
+import android.app.NotificationManager;
+import android.widget.Toast;
+import androidx.lifecycle.Lifecycle;
+import com.example.astro_mobile.shared.notifications.ChatPushNavigationViewModel;
+import com.example.astro_mobile.shared.notifications.ChatPushNotifications;
+import com.example.astro_mobile.data.api.dto.ChatConversationData;
+import com.example.astro_mobile.chat.human.HumanChatFragment;
+import java.util.UUID;
 import android.os.Bundle;
 import android.os.Build;
 import android.Manifest;
@@ -34,6 +42,8 @@ import com.example.astro_mobile.shared.notifications.PendingEventNotifications;
 import com.example.astro_mobile.shared.notifications.PushRegistrationViewModel;
 
 public class MainActivity extends AppCompatActivity {
+    private boolean openingChatPush;
+    private ChatPushNavigationViewModel chatPushNavigation;
     private PushRegistrationViewModel pushRegistration;
     private final ActivityResultLauncher<String> notificationPermission = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), granted -> { if (granted) pushRegistration.synchronize(); });
@@ -43,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
         // Prepara a splash nativa e permite desenhar sob as barras do sistema.
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
+        chatPushNavigation = new ViewModelProvider(this,
+                new ChatPushNavigationViewModel.Factory())
+                .get(ChatPushNavigationViewModel.class);
         pushRegistration = new ViewModelProvider(this, PushRegistrationViewModel.Factory.createDefault(this))
                 .get(PushRegistrationViewModel.class);
         EdgeToEdge.enable(
@@ -73,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     root.post(() -> openPushIfReady(controller));
                 }
                 if (destinationId == R.id.emailIdentificationFragment) {
-                    new ViewModelProvider(this).get(HumanConversationsViewModel.class).clearSession();
+                    humanConversations().clearSession();
                 }
                 boolean isAuthenticationScreen = destinationId == R.id.emailIdentificationFragment
                         || destinationId == R.id.accessKeyInformationFragment
@@ -115,12 +128,35 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override protected void onStart() {
+        super.onStart();
+        ChatPushNotifications.setForeground(true);
+        humanConversations().setForeground(true);
+    }
+
+    @Override protected void onStop() {
+        chatPushNavigation.cancel();
+        openingChatPush = false;
+        ChatPushNotifications.setForeground(false);
+        humanConversations().setForeground(false);
+        super.onStop();
+    }
+
     @Override protected void onResume() {
         super.onResume();
         if (pushRegistration != null) pushRegistration.synchronize();
+        NavHostFragment host = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        if (host != null) openPushIfReady(host.getNavController());
+    }
+    private HumanConversationsViewModel humanConversations() {
+        return new ViewModelProvider(this, HumanConversationsViewModel.Factory.createDefault(this))
+                .get(HumanConversationsViewModel.class);
     }
     @Override protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent); setIntent(intent);
+        super.onNewIntent(intent);
+        chatPushNavigation.cancel();
+        openingChatPush = false;
+        setIntent(intent);
         NavHostFragment host = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         if (host != null) openPushIfReady(host.getNavController());
     }
@@ -143,13 +179,68 @@ public class MainActivity extends AppCompatActivity {
             // A Home na pilha comprova que o fluxo autenticado já foi estabelecido.
             authenticatedArgs = controller.getBackStackEntry(home).getArguments();
         } catch (IllegalArgumentException notAuthenticatedYet) { return; }
+        if (!pushRegistration.isCurrentUser(uid)) {
+            getIntent().removeExtra(PendingEventNotifications.RECIPIENT);
+            getIntent().removeExtra(ChatPushNotifications.CONVERSATION);
+            getIntent().removeExtra(ChatPushNotifications.MESSAGE);
+            return;
+        }
+        String conversationId = getIntent().getStringExtra(ChatPushNotifications.CONVERSATION);
+        if (conversationId != null) {
+            openChatPush(controller, authenticatedArgs, uid, conversationId, home);
+            return;
+        }
         getIntent().removeExtra(PendingEventNotifications.RECIPIENT);
-        if (!pushRegistration.isCurrentUser(uid)) return;
         int events = home == R.id.managerHomeFragment ? R.id.managerEventsFragment : R.id.employeeEventsFragment;
         if (controller.getCurrentDestination().getId() == events) return;
         int action = home == R.id.managerHomeFragment
                 ? R.id.action_global_manager_events : R.id.action_global_employee_events;
         controller.navigate(action, AuthArgs.copy(authenticatedArgs));
+    }
+
+    private void openChatPush(NavController controller, Bundle authenticatedArgs, String uid, String conversationId, int home) {
+        if (openingChatPush || !getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) return;
+        try {
+            if (!UUID.fromString(conversationId).toString().equals(conversationId)) return;
+        } catch (RuntimeException invalid) { return; }
+        openingChatPush = true;
+        chatPushNavigation.load(conversationId, new ChatPushNavigationViewModel.Callback() {
+            @Override public void onFailure() {
+                openingChatPush = false;
+                if (canOpenChatPush(uid, conversationId))
+                    Toast.makeText(MainActivity.this, R.string.push_chat_open_error, Toast.LENGTH_LONG).show();
+            }
+            @Override public void onResult(ChatConversationData conversation) {
+                openingChatPush = false;
+                if (!canOpenChatPush(uid, conversationId)) return;
+                getIntent().removeExtra(PendingEventNotifications.RECIPIENT);
+                getIntent().removeExtra(ChatPushNotifications.CONVERSATION);
+                getIntent().removeExtra(ChatPushNotifications.MESSAGE);
+                if (conversation == null) {
+                    Toast.makeText(MainActivity.this, R.string.push_chat_open_error, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Bundle args = AuthArgs.copy(authenticatedArgs);
+                args.putString(HumanChatFragment.CONVERSATION_ID, conversationId);
+                boolean manager = conversation.participant.role.startsWith("GESTOR");
+                args.putLong(HumanChatFragment.PEER_ID, conversation.participant.id);
+                args.putString(HumanChatFragment.PEER_NAME, conversation.participant.name);
+                args.putString(HumanChatFragment.PEER_ROLE, manager ? "Gestor" : "Colaborador");
+                args.putBoolean(HumanChatFragment.PEER_IS_MANAGER, manager);
+                controller.navigate(R.id.action_global_human_chat, args,
+                        new NavOptions.Builder().setPopUpTo(home, false).setLaunchSingleTop(true).build());
+                getSystemService(NotificationManager.class).cancel(
+                        ChatPushNotifications.CHANNEL + ":" + conversationId, 2001);
+            }
+        });
+    }
+
+    private boolean canOpenChatPush(String uid, String conversationId) {
+        return !isFinishing() && !isDestroyed()
+                && getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)
+                && pushRegistration.isCurrentUser(uid)
+                && conversationId.equals(getIntent().getStringExtra(
+                ChatPushNotifications.CONVERSATION));
     }
 
     private void configureBottomNavigation(NavController navigation, View navbar) {

@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="human_chat_integration_pending">O envio de mensagens ainda não está disponível.</string>
+    <string name="human_reply_action">Responder</string>
+    <string name="human_reply_copy">Copiar texto</string>
+    <string name="human_reply_cancel">Cancelar resposta</string>
+    <string name="human_reply_you">Você</string>
+    <string name="human_reply_to">Respondendo a %1$s</string>
+    <string name="human_reply_missing">Mensagem anterior não carregada</string>
+    <string name="human_reply_load_older">Carregue as mensagens anteriores para ver a citação.</string>
+    <string name="human_reply_accessibility">Mensagem de %1$s, %2$s: %3$s. Toque para ver as opções.</string>
+    <string name="human_chat_connecting">Conectando…</string>
+    <string name="human_chat_reconnecting">Reconectando… Seu rascunho está preservado.</string>
+    <string name="human_chat_disconnected">Sem conexão com o chat. Toque para tentar novamente.</string>
+    <string name="human_chat_rejected">Conexão recusada pelo servidor. Verifique o acesso da conta e toque para tentar novamente.</string>
+    <string name="human_chat_tls_failed">Não foi possível validar o certificado do chat. Verifique a rede ou a inspeção HTTPS e toque para tentar novamente.</string>
+    <string name="human_chat_sending">Aguardando confirmação do servidor…</string>
+    <string name="human_chat_uncertain">Envio sem confirmação. Toque na seta para repetir a mesma operação.</string>
+    <string name="human_chat_send_error">O servidor recusou o envio. Revise o destinatário e a mensagem antes de tentar novamente.</string>
     <plurals name="human_conversation_unread">
         <item quantity="one">%1$d mensagem não lida</item>
         <item quantity="other">%1$d mensagens não lidas</item>
     </plurals>
-    <string name="human_chat_attachment_pending">Anexos ainda não estão disponíveis nesta demonstração.</string>
+    <string name="human_chat_attachment_pending">Anexos ainda não estão disponíveis.</string>
     <string name="human_conversation_manager_label">&lt;b>Gestor - &lt;/b>%1$s</string>
     <string name="human_conversation_sent_preview">Você: %1$s</string>
 </resources>

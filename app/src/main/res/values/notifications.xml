@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="push_chat_channel">Mensagens do chat</string>
+    <string name="push_chat_private">Você recebeu uma nova mensagem no Astro</string>
+    <string name="push_chat_open_error">Não foi possível abrir a conversa. Tente novamente pela lista de conversas.</string>
     <string name="notifications_title">Alertas</string>
     <string name="notifications_back">Voltar</string>
     <string name="notifications_close">Fechar alerta</string>
