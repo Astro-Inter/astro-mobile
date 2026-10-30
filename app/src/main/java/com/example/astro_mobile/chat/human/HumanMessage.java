@@ -6,6 +6,7 @@ public final class HumanMessage {
     public final boolean sent;
     public String id;
     public String createdAt;
+    public String replyToMessageId;
 
     public HumanMessage(String text, String time, boolean sent) {
         this.text = text;

@@ -5,6 +5,19 @@ import com.google.gson.Gson;
 import org.junit.Test;
 
 public final class HumanPendingSendTest {
+    @Test public void replyKeepsOriginalReferenceAndContentOnManualRetry() {
+        HumanConversation conversation = new HumanConversation("Contato", "Gestor", true, 0);
+        conversation.participantId = 25L;
+        conversation.conversationId = "11111111-2222-4333-8444-555555555555";
+        conversation.replyToMessageId = "22222222-3333-4444-8555-666666666666";
+        conversation.draft = "Resposta à mensagem";
+        HumanPendingSend pending = new HumanPendingSend(conversation);
+        conversation.replyToMessageId = null;
+        conversation.draft = "Outro rascunho";
+        assertEquals("22222222-3333-4444-8555-666666666666", pending.request.replyToMessageId);
+        assertEquals("Resposta à mensagem", pending.request.content);
+        assertTrue(new Gson().toJson(pending.request).contains("replyToMessageId"));
+    }
     @Test public void firstMessageUsesInternalRecipientAndKeepsOperationAndOriginalContentOnRetry() {
         HumanConversation conversation = new HumanConversation("Contato autorizado", "Gestor", true, 0);
         conversation.participantId = 25L;

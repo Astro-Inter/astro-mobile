@@ -272,6 +272,7 @@ public final class HumanConversationsViewModel extends ViewModel {
         HumanMessage result = new HumanMessage(data.content, time, sent);
         result.id = data.id;
         result.createdAt = data.createdAt;
+        result.replyToMessageId = data.replyToMessageId;
         return result;
     }
 
@@ -356,6 +357,7 @@ public final class HumanConversationsViewModel extends ViewModel {
                 && !event.senderId.equals(conversation.participantId)) {
             cancelConfirmation(conversation);
             if (conversation.draft.equals(conversation.pending.request.content)) conversation.draft = "";
+            conversation.replyToMessageId = null;
             conversation.pending = null;
             conversation.sendErrorCode = null;
         }
@@ -397,6 +399,7 @@ public final class HumanConversationsViewModel extends ViewModel {
         for (HumanConversation conversation : allConversations()) {
             conversation.messages.clear();
             conversation.draft = "";
+            conversation.replyToMessageId = null;
             conversation.pending = null;
             conversation.unreadCount = 0;
         }

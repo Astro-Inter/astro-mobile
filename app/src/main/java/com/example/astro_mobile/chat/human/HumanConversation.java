@@ -17,6 +17,13 @@ public final class HumanConversation {
     public final int avatarIndex;
     public final List<HumanMessage> messages = new ArrayList<>();
     public String draft = "";
+    public String replyToMessageId;
+
+    public HumanMessage findMessage(String id) {
+        if (id == null) return null;
+        for (HumanMessage message : messages) if (id.equals(message.id)) return message;
+        return null;
+    }
     public boolean loaded;
     public boolean historyLoading;
     public boolean loadingOlder;

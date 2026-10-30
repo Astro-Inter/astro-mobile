@@ -10,6 +10,6 @@ public final class HumanPendingSend {
 
     public HumanPendingSend(HumanConversation conversation) {
         request = new ChatSendRequest(conversation.participantId, conversation.conversationId,
-                conversation.draft, UUID.randomUUID().toString());
+                conversation.draft, UUID.randomUUID().toString(), conversation.replyToMessageId);
     }
 }

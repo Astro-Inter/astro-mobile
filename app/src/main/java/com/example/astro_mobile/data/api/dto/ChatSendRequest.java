@@ -9,10 +9,14 @@ public final class ChatSendRequest {
     public final String clientMessageId;
 
     public ChatSendRequest(Long recipientId, String conversationId, String content, String clientMessageId) {
+        this(recipientId, conversationId, content, clientMessageId, null);
+    }
+
+    public ChatSendRequest(Long recipientId, String conversationId, String content, String clientMessageId, String replyToMessageId) {
         this.recipientId = conversationId == null ? recipientId : null;
         this.conversationId = conversationId;
         this.content = content;
-        this.replyToMessageId = null;
+        this.replyToMessageId = replyToMessageId;
         this.clientMessageId = clientMessageId;
     }
 }
