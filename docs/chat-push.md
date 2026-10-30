@@ -10,6 +10,19 @@ segunda conexão WebSocket, nem acrescenta mensagens ao histórico a partir do p
 - Em segundo plano, mostra nome do remetente e prévia; na tela bloqueada oferece
   uma versão pública genérica, respeitando as configurações do Android.
 - Substitui o aviso anterior da mesma conversa, sem acumular uma entrada por mensagem.
+- Usa MessagingStyle e Person do Android: remetente e horário separados, avatar
+  circular e até cinco prévias recentes da conversa ao expandir. O histórico
+  visual vem somente do aviso ainda ativo, sem persistir novas prévias em disco;
+  ao dispensar o aviso ou trocar de conta, a próxima apresentação começa limpa.
+- Exibe iniciais imediatamente e tenta enriquecer com a foto HTTPS retornada por
+  HumanChatRepository (GET /chats), verificando conversa e participante. Falha de
+  rede ou foto ausente mantém as iniciais. A atualização da imagem é silenciosa
+  e só ocorre se o aviso ainda existe, pertence à mesma conta/mensagem e o app
+  continua em segundo plano; não recria aviso dispensado nem repete mensagens.
+- Não adiciona ações de responder, marcar como lida ou silenciar; desabilita
+  sugestões contextuais automáticas. A aparência final depende do Android e do
+  fabricante. A versão pública da tela bloqueada continua genérica, sem avatar
+  do remetente, nome ou prévia. Não há mudanças no contrato FCM, Worker ou API.
 - Filtra UID atual, logout pendente, mensagem repetida, formato e validade de 24h.
   Guarda até 1.024 recibos locais por 24h. O logout remove os avisos e recibos.
 - Ao tocar, mantém o destino durante a autenticação. Busca a lista autorizada
@@ -45,7 +58,54 @@ O contrato entre a API e o Worker está em docs/chat-push.md de ambos os serviç
 Verificações locais: testDebugUnitTest (156 casos) e assembleDebug aprovados.
 ChatPushPolicyTest cobre primeiro plano, UID, duplicata, formato, limites Unicode
 e validade. Testes de repository/STOMP existentes também executados.
+ChatNotificationFactoryTest verifica estilo de conversa, avatar, ausência de
+ações, privacidade, limite e ordem das cinco prévias, atualização silenciosa sem
+duplicar mensagens e isolamento entre contas. O teste instrumentado foi
+compilado; a execução/inspeção da nova aparência no aparelho ficou para o usuário.
 Sem aparelho conectado nesta etapa: entrega FCM real, toque, processo encerrado
 e comportamento visual do Android ainda dependem da instalação e do serviço ativo.
 Não há garantia de entrega/exibição: FCM, permissão, rede e sistema operacional
 podem atrasar ou impedir o aviso. Aceite FCM não é confirmação de leitura.
+
+## Diagnóstico em aparelho — 30/10/2026
+
+HumanChatPushDeviceTest é opt-in: requer as duas contas autorizadas em fixture
+privada no aparelho, preserva a sessão padrão, envia uma mensagem identificada
+como teste e aguarda um aviso Android por até 45s. A fixture é removida ao terminar.
+O resultado não contém tokens ou senhas.
+
+No M31, a permissão de notificações e a sincronização do cadastro passaram.
+A conta remetente Rosa enviou para a conta Lucas, após validação de contatos
+autorizados pelo backend. A mensagem foi confirmada por STOMP e localizada no
+Mongo com ID aa4bec92-9021-3b2e-b5f2-b9a94d780264. Não houve aviso em 45s e
+nenhum evento dessa mensagem foi encontrado em chat_push_outbox. Portanto,
+o teste ponta a ponta falhou antes do encaminhamento ao Worker.
+
+Cloudflare: versão c36083b8-b3e8-48e4-a390-156a61a2096c publicada e ativa.
+GitOps declara imagem sha-26ecf94a64be9fa86ad818d7cc8f8f76133f9dda, que inclui
+o código da PR API #100; isso não comprova a imagem efetivamente executada na AWS.
+A API precisa ser inspecionada quanto à imagem e às variáveis CHAT_PUSH_ENABLED,
+CHAT_PUSH_URL e presença de CHAT_PUSH_SECRET. Não registrar o valor do segredo.
+Uma checagem isolada de entrega não foi executada: a revalidação SQL falhou por
+cadeia de certificados não confiável no computador; TLS permaneceu validado.
+
+### Correção de configuração na AWS
+
+A inspeção no CloudShell confirmou a API no ECS/Fargate, cluster astro-fargate,
+serviço astro-api, revisão astro-api-fargate:6. O contêiner api usava a imagem
+sha-26ecf94a64be9fa86ad818d7cc8f8f76133f9dda, mas não tinha CHAT_PUSH_ENABLED,
+CHAT_PUSH_URL ou CHAT_PUSH_SECRET. O push permanecia desligado por padrão.
+
+Com autorização do usuário, as três configurações foram adicionadas ao Secret
+existente do Secrets Manager, com o mesmo segredo do Worker, e injetadas na nova
+revisão astro-api-fargate:7. A imagem e os demais parâmetros foram preservados.
+O CloudShell validou o segredo e a conectividade HTTPS com o Worker: HTTP 400
+para corpo inválido usando o User-Agent do Java. A cópia temporária do segredo
+foi removida do CloudShell após o registro e início do rollout.
+
+O usuário optou por executar pessoalmente o próximo teste no celular. Nenhuma
+nova mensagem de teste foi enviada nesta etapa de configuração da API.
+Verificações após a alteração: aplicação inicializada, revisão 7 com uma tarefa
+ativa, zero pendentes e alvo healthy no ALB; revisão anterior em draining.
+Outbox criada com índices _id_, done_1_nextAttempt_1 e expiresAt_1. A conclusão
+do teste de recebimento FCM permanece a cargo do usuário.

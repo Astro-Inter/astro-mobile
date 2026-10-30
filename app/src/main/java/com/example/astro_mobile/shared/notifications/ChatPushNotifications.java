@@ -1,12 +1,24 @@
 package com.example.astro_mobile.shared.notifications;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.service.notification.StatusBarNotification;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.example.astro_mobile.data.api.HumanChatRepository;
+import com.example.astro_mobile.data.api.FailureKind;
+import com.example.astro_mobile.data.api.dto.ChatConversationData;
+import java.util.List;
 import android.app.NotificationChannel;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import com.example.astro_mobile.MainActivity;
 import com.example.astro_mobile.R;
@@ -41,6 +53,7 @@ public final class ChatPushNotifications {
         ChatPushData message = ChatPushData.parse(data, Instant.now());
         if (message == null) return;
         PushTokenRepository repository = PushTokenRepository.getInstance();
+        boolean displayed = false;
         synchronized (LOCK) {
             if (!repository.isCurrentUser(message.uid)) return;
             android.content.SharedPreferences preferences = context.getSharedPreferences(RECEIPTS, Context.MODE_PRIVATE);
@@ -71,21 +84,63 @@ public final class ChatPushNotifications {
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 PendingIntent open = PendingIntent.getActivity(context, 0, intent,
                         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                NotificationCompat.Builder notification = new NotificationCompat.Builder(context, CHANNEL)
-                        .setSmallIcon(R.drawable.ic_push_notification)
-                        .setContentTitle(message.senderName).setContentText(message.preview)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(message.preview))
-                        .setContentIntent(open).setAutoCancel(true)
-                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                        .setPublicVersion(new NotificationCompat.Builder(context, CHANNEL)
-                                .setSmallIcon(R.drawable.ic_push_notification)
-                                .setContentTitle(context.getString(R.string.push_chat_private)).build());
+                Notification previous = active(context, message.conversationId);
+                Notification notification = ChatNotificationFactory.create(context, message, previous, open, null, false);
                 try {
-                    NotificationManagerCompat.from(context).notify(CHANNEL + ":" + message.conversationId, 2001, notification.build());
+                    NotificationManagerCompat.from(context).notify(CHANNEL + ":" + message.conversationId, 2001, notification);
+                    displayed = true;
                 } catch (SecurityException denied) { return; }
             }
             recent.put(new JSONArray().put(key).put(now));
             preferences.edit().putString("messages", recent.toString()).commit();
         }
+        if (displayed) loadAvatar(context.getApplicationContext(), message);
+    }
+
+    private static Notification active(Context context, String conversationId) {
+        for (StatusBarNotification item : context.getSystemService(NotificationManager.class).getActiveNotifications()) {
+            if (item.getId() == 2001 && (CHANNEL + ":" + conversationId).equals(item.getTag())) return item.getNotification();
+        }
+        return null;
+    }
+
+    private static void loadAvatar(Context context, ChatPushData message) {
+        HumanChatRepository.createDefault().load(
+                new HumanChatRepository.ResultCallback() {
+            @Override public void onSuccess(List<ChatConversationData> conversations) {
+                if (!PushTokenRepository.getInstance().isCurrentUser(message.uid) || foreground
+                        || !ChatNotificationFactory.isLatest(active(context, message.conversationId), message)) return;
+                for (ChatConversationData conversation : conversations) {
+                    if (!message.conversationId.equals(conversation.id) || !Long.valueOf(message.senderId).equals(conversation.participant.id)) continue;
+                    String url = conversation.participant.profilePhotoUrl;
+                    if (url == null || !"https".equalsIgnoreCase(Uri.parse(url).getScheme())) return;
+                    Glide.with(context).asBitmap().load(url).timeout(4000).circleCrop().override(192, 192)
+                            .into(new CustomTarget<Bitmap>() {
+                        @Override public void onResourceReady(@NonNull Bitmap photo,
+                                @Nullable Transition<? super Bitmap> transition) {
+                            try {
+                                synchronized (LOCK) {
+                                    Notification previous = active(context, message.conversationId);
+                                    if (!foreground && PushTokenRepository.getInstance().isCurrentUser(message.uid)
+                                            && ChatNotificationFactory.isLatest(previous, message)) {
+                                        Bitmap retained = photo.copy(Bitmap.Config.ARGB_8888, false);
+                                        Notification updated = ChatNotificationFactory.create(context, message, previous,
+                                                previous.contentIntent, retained, true);
+                                        NotificationManagerCompat.from(context).notify(CHANNEL + ":" + message.conversationId, 2001, updated);
+                                    }
+                                }
+                            } catch (SecurityException denied) { }
+                            finally { new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> Glide.with(context).clear(this)); }
+                        }
+                        @Override public void onLoadFailed(@Nullable Drawable error) {
+                            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> Glide.with(context).clear(this));
+                        }
+                        @Override public void onLoadCleared(@Nullable Drawable placeholder) { }
+                    });
+                    return;
+                }
+            }
+            @Override public void onFailure(FailureKind failure) { }
+        });
     }
 }
