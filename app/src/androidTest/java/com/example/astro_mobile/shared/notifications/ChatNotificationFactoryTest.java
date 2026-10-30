@@ -65,10 +65,36 @@ public final class ChatNotificationFactoryTest {
         ChatPushData data = message("recipient", "Olá", 1);
         Notification original = ChatNotificationFactory.create(context, data, null, null, null, false);
         Bitmap photo = Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888);
-        Notification updated = ChatNotificationFactory.create(context, data, original, null, photo, true);
-        assertEquals(1, NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(updated).getMessages().size());
+        photo.eraseColor(android.graphics.Color.GREEN);
+        Notification updated = ChatNotificationFactory.withAvatar(context, original, photo);
+        NotificationCompat.MessagingStyle style = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(updated);
+        assertEquals(1, style.getMessages().size());
+        assertTrue(photo.sameAs(senderPhoto(style, 0)));
+        assertEquals("Olá", style.getMessages().get(0).getText().toString());
+        assertTrue(ChatNotificationFactory.isLatest(updated, data));
+        assertTrue(updated.actions == null || updated.actions.length == 0);
+        assertNull(updated.publicVersion.extras.getCharSequence(Notification.EXTRA_TEXT));
         assertTrue((updated.flags & Notification.FLAG_ONLY_ALERT_ONCE) != 0);
         assertFalse((original.flags & Notification.FLAG_ONLY_ALERT_ONCE) != 0);
+    }
+
+    @Test public void nextMessageKeepsPhotoAndAnotherAccountDoesNotInheritIt() {
+        Bitmap photo = Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888);
+        photo.eraseColor(android.graphics.Color.GREEN);
+        Notification previous = ChatNotificationFactory.create(context, message("recipient", "Primeira", 2), null, null, photo, false);
+        Notification next = ChatNotificationFactory.create(context, message("recipient", "Segunda", 1), previous, null, null, false);
+        NotificationCompat.MessagingStyle style = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(next);
+        assertEquals(2, style.getMessages().size());
+        assertTrue(photo.sameAs(senderPhoto(style, 1)));
+        Notification otherAccount = ChatNotificationFactory.create(context, message("another", "Nova conta", 0), next, null, null, false);
+        NotificationCompat.MessagingStyle other = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(otherAccount);
+        assertFalse(photo.sameAs(senderPhoto(other, 0)));
+    }
+
+    private Bitmap senderPhoto(NotificationCompat.MessagingStyle style, int index) {
+        android.graphics.drawable.Drawable drawable = style.getMessages().get(index).getPerson().getIcon().loadDrawable(context);
+        assertTrue(drawable instanceof android.graphics.drawable.BitmapDrawable);
+        return ((android.graphics.drawable.BitmapDrawable) drawable).getBitmap();
     }
 
     @Test public void anotherAccountOrDismissedNotificationStartsFreshHistory() {

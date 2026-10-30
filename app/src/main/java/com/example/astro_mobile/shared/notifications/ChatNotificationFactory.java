@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.Person;
@@ -24,8 +26,13 @@ final class ChatNotificationFactory {
     private ChatNotificationFactory() { }
 
     static boolean isLatest(Notification notification, ChatPushData message) {
-        return belongsTo(notification, message)
-                && message.messageId.equals(notification.extras.getString(LAST_MESSAGE));
+        return isLatest(notification, message.uid, message.conversationId, message.messageId);
+    }
+
+    static boolean isLatest(Notification notification, String uid, String conversationId, String messageId) {
+        return notification != null && uid.equals(notification.extras.getString(RECIPIENT))
+                && conversationId.equals(notification.extras.getString(ChatPushNotifications.CONVERSATION))
+                && messageId.equals(notification.extras.getString(LAST_MESSAGE));
     }
 
     private static boolean belongsTo(Notification notification, ChatPushData message) {
@@ -35,7 +42,18 @@ final class ChatNotificationFactory {
 
     static Notification create(Context context, ChatPushData message, Notification previous,
                                PendingIntent open, Bitmap photo, boolean avatarUpdate) {
-        Bitmap avatar = photo == null ? initials(context, message.senderName) : photo;
+        Bitmap avatar = photo;
+        if (avatar == null && belongsTo(previous, message)) {
+            NotificationCompat.MessagingStyle prior = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(previous);
+            if (prior != null && !prior.getMessages().isEmpty()) {
+                Person lastSender = prior.getMessages().get(prior.getMessages().size() - 1).getPerson();
+                if (lastSender != null && Long.toString(message.senderId).equals(lastSender.getKey()) && lastSender.getIcon() != null) {
+                    Drawable retained = lastSender.getIcon().loadDrawable(context);
+                    if (retained instanceof BitmapDrawable) avatar = ((BitmapDrawable) retained).getBitmap();
+                }
+            }
+        }
+        if (avatar == null) avatar = initials(context, message.senderName);
         Person sender = new Person.Builder().setName(message.senderName).setKey(Long.toString(message.senderId))
                 .setIcon(IconCompat.createWithBitmap(avatar)).build();
         Person self = new Person.Builder().setName(context.getString(R.string.human_reply_you)).setKey(message.uid).build();
@@ -71,6 +89,20 @@ final class ChatNotificationFactory {
                         .setSmallIcon(R.drawable.ic_push_notification)
                         .setContentTitle(context.getString(R.string.push_chat_private))
                         .setAllowSystemGeneratedContextualActions(false).build()).build();
+    }
+
+    static Notification withAvatar(Context context, Notification previous, Bitmap photo) {
+        NotificationCompat.MessagingStyle prior = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(previous);
+        if (prior == null) return previous;
+        NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(prior.getUser())
+                .setGroupConversation(false);
+        for (NotificationCompat.MessagingStyle.Message item : prior.getMessages()) {
+            Person sender = item.getPerson();
+            if (sender != null) sender = sender.toBuilder().setIcon(IconCompat.createWithBitmap(photo)).build();
+            style.addMessage(new NotificationCompat.MessagingStyle.Message(item.getText(), item.getTimestamp(), sender));
+        }
+        return new NotificationCompat.Builder(context, previous).setLargeIcon(photo).setStyle(style)
+                .setOnlyAlertOnce(true).build();
     }
 
     private static Bitmap initials(Context context, String name) {
