@@ -21,7 +21,6 @@
         <item quantity="one">%1$d mensagem não lida</item>
         <item quantity="other">%1$d mensagens não lidas</item>
     </plurals>
-    <string name="human_chat_attachment_pending">Anexos ainda não estão disponíveis.</string>
     <string name="human_conversation_manager_label">&lt;b>Gestor - &lt;/b>%1$s</string>
     <string name="human_conversation_sent_preview">Você: %1$s</string>
 </resources>

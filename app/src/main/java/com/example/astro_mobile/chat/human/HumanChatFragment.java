@@ -72,8 +72,6 @@ public final class HumanChatFragment extends Fragment {
 
         view.findViewById(R.id.button_human_chat_back).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack());
-        view.findViewById(R.id.button_human_chat_add).setOnClickListener(clicked ->
-                Toast.makeText(requireContext(), R.string.human_chat_attachment_pending, Toast.LENGTH_SHORT).show());
 
         RecyclerView messages = view.findViewById(R.id.list_human_chat_messages);
         HumanMessagesAdapter adapter = new HumanMessagesAdapter(conversation, new HumanMessagesAdapter.Listener() {

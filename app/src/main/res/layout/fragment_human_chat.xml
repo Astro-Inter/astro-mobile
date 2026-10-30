@@ -55,12 +55,8 @@
         </LinearLayout>
         <LinearLayout android:id="@+id/container_human_chat_composer" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:minHeight="100dp" android:orientation="horizontal"
-            android:gravity="center_vertical" android:baselineAligned="false" android:paddingStart="16dp"
+            android:gravity="center_vertical" android:baselineAligned="false" android:paddingStart="30dp"
             android:paddingEnd="30dp" android:paddingVertical="20dp" android:layout_marginBottom="20dp">
-            <ImageButton android:id="@+id/button_human_chat_add" android:layout_width="44dp" android:layout_height="48dp"
-                android:layout_marginEnd="16dp" android:background="@drawable/bg_login_icon_button"
-                android:padding="13dp" android:scaleType="fitCenter" android:src="@drawable/chat_add"
-                android:contentDescription="@string/chat_add_attachment" />
             <FrameLayout android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:background="@drawable/bg_chat_input">
                 <EditText android:id="@+id/input_human_chat_message" android:layout_width="match_parent"
