@@ -54,7 +54,7 @@ final class ChatNotificationFactory {
             }
         }
         if (avatar == null) avatar = initials(context, message.senderName);
-        Person sender = new Person.Builder().setName(message.senderName).setKey(avatarKey(Long.toString(message.senderId), avatar))
+        Person sender = new Person.Builder().setName(message.senderName).setKey(Long.toString(message.senderId))
                 .setIcon(IconCompat.createWithBitmap(avatar)).build();
         Person self = new Person.Builder().setName(context.getString(R.string.human_reply_you)).setKey(message.uid).build();
         NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(self).setGroupConversation(false);
@@ -89,7 +89,7 @@ final class ChatNotificationFactory {
                 .setContentTitle(title).setContentText(text)
                 .setStyle(style).setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setWhen(timestamp).setShowWhen(true).setContentIntent(open).setAutoCancel(true)
-                .setOnlyAlertOnce(avatarUpdate).setAllowSystemGeneratedContextualActions(false)
+                .setOnlyAlertOnce(avatarUpdate).setSilent(avatarUpdate).setAllowSystemGeneratedContextualActions(false)
                 .addExtras(extras).setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setPublicVersion(new NotificationCompat.Builder(context, ChatPushNotifications.CHANNEL)
                         .setSmallIcon(R.drawable.ic_push_notification)
@@ -105,7 +105,7 @@ final class ChatNotificationFactory {
         for (NotificationCompat.MessagingStyle.Message item : prior.getMessages()) {
             Person sender = item.getPerson();
             if (sender != null) sender = sender.toBuilder()
-                    .setKey(avatarKey(sender.getKey(), photo)).setIcon(IconCompat.createWithBitmap(photo)).build();
+                    .setKey(sender.getKey().split("#avatar:", 2)[0]).setIcon(IconCompat.createWithBitmap(photo)).build();
             style.addMessage(new NotificationCompat.MessagingStyle.Message(item.getText(), item.getTimestamp(), sender));
         }
         // Copy only application metadata. Recovered notification extras may retain the
@@ -125,15 +125,6 @@ final class ChatNotificationFactory {
         return id.equals(key) || (key != null && key.startsWith(id + "#avatar:"));
     }
 
-    private static String avatarKey(String sender, Bitmap photo) {
-        int separator = sender.indexOf("#avatar:");
-        String identity = separator < 0 ? sender : sender.substring(0, separator);
-        int[] pixels = new int[photo.getWidth() * photo.getHeight()];
-        photo.getPixels(pixels, 0, photo.getWidth(), 0, 0, photo.getWidth(), photo.getHeight());
-        // Some system notification views retain a sender avatar while its Person key
-        // stays unchanged. Version the presentation by image content, not by message.
-        return identity + "#avatar:" + Integer.toHexString(java.util.Arrays.hashCode(pixels));
-    }
 
     private static Bitmap initials(Context context, String name) {
         int size = Math.min(192, Math.round(64 * context.getResources().getDisplayMetrics().density));

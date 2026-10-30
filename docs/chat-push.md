@@ -27,10 +27,11 @@ segunda conexão WebSocket, nem acrescenta mensagens ao histórico a partir do p
 - A atualização da foto reconstrói o aviso com um builder novo, copiando somente
   os identificadores internos, histórico e destino de abertura. Isso evita
   reaproveitar metadados antigos do estilo nativo ao trocar as iniciais pela foto.
-- A chave visual do Person inclui uma impressão do conteúdo do avatar. Isso
-  invalida a representação anterior quando a foto muda, preservando a mesma
-  chave enquanto a imagem permanece igual. A identidade e a autorização do
-  remetente continuam usando o identificador da API.
+- O painel de notificações do M31 pode reter as iniciais ao atualizar um aviso,
+  mesmo com a foto correta no Person nativo. A atualização da imagem substitui
+  a entrada existente, sob o mesmo lock e após validar conta/mensagem, usando
+  setSilent(true) para não repetir som ou vibração. O histórico, destino e
+  identificador do remetente são preservados.
 - Não adiciona ações de responder, marcar como lida ou silenciar; desabilita
   sugestões contextuais automáticas. A aparência final depende do Android e do
   fabricante. A versão pública da tela bloqueada continua genérica, sem avatar
@@ -78,6 +79,8 @@ opt-in ChatNotificationAvatarDeviceTest passou consultando o remetente autorizad
 pela API e baixando sua foto HTTPS no aparelho, sem enviar mensagens ou publicar
 notificações. Ele requer o argumento avatar_sender_id; sem esse argumento,
 é ignorado. O teste não registra tokens, URL da imagem ou conteúdo da conversa.
+O argumento inspect_active_avatar=true compara a foto com o Person nativo do
+aviso ativo; refresh_active_avatar=true também reaplica a imagem nesse aviso.
 Sem aparelho conectado nesta etapa: entrega FCM real, toque, processo encerrado
 e comportamento visual do Android ainda dependem da instalação e do serviço ativo.
 Não há garantia de entrega/exibição: FCM, permissão, rede e sistema operacional

@@ -106,8 +106,12 @@ public final class ChatPushNotifications {
             if (!canUpdateAvatar(context, uid, conversationId, messageId)) return;
             Notification previous = active(context, conversationId);
             try {
+                Notification updated = ChatNotificationFactory.withAvatar(context, previous, photo);
+                // Some system panels keep the original MessagingStyle avatar when
+                // reapplying an existing notification. Repost the same entry silently.
+                NotificationManagerCompat.from(context).cancel(CHANNEL + ":" + conversationId, 2001);
                 NotificationManagerCompat.from(context).notify(CHANNEL + ":" + conversationId, 2001,
-                        ChatNotificationFactory.withAvatar(context, previous, photo));
+                        updated);
             } catch (SecurityException denied) { }
         }
     }

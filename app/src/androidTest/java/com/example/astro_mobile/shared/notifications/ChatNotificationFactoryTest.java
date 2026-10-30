@@ -70,7 +70,7 @@ public final class ChatNotificationFactoryTest {
         NotificationCompat.MessagingStyle style = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(updated);
         assertEquals(1, style.getMessages().size());
         assertTrue(photo.sameAs(senderPhoto(style, 0)));
-        assertNotEquals(NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(original)
+        assertEquals(NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(original)
                 .getMessages().get(0).getPerson().getKey(), style.getMessages().get(0).getPerson().getKey());
         java.util.List<Notification.MessagingStyle.Message> nativeMessages = Notification.MessagingStyle.Message.getMessagesFromBundleArray(
                 updated.extras.getParcelableArray(Notification.EXTRA_MESSAGES));

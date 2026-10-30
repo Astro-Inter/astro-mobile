@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/** Diagnóstico opt-in somente de leitura: não envia mensagens nem publica avisos. */
+/** Diagnóstico opt-in: não envia mensagens; só atualiza um aviso com argumento explícito. */
 @RunWith(AndroidJUnit4.class)
 public final class ChatNotificationAvatarDeviceTest {
     @Test public void authorizedSenderPhotoCanBeLoaded() throws Exception {
@@ -65,9 +65,6 @@ public final class ChatNotificationAvatarDeviceTest {
                 android.graphics.drawable.Drawable icon = messages.get(messages.size() - 1).getSenderPerson().getIcon().loadDrawable(context);
                 assertTrue(icon instanceof android.graphics.drawable.BitmapDrawable);
                 Bitmap avatar = ((android.graphics.drawable.BitmapDrawable) icon).getBitmap();
-                try (java.io.FileOutputStream stream = context.openFileOutput("notification-sender-avatar.png", Context.MODE_PRIVATE)) {
-                    avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                }
                 assertTrue("Native sender avatar differs from the profile photo", photo.sameAs(avatar));
                 if ("true".equals(InstrumentationRegistry.getArguments().getString("refresh_active_avatar"))) {
                     String uid = active.extras.getString("astro_chat_notification_uid");
