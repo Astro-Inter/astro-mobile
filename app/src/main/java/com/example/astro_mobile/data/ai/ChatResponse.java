@@ -5,9 +5,11 @@ import com.google.gson.annotations.SerializedName;
 public final class ChatResponse {
     @SerializedName("session_id") private String sessionId;
     @SerializedName("resposta") private String answer;
+    @SerializedName("blocos") private com.google.gson.JsonElement blocks;
 
     public String getSessionId() { return sessionId; }
     public String getAnswer() { return answer; }
+    public com.google.gson.JsonElement getBlocks() { return blocks; }
 
     public boolean isValid() {
         return sessionId != null

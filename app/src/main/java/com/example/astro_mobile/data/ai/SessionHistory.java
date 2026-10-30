@@ -12,6 +12,7 @@ public final class SessionHistory {
     public static final class Message {
         public String role;
         public String content;
+        public com.google.gson.JsonElement blocos;
     }
 
     public boolean isValid() {

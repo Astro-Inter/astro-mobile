@@ -252,7 +252,7 @@ public final class ChatViewModel extends ViewModel {
                 }
                 messages.clear();
                 for (SessionHistory.Message message : history.messages) {
-                    messages.add(ChatMessage.fromHistory(message.content, "user".equals(message.role)));
+                    messages.add(ChatMessage.fromHistory(message.content, "user".equals(message.role), message.blocos));
                 }
                 pendingMessageIndex = -1;
                 // Não reenvia: só recupera a pergunta que ainda não apareceu no histórico.
@@ -380,7 +380,7 @@ public final class ChatViewModel extends ViewModel {
                 clearTimers();
                 String previousId = conversationId;
                 sessionId = response.getSessionId(); conversationId = sessionId; drafts.remove(previousId);
-                messages.add(new ChatMessage(response.getAnswer(), false));
+                messages.add(ChatMessage.fromResponse(response.getAnswer(), response.getBlocks()));
                 sending = false; currentOperation = null; pendingMessageIndex = -1; waitingLong = false;
                 status = "ativa"; retryChecked = false; publish(null); refreshConversations();
             }
