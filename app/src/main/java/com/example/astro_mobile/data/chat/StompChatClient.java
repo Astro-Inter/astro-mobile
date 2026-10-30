@@ -13,6 +13,7 @@ public final class StompChatClient {
         void onState(ChatConnectionState state);
         void onMessage(ChatSendResponse message);
         void onError(ChatSendError error);
+        default void onTyping(com.example.astro_mobile.data.api.dto.ChatTypingData event) { }
     }
     private final ChatTransport transport;
     private final IdTokenProvider tokens;
@@ -24,6 +25,7 @@ public final class StompChatClient {
     private ChatScheduler.Task timer, heartbeat;
     private ChatConnectionState state = ChatConnectionState.STOPPED;
     private boolean active;
+    private boolean typingSupported;
     private int generation, retries;
     private long receivedAt, incomingHeartbeat;
     private Long authenticatedUserId;
@@ -99,8 +101,12 @@ public final class StompChatClient {
             long serverSend = Long.parseLong(beats[0]), serverReceive = Long.parseLong(beats[1]);
             if (serverSend < 0 || serverReceive < 0) throw new IllegalArgumentException("Heartbeat inválido");
             incomingHeartbeat = serverSend == 0 ? 0 : Math.max(10000, serverSend);
+            typingSupported = "1".equals(frame.headers.get("astro-typing"));
             if (!sendFrame("SUBSCRIBE", Map.of("id", "private-messages", "destination", "/user/queue/messages", "ack", "auto"), "")
                     || !sendFrame("SUBSCRIBE", Map.of("id", "private-errors", "destination", "/user/queue/errors", "ack", "auto"), "")) {
+                lost(id); return;
+            }
+            if (typingSupported && !sendFrame("SUBSCRIBE", Map.of("id", "private-typing", "destination", "/user/queue/typing", "ack", "auto"), "")) {
                 lost(id); return;
             }
             if (timer != null) timer.cancel();
@@ -118,6 +124,12 @@ public final class StompChatClient {
                 ChatSendError error = gson.fromJson(frame.body, ChatSendError.class);
                 if (error == null || error.code == null) throw new IllegalArgumentException("Erro inválido");
                 listener.onError(error);
+            } else if (typingSupported && "private-typing".equals(subscription)) {
+                try {
+                    com.example.astro_mobile.data.api.dto.ChatTypingData event = gson.fromJson(frame.body,
+                            com.example.astro_mobile.data.api.dto.ChatTypingData.class);
+                    if (event != null && event.isValid()) listener.onTyping(event);
+                } catch (com.google.gson.JsonParseException ignored) { }
             }
         }
     }
@@ -127,6 +139,11 @@ public final class StompChatClient {
         boolean queued = sendFrame("SEND", Map.of("destination", "/app/chat.send", "content-type", "application/json"), gson.toJson(request));
         if (!queued) lost(generation);
         return queued;
+    }
+
+    public boolean sendTyping(com.example.astro_mobile.data.api.dto.ChatTypingRequest request) {
+        if (!typingSupported || state != ChatConnectionState.CONNECTED) return false;
+        return sendFrame("SEND", Map.of("destination", "/app/chat.typing", "content-type", "application/json"), gson.toJson(request));
     }
 
     private boolean sendFrame(String command, Map<String, String> headers, String body) {
@@ -162,12 +179,14 @@ public final class StompChatClient {
             if (state == ChatConnectionState.CONNECTED) {
                 sendFrame("UNSUBSCRIBE", Map.of("id", "private-messages"), "");
                 sendFrame("UNSUBSCRIBE", Map.of("id", "private-errors"), "");
+                if (typingSupported) sendFrame("UNSUBSCRIBE", Map.of("id", "private-typing"), "");
                 sendFrame("DISCONNECT", Map.of(), "");
             }
             socket.close(); socket = null;
         }
         decoder.reset();
         authenticatedUserId = null;
+        typingSupported = false;
     }
 
     private void change(ChatConnectionState value) { state = value; listener.onState(value); }

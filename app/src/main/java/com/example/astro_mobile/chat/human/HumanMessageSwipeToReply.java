@@ -33,6 +33,7 @@ public final class HumanMessageSwipeToReply extends ItemTouchHelper.SimpleCallba
     }
 
     @Override public int getMovementFlags(@NonNull RecyclerView list, @NonNull RecyclerView.ViewHolder holder) {
+        if (!(holder.getBindingAdapter() instanceof HumanMessagesAdapter)) return makeMovementFlags(0, 0);
         HumanMessage message = messageAt(holder.getBindingAdapterPosition());
         return makeMovementFlags(0, message == null || message.id == null || conversation.pending != null
                 ? 0 : ItemTouchHelper.RIGHT);
