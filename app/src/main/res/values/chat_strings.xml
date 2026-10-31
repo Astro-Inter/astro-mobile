@@ -27,4 +27,5 @@
     <string name="chat_invalid_response_error">Não foi possível ler a resposta. O envio pode ter sido recebido; aguarde antes de tentar novamente.</string>
     <string name="chat_server_error">O assistente está indisponível no momento. Tente novamente mais tarde.</string>
     <string name="chat_character_count">%1$d / 4.000</string>
+    <string name="chat_table_pagination">Página %1$d de %2$d · %3$d resultados</string>
 </resources>

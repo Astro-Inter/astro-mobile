@@ -23,4 +23,30 @@ public class ChatStructuredContentTest {
         assertTrue(history.isValid());
         assertTrue(ChatStructuredContent.valid(ChatMessage.fromHistory(history.messages.get(0).content, false, history.messages.get(0).blocos).getBlocks().getAsJsonArray()));
     }
+    @Test public void readsTextFromBlocksWithoutLegacyAnswer() {
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        com.example.astro_mobile.data.ai.ChatResponse response = gson.fromJson(
+            "{\"session_id\":\"94229143-d20b-4766-80a4-05341435c236\",\"blocos\":[{\"tipo\":\"texto\",\"conteudo\":\"Antes\"},{\"tipo\":\"texto\",\"conteudo\":\"Depois\"}]}",
+            com.example.astro_mobile.data.ai.ChatResponse.class);
+        assertTrue(response.isValid());
+        assertEquals("Antes\n\nDepois", response.getAnswer());
+    }
+    @Test public void acceptsTypedPhotoInsideTable() {
+        String input = "[{\"tipo\":\"tabela\",\"versao\":1,\"titulo\":\"Pessoas\",\"colunas\":[{\"chave\":\"foto\",\"titulo\":\"Foto\"}],\"linhas\":[{\"foto\":{\"tipo\":\"imagem\",\"descricao\":\"Foto de Ana\",\"url\":null}}]}]";
+        assertTrue(ChatStructuredContent.valid(JsonParser.parseString(input).getAsJsonArray()));
+    }
+    @Test public void validatesUserCardCompliance() {
+        String input = "[{\"tipo\": \"ficha_usuario\", \"versao\": 1, \"titulo\": \"Ficha\", \"nome\": \"Ana\", \"email\": null, \"cargo\": null, \"unidade\": null, \"perfil\": null, \"situacao\": null, \"foto\": {\"tipo\": \"imagem\", \"url\": null, \"descricao\": \"Foto de Ana\"}, \"conformidade\": {\"percentual\": 50, \"total\": 2, \"vigentes\": 1, \"criterio\": \"NRs vigentes / NRs aplicáveis retornadas\", \"data_referencia\": \"2026-10-30\"}}]";
+        assertTrue(ChatStructuredContent.valid(JsonParser.parseString(input).getAsJsonArray()));
+        com.google.gson.JsonArray blocks = JsonParser.parseString(input).getAsJsonArray();
+        blocks.get(0).getAsJsonObject().getAsJsonObject("conformidade").addProperty("percentual", 100);
+        assertFalse(ChatStructuredContent.valid(blocks));
+    }
+    @Test public void acceptsMissingAndNullTableCellsAndIndependentGallery() {
+        String table = "[{\"tipo\":\"tabela\",\"versao\":1,\"titulo\":\"Usuários\",\"pagina\":1,\"total_paginas\":2,\"total\":3,\"colunas\":[{\"chave\":\"nome\",\"titulo\":\"Nome\"},{\"chave\":\"email\",\"titulo\":\"E-mail\"}],\"linhas\":[{\"nome\":\"Ana\"},{\"nome\":\"Bia\",\"email\":null}]}]";
+        assertTrue(ChatStructuredContent.valid(JsonParser.parseString(table).getAsJsonArray()));
+        assertTrue(ChatStructuredContent.valid(JsonParser.parseString("[{\"tipo\":\"galeria_usuarios\",\"versao\":1,\"titulo\":\"Pessoas\",\"imagens\":[{\"nome\":\"Ana Exemplo\",\"url\":null}]}]").getAsJsonArray()));
+        assertEquals("AE", ChatStructuredContent.initials("Ana Exemplo"));
+        assertEquals("A", ChatStructuredContent.initials("Ana"));
+    }
 }
