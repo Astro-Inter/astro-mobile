@@ -42,4 +42,11 @@ public class ChatStructuredContentTest {
         blocks.get(0).getAsJsonObject().getAsJsonObject("conformidade").addProperty("percentual", 100);
         assertFalse(ChatStructuredContent.valid(blocks));
     }
+    @Test public void acceptsMissingAndNullTableCellsAndIndependentGallery() {
+        String table = "[{\"tipo\":\"tabela\",\"versao\":1,\"titulo\":\"Usuários\",\"pagina\":1,\"total_paginas\":2,\"total\":3,\"colunas\":[{\"chave\":\"nome\",\"titulo\":\"Nome\"},{\"chave\":\"email\",\"titulo\":\"E-mail\"}],\"linhas\":[{\"nome\":\"Ana\"},{\"nome\":\"Bia\",\"email\":null}]}]";
+        assertTrue(ChatStructuredContent.valid(JsonParser.parseString(table).getAsJsonArray()));
+        assertTrue(ChatStructuredContent.valid(JsonParser.parseString("[{\"tipo\":\"galeria_usuarios\",\"versao\":1,\"titulo\":\"Pessoas\",\"imagens\":[{\"nome\":\"Ana Exemplo\",\"url\":null}]}]").getAsJsonArray()));
+        assertEquals("AE", ChatStructuredContent.initials("Ana Exemplo"));
+        assertEquals("A", ChatStructuredContent.initials("Ana"));
+    }
 }
