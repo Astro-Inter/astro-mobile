@@ -42,7 +42,21 @@ final class ChatStructuredContent {
                 } else if ("tabela".equals(type)) {
                     JsonArray cols = arr(b,"colunas",10); JsonArray rows = arr(b,"linhas",50);
                     for (JsonElement c : cols) { JsonObject col = c.getAsJsonObject(); if (!str(col,"chave").matches("[a-z][a-z0-9_]{0,39}") || !bounded(str(col,"titulo"),100)) return false; }
-                    for (JsonElement r : rows) for (JsonElement c : cols) { JsonElement value = r.getAsJsonObject().get(str(c.getAsJsonObject(),"chave")); if (value == null || (!value.isJsonNull() && !value.isJsonPrimitive())) return false; }
+                    for (JsonElement r : rows) for (JsonElement c : cols) { JsonElement value = r.getAsJsonObject().get(str(c.getAsJsonObject(),"chave")); if (value == null) return false;
+                        if (value.isJsonObject()) { JsonObject photo = value.getAsJsonObject(); if (!"imagem".equals(str(photo,"tipo")) || !bounded(str(photo,"descricao"),280) || !photo.has("url") || (!photo.get("url").isJsonNull() && (!photo.get("url").isJsonPrimitive() || !photo.get("url").getAsJsonPrimitive().isString()))) return false; }
+                        else if (!value.isJsonNull() && !value.isJsonPrimitive()) return false; }
+                } else if ("ficha_usuario".equals(type)) {
+                    if (!bounded(str(b,"nome"),255) || !b.get("foto").isJsonObject()) return false;
+                    JsonObject photo = b.getAsJsonObject("foto");
+                    if (!"imagem".equals(str(photo,"tipo")) || !bounded(str(photo,"descricao"),280) || !photo.has("url") || (!photo.get("url").isJsonNull() && (!photo.get("url").isJsonPrimitive() || !photo.get("url").getAsJsonPrimitive().isString()))) return false;
+                    for (String key : new String[]{"email","cargo","unidade","perfil","situacao"}) if (!b.has(key) || (!b.get(key).isJsonNull() && (!b.get(key).isJsonPrimitive() || !b.get(key).getAsJsonPrimitive().isString() || !bounded(str(b,key),255)))) return false;
+                    if (!b.has("conformidade")) return false;
+                    if (!b.get("conformidade").isJsonNull()) {
+                        JsonObject c = b.getAsJsonObject("conformidade");
+                        double total = c.get("total").getAsDouble(), valid = c.get("vigentes").getAsDouble();
+                        if (!Double.isFinite(total) || !Double.isFinite(valid) || total < 0 || valid < 0 || valid > total || total != Math.floor(total) || valid != Math.floor(valid) || !bounded(str(c,"criterio"),200)) return false;
+                        if (total == 0 ? !c.get("percentual").isJsonNull() : c.get("percentual").isJsonNull() || c.get("percentual").getAsDouble() != Math.round(10000 * valid / total) / 100.0) return false;
+                    }
                 } else if ("galeria_usuarios".equals(type)) {
                     for (JsonElement image : arr(b,"imagens",50)) { JsonObject img = image.getAsJsonObject(); if (!bounded(str(img,"nome"),255) || (img.has("url") && !img.get("url").isJsonNull() && !img.get("url").isJsonPrimitive())) return false; }
                 } else return false;
@@ -63,11 +77,20 @@ final class ChatStructuredContent {
                 JsonArray data = arr(b,"dados",12); card.addView(new ChartView(context,type,data), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dp(context,130)));
                 for (JsonElement p : data) { JsonObject row = p.getAsJsonObject(); label(card,str(row,"categoria") + ": " + str(row,"valor"), false); }
                 label(card,str(b,"fonte") + " · " + str(b,"unidade"), false);
+            } else if ("ficha_usuario".equals(type)) {
+                imageCell(card, b.getAsJsonObject("foto"));
+                for (String key : new String[]{"nome","email","cargo","unidade","perfil","situacao"}) if (!b.get(key).isJsonNull()) label(card, key + ": " + str(b,key), false);
+                if (!b.get("conformidade").isJsonNull()) {
+                    JsonObject c = b.getAsJsonObject("conformidade");
+                    label(card, "Conformidade cadastral: " + (c.get("percentual").isJsonNull() ? "Sem NRs aplicáveis" : str(c,"percentual") + "%"), true);
+                    label(card, str(c,"vigentes") + " de " + str(c,"total") + " NRs vigentes · " + str(c,"criterio"), false);
+                    if (c.has("data_referencia") && !c.get("data_referencia").isJsonNull()) label(card, "Referência: " + str(c,"data_referencia"), false);
+                }
             } else if ("tabela".equals(type)) {
                 HorizontalScrollView scroll = new HorizontalScrollView(context); LinearLayout table = new LinearLayout(context); table.setOrientation(LinearLayout.VERTICAL); scroll.addView(table); card.addView(scroll);
                 JsonArray cols = arr(b,"colunas",10); LinearLayout header = row(context); table.addView(header);
                 for (JsonElement c : cols) cell(header,str(c.getAsJsonObject(),"titulo"),true);
-                for (JsonElement entry : arr(b,"linhas",50)) { LinearLayout line = row(context); table.addView(line); for (JsonElement c : cols) { JsonElement value = entry.getAsJsonObject().get(str(c.getAsJsonObject(),"chave")); cell(line,value.isJsonNull() ? "—" : value.getAsString(),false); } }
+                for (JsonElement entry : arr(b,"linhas",50)) { LinearLayout line = row(context); table.addView(line); for (JsonElement c : cols) { JsonElement value = entry.getAsJsonObject().get(str(c.getAsJsonObject(),"chave")); if (value.isJsonObject()) imageCell(line, value.getAsJsonObject()); else cell(line,value.isJsonNull() ? "—" : value.getAsString(),false); } }
             } else {
                 for (JsonElement entry : arr(b,"imagens",50)) { JsonObject item = entry.getAsJsonObject(); LinearLayout line = row(context); card.addView(line); ImageView image = new ImageView(context); line.addView(image,new LinearLayout.LayoutParams(dp(context,40),dp(context,40))); String name = str(item,"nome"); image.setContentDescription("Foto de " + name); String url = item.has("url") && !item.get("url").isJsonNull() ? item.get("url").getAsString() : null;
                     if (safeUrl(url)) Glide.with(image).load(url).placeholder(android.R.drawable.ic_menu_myplaces).error(android.R.drawable.ic_menu_myplaces).circleCrop().diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(image); else image.setImageResource(android.R.drawable.ic_menu_myplaces);
@@ -75,6 +98,15 @@ final class ChatStructuredContent {
                 }
             }
         }
+    }
+    private static void imageCell(LinearLayout line, JsonObject photo) {
+        Context context = line.getContext();
+        ImageView image = new ImageView(context);
+        line.addView(image, new LinearLayout.LayoutParams(dp(context,120), dp(context,40)));
+        image.setContentDescription(str(photo, "descricao"));
+        String url = photo.get("url").isJsonNull() ? null : photo.get("url").getAsString();
+        if (safeUrl(url)) Glide.with(image).load(url).placeholder(android.R.drawable.ic_menu_myplaces).error(android.R.drawable.ic_menu_myplaces).circleCrop().diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(image);
+        else image.setImageResource(android.R.drawable.ic_menu_myplaces);
     }
     private static boolean safeUrl(String value) { try { Uri uri = Uri.parse(value); return "https".equals(uri.getScheme()) && uri.getHost() != null && uri.getHost().endsWith(".r2.cloudflarestorage.com") && uri.getUserInfo() == null; } catch (Exception e) { return false; } }
     private static int dp(Context c,int n) { return Math.round(n*c.getResources().getDisplayMetrics().density); }
