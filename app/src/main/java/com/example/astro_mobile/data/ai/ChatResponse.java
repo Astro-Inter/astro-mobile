@@ -32,6 +32,7 @@ public final class ChatResponse {
     public boolean isValid() {
         return sessionId != null
                 && sessionId.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
-                && getAnswer() != null;
+                && (getAnswer() != null || (blocks != null && blocks.isJsonArray()
+                && !blocks.getAsJsonArray().isEmpty() && blocks.getAsJsonArray().size() <= 10));
     }
 }

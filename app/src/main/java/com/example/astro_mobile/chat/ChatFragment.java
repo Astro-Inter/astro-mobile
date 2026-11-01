@@ -54,6 +54,7 @@ public final class ChatFragment extends Fragment {
         messages.setLayoutManager(new LinearLayoutManager(requireContext()));
         messages.setAdapter(adapter);
         messages.setItemAnimator(null);
+        ChatScrollController scrolling = new ChatScrollController(messages);
         input.setFilters(new InputFilter[]{new CodePointLengthFilter(ChatRequest.MAX_MESSAGE_LENGTH)});
         input.setText(model.getDraft());
         input.setSelection(input.length());
@@ -72,7 +73,7 @@ public final class ChatFragment extends Fragment {
             }
             @Override public void afterTextChanged(Editable s) { }
         });
-        sendButton.setOnClickListener(clicked -> model.send(input.getText().toString()));
+        sendButton.setOnClickListener(clicked -> { scrolling.outgoing(); model.send(input.getText().toString()); });
         input.setOnEditorActionListener((text, action, event) -> {
             if (action != EditorInfo.IME_ACTION_SEND) return false;
             sendButton.performClick();
@@ -125,10 +126,7 @@ public final class ChatFragment extends Fragment {
                         ? R.id.connectionErrorFragment : R.id.genericErrorFragment);
                 return;
             }
-            boolean atBottom = !messages.canScrollVertically(1);
-            adapter.submitList(state.messages, () -> {
-                if (atBottom && !state.messages.isEmpty()) messages.scrollToPosition(state.messages.size() - 1);
-            });
+            adapter.submitList(state.messages, scrolling::changed);
             view.findViewById(R.id.container_chat_welcome).setVisibility(state.messages.isEmpty() ? View.VISIBLE : View.GONE);
             view.findViewById(R.id.container_chat_loading).setVisibility(state.loading ? View.VISIBLE : View.GONE);
             ((TextView) view.findViewById(R.id.text_chat_loading)).setText(state.action == ChatViewModel.Action.HISTORY
