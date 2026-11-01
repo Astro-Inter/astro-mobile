@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">astro</string>
+    <string name="app_name">Astro</string>
     <string name="astro_logo_content_description">Logo Astro</string>
     <string name="email_identification_title">Entre com sua conta <b>Astro</b></string>
     <string name="email_identification_label">E-mail</string>

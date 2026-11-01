@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateBottomNavigation(View navbar, int destination, WindowInsetsCompat insets) {
-        // A navbar permanece ancorada no rodapé; o teclado pode cobri-la sem deslocá-la.
+        // Oculta a navbar global enquanto qualquer campo mantém o teclado aberto.
         boolean home = destination == R.id.employeeHomeFragment || destination == R.id.managerHomeFragment;
         boolean conversations = destination == R.id.conversationsFragment || destination == R.id.chatFragment
                 || destination == R.id.newConversationFragment
@@ -295,13 +295,11 @@ public class MainActivity extends AppCompatActivity {
                 || destination == R.id.eventEvidenceFragment;
         boolean notifications = destination == R.id.notificationsFragment;
         boolean keyboard = insets != null && insets.isVisible(WindowInsetsCompat.Type.ime());
-        int imeBottom = keyboard ? insets.getInsets(WindowInsetsCompat.Type.ime()).bottom : 0;
-        int systemBottom = insets == null ? 0 : insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom;
-        navbar.setVisibility((home || conversations || profile || events || notifications
+        boolean destinationShowsNavbar = home || conversations || profile || events || notifications
                 || destination == R.id.staffFragment || destination == R.id.staffDetailsFragment
-                || destination == R.id.staffEventsFragment || destination == R.id.managerFormsFragment)
-                ? View.VISIBLE : View.GONE);
-        navbar.setTranslationY(Math.max(0, imeBottom - systemBottom));
+                || destination == R.id.staffEventsFragment || destination == R.id.managerFormsFragment;
+        navbar.setVisibility(destinationShowsNavbar && !keyboard ? View.VISIBLE : View.GONE);
+        navbar.setTranslationY(0);
         navbar.findViewById(R.id.button_conversations_nav_home).setSelected(home);
         navbar.findViewById(R.id.button_conversations_nav_chat).setSelected(conversations);
         navbar.findViewById(R.id.button_conversations_nav_profile).setSelected(profile);
