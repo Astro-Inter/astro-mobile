@@ -20,14 +20,19 @@
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:paddingHorizontal="30dp" android:paddingBottom="20dp"
         android:orientation="vertical" android:visibility="gone" tools:visibility="visible">
+        <TextView style="@style/ProfileText" android:textStyle="bold" android:text="@string/profile_nr_description" />
         <TextView android:id="@+id/text_profile_nr_description" style="@style/ProfileText"
             android:textColor="@color/astro_input_hint"
-            tools:text="Descrição:&#10;Estabelece os requisitos para o fornecimento, uso e conservação de Equipamentos de Proteção Individual – EPI." />
+            tools:text="Estabelece os requisitos para o fornecimento, uso e conservação de Equipamentos de Proteção Individual – EPI." />
+        <TextView style="@style/ProfileText" android:layout_marginTop="20dp"
+            android:textStyle="bold" android:text="@string/profile_nr_objective" />
         <TextView android:id="@+id/text_profile_nr_objective" style="@style/ProfileText"
-            android:layout_marginTop="20dp" android:textColor="@color/astro_input_hint"
-            tools:text="Objetivo:&#10;Garantir a proteção e a segurança do trabalhador." />
+            android:textColor="@color/astro_input_hint"
+            tools:text="Garantir a proteção e a segurança do trabalhador." />
+        <TextView style="@style/ProfileText" android:layout_marginTop="20dp"
+            android:textStyle="bold" android:text="@string/profile_nr_applicability" />
         <TextView android:id="@+id/text_profile_nr_applicability" style="@style/ProfileText"
-            android:layout_marginTop="20dp" android:textColor="@color/astro_input_hint"
-            tools:text="Aplicabilidade:&#10;Trabalhadores expostos a riscos em suas atividades." />
+            android:textColor="@color/astro_input_hint"
+            tools:text="Trabalhadores expostos a riscos em suas atividades." />
     </LinearLayout>
 </LinearLayout>

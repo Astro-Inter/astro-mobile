@@ -16,12 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.NotificationViewHolder> {
-    private final boolean managerFlow;
     private final OnNotificationClickListener clickListener;
     private final List<NotificationData> notifications = new ArrayList<>();
 
-    public NotificationsAdapter(boolean managerFlow, OnNotificationClickListener clickListener) {
-        this.managerFlow = managerFlow;
+    public NotificationsAdapter(OnNotificationClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
@@ -39,8 +37,8 @@ public final class NotificationsAdapter extends RecyclerView.Adapter<Notificatio
                 .inflate(R.layout.item_notification, parent, false);
         View content = row.findViewById(R.id.container_notification_row);
         float density = parent.getResources().getDisplayMetrics().density;
-        int minHeight = Math.round((managerFlow ? 80 : 60) * density);
-        int verticalPadding = Math.round((managerFlow ? 18 : 8) * density);
+        int minHeight = Math.round(60 * density);
+        int verticalPadding = Math.round(8 * density);
         content.setMinimumHeight(minHeight);
         content.setPadding(content.getPaddingLeft(), verticalPadding,
                 content.getPaddingRight(), verticalPadding);

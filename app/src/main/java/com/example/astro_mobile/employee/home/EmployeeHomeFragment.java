@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.example.astro_mobile.auth.SessionNavigation;
@@ -31,6 +32,7 @@ import com.example.astro_mobile.notifications.NotificationsFragment;
 import com.example.astro_mobile.notifications.NotificationTimeFormatter;
 import com.example.astro_mobile.shared.home.HomeAiBubble;
 import com.example.astro_mobile.employee.events.EmployeeEvent;
+import com.example.astro_mobile.employee.events.EmployeeEventsFragment;
 import java.time.Instant;
 import java.time.ZoneId;
 
@@ -58,7 +60,10 @@ public class EmployeeHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_employee_home),
+                view.findViewById(R.id.scroll_employee_home), () -> loadHome());
 
+        sizeEventIndicators(view);
         model = new ViewModelProvider(this, EmployeeHomeViewModel.Factory.createDefault())
                 .get(EmployeeHomeViewModel.class);
         homeContent = view.findViewById(R.id.scroll_employee_home);
@@ -79,13 +84,18 @@ public class EmployeeHomeFragment extends Fragment {
         }
 
         // Os atalhos de eventos abrem o calendário do colaborador.
-        int[] eventsActions = { R.id.button_employee_home_events, R.id.button_employee_home_pending_card,
-                R.id.button_employee_home_review_card, R.id.button_employee_home_completed_card,
-                R.id.button_employee_home_events_more };
+        int[] eventsActions = { R.id.button_employee_home_events, R.id.button_employee_home_events_more };
         for (int id : eventsActions) {
             view.findViewById(id).setOnClickListener(clicked -> Navigation.findNavController(clicked)
                     .navigate(R.id.action_global_employee_events, AuthArgs.copy(getArguments())));
         }
+        // Cada indicador abre o calendário com o filtro correspondente já selecionado.
+        view.findViewById(R.id.button_employee_home_pending_card).setOnClickListener(clicked ->
+                openEvents(clicked, EmployeeEvent.Status.PENDING));
+        view.findViewById(R.id.button_employee_home_review_card).setOnClickListener(clicked ->
+                openEvents(clicked, EmployeeEvent.Status.REVIEW));
+        view.findViewById(R.id.button_employee_home_completed_card).setOnClickListener(clicked ->
+                openEvents(clicked, EmployeeEvent.Status.DONE));
 
         // O mascote continua sendo um atalho direto para a IA; a Activity controla a navbar.
         aiBubble.setOnClickListener(clicked ->
@@ -96,6 +106,36 @@ public class EmployeeHomeFragment extends Fragment {
         assistant = new HomeAiBubble(aiBubble, aiBubbleText,
                 view.findViewById(R.id.container_employee_home_content),
                 view.findViewById(R.id.container_employee_home_header));
+    }
+
+    private void sizeEventIndicators(View view) {
+        View strip = view.findViewById(R.id.scroll_employee_home_indicators);
+        int[] ids = {R.id.button_employee_home_pending_card, R.id.button_employee_home_review_card,
+                R.id.button_employee_home_completed_card};
+        strip.addOnLayoutChangeListener((changed, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (right - left == oldRight - oldLeft || right <= left) return;
+            int gap = Math.round(20 * getResources().getDisplayMetrics().density);
+            int width = (right - left - strip.getPaddingLeft() - strip.getPaddingRight() - gap) / ids.length;
+            for (int id : ids) {
+                LinearLayout card = view.findViewById(id);
+                TextView label = (TextView) card.getChildAt(card.getChildCount() - 1);
+                for (String word : label.getText().toString().split("\\s+")) {
+                    width = Math.max(width, (int) Math.ceil(label.getPaint().measureText(word))
+                            + card.getPaddingLeft() + card.getPaddingRight() + 1);
+                }
+            }
+            for (int id : ids) {
+                View card = view.findViewById(id);
+                ViewGroup.LayoutParams params = card.getLayoutParams();
+                if (params.width != width) { params.width = width; card.setLayoutParams(params); }
+            }
+        });
+    }
+
+    private void openEvents(View view, EmployeeEvent.Status filter) {
+        Bundle args = AuthArgs.copy(getArguments());
+        args.putString(EmployeeEventsFragment.INITIAL_FILTER, filter.name());
+        Navigation.findNavController(view).navigate(R.id.action_global_employee_events, args);
     }
 
     @Override
@@ -274,10 +314,11 @@ public class EmployeeHomeFragment extends Fragment {
     }
 
     private void bindHome(View view, CollaboratorHomeData home) {
+        view.findViewById(R.id.image_employee_home_unread)
+                .setVisibility(home.hasUnreadNotifications() ? View.VISIBLE : View.GONE);
         setNamedText(view, R.id.text_employee_home_greeting,
                 R.string.employee_home_greeting_api, home.getUsername());
-        setNamedText(view, R.id.text_employee_home_workspace,
-                R.string.employee_home_workspace_api, home.getWorkspaceName());
+        setText(view, R.id.text_employee_home_workspace, home.getWorkspaceName());
         CollaboratorHomeData.EventsMetrics metrics = home.getEventsMetrics();
         setText(view, R.id.text_employee_home_pending_count, String.valueOf(metrics.getPending()));
         setText(view, R.id.text_employee_home_review_count, String.valueOf(metrics.getUnderAnalysis()));
@@ -333,12 +374,13 @@ public class EmployeeHomeFragment extends Fragment {
                 case NEW: label = R.string.employee_events_new; eventIcon = R.drawable.ic_employee_event_new; break;
                 case DONE: label = R.string.employee_events_done; eventIcon = R.drawable.ic_employee_event_done; break;
                 case ANALYSIS: label = R.string.employee_events_review; eventIcon = R.drawable.home_clock; break;
-                case REJECTED: label = R.string.employee_events_rejected; red = true; break;
+                case REJECTED: label = R.string.employee_events_rejected; eventIcon = R.drawable.ic_status_reload; red = true; break;
                 case CANCELLED: label = R.string.employee_events_cancelled; red = true; break;
                 case EXPIRED: label = R.string.employee_events_expired; red = true; break;
                 default: label = R.string.employee_events_pending;
             }
-            if (red) eventIcon = R.drawable.conversations_close;
+            if (red && item.displayStatus != com.example.astro_mobile.employee.events.EventStatusClassifier.DisplayStatus.REJECTED)
+                eventIcon = R.drawable.conversations_close;
             View row = addRow(events, event.getTitle(), formatDeadline(item.date.toString()), getString(label), eventIcon);
             if (red) ((ImageView) row.findViewById(R.id.image_home_feed_status)).setImageTintList(
                     ColorStateList.valueOf(requireContext().getColor(R.color.employee_event_status_red)));

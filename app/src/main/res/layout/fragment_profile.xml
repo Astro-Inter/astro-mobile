@@ -42,7 +42,8 @@
                             android:layout_gravity="center_vertical|start"
                             android:background="@drawable/bg_profile_avatar"
                             android:scaleType="fitCenter" android:src="@drawable/profile_avatar_placeholder"
-                            android:contentDescription="@null" />
+                            android:foreground="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/profile_view_photo" />
                         <ImageButton android:id="@+id/button_profile_change_photo"
                             android:layout_width="48dp" android:layout_height="48dp"
                             android:layout_gravity="bottom|end"
@@ -93,7 +94,8 @@
                         app:tint="@color/astro_light_background" />
                     <TextView style="@style/ProfileFieldLabel" android:text="@string/profile_email" />
                     <TextView android:id="@+id/text_profile_email" style="@style/ProfileFieldValue"
-                        android:breakStrategy="simple" tools:text="kevin.parker@picpay.com" />
+                        android:maxLines="1" android:ellipsize="end" android:clickable="true"
+                        android:focusable="true" android:foreground="?attr/selectableItemBackground" tools:text="kevin.parker@picpay.com" />
                 </LinearLayout>
                 <View style="@style/ProfileDivider" />
                 <LinearLayout style="@style/ProfileField" android:minHeight="56dp"
@@ -110,12 +112,12 @@
                 </LinearLayout>
                 <View style="@style/ProfileDivider" />
                 <LinearLayout style="@style/ProfileField"
-                    android:background="@drawable/bg_access_key_button" android:paddingHorizontal="30dp"
-                    android:paddingVertical="20dp" android:layout_marginBottom="20dp">
-                    <TextView style="@style/ProfileText" android:layout_width="0dp"
-                        android:layout_weight="1" android:text="@string/profile_nrs" />
-                    <ImageView style="@style/ProfileFieldIcon" android:layout_marginEnd="0dp"
+                    android:paddingVertical="10dp" android:layout_marginBottom="20dp">
+                    <ImageView style="@style/ProfileFieldIcon"
                         android:src="@drawable/profile_shield" android:contentDescription="@null" />
+                    <TextView style="@style/ProfileText" android:layout_width="0dp"
+                        android:layout_weight="1" android:textSize="24sp"
+                        android:accessibilityHeading="true" android:text="@string/profile_nrs" />
                 </LinearLayout>
                 <!-- A lista curta de NRs acompanha a rolagem do perfil, sem uma segunda área de scroll. -->
                 <LinearLayout android:id="@+id/list_profile_nrs"

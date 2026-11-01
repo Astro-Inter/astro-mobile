@@ -43,11 +43,15 @@ public final class ManagerHomeData {
 
     public static final class PendingValidation {
         private Long id;
+        private Long eventId;
+        private Long participantId;
         @SerializedName("collaborator_name") private String collaboratorName;
         @SerializedName("event_title") private String eventTitle;
         private boolean viewed;
 
         public Long getId() { return id; }
+        public Long getEventId() { return eventId; }
+        public Long getParticipantId() { return participantId; }
         public String getCollaboratorName() { return collaboratorName; }
         public String getEventTitle() { return eventTitle; }
         public boolean isViewed() { return viewed; }

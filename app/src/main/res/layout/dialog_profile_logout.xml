@@ -2,10 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
     android:background="@drawable/bg_profile_dialog" android:orientation="vertical" android:padding="24dp">
-    <ImageButton android:id="@+id/button_profile_logout_close"
-        android:layout_width="40dp" android:layout_height="40dp" android:layout_gravity="end"
-        android:background="@drawable/bg_login_icon_button" android:padding="10dp"
-        android:src="@drawable/conversations_close" android:contentDescription="@string/profile_logout_cancel" />
+    <ImageButton android:id="@+id/button_profile_logout_close" style="@style/PopupCloseButton"
+        android:layout_gravity="end" android:contentDescription="@string/profile_logout_cancel" />
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginTop="12dp" android:background="@drawable/bg_profile_panel"
         android:orientation="vertical" android:padding="24dp">

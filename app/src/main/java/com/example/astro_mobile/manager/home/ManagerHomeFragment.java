@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +21,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.manager.forms.details.FormDetailsFragment;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
@@ -29,6 +29,7 @@ import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.ManagerHomeData;
 import com.example.astro_mobile.shared.home.HomeAiBubble;
+import com.example.astro_mobile.manager.events.validation.EventValidationFragment;
 
 public final class ManagerHomeFragment extends Fragment {
     private ManagerHomeViewModel model;
@@ -43,6 +44,9 @@ public final class ManagerHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
         super.onViewCreated(view, state);
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_manager_home),
+                view.findViewById(R.id.scroll_manager_home), () -> loadHome());
+        sizeQuickActions(view);
         model = new ViewModelProvider(this, ManagerHomeViewModel.Factory.createDefault())
                 .get(ManagerHomeViewModel.class);
         content = view.findViewById(R.id.scroll_manager_home);
@@ -58,8 +62,6 @@ public final class ManagerHomeFragment extends Fragment {
         NavController navigation = NavHostFragment.findNavController(this);
         view.findViewById(R.id.button_manager_home_conversations).setOnClickListener(clicked ->
                 navigation.navigate(R.id.action_global_conversations, AuthArgs.copy(getArguments())));
-        view.findViewById(R.id.button_manager_home_notifications).setOnClickListener(clicked ->
-                navigation.navigate(R.id.action_global_notifications));
         assistant.setOnClickListener(clicked ->
                 navigation.navigate(R.id.action_manager_home_to_chat, AuthArgs.copy(getArguments())));
         view.findViewById(R.id.button_manager_home_employees).setOnClickListener(clicked ->
@@ -68,10 +70,31 @@ public final class ManagerHomeFragment extends Fragment {
         view.findViewById(R.id.button_manager_home_forms_action).setOnClickListener(openForms);
         view.findViewById(R.id.button_manager_home_forms).setOnClickListener(openForms);
         view.findViewById(R.id.button_manager_home_forms_more).setOnClickListener(openForms);
-        // A validação ainda usa exemplos locais e não recebe o ID real desta prévia.
+        // Os atalhos de validação abrem a lista de eventos do gestor.
         int[] pendingActions = {R.id.button_manager_home_validate,
                 R.id.button_manager_home_validations, R.id.button_manager_home_validations_more};
-        for (int id : pendingActions) view.findViewById(id).setOnClickListener(clicked -> showPending());
+        for (int id : pendingActions) view.findViewById(id).setOnClickListener(clicked ->
+                navigation.navigate(R.id.action_global_manager_events, AuthArgs.copy(getArguments())));
+    }
+
+    private void sizeQuickActions(View view) {
+        int[] ids = {R.id.button_manager_home_validate, R.id.button_manager_home_employees,
+                R.id.button_manager_home_forms_action, R.id.button_manager_home_conversations};
+        int width = Math.round(163 * getResources().getDisplayMetrics().density);
+        for (int id : ids) {
+            LinearLayout card = view.findViewById(id);
+            TextView label = (TextView) card.getChildAt(card.getChildCount() - 1);
+            for (String word : label.getText().toString().split("\\s+")) {
+                int wordWidth = (int) Math.ceil(label.getPaint().measureText(word));
+                width = Math.max(width, wordWidth + card.getPaddingLeft() + card.getPaddingRight() + 1);
+            }
+        }
+        for (int id : ids) {
+            View card = view.findViewById(id);
+            android.view.ViewGroup.LayoutParams params = card.getLayoutParams();
+            params.width = width;
+            card.setLayoutParams(params);
+        }
     }
 
     private void bindHome(View view, ManagerHomeData home) {
@@ -94,7 +117,19 @@ public final class ManagerHomeFragment extends Fragment {
             View row = addRow(validations, validation.getCollaboratorName(), validation.getEventTitle(),
                     getString(validation.isViewed() ? R.string.manager_home_seen : R.string.manager_home_new),
                     validation.isViewed() ? 0 : R.drawable.home_new);
-            row.setOnClickListener(clicked -> showPending());
+            row.setOnClickListener(clicked -> {
+                if (validation.getEventId() == null || validation.getParticipantId() == null) {
+                    NavHostFragment.findNavController(this).navigate(R.id.genericErrorFragment);
+                    return;
+                }
+                Bundle args = AuthArgs.copy(getArguments());
+                args.putLong("event_id", validation.getEventId());
+                args.putLong("participant_id", validation.getParticipantId());
+                args.putString("event_title", validation.getEventTitle());
+                args.putString("participant_name", validation.getCollaboratorName());
+                args.putBoolean(EventValidationFragment.FROM_HOME, true);
+                NavHostFragment.findNavController(this).navigate(R.id.action_manager_home_to_validation, args);
+            });
         }
         showFeed(view, validations.getChildCount() == 0, R.id.list_manager_home_validations,
                 R.id.button_manager_home_validations_more, R.id.text_manager_home_validations_empty);
@@ -154,10 +189,6 @@ public final class ManagerHomeFragment extends Fragment {
     private void openForms() {
         NavHostFragment.findNavController(this).navigate(R.id.action_manager_home_to_forms,
                 AuthArgs.copy(getArguments()));
-    }
-
-    private void showPending() {
-        Toast.makeText(requireContext(), R.string.employee_home_mock_unavailable, Toast.LENGTH_SHORT).show();
     }
 
     private void startSkeletonPulse() {

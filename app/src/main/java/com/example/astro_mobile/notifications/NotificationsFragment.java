@@ -22,6 +22,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -29,7 +30,6 @@ import com.example.astro_mobile.data.api.NotificationsRepository;
 import com.example.astro_mobile.data.api.dto.NotificationData;
 import com.example.astro_mobile.data.api.dto.NotificationDetailsData;
 import com.example.astro_mobile.data.local.FlowPreferences;
-import com.example.astro_mobile.manager.events.ManagerEvent;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 import java.util.List;
@@ -51,12 +51,19 @@ public final class NotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_notifications_content),
+                view.findViewById(R.id.scroll_notifications_content), () -> loadNotifications());
         state = new ViewModelProvider(this, NotificationsViewModel.Factory.createDefault())
                 .get(NotificationsViewModel.class);
         initialNotificationId = getArguments() == null ? null
                 : getArguments().getString(ARG_NOTIFICATION_ID);
         managerFlow = FlowPreferences.wasManagerFlow(requireContext());
-        adapter = new NotificationsAdapter(managerFlow, this::showDetails);
+        if (managerFlow) {
+            androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                    .popBackStack(HomeNavigation.destination(requireContext()), false);
+            return;
+        }
+        adapter = new NotificationsAdapter(this::showDetails);
 
         // Filtra a lista já carregada a cada mudança no texto, sem novas requisições.
         RecyclerView list = view.findViewById(R.id.list_notifications);
@@ -84,6 +91,7 @@ public final class NotificationsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (managerFlow) return;
         loadNotifications();
     }
 
@@ -164,7 +172,6 @@ public final class NotificationsFragment extends Fragment {
         sheet.findViewById(R.id.container_notification_open_event).setVisibility(View.GONE);
         Dialog dialog = detailDialog;
         sheet.findViewById(R.id.button_notification_detail_close).setOnClickListener(clicked -> dialog.dismiss());
-        dialog.setOnDismissListener(ignored -> state.cancelDetail());
 
         detailDialog.show();
         if (dialog.getWindow() != null) {
@@ -195,6 +202,7 @@ public final class NotificationsFragment extends Fragment {
         sheet.findViewById(R.id.text_notification_detail_body).setVisibility(View.GONE);
         state.loadDetail(notification.getId(), new NotificationsRepository.OperationCallback<NotificationDetailsData>() {
             @Override public void onSuccess(NotificationDetailsData detail) {
+                if (!notification.isViewed()) markViewed(dialog, sheet, notification);
                 if (!isDetailActive(dialog)) return;
                 String title = detail.getTitle();
                 ((TextView) sheet.findViewById(R.id.text_notification_detail_title)).setText(
@@ -209,7 +217,6 @@ public final class NotificationsFragment extends Fragment {
                     openEvent(detail.getEventId());
                 });
                 sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.GONE);
-                if (!notification.isViewed()) markViewed(dialog, sheet, notification);
             }
             @Override public void onFailure(FailureKind failure) {
                 if (!isDetailActive(dialog)) return;
@@ -221,12 +228,13 @@ public final class NotificationsFragment extends Fragment {
 
     // A mensagem permanece visível mesmo se a confirmação de leitura falhar.
     private void markViewed(Dialog dialog, View sheet, NotificationData notification) {
-        setDetailLoading(sheet);
+        if (isDetailActive(dialog)) setDetailLoading(sheet);
         state.markViewed(notification.getId(), new NotificationsRepository.OperationCallback<Void>() {
             @Override public void onSuccess(Void result) {
-                if (!isDetailActive(dialog)) return;
-                sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.GONE);
-                renderNotifications(requireView());
+                if (isDetailActive(dialog)) {
+                    sheet.findViewById(R.id.progress_notification_detail).setVisibility(View.GONE);
+                }
+                if (getView() != null && isResumed()) renderNotifications(requireView());
             }
             @Override public void onFailure(FailureKind failure) {
                 if (!isDetailActive(dialog)) return;
@@ -237,15 +245,10 @@ public final class NotificationsFragment extends Fragment {
     }
 
     private void openEvent(long eventId) {
-        // Colaborador abre o detalhe real pelo ID; o detalhe administrativo segue na sua tarefa.
         Bundle args = AuthArgs.copy(getArguments());
         args.putLong("event_id", eventId);
-        if (managerFlow) {
-            args.putString("event_title", getString(R.string.employee_home_training));
-            args.putString("event_completion_mode", ManagerEvent.CompletionMode.SELF_DECLARATION.name());
-        }
-        Navigation.findNavController(requireView()).navigate(managerFlow
-                ? R.id.action_notifications_to_manager_event : R.id.action_notifications_to_employee_event, args);
+        Navigation.findNavController(requireView())
+                .navigate(R.id.action_notifications_to_employee_event, args);
     }
 
     private void showDetailError(View sheet, NotificationData notification, FailureKind failure, Runnable retry) {

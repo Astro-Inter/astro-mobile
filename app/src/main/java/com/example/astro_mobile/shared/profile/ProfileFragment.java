@@ -29,6 +29,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.FullTextPopup;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.bumptech.glide.Glide;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
@@ -75,6 +77,7 @@ public final class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle state) {
         super.onViewCreated(view, state);
+        FullTextPopup.attach(view.findViewById(R.id.text_profile_email));
         NavController navigation = NavHostFragment.findNavController(this);
         model = new ViewModelProvider(navigation.getBackStackEntry(R.id.profileFragment),
                 new ProfileViewModel.Factory()).get(ProfileViewModel.class);
@@ -88,8 +91,11 @@ public final class ProfileFragment extends Fragment {
                     .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
         };
         view.findViewById(R.id.button_profile_change_photo).setOnClickListener(choosePhoto);
-        view.findViewById(R.id.image_profile_photo).setOnClickListener(choosePhoto);
-        view.findViewById(R.id.image_profile_photo).setContentDescription(getString(R.string.profile_change_photo));
+        view.findViewById(R.id.image_profile_photo).setOnClickListener(clicked -> {
+            UserProfileData profile = model.getProfile();
+            if (profile != null) PhotoViewerDialog.show(this, profile.getProfilePhotoUrl(), R.drawable.profile_avatar_placeholder);
+        });
+        view.findViewById(R.id.image_profile_photo).setContentDescription(getString(R.string.profile_view_photo));
         view.findViewById(R.id.image_profile_photo).setFocusable(true);
 
         // O papel da conta é preservado mesmo quando o Gestor usa a Home do Colaborador.
@@ -137,6 +143,16 @@ public final class ProfileFragment extends Fragment {
         if (hasCachedProfile) showProfile(view, model.getProfile(), false);
         view.findViewById(R.id.button_profile_change_photo).setEnabled(false);
         view.findViewById(R.id.image_profile_photo).setEnabled(false);
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_profile),
+                view.findViewById(R.id.scroll_profile), () -> {
+                    if (!model.isLoading() && pendingPhoto == null) loadProfile(view);
+                });
+        loadProfile(view);
+    }
+
+    private void loadProfile(View view) {
+        boolean hasCachedProfile = model.getProfile() != null;
+        NavController navigation = NavHostFragment.findNavController(this);
         // A URL da foto é temporária: cada retorno à tela consulta o perfil novamente.
         model.load(new UserProfileRepository.ResultCallback() {
             @Override
@@ -162,7 +178,7 @@ public final class ProfileFragment extends Fragment {
         ((TextView) view.findViewById(R.id.text_profile_name)).setText(data.getNome());
         ((TextView) view.findViewById(R.id.text_profile_role)).setText(data.getCargo());
         ((TextView) view.findViewById(R.id.text_profile_unit)).setText(data.getUnidade());
-        ((TextView) view.findViewById(R.id.text_profile_modality)).setText(data.getModalidade());
+        ((TextView) view.findViewById(R.id.text_profile_modality)).setText(WorkModelFormatter.format(requireContext(), data.getModalidade()));
         ((TextView) view.findViewById(R.id.text_profile_email)).setText(data.getEmail());
         showPhoto(view.findViewById(R.id.image_profile_photo), data.getProfilePhotoUrl());
         showNrs(view.findViewById(R.id.list_profile_nrs), data.getNrs());
@@ -246,14 +262,16 @@ public final class ProfileFragment extends Fragment {
             String title = getString(R.string.profile_nr_code, nr.getCode());
             if (nr.getValidade() != null && !nr.getValidade().isEmpty()) {
                 title = getString(R.string.profile_nr_validity, title, formatDate(nr.getValidade()));
+            } else {
+                title = getString(R.string.profile_nr_without_validity, title);
             }
             ((TextView) item.findViewById(R.id.text_profile_nr_title)).setText(title);
             ((TextView) item.findViewById(R.id.text_profile_nr_description)).setText(
-                    getString(R.string.profile_nr_description, text(nr.getDescricao())));
+                    text(nr.getDescricao()));
             ((TextView) item.findViewById(R.id.text_profile_nr_objective)).setText(
-                    getString(R.string.profile_nr_objective, text(nr.getObjetivo())));
+                    text(nr.getObjetivo()));
             ((TextView) item.findViewById(R.id.text_profile_nr_applicability)).setText(
-                    getString(R.string.profile_nr_applicability, text(nr.getAplicabilidade())));
+                    text(nr.getAplicabilidade()));
             View details = item.findViewById(R.id.container_profile_nr_details);
             ImageView chevron = item.findViewById(R.id.image_profile_nr_chevron);
             item.findViewById(R.id.button_profile_nr).setOnClickListener(clicked -> {

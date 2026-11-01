@@ -13,11 +13,13 @@ public final class CollaboratorHomeData {
     @SerializedName("status_message") private String statusMessage;
     @SerializedName("pending_events") private List<PendingEvent> pendingEvents;
     @SerializedName("last_notifications") private List<HomeNotification> lastNotifications;
+    private transient boolean hasUnreadNotifications;
 
     public String getUsername() { return username; }
     public String getWorkspaceName() { return workspaceName; }
     public EventsMetrics getEventsMetrics() { return eventsMetrics; }
     public String getStatusMessage() { return statusMessage; }
+    public boolean hasUnreadNotifications() { return hasUnreadNotifications; }
     public List<PendingEvent> getPendingEvents() {
         return pendingEvents == null ? Collections.emptyList() : pendingEvents;
     }
@@ -28,11 +30,14 @@ public final class CollaboratorHomeData {
     public void setLastNotificationsFrom(List<NotificationData> notifications) {
         if (notifications == null) return;
         lastNotifications = new ArrayList<>();
+        hasUnreadNotifications = false;
         for (NotificationData notification : notifications) {
             if (notification == null) continue;
-            lastNotifications.add(new HomeNotification(notification.getId(), notification.getTitle(),
-                    notification.getHours(), notification.isViewed()));
-            if (lastNotifications.size() == 3) break;
+            if (!notification.isViewed()) hasUnreadNotifications = true;
+            if (lastNotifications.size() < 3) {
+                lastNotifications.add(new HomeNotification(notification.getId(), notification.getTitle(),
+                        notification.getHours(), notification.isViewed()));
+            }
         }
     }
 

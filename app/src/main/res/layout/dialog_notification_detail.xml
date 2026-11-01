@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -23,14 +24,9 @@
 
         <ImageButton
             android:id="@+id/button_notification_detail_close"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            style="@style/PopupCloseButton"
             android:layout_gravity="end|center_vertical"
-            android:background="@drawable/bg_login_icon_button"
-            android:contentDescription="@string/notifications_close"
-            android:padding="14dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/conversations_close" />
+            android:contentDescription="@string/notifications_close" />
     </FrameLayout>
 
     <LinearLayout
@@ -94,6 +90,9 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:text="@string/notifications_retry"
+        android:textColor="@color/astro_light_background"
+        app:backgroundTint="@color/astro_primary_button_tint"
+        app:rippleColor="@color/astro_button_ripple"
         android:visibility="gone" />
 
     <FrameLayout
