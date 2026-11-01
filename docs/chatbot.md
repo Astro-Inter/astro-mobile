@@ -116,6 +116,9 @@ Os contratos analíticos da PR #33, incluindo indicadores, matriz longa,
 contexto e gráfico de rosca, estão descritos em
 [chatbot-contratos-analiticos.md](chatbot-contratos-analiticos.md).
 
+O bloco `arquivo` v1, download explícito de PDF, expiração e homologação da
+PR #34 estão em [chatbot-arquivos-pr34.md](chatbot-arquivos-pr34.md).
+
 ## Contrato da API de IA #30 — tabelas locais e perfil
 
 - Tabelas v2 aceitam até 200 linhas e metadados de paginação local. O mobile mostra 10 linhas por página, sem novas chamadas HTTP ou mensagens. O histórico reconstrói a primeira página a partir do bloco completo em memória.

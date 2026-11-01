@@ -98,10 +98,24 @@ public class ChatAnalyticalContentDeviceTest {
                 String payload = blocks.toString();
                 assertEquals(11, grid.getChildCount());
                 assertEquals("1 / " + count / 10, ((TextView) controls.getChildAt(1)).getText().toString());
+                View previous = controls.getChildAt(0), next = controls.getChildAt(2);
+                assertTrue(previous instanceof android.widget.ImageButton);
+                assertTrue(next instanceof android.widget.ImageButton);
+                assertEquals(root.getContext().getString(R.string.chat_table_previous), previous.getContentDescription());
+                assertEquals(root.getContext().getString(R.string.chat_table_next), next.getContentDescription());
+                assertEquals(ChatStructuredContent.dp(root.getContext(), 48), previous.getLayoutParams().width);
+                assertFalse(previous.isEnabled());
+                assertTrue(next.isEnabled());
                 for (int page = 1; page < count / 10; page++) controls.getChildAt(2).performClick();
                 assertEquals(11, grid.getChildCount()); assertFalse(controls.getChildAt(2).isEnabled());
                 assertEquals(graph, texts(root.getChildAt(4))); assertEquals(payload, blocks.toString());
                 assertEquals(String.valueOf(1000 + count - 10), ((TextView) ((LinearLayout) grid.getChildAt(1)).getChildAt(0)).getText().toString());
+                assertTrue(previous.isEnabled());
+                assertTrue(next.getAlpha() < previous.getAlpha());
+                for (int page = 1; page < count / 10; page++) previous.performClick();
+                assertEquals("1 / " + count / 10, ((TextView) controls.getChildAt(1)).getText().toString());
+                assertFalse(previous.isEnabled());
+                assertEquals(payload, blocks.toString());
             }
         });
     }
@@ -162,6 +176,41 @@ public class ChatAnalyticalContentDeviceTest {
             assertTrue(texts(root).contains("Sem base: 0"));
             assertNotNull(chart.getContentDescription());
             assertTrue(chart.isLongClickable());
+        });
+    }
+    @Test public void longTableTextWithAvatarFitsInsideItsRow() throws Exception {
+        JsonArray sample = fixture();
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            JsonObject block = sample.get(2).getAsJsonObject();
+            block.getAsJsonArray("colunas").add(JsonParser.parseString("{\"chave\":\"email\",\"titulo\":\"E-mail\"}"));
+            block.getAsJsonArray("colunas").add(JsonParser.parseString("{\"chave\":\"foto\",\"titulo\":\"Foto\"}"));
+            for (JsonElement entry : block.getAsJsonArray("linhas")) {
+                entry.getAsJsonObject().addProperty("email", "pessoa.com.nome.muito.extenso.para.validar.quebra.de.linhas.0123456789@example.com");
+                entry.getAsJsonObject().add("foto", JsonParser.parseString("{\"tipo\":\"imagem\",\"descricao\":\"Foto de exemplo\",\"url\":null}"));
+            }
+            for (String type : new String[]{"matriz_conformidade", "tabela"}) {
+                block.addProperty("tipo", type);
+                block.addProperty("versao", "tabela".equals(type) ? 2 : 1);
+                assertTrue(ChatStructuredContent.validBlock(block));
+                for (int widthDp : new int[]{240, 600}) {
+                    LinearLayout root = render(sample);
+                    int width = ChatStructuredContent.dp(root.getContext(), widthDp);
+                    root.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                    root.layout(0, 0, width, root.getMeasuredHeight());
+                    LinearLayout card = (LinearLayout) root.getChildAt(2);
+                    LinearLayout grid = (LinearLayout) ((HorizontalScrollView) card.getChildAt(1)).getChildAt(0);
+                    LinearLayout row = (LinearLayout) grid.getChildAt(1);
+                    TextView email = (TextView) row.getChildAt(4);
+                    assertTrue(email.getLineCount() >= 3);
+                    int textHeight = email.getLayout().getHeight() + email.getCompoundPaddingTop() + email.getCompoundPaddingBottom();
+                    assertTrue("Todas as linhas devem caber na célula", email.getHeight() >= textHeight);
+                    assertTrue(row.getHeight() >= email.getHeight());
+                    View avatar = row.getChildAt(5);
+                    assertEquals(ChatStructuredContent.dp(root.getContext(), 72), avatar.getWidth());
+                    assertTrue("Avatar permanece centralizado", Math.abs(avatar.getTop() + avatar.getHeight() / 2 - row.getHeight() / 2) <= 1);
+                }
+            }
         });
     }
     @Test public void matrixImageWithoutUrlKeepsInitials() throws Exception {

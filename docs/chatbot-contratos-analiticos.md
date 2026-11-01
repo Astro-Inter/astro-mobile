@@ -18,6 +18,10 @@ O paginador modifica somente as linhas da tabela/matriz. Não chama repository, 
 
 Fotos e fichas legadas conservam o fallback de iniciais. Colunas de imagens usam 72 dp, com avatares centralizados; colunas textuais mantêm 160 dp. Colunas que misturam texto e imagem preservam a largura de texto. URLs ausentes nas células da matriz mantêm o fallback. As URLs R2 temporárias não são registradas nem persistidas no cache de imagens, e o carregador desabilita o uso de caches HTTP. Os tipos e campos antigos permanecem compatíveis.
 
+As células textuais medem a própria altura (`WRAP_CONTENT`) para que e-mails e outros valores longos ampliem a linha em vez de serem cortados pela altura do avatar. A largura das colunas não muda, e os avatares continuam centralizados. A regressão instrumentada cobre tabela v2 e matriz com texto de mais de três linhas em larguras de 240/600 dp.
+
+A paginação local usa os ícones originais [Chevron left](https://www.figma.com/design/qdCrRXAVuiNhNkBuim95zz/Astro?node-id=1011-705) e [Chevron right](https://www.figma.com/design/qdCrRXAVuiNhNkBuim95zz/Astro?node-id=1011-696) do Figma. Os SVGs foram rasterizados sem redesenho em recursos xxxhdpi, mantendo o tamanho lógico de 20 dp. Os botões têm área de toque de 48 dp, tooltip e descrição acessível; no limite de páginas, ficam desabilitados e atenuados. O contador central e a troca local de dez registros permanecem iguais.
+
 ## Validação
 
 A fixture compartilhada `app/src/test/resources/chat/analytical-mixed.json` utiliza os discriminadores e exemplos documentados. Só o APK de testes a recebe como asset; não há fixture nem chave de diagnóstico no aplicativo de produção.
