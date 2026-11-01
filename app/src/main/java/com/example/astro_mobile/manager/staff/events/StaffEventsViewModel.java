@@ -17,7 +17,13 @@ import java.time.ZoneId;
 
 public final class StaffEventsViewModel extends ViewModel {
     public enum Filter {
-        ALL(null), PENDING(StaffEvent.Status.PENDING), DONE(StaffEvent.Status.DONE), EXPIRED(StaffEvent.Status.EXPIRED);
+        ALL(null),
+        PENDING(StaffEvent.Status.PENDING),
+        ANALYSIS(StaffEvent.Status.ANALYSIS),
+        DONE(StaffEvent.Status.DONE),
+        REJECTED(StaffEvent.Status.REJECTED),
+        CANCELLED(StaffEvent.Status.CANCELLED),
+        EXPIRED(StaffEvent.Status.EXPIRED);
 
         final StaffEvent.Status status;
         Filter(StaffEvent.Status status) { this.status = status; }
@@ -77,7 +83,9 @@ public final class StaffEventsViewModel extends ViewModel {
         // Aplica o filtro selecionado aos eventos carregados.
         List<StaffEvent> result = new ArrayList<>();
         for (StaffEvent event : events) {
-            if (filter == Filter.ALL || event.status == filter.status) result.add(event);
+            boolean matchesFilter = filter == Filter.ALL || event.status == filter.status
+                    || (filter == Filter.PENDING && event.status == StaffEvent.Status.REJECTED);
+            if (matchesFilter) result.add(event);
         }
         return result;
     }

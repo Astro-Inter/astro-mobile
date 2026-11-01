@@ -2,6 +2,9 @@
 <resources>
     <string name="profile_title">Perfil</string>
     <string name="profile_change_photo">Alterar foto</string>
+    <string name="profile_view_photo">Ver foto</string>
+    <string name="profile_close_photo">Fechar foto</string>
+    <string name="profile_view_photo_error">Não foi possível carregar a foto.</string>
     <string name="profile_photo_sending">Enviando foto…</string>
     <string name="profile_photo_updated">Foto atualizada.</string>
     <string name="profile_photo_invalid">Escolha uma foto JPEG, PNG ou WebP de até 5 MB.</string>
@@ -10,14 +13,15 @@
     <string name="profile_unit">Unidade:</string>
     <string name="profile_modality">Modalidade:</string>
     <string name="profile_email">E-mail:</string>
-    <string name="profile_notifications">Receber alertas no celular</string>
+    <string name="profile_notifications">Receber notificações no dispositivo</string>
     <string name="profile_nrs">Minhas NR’s</string>
     <string name="profile_nrs_empty">Nenhuma NR vinculada ao seu cargo.</string>
     <string name="profile_nr_code">NR-%1$02d</string>
     <string name="profile_nr_validity">%1$s · Validade: %2$s</string>
-    <string name="profile_nr_description">Descrição:\n%1$s</string>
-    <string name="profile_nr_objective">Objetivo:\n%1$s</string>
-    <string name="profile_nr_applicability">Aplicabilidade:\n%1$s</string>
+    <string name="profile_nr_without_validity">%1$s · Sem validade</string>
+    <string name="profile_nr_description">Descrição:</string>
+    <string name="profile_nr_objective">Objetivo:</string>
+    <string name="profile_nr_applicability">Aplicabilidade:</string>
     <string name="profile_change_password">Alterar senha</string>
     <string name="profile_switch_flow">Trocar tipo de usuário</string>
     <string name="profile_logout">Sair da conta</string>

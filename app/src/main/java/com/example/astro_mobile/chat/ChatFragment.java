@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.data.ai.ChatRequest;
 import com.example.astro_mobile.data.ai.ChatFailure;
@@ -29,6 +30,7 @@ import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
+import com.example.astro_mobile.shared.profile.PhotoViewerDialog;
 
 public final class ChatFragment extends Fragment {
     private ChatCalendarLinkHandler calendarLinks;
@@ -38,6 +40,8 @@ public final class ChatFragment extends Fragment {
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         NavController navigation = NavHostFragment.findNavController(this);
+        view.findViewById(R.id.image_chat_header_avatar).setOnClickListener(clicked ->
+                PhotoViewerDialog.show(this, null, R.drawable.chat_mascot));
         view.findViewById(R.id.button_chat_sessions).setOnClickListener(clicked -> {
             if (!navigation.popBackStack(R.id.aiSessionsFragment, false)) {
                 navigation.navigate(R.id.action_chat_to_ai_sessions, AuthArgs.copy(getArguments()));
@@ -49,8 +53,10 @@ public final class ChatFragment extends Fragment {
         // O rascunho pertence à sessão no ViewModel; não restaura texto de outra tela.
         View sendButton = view.findViewById(R.id.button_chat_send);
         RecyclerView messages = view.findViewById(R.id.list_chat_messages);
+        PullToRefresh.attach(this, messages, messages, () -> model.refreshCurrentHistory());
         calendarLinks = new ChatCalendarLinkHandler(requireContext());
-        ChatMessageAdapter adapter = new ChatMessageAdapter(ChatMarkdown.create(requireContext(), calendarLinks::connect));
+        ChatMessageAdapter adapter = new ChatMessageAdapter(ChatMarkdown.create(requireContext(), calendarLinks::connect),
+                () -> PhotoViewerDialog.show(this, null, R.drawable.chat_mascot));
         messages.setLayoutManager(new LinearLayoutManager(requireContext()));
         messages.setAdapter(adapter);
         messages.setItemAnimator(null);

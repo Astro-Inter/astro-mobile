@@ -32,8 +32,8 @@ public final class StaffEventMapperTest {
     }
 
     @Test
-    public void rejectedCompletionRemainsRejected() {
-        assertEquals(StaffEvent.Status.REJECTED, map("REJEITADO", "ATIVO", "2026-10-28T10:00:00").status);
+    public void expiredDeadlineTakesPriorityOverRejectedCompletion() {
+        assertEquals(StaffEvent.Status.EXPIRED, map("REJEITADO", "ATIVO", "2026-10-28T10:00:00").status);
     }
 
     @Test

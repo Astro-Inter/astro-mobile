@@ -9,7 +9,7 @@
     <string name="event_validation_completion_mock">26/08/2026 às 09:15</string>
     <string name="event_validation_deadline_label">Data de término:</string>
     <string name="event_validation_deadline_mock">30/08/2026</string>
-    <string name="event_validation_evidence_required">Evidência: Obrigatória</string>
+    <string name="event_validation_evidence_required">Evidência obrigatória:</string>
     <string name="event_validation_evidence_yes">Sim</string>
     <string name="event_validation_evidence_title">Evidências envidadas</string>
     <string name="event_validation_evidence_description">Verifique as evidências deste colaborador para este evento</string>

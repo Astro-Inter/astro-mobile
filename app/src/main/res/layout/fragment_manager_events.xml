@@ -55,39 +55,27 @@
                         android:src="@drawable/manager_events_search" android:contentDescription="@null"
                         android:importantForAccessibility="no" android:scaleType="fitCenter" />
             </FrameLayout>
-            <FrameLayout android:id="@+id/container_manager_events_dropdown" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
+            <HorizontalScrollView android:id="@+id/container_manager_events_filters" android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="30dp" android:paddingVertical="10dp"
                 app:layout_constraintTop_toBottomOf="@id/container_manager_events_search"
-                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
-                    <TextView android:id="@+id/button_manager_events_filter" style="@style/ManagerEventsText"
-                        android:minHeight="60dp" android:background="@drawable/bg_conversations_filter"
-                        android:clickable="true" android:focusable="true" android:gravity="center_vertical"
-                        android:paddingStart="15dp" android:paddingEnd="55dp" android:paddingVertical="10dp"
-                        android:text="@string/manager_events_filter" />
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
-                        android:layout_gravity="end|center_vertical" android:layout_marginEnd="15dp"
-                        android:src="@drawable/manager_events_chevron_down"
-                        android:scaleType="fitCenter" android:contentDescription="@null" android:importantForAccessibility="no" />
-            </FrameLayout>
-            <LinearLayout android:id="@+id/container_manager_events_filters" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:orientation="horizontal" android:baselineAligned="false"
-                android:paddingHorizontal="30dp" android:paddingVertical="10dp" android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/container_manager_events_search"
-                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
-                <TextView android:id="@+id/filter_manager_events_all" style="@style/ConversationsFilter"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:fillViewport="true" android:clipToPadding="false" android:scrollbars="none">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:baselineAligned="false">
+                <TextView android:id="@+id/filter_manager_events_all" style="@style/ConversationsFilter" android:layout_height="match_parent"
                     android:text="@string/employee_events_all" android:textSize="12sp" tools:background="@color/astro_primary_purple" />
-                <TextView android:id="@+id/filter_manager_events_progress" style="@style/ConversationsFilter"
+                <TextView android:id="@+id/filter_manager_events_progress" style="@style/ConversationsFilter" android:layout_height="match_parent"
                     android:layout_marginStart="10dp" android:text="@string/manager_events_in_progress" android:textSize="12sp" />
-                <TextView android:id="@+id/filter_manager_events_finished" style="@style/ConversationsFilter"
+                <TextView android:id="@+id/filter_manager_events_finished" style="@style/ConversationsFilter" android:layout_height="match_parent"
                     android:layout_marginStart="10dp" android:text="@string/manager_events_finished" android:textSize="12sp" />
+                <TextView android:id="@+id/filter_manager_events_cancelled" style="@style/ConversationsFilter" android:layout_height="match_parent"
+                    android:layout_marginStart="10dp" android:text="@string/manager_events_cancelled" android:textSize="12sp" />
+                <TextView android:id="@+id/filter_manager_events_expired" style="@style/ConversationsFilter" android:layout_height="match_parent"
+                    android:layout_marginStart="10dp" android:text="@string/manager_events_expired" android:textSize="12sp" />
             </LinearLayout>
-            <androidx.constraintlayout.widget.Barrier android:id="@+id/barrier_manager_events_filters"
-                android:layout_width="wrap_content" android:layout_height="wrap_content" app:barrierDirection="bottom"
-                app:barrierAllowsGoneWidgets="false"
-                app:constraint_referenced_ids="container_manager_events_dropdown,container_manager_events_filters" />
+                </HorizontalScrollView>
             <View android:id="@+id/divider_manager_events_top" android:layout_width="0dp" android:layout_height="21dp"
                 android:background="@drawable/bg_home_divider" android:importantForAccessibility="no"
-                app:layout_constraintTop_toBottomOf="@id/barrier_manager_events_filters"
+                app:layout_constraintTop_toBottomOf="@id/container_manager_events_filters"
                 app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_manager_events"
                 android:layout_width="0dp" android:layout_height="0dp" android:clipToPadding="false" android:paddingBottom="30dp"

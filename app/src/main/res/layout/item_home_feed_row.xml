@@ -31,6 +31,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_family"
                 android:includeFontPadding="false"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textColor="@color/astro_light_background"
                 android:textSize="@dimen/employee_home_body_text_size" />
 
@@ -40,6 +42,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_family"
                 android:includeFontPadding="false"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textColor="@color/astro_input_hint"
                 android:textSize="@dimen/employee_home_caption_text_size" />
         </LinearLayout>

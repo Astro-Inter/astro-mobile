@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import android.content.res.ColorStateList;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventParticipantsAdapter.Row> {
     public interface OnParticipantClickListener {
@@ -24,13 +25,16 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
     private final String eventTitle;
     private final boolean assignmentMode;
     private final OnParticipantClickListener participantClick;
+    private final Consumer<EventParticipant> photoClick;
 
     public EventParticipantsAdapter(List<EventParticipant> participants, String eventTitle,
-                                    boolean assignmentMode, OnParticipantClickListener participantClick) {
+                                    boolean assignmentMode, OnParticipantClickListener participantClick,
+                                    Consumer<EventParticipant> photoClick) {
         this.participants = participants;
         this.eventTitle = eventTitle;
         this.assignmentMode = assignmentMode;
         this.participantClick = participantClick;
+        this.photoClick = photoClick;
     }
 
     @NonNull
@@ -43,6 +47,7 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
     public void onBindViewHolder(@NonNull Row row, int position) {
         // Exibe os dados e indicadores da modalidade selecionada.
         EventParticipant participant = participants.get(position);
+        row.avatar.setOnClickListener(clicked -> photoClick.accept(participant));
         row.name.setText(participant.name);
         row.event.setText(eventTitle);
         Glide.with(row.itemView).load(participant.photoUrl).circleCrop()
@@ -67,7 +72,7 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
                 break;
             case REJECTED:
                 row.status.setText(R.string.employee_events_rejected);
-                row.icon.setImageResource(R.drawable.conversations_close);
+                row.icon.setImageResource(R.drawable.ic_status_reload);
                 row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red)));
                 break;
         }

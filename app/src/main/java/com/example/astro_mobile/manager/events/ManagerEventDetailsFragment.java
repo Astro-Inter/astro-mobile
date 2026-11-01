@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -35,6 +36,8 @@ public final class ManagerEventDetailsFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_manager_event_details),
+                view.findViewById(R.id.scroll_manager_event_details), () -> loadDetails(view));
         state = new ViewModelProvider(this).get(ManagerEventDetailsViewModel.class);
         Bundle args = requireArguments();
         selfDeclaration = ManagerEvent.CompletionMode.valueOf(args.getString(COMPLETION_MODE))
@@ -94,7 +97,7 @@ public final class ManagerEventDetailsFragment extends Fragment {
         });
     }
 
-    // Preenche a tela com o retorno; validade ainda não faz parte do contrato.
+    // Preenche a tela com os dados retornados para o evento.
     private void render(View view, ManagerEventDetailsData data) {
         setValue(view, R.id.text_manager_event_title, data.eventTitle);
         setValue(view, R.id.text_manager_event_description, data.eventDescription);
@@ -111,7 +114,6 @@ public final class ManagerEventDetailsFragment extends Fragment {
             catch (DateTimeParseException ignored) { deadline = null; }
         }
         setValue(view, R.id.text_manager_event_deadline, deadline);
-        setValue(view, R.id.text_manager_event_validity, null);
         boolean hasMaterial = data.externalLink != null && !data.externalLink.trim().isEmpty();
         view.findViewById(R.id.heading_manager_event_material).setVisibility(hasMaterial ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.container_manager_event_material).setVisibility(hasMaterial ? View.VISIBLE : View.GONE);

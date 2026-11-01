@@ -135,7 +135,9 @@
 
                         <TextView
                             android:layout_width="match_parent"
-                            android:layout_height="100dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="100dp"
+                            android:paddingVertical="12dp"
                             android:fontFamily="@font/montserrat_family"
                             android:gravity="center"
                             android:includeFontPadding="false"

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_confirmation_yes">Sim</string>
+    <string name="action_confirmation_irreversible">Essa ação não pode ser desfeita.</string>
+    <string name="action_confirmation_complete_event">Tem certeza que quer concluir esse evento?</string>
+    <string name="action_confirmation_assign_event">Tem certeza que quer atribuir a conclusão desse evento para esse funcionário?</string>
+    <string name="action_confirmation_validate_event">Tem certeza que quer validar esse evento?</string>
+    <string name="action_confirmation_reject_event">Tem certeza que quer rejeitar essa conclusão?</string>
+    <string name="action_confirmation_send_form">Tem certeza que quer enviar esse formulário?</string>
+</resources>

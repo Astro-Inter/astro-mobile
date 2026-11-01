@@ -49,6 +49,8 @@ public final class ManagerEventsViewModelTest {
         model.setFilter(ManagerEventsViewModel.Filter.FINISHED);
         assertEquals(4L, model.visibleEvents().get(0).id);
         assertEquals(1, model.visibleEvents().size());
+        model.setFilter(ManagerEventsViewModel.Filter.EXPIRED);
+        assertTrue(model.visibleEvents().isEmpty());
         model.setFilter(ManagerEventsViewModel.Filter.ALL);
         model.setQuery("validacao");
         assertEquals(1L, model.visibleEvents().get(0).id);
@@ -62,6 +64,39 @@ public final class ManagerEventsViewModelTest {
         result.await();
         assertEquals(FailureKind.INTERNAL, result.failure);
         assertTrue(!model.isLoaded());
+    }
+
+    @Test public void pastDeadlineTakesPriorityOverManagerAssignment() throws Exception {
+        String expiredEvent = "{\"success\":true,\"data\":[{\"id\":6,\"title\":\"Prazo vencido\","
+                + "\"status\":\"ATIVO\",\"completionMode\":\"GESTOR\",\"pendingCount\":1,"
+                + "\"lastClassLimitDate\":\"2000-01-01T23:59:00\"}]}";
+        ManagerEventsViewModel model = model(200, expiredEvent);
+        Result result = new Result();
+
+        model.load(result);
+        result.await();
+
+        assertNull(result.failure);
+        assertEquals("EXPIRED", model.visibleEvents().get(0).status.name());
+        assertEquals(6L, model.visibleEvents().get(0).id);
+        model.setFilter(ManagerEventsViewModel.Filter.EXPIRED);
+        assertEquals(1, model.visibleEvents().size());
+        model.setFilter(ManagerEventsViewModel.Filter.IN_PROGRESS);
+        assertTrue(model.visibleEvents().isEmpty());
+    }
+
+    @Test public void futureDeadlineKeepsManagerAssignmentState() throws Exception {
+        String event = "{\"success\":true,\"data\":[{\"id\":7,\"title\":\"Prazo futuro\","
+                + "\"status\":\"ATIVO\",\"completionMode\":\"GESTOR\",\"pendingCount\":1,"
+                + "\"lastClassLimitDate\":\"2999-12-31T23:59:00\"}]}";
+        ManagerEventsViewModel model = model(200, event);
+        Result result = new Result();
+
+        model.load(result);
+        result.await();
+
+        assertNull(result.failure);
+        assertEquals(ManagerEvent.Status.ASSIGNMENT_PENDING, model.visibleEvents().get(0).status);
     }
 
     @Test public void connectionFailureIsDistinguishedFromServerFailure() throws Exception {

@@ -7,8 +7,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +16,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ResponsiveFilters;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -27,9 +27,13 @@ import java.util.List;
 
 public final class ManagerEventsFragment extends Fragment {
     private final int[] filterIds = {R.id.filter_manager_events_all,
-            R.id.filter_manager_events_progress, R.id.filter_manager_events_finished};
-    private final int[] filterLabels = {R.string.employee_events_all,
-            R.string.manager_events_in_progress, R.string.manager_events_finished};
+            R.id.filter_manager_events_progress, R.id.filter_manager_events_finished,
+            R.id.filter_manager_events_cancelled, R.id.filter_manager_events_expired};
+    private final ManagerEventsViewModel.Filter[] filters = {
+            ManagerEventsViewModel.Filter.ALL, ManagerEventsViewModel.Filter.IN_PROGRESS,
+            ManagerEventsViewModel.Filter.FINISHED, ManagerEventsViewModel.Filter.CANCELLED,
+            ManagerEventsViewModel.Filter.EXPIRED
+    };
     private ManagerEventsViewModel state;
 
     public ManagerEventsFragment() { super(R.layout.fragment_manager_events); }
@@ -37,6 +41,9 @@ public final class ManagerEventsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ResponsiveFilters.bind(view.findViewById(R.id.container_manager_events_filters));
+        PullToRefresh.attach(this, view.findViewById(R.id.container_manager_events_content),
+                view.findViewById(R.id.list_manager_events), () -> loadEvents());
         state = new ViewModelProvider(this, new ManagerEventsViewModel.Factory()).get(ManagerEventsViewModel.class);
 
         // Voltar e fechar retornam à Home, sem mudar o fluxo ativo da conta.
@@ -44,9 +51,8 @@ public final class ManagerEventsFragment extends Fragment {
                 .popBackStack(HomeNavigation.destination(requireContext()), false);
         view.findViewById(R.id.button_manager_events_back).setOnClickListener(returnHome);
         view.findViewById(R.id.button_manager_events_close).setOnClickListener(returnHome);
-        view.findViewById(R.id.button_manager_events_filter).setOnClickListener(clicked -> showFilters(view, clicked));
         for (int index = 0; index < filterIds.length; index++) {
-            ManagerEventsViewModel.Filter filter = ManagerEventsViewModel.Filter.values()[index];
+            ManagerEventsViewModel.Filter filter = filters[index];
             view.findViewById(filterIds[index]).setOnClickListener(clicked -> {
                 state.setFilter(filter);
                 render(view);
@@ -105,20 +111,6 @@ public final class ManagerEventsFragment extends Fragment {
         });
     }
 
-    private void showFilters(View view, View anchor) {
-        // O seletor e os chips da tela vazia usam os mesmos três filtros do Figma.
-        PopupMenu menu = new PopupMenu(requireContext(), anchor);
-        for (int index = 0; index < filterLabels.length; index++) {
-            menu.getMenu().add(0, index, index, filterLabels[index]);
-        }
-        menu.setOnMenuItemClickListener(item -> {
-            state.setFilter(ManagerEventsViewModel.Filter.values()[item.getItemId()]);
-            render(view);
-            return true;
-        });
-        menu.show();
-    }
-
     private void render(View view) {
         List<ManagerEvent> events = state.visibleEvents();
         boolean empty = events.isEmpty();
@@ -126,12 +118,7 @@ public final class ManagerEventsFragment extends Fragment {
         list.setAdapter(new ManagerEventsAdapter(events, this::openDetails));
         list.setVisibility(empty ? View.GONE : View.VISIBLE);
         view.findViewById(R.id.container_manager_events_empty).setVisibility(empty ? View.VISIBLE : View.GONE);
-        // Preserva as duas composições: dropdown na lista e chips no estado vazio.
-        view.findViewById(R.id.container_manager_events_dropdown).setVisibility(empty ? View.GONE : View.VISIBLE);
-        view.findViewById(R.id.container_manager_events_filters).setVisibility(empty ? View.VISIBLE : View.GONE);
-        TextView filterText = view.findViewById(R.id.button_manager_events_filter);
-        filterText.setText(state.getFilter() == ManagerEventsViewModel.Filter.ALL
-                ? R.string.manager_events_filter : filterLabels[state.getFilter().ordinal()]);
+        // Os filtros permanecem disponíveis mesmo quando não há resultados.
         for (int index = 0; index < filterIds.length; index++) {
             view.findViewById(filterIds[index]).setSelected(index == state.getFilter().ordinal());
         }

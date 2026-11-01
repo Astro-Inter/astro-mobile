@@ -4,6 +4,8 @@ public final class ChatContactData {
     public Long id;
     public String name;
     public String role;
+    public String profilePhotoUrl;
+    public String avatarInitials;
 
     public boolean isValid() {
         return id != null && id > 0 && name != null && !name.trim().isEmpty()

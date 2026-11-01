@@ -14,12 +14,15 @@
                 android:background="@drawable/bg_conversations_ai_avatar" tools:text="KP" />
             <ImageView android:id="@+id/image_staff_avatar" android:layout_width="match_parent"
                 android:layout_height="match_parent" android:scaleType="centerCrop" android:visibility="gone"
-                android:contentDescription="@null" android:importantForAccessibility="no" />
+                android:contentDescription="@string/profile_view_photo"
+                android:foreground="?attr/selectableItemBackgroundBorderless" />
         </FrameLayout>
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="137"
             android:orientation="vertical" android:layout_marginEnd="20dp">
-            <TextView android:id="@+id/text_staff_name" style="@style/ManagerEventsText" tools:text="Kevin Parker" />
-            <TextView android:id="@+id/text_staff_role" style="@style/ManagerEventsCaption" tools:text="Eletricista" />
+            <TextView android:id="@+id/text_staff_name" style="@style/ManagerEventsText"
+                android:maxLines="1" android:ellipsize="end" tools:text="Kevin Parker" />
+            <TextView android:id="@+id/text_staff_role" style="@style/ManagerEventsCaption"
+                android:maxLines="2" android:ellipsize="end" tools:text="Eletricista" />
         </LinearLayout>
         <TextView android:id="@+id/text_staff_pending" style="@style/ManagerEventsCaption"
             android:layout_width="0dp" android:layout_weight="113" android:gravity="end"

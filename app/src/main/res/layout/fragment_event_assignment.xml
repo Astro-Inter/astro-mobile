@@ -83,7 +83,7 @@
                 <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:paddingHorizontal="30dp" android:paddingVertical="25dp">
                     <TextView android:id="@+id/button_assignment_submit" style="@style/EmployeeEventDetailsButton"
-                        android:background="@drawable/bg_login_password_button" android:text="@string/event_assignment_submit" />
+                        android:background="@drawable/bg_primary_button" android:text="@string/event_assignment_submit" />
                 </FrameLayout>
             </LinearLayout>
         </ScrollView>

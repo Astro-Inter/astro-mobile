@@ -21,6 +21,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ResponsiveFilters;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
+import com.example.astro_mobile.shared.profile.PhotoViewerDialog;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -41,6 +44,9 @@ public final class EventParticipantsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ResponsiveFilters.bind(view.findViewById(R.id.container_participants_filters));
+        PullToRefresh.attach(this, view.findViewById(R.id.container_participants_content),
+                view.findViewById(R.id.list_event_participants), () -> loadParticipants(view));
         Bundle args = requireArguments();
         eventTitle = args.getString("event_title");
         completionMode = ManagerEvent.CompletionMode.valueOf(args.getString("event_completion_mode"));
@@ -133,7 +139,8 @@ public final class EventParticipantsFragment extends Fragment {
         List<EventParticipant> participants = state.visibleParticipants();
         RecyclerView list = view.findViewById(R.id.list_event_participants);
         list.setAdapter(new EventParticipantsAdapter(participants, eventTitle,
-                completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT, this::openParticipant));
+                completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT, this::openParticipant,
+                participant -> PhotoViewerDialog.show(this, participant.photoUrl, R.drawable.profile_avatar_placeholder)));
         boolean empty = participants.isEmpty();
         list.setVisibility(empty ? View.GONE : View.VISIBLE);
         view.findViewById(R.id.text_participants_empty).setVisibility(empty ? View.VISIBLE : View.GONE);

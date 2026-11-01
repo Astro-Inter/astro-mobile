@@ -4,7 +4,7 @@
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="10dp" />
-            <solid android:color="@color/astro_primary_purple" />
+            <solid android:color="@color/astro_primary_button_tint" />
         </shape>
     </item>
     <item android:id="@android:id/mask">

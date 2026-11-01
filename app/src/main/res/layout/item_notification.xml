@@ -25,6 +25,7 @@
             android:fontFamily="@font/montserrat_family"
             android:includeFontPadding="false"
             android:maxLines="2"
+            android:ellipsize="end"
             android:textColor="@color/astro_light_background"
             android:textSize="16sp"
             tools:text="Você tem validações pendentes" />

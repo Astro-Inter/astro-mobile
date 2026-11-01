@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ActionConfirmationDialog;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.EventEvidenceFile;
@@ -27,9 +29,7 @@ import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.CollaboratorEventDetailsData;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public final class EmployeeEventDetailsFragment extends Fragment {
     public static final String EVENT_ID = "event_id";
@@ -55,16 +55,31 @@ public final class EmployeeEventDetailsFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        PullToRefresh.attach(this,
+                view.findViewById(R.id.scroll_employee_event_details),
+                view.findViewById(R.id.scroll_employee_event_details), () -> { if (!state.isLoading()) loadDetails(); });
         state = new ViewModelProvider(this, new EmployeeEventDetailsViewModel.Factory()).get(EmployeeEventDetailsViewModel.class);
         view.findViewById(R.id.button_employee_event_details_back).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack());
         view.findViewById(R.id.button_employee_event_attachment).setOnClickListener(clicked -> openUrl(state.getDetails().getExternalLink()));
         view.findViewById(R.id.button_employee_event_evidence).setOnClickListener(clicked -> selectEvidence.launch(new String[]{"*/*"}));
-        view.findViewById(R.id.button_employee_event_complete).setOnClickListener(clicked -> complete());
+        view.findViewById(R.id.button_employee_event_complete).setOnClickListener(clicked -> {
+            if (state.isLoading() || !state.canComplete()) return;
+            if (state.getDetails().isEvidenceMandatory() && state.getFiles().isEmpty()) {
+                showEvidenceError(getString(R.string.employee_event_evidence_required));
+                return;
+            }
+            ActionConfirmationDialog.show(this,
+                    R.string.action_confirmation_complete_event, this::complete);
+        });
     }
 
     @Override public void onResume() {
         super.onResume();
+        loadDetails();
+    }
+
+    private void loadDetails() {
         View view = requireView();
         view.findViewById(R.id.scroll_employee_event_details).setVisibility(View.INVISIBLE);
         view.findViewById(R.id.skeleton_employee_event_details).setVisibility(View.VISIBLE);
@@ -90,7 +105,6 @@ public final class EmployeeEventDetailsFragment extends Fragment {
         setText(view, R.id.text_employee_event_details_title, detail.getEventTitle());
         setText(view, R.id.text_employee_event_description, detail.getEventDescription());
         setText(view, R.id.text_employee_event_deadline, DATE.format(detail.getDeadline()));
-        setText(view, R.id.text_employee_event_validity, formatValidity(detail.getComplianceValidity()));
         setText(view, R.id.text_employee_event_sender, detail.getManagerName());
         setText(view, R.id.text_employee_event_completion_mode, getString(
                 detail.getCompletionMode() == CollaboratorEventDetailsData.CompletionMode.COLABORADOR
@@ -110,14 +124,14 @@ public final class EmployeeEventDetailsFragment extends Fragment {
             case URGENT: label = R.string.employee_events_urgent; drawable = R.drawable.ic_employee_event_warning; break;
             case ANALYSIS: label = R.string.employee_events_review; drawable = R.drawable.home_clock; break;
             case DONE: label = R.string.employee_events_done; drawable = R.drawable.ic_employee_event_done; break;
-            case REJECTED: label = R.string.employee_events_rejected; red = true; break;
+            case REJECTED: label = R.string.employee_events_rejected; drawable = R.drawable.ic_status_reload; red = true; break;
             case CANCELLED: label = R.string.employee_events_cancelled; red = true; break;
             case EXPIRED: label = R.string.employee_events_expired; red = true; break;
             default: break;
         }
         setText(view, R.id.text_employee_event_details_status, getString(label));
         icon.setImageTintList(red ? ColorStateList.valueOf(requireContext().getColor(R.color.employee_event_status_red)) : null);
-        if (red) drawable = R.drawable.conversations_close;
+        if (red && status != EventStatusClassifier.DisplayStatus.REJECTED) drawable = R.drawable.conversations_close;
         icon.setVisibility(drawable == 0 ? View.GONE : View.VISIBLE);
         if (drawable != 0) icon.setImageResource(drawable);
         view.findViewById(R.id.container_employee_event_material).setVisibility(
@@ -127,6 +141,8 @@ public final class EmployeeEventDetailsFragment extends Fragment {
     }
 
     private void renderEvidence(View view) {
+        view.findViewById(R.id.text_employee_event_evidence_optional).setVisibility(
+                state.getDetails().isEvidenceMandatory() ? View.GONE : View.VISIBLE);
         LinearLayout list = view.findViewById(R.id.list_employee_event_evidences);
         list.removeAllViews();
         for (CollaboratorEventDetailsData.Evidence evidence : state.getDetails().getEvidences()) {
@@ -207,11 +223,6 @@ public final class EmployeeEventDetailsFragment extends Fragment {
     }
     private void showUrlError() { Toast.makeText(requireContext(), R.string.employee_event_open_error, Toast.LENGTH_SHORT).show(); }
     private void setText(View view, int id, String text) { ((TextView) view.findViewById(id)).setText(text == null ? "—" : text); }
-    private String formatValidity(String value) {
-        if (value == null) return getString(R.string.employee_event_no_validity);
-        try { return DATE.format(LocalDate.parse(value)); }
-        catch (DateTimeParseException error) { return getString(R.string.employee_event_no_validity); }
-    }
     @Override public void onPause() { state.cancel(); super.onPause(); }
     @Override public void onDestroyView() { state.cancel(); super.onDestroyView(); }
 }

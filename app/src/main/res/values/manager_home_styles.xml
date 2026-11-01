@@ -31,7 +31,7 @@
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:layout_marginBottom">10dp</item>
         <item name="android:minHeight">58dp</item>
-        <item name="android:background">@drawable/bg_access_key_button</item>
+        <item name="android:background">@drawable/bg_primary_button</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:paddingStart">30dp</item>

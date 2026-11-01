@@ -33,7 +33,8 @@
                 <LinearLayout style="@style/ProfileField" android:minHeight="74dp" android:paddingHorizontal="30dp">
                     <ImageView android:id="@+id/image_staff_details_avatar" android:layout_width="56dp"
                         android:layout_height="56dp" android:src="@drawable/participant_avatar_1"
-                        android:contentDescription="@null" android:scaleType="fitCenter" android:layout_marginEnd="30dp" />
+                        android:contentDescription="@string/profile_view_photo" android:scaleType="fitCenter" android:layout_marginEnd="30dp"
+                        android:foreground="?attr/selectableItemBackgroundBorderless" />
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical" android:paddingVertical="10dp">
                         <TextView android:id="@+id/text_staff_details_name" style="@style/ProfileText"
@@ -51,7 +52,7 @@
                     <FrameLayout android:id="@+id/button_staff_details_chat" android:layout_width="match_parent"
                         android:layout_marginHorizontal="30dp" android:layout_marginVertical="15dp"
                         android:layout_height="wrap_content" android:minHeight="60dp" android:clickable="true"
-                        android:focusable="true" android:background="@drawable/bg_access_key_button">
+                        android:focusable="true" android:background="@drawable/bg_primary_button">
                         <TextView style="@style/ProfileText" android:layout_gravity="center"
                             android:paddingVertical="18dp" android:layout_marginHorizontal="50dp"
                             android:text="@string/staff_detail_chat" android:textSize="16sp" android:gravity="center" />
@@ -80,7 +81,8 @@
                         android:src="@drawable/ic_email_closed" app:tint="@color/astro_light_background" android:contentDescription="@null" />
                     <TextView style="@style/StaffDetailLabel" android:text="@string/profile_email" />
                     <TextView android:id="@+id/text_staff_details_email" style="@style/StaffDetailValue"
-                        android:text="@string/staff_detail_value_unavailable" />
+                        android:maxLines="1" android:ellipsize="end" android:clickable="true"
+                        android:focusable="true" android:foreground="?attr/selectableItemBackground" android:text="@string/staff_detail_value_unavailable" />
                 </LinearLayout>
                 <View style="@style/StaffDetailDivider" />
                 <LinearLayout style="@style/StaffDetailField">
@@ -109,7 +111,7 @@
                     <FrameLayout android:id="@+id/button_staff_details_pending" android:layout_width="match_parent"
                         android:layout_marginHorizontal="30dp" android:layout_marginTop="10dp" android:layout_marginBottom="20dp"
                         android:layout_height="wrap_content" android:minHeight="60dp" android:clickable="true"
-                        android:focusable="true" android:background="@drawable/bg_access_key_button">
+                        android:focusable="true" android:background="@drawable/bg_primary_button">
                         <TextView style="@style/ProfileText" android:layout_gravity="center"
                             android:paddingVertical="18dp" android:layout_marginHorizontal="50dp"
                             android:text="@string/staff_detail_view_pending" android:textSize="16sp" android:gravity="center" />

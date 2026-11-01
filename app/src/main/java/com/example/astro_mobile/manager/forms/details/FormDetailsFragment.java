@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.ReceivedFormDetailsRepository;
@@ -58,6 +59,8 @@ public final class FormDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_form_details),
+                view.findViewById(R.id.scroll_form_details), () -> loadDetails());
         state = new ViewModelProvider(this, new FormDetailsViewModel.Factory()).get(FormDetailsViewModel.class);
         answer = new ViewModelProvider(NavHostFragment.findNavController(this)
                 .getBackStackEntry(R.id.formDetailsFragment), FormAnswerViewModel.factory(requireContext()))

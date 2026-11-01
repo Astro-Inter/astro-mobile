@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.navigation.HomeNavigation;
 
 /** Exibe o resultado antes de retornar à lista atualizada. */
 public final class EventValidationConfirmationFragment extends Fragment {
@@ -19,7 +20,9 @@ public final class EventValidationConfirmationFragment extends Fragment {
         boolean rejected = getArguments() != null && getArguments().getBoolean("validation_rejected");
         ((TextView) view.findViewById(R.id.text_event_confirmation)).setText(rejected
                 ? R.string.event_validation_rejected_confirmation : R.string.event_validation_confirmation);
-        returnToParticipants = () -> NavHostFragment.findNavController(this).popBackStack(R.id.eventParticipantsFragment, false);
+        boolean fromHome = getArguments() != null && getArguments().getBoolean(EventValidationFragment.FROM_HOME);
+        returnToParticipants = () -> NavHostFragment.findNavController(this).popBackStack(
+                fromHome ? HomeNavigation.destination(requireContext()) : R.id.eventParticipantsFragment, false);
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() { returnToParticipants.run(); }
         });

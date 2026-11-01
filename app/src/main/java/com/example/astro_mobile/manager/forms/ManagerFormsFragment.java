@@ -16,6 +16,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ResponsiveFilters;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -35,6 +37,9 @@ public final class ManagerFormsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ResponsiveFilters.bind(view.findViewById(R.id.container_manager_forms_filters));
+        PullToRefresh.attach(this, view.findViewById(R.id.container_manager_forms_content),
+                view.findViewById(R.id.list_manager_forms), () -> loadForms());
         state = new ViewModelProvider(this, new ManagerFormsViewModel.Factory()).get(ManagerFormsViewModel.class);
         View.OnClickListener returnHome = clicked -> NavHostFragment.findNavController(this)
                 .popBackStack(HomeNavigation.destination(requireContext()), false);

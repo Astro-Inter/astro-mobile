@@ -1,8 +1,8 @@
 <resources>
-    <string name="ai_sessions_title">Suas conversas</string>
+    <string name="ai_sessions_title">Seus chats</string>
     <string name="ai_sessions_heading">Suas conversas</string>
     <string name="ai_sessions_subtitle">Continue de onde parou com o Astrinho.</string>
-    <string name="ai_sessions_new">Nova conversa</string>
+    <string name="ai_sessions_new">Novo chat</string>
     <string name="ai_sessions_search">Buscar conversas carregadas</string>
     <string name="ai_sessions_current_visit">Suas conversas</string>
     <string name="ai_sessions_notice">Suas conversas são sincronizadas com sua conta.</string>

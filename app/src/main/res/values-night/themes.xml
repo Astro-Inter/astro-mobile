@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Astromobile" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/astro_primary_purple</item>
+        <item name="colorOnPrimary">@color/astro_light_background</item>
         <item name="android:colorAccent">@color/astro_light_background</item>
         <item name="android:navigationBarColor">@color/astro_dark_background</item>
         <item name="android:statusBarColor">@color/purple_gray</item>

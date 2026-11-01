@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="PopupCloseButton">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/bg_login_icon_button</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:src">@drawable/ic_dialog_close</item>
+    </style>
+
     <style name="AccessKeyDigitInput">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">75dp</item>

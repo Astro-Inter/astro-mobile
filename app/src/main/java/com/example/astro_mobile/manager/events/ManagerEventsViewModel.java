@@ -9,12 +9,13 @@ import com.example.astro_mobile.data.api.ManagerEventsRepository;
 import com.example.astro_mobile.data.api.dto.ManagerEventData;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public final class ManagerEventsViewModel extends ViewModel {
-    public enum Filter { ALL, IN_PROGRESS, FINISHED }
+    public enum Filter { ALL, IN_PROGRESS, FINISHED, CANCELLED, EXPIRED }
     public interface ResultCallback {
         void onSuccess();
         void onFailure(FailureKind failure);
@@ -76,10 +77,21 @@ public final class ManagerEventsViewModel extends ViewModel {
         if ("CANCELADO".equals(item.status)) status = ManagerEvent.Status.CANCELLED;
         else if ("CONCLUIDO".equals(item.status)) status = ManagerEvent.Status.FINISHED;
         else if (!"ATIVO".equals(item.status)) return null;
+        else if (isDeadlineExpired(item.lastClassLimitDate)) status = ManagerEvent.Status.EXPIRED;
         else if (item.pendingCount == 0) status = ManagerEvent.Status.NO_ACTION;
         else status = mode == ManagerEvent.CompletionMode.SELF_DECLARATION
                     ? ManagerEvent.Status.VALIDATION_PENDING : ManagerEvent.Status.ASSIGNMENT_PENDING;
         return new ManagerEvent(item.id, item.title, status, item.pendingCount, mode);
+    }
+
+    private boolean isDeadlineExpired(String deadline) {
+        if (deadline == null || deadline.trim().isEmpty()) return false;
+        try {
+            return LocalDateTime.now().isAfter(LocalDateTime.parse(deadline));
+        } catch (RuntimeException ignored) {
+            // A missing or malformed optional deadline must not make the entire list fail.
+            return false;
+        }
     }
 
     // Pesquisa e filtros são aplicados aos dados já recebidos.
@@ -88,8 +100,11 @@ public final class ManagerEventsViewModel extends ViewModel {
         String search = normalize(query.trim());
         for (ManagerEvent event : events) {
             if (filter == Filter.IN_PROGRESS && (event.status == ManagerEvent.Status.FINISHED
-                    || event.status == ManagerEvent.Status.CANCELLED)) continue;
+                    || event.status == ManagerEvent.Status.CANCELLED
+                    || event.status == ManagerEvent.Status.EXPIRED)) continue;
             if (filter == Filter.FINISHED && event.status != ManagerEvent.Status.FINISHED) continue;
+            if (filter == Filter.CANCELLED && event.status != ManagerEvent.Status.CANCELLED) continue;
+            if (filter == Filter.EXPIRED && event.status != ManagerEvent.Status.EXPIRED) continue;
             if (normalize(event.title).contains(search)) result.add(event);
         }
         return result;

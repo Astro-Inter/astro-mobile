@@ -16,6 +16,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
     public interface Listener {
         void onQuote(String messageId);
         void onCopy(HumanMessage message);
+        default void onAvatar() { }
     }
     private final HumanConversation conversation;
     private final List<HumanMessage> messages;
@@ -42,6 +43,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
                 .placeholder(R.drawable.profile_avatar_placeholder).fallback(R.drawable.profile_avatar_placeholder)
                 .error(R.drawable.profile_avatar_placeholder).into(row.avatar);
         row.avatar.setVisibility(message.sent || sameNext ? View.GONE : View.VISIBLE);
+        row.avatar.setOnClickListener(clicked -> listener.onAvatar());
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) row.bubble.getLayoutParams();
         boolean hasQuote = message.replyToMessageId != null;
         params.width = hasQuote ? 0 : ViewGroup.LayoutParams.WRAP_CONTENT;

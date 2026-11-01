@@ -137,7 +137,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_marginTop="20dp"
-                    android:background="@drawable/bg_access_key_button"
+                    android:background="@drawable/bg_primary_button"
                     android:clickable="true"
                     android:contentDescription="@string/first_login_access_key_continue_description"
                     android:focusable="true">

@@ -4,12 +4,16 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:background="@color/astro_dark_background">
 
     <LinearLayout
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="vertical">
 
         <androidx.fragment.app.FragmentContainerView
@@ -47,6 +51,7 @@
         android:contentDescription="@null"
         android:importantForAccessibility="no"
         android:scaleType="fitXY"
+        android:translationY="2dp"
         android:src="@drawable/astro_planet"
         android:visibility="gone" />
 

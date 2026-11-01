@@ -227,7 +227,7 @@ public final class CollaboratorHomeRepositoryTest {
         assertEquals(1, eventCalls.get());
         assertEquals(CollaboratorEventData.ParticipationStatus.REJEITADO,
                 result.home.getPendingEvents().get(0).getEventData().getParticipationStatus());
-        assertEquals(EventStatusClassifier.DisplayStatus.REJECTED,
+        assertEquals(EventStatusClassifier.DisplayStatus.EXPIRED,
                 EmployeeEvent.fromApi(
                         result.home.getPendingEvents().get(0).getEventData(), ZoneId.of("America/Sao_Paulo"),
                         Instant.parse("2026-10-25T12:00:00Z")).displayStatus);

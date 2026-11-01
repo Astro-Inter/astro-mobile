@@ -23,6 +23,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ActionConfirmationDialog;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.FormResponseRepository;
@@ -59,6 +61,10 @@ public final class FormAnswerFragment extends Fragment {
                 .getBackStackEntry(R.id.formDetailsFragment), FormAnswerViewModel.factory(requireContext()))
                 .get(FormAnswerViewModel.class);
         evidence = new FormEvidenceRepository(requireContext());
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_form_answer),
+                view.findViewById(R.id.scroll_form_answer), () -> {
+                    if (!state.isBusy() && !state.isLoading()) refresh();
+                });
         view.findViewById(R.id.button_form_answer_back).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).navigateUp());
         view.findViewById(R.id.button_form_answer_close).setOnClickListener(clicked ->
@@ -66,7 +72,8 @@ public final class FormAnswerFragment extends Fragment {
         view.findViewById(R.id.button_form_answer_location_retry).setOnClickListener(clicked -> retryLocation());
         view.findViewById(R.id.button_form_answer_check_submission).setOnClickListener(clicked -> refresh());
         view.findViewById(R.id.button_form_answer_complete).setOnClickListener(clicked -> {
-            if (state.canSubmit()) checkLocation(true);
+            if (state.canSubmit()) ActionConfirmationDialog.show(this,
+                    R.string.action_confirmation_send_form, () -> checkLocation(true));
         });
         if (state.getDetails() != null) renderQuestions(view);
     }
@@ -75,8 +82,10 @@ public final class FormAnswerFragment extends Fragment {
         LinearLayout questions = view.findViewById(R.id.list_form_answer_questions);
         questions.removeAllViews();
         FormQuestionRenderer renderer = new FormQuestionRenderer(getLayoutInflater(), state,
-                () -> renderControls(view), this::takePhoto, state::removePhoto,
-                this::openSubmittedImage, evidence);
+                () -> renderControls(view), this::takePhoto, (questionId, photo) -> {
+                    state.removePhoto(questionId, photo);
+                    renderQuestions(view);
+                }, this::openSubmittedImage, this::loadSubmittedImagePreview, evidence);
         if (state.getDetails().form.questions != null) {
             for (int index = 0; index < state.getDetails().form.questions.size(); index++)
                 questions.addView(renderer.create(questions, state.getDetails().form.questions.get(index), index));
@@ -128,6 +137,23 @@ public final class FormAnswerFragment extends Fragment {
             @Override public void onFailure(FailureKind failure) {
                 if (dialog.isShowing()) dialog.dismiss();
                 if (getView() != null && isResumed()) showFailure(failure);
+            }
+        });
+    }
+
+    private void loadSubmittedImagePreview(String imageId, ImageView target) {
+        state.getImageUrl(imageId, new FormResponseRepository.ImageUrlCallback() {
+            @Override public void onSuccess(String url) {
+                if (getView() == null || !target.isAttachedToWindow()) return;
+                Glide.with(FormAnswerFragment.this).load(url).centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .error(android.R.drawable.ic_menu_report_image).into(target);
+            }
+            @Override public void onFailure(FailureKind failure) {
+                if (getView() != null && target.isAttachedToWindow()) {
+                    target.setImageResource(android.R.drawable.ic_menu_report_image);
+                }
             }
         });
     }

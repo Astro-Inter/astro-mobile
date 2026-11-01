@@ -92,8 +92,8 @@ public final class EventStatusClassifierTest {
     }
 
     @Test
-    public void rejectionRemainsRejectedAfterDeadline() {
-        assertEquals(EventStatusClassifier.DisplayStatus.REJECTED,
+    public void expiredDeadlineTakesPriorityOverRejection() {
+        assertEquals(EventStatusClassifier.DisplayStatus.EXPIRED,
                 EventStatusClassifier.classify(false, EventStatusClassifier.Participation.REJECTED,
                         true, NOW.minusSeconds(1), NOW));
     }

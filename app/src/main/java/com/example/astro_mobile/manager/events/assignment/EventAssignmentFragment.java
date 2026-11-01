@@ -12,6 +12,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import com.bumptech.glide.Glide;
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ActionConfirmationDialog;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.EventAssignmentData;
@@ -26,11 +28,15 @@ public final class EventAssignmentFragment extends Fragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        PullToRefresh.attach(this, view.findViewById(R.id.container_assignment_content),
+                view.findViewById(R.id.container_assignment_content), () -> { if (!state.isLoading()) load(view); });
         state = new ViewModelProvider(this).get(EventAssignmentViewModel.class);
         view.findViewById(R.id.button_assignment_back).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack());
         view.findViewById(R.id.button_assignment_event).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack(R.id.managerEventDetailsFragment, false));
         view.findViewById(R.id.button_assignment_close).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack(HomeNavigation.destination(requireContext()), false));
-        view.findViewById(R.id.button_assignment_submit).setOnClickListener(clicked -> submit(view));
+        view.findViewById(R.id.button_assignment_submit).setOnClickListener(clicked ->
+                ActionConfirmationDialog.show(this,
+                        R.string.action_confirmation_assign_event, () -> submit(view)));
         if (state.getDetails() == null) {
             String retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry().getSavedStateHandle().get("retry_event_assignment");
             if (retry == null) load(view);

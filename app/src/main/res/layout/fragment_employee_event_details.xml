@@ -100,13 +100,7 @@
                     </LinearLayout>
                     <View style="@style/EmployeeEventDetailsDivider" />
                     <LinearLayout style="@style/EmployeeEventDetailsRow">
-                        <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/home_clock" />
-                        <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_validity_label" />
-                        <TextView android:id="@+id/text_employee_event_validity" style="@style/EmployeeEventDetailsValue" tools:text="06/07/2069" />
-                    </LinearLayout>
-                    <View style="@style/EmployeeEventDetailsDivider" />
-                    <LinearLayout style="@style/EmployeeEventDetailsRow">
-                        <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/employee_event_notes" />
+                        <androidx.appcompat.widget.AppCompatImageView style="@style/EmployeeEventDetailsIcon" android:src="@drawable/manager_notes" />
                         <TextView style="@style/EmployeeEventDetailsLabel" android:text="@string/employee_event_completion_mode_label" />
                         <TextView android:id="@+id/text_employee_event_completion_mode" style="@style/EmployeeEventDetailsValue" tools:text="Autodeclaração" />
                     </LinearLayout>
@@ -127,6 +121,10 @@
                             <TextView android:id="@+id/button_employee_event_evidence" style="@style/EmployeeEventDetailsButton"
                                 android:background="?attr/selectableItemBackground" android:text="@string/employee_event_add_evidence" />
                         </FrameLayout>
+                        <TextView android:id="@+id/text_employee_event_evidence_optional"
+                            style="@style/EmployeeEventDetailsText" android:gravity="center"
+                            android:paddingHorizontal="30dp" android:paddingBottom="10dp"
+                            android:text="@string/employee_event_add_evidence_optional" android:visibility="gone" />
                         <LinearLayout android:id="@+id/list_employee_event_selected_files"
                             android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
                         <TextView android:id="@+id/text_employee_event_evidence_error" style="@style/EmployeeEventDetailsText"
@@ -136,7 +134,7 @@
                         <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:layout_marginTop="10dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp">
                             <TextView android:id="@+id/button_employee_event_complete" style="@style/EmployeeEventDetailsButton"
-                                android:background="@drawable/bg_login_password_button" android:text="@string/employee_event_complete" />
+                                android:background="@drawable/bg_primary_button" android:text="@string/employee_event_complete" />
                         </FrameLayout>
                     </LinearLayout>
                 </LinearLayout>

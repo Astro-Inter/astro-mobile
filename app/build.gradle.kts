@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.astro_mobile"
-        minSdk = 31
+        minSdk = 30
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.lifecycle.livedata)
     implementation(libs.recyclerview)
     implementation(libs.glide)
+    implementation(libs.swiperefreshlayout)
     implementation(libs.markwon.core)
     implementation(libs.markwon.tables)
     implementation(libs.markwon.strikethrough)

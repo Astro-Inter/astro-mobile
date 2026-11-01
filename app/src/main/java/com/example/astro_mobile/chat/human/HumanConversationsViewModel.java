@@ -211,6 +211,8 @@ public final class HumanConversationsViewModel extends ViewModel {
                             .findFirst().orElseGet(() -> new HumanConversation(data.name,
                                     data.role.startsWith("GESTOR") ? "Gestor" : "Colaborador", data.role.startsWith("GESTOR"), 0));
                     conversation.participantId = data.id;
+                    if (data.profilePhotoUrl != null) conversation.profilePhotoUrl = data.profilePhotoUrl;
+                    if (data.avatarInitials != null) conversation.avatarInitials = data.avatarInitials;
                     contacts.add(conversation);
                 }
                 contactsLoading = false;

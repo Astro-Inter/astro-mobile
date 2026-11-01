@@ -23,10 +23,12 @@ import java.util.function.Consumer;
 public final class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.Row> {
     private final List<StaffMember> members;
     private final Consumer<StaffMember> memberClick;
+    private final Consumer<StaffMember> photoClick;
 
-    public StaffAdapter(List<StaffMember> members, Consumer<StaffMember> memberClick) {
+    public StaffAdapter(List<StaffMember> members, Consumer<StaffMember> memberClick, Consumer<StaffMember> photoClick) {
         this.members = members;
         this.memberClick = memberClick;
+        this.photoClick = photoClick;
     }
 
     @NonNull
@@ -39,6 +41,7 @@ public final class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.Row> {
     public void onBindViewHolder(@NonNull Row row, int position) {
         // Mostra foto ou as iniciais fornecidas pela API enquanto a foto não carrega.
         StaffMember member = members.get(position);
+        row.avatar.setOnClickListener(clicked -> photoClick.accept(member));
         row.name.setText(member.name);
         row.role.setText(member.role);
         row.initials.setText(member.initials);
