@@ -16,6 +16,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
+import com.example.astro_mobile.shared.profile.PhotoViewerDialog;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -62,6 +64,7 @@ public final class ConversationsFragment extends Fragment {
             Bundle args = AuthArgs.copy(getArguments());
             args.putString(HumanChatFragment.PEER_NAME, conversation.name);
             args.putString(HumanChatFragment.PEER_ROLE, conversation.role);
+            args.putString(HumanChatFragment.PEER_PHOTO_URL, conversation.profilePhotoUrl);
             args.putInt(HumanChatFragment.PEER_AVATAR_INDEX, conversation.avatarIndex);
             args.putBoolean(HumanChatFragment.PEER_IS_MANAGER, conversation.manager);
             if (conversation.participantId != null) args.putLong(HumanChatFragment.PEER_ID, conversation.participantId);
@@ -70,9 +73,13 @@ public final class ConversationsFragment extends Fragment {
             }
             navigation.navigate(contacts ? R.id.action_new_conversation_to_human_chat
                     : R.id.action_conversations_to_human_chat, args);
-        });
+        }, conversation -> PhotoViewerDialog.show(this, conversation.profilePhotoUrl, R.drawable.profile_avatar_placeholder));
         list.setAdapter(adapter);
         list.setItemAnimator(null);
+        PullToRefresh.attach(this, list, list, () -> {
+            if (contacts) state.loadContacts(renderList);
+            else state.loadConversations(renderList);
+        });
         EditText search = view.findViewById(R.id.input_conversations_search);
         search.setHint(contacts ? (manager ? R.string.conversations_search_employees
                 : R.string.conversations_search_managers) : R.string.conversations_search_hint);

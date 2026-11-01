@@ -26,8 +26,10 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
+import com.example.astro_mobile.shared.profile.PhotoViewerDialog;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -54,10 +56,12 @@ public final class AiSessionsFragment extends Fragment {
         ViewCompat.setAccessibilityDelegate(view.findViewById(R.id.button_ai_sessions_new), buttonAccessibility);
         EditText search = view.findViewById(R.id.input_ai_sessions_search);
         RecyclerView list = view.findViewById(R.id.list_ai_sessions);
+        PullToRefresh.attach(this, (View) list.getParent(), list,
+                () -> model.refreshConversations());
         SessionAdapter adapter = new SessionAdapter(conversation -> {
             if (!model.openConversation(conversation.id))
                 Toast.makeText(requireContext(), R.string.ai_sessions_wait, Toast.LENGTH_SHORT).show();
-        });
+        }, () -> PhotoViewerDialog.show(this, null, R.drawable.home_mascot));
         LinearLayoutManager layout = new LinearLayoutManager(requireContext());
         list.setLayoutManager(layout);
         list.setAdapter(adapter);
@@ -103,7 +107,6 @@ public final class AiSessionsFragment extends Fragment {
         model.getState().observe(getViewLifecycleOwner(), state -> {
             View newConversation = view.findViewById(R.id.button_ai_sessions_new);
             newConversation.setEnabled(!state.loading);
-            newConversation.setAlpha(state.loading ? 0.4f : 1f);
             adapter.setEnabled(!state.loading);
         });
         model.getListState().observe(getViewLifecycleOwner(), state -> {
@@ -190,8 +193,9 @@ public final class AiSessionsFragment extends Fragment {
             }
         };
         private final OpenConversation open;
+        private final Runnable viewAvatar;
         private boolean enabled = true;
-        SessionAdapter(OpenConversation open) { super(DIFF); this.open = open; }
+        SessionAdapter(OpenConversation open, Runnable viewAvatar) { super(DIFF); this.open = open; this.viewAvatar = viewAvatar; }
 
         void setEnabled(boolean enabled) {
             if (this.enabled == enabled) return;
@@ -211,11 +215,13 @@ public final class AiSessionsFragment extends Fragment {
             // Compartilha o card humano; somente o avatar e os dados vêm da sessão da IA.
             holder.button.setEnabled(enabled);
             holder.button.setOnClickListener(clicked -> open.open(conversation));
+            holder.avatar.setOnClickListener(clicked -> viewAvatar.run());
         }
 
         static final class Holder extends RecyclerView.ViewHolder {
             final TextView title, preview;
             final View button;
+            final ImageView avatar;
             Holder(View view) {
                 super(view);
                 title = view.findViewById(R.id.text_human_conversation_name);
@@ -223,7 +229,7 @@ public final class AiSessionsFragment extends Fragment {
                 title.setEllipsize(android.text.TextUtils.TruncateAt.END);
                 preview = view.findViewById(R.id.text_human_conversation_preview);
                 button = view.findViewById(R.id.button_human_conversation);
-                ImageView avatar = view.findViewById(R.id.image_human_conversation_avatar);
+                avatar = view.findViewById(R.id.image_human_conversation_avatar);
                 avatar.setImageResource(R.drawable.home_mascot);
                 avatar.setBackgroundResource(R.drawable.bg_conversations_ai_avatar);
                 int padding = Math.round(7 * view.getResources().getDisplayMetrics().density);

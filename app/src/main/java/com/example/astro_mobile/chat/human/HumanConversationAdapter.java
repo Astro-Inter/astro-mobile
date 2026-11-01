@@ -15,16 +15,19 @@ import com.bumptech.glide.Glide;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanConversationAdapter.Row> {
     public interface Listener { void open(HumanConversation conversation); }
     private final boolean contacts;
     private final Listener listener;
+    private final Consumer<HumanConversation> photoClick;
     private List<HumanConversation> items = Collections.emptyList();
 
-    public HumanConversationAdapter(boolean contacts, Listener listener) {
+    public HumanConversationAdapter(boolean contacts, Listener listener, Consumer<HumanConversation> photoClick) {
         this.contacts = contacts;
         this.listener = listener;
+        this.photoClick = photoClick;
     }
 
     public void submit(List<HumanConversation> items) {
@@ -40,7 +43,10 @@ public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanCo
 
     @Override public void onBindViewHolder(@NonNull Row row, int position) {
         HumanConversation conversation = items.get(position);
-        row.name.setText(conversation.manager ? Html.fromHtml(row.itemView.getContext()
+        boolean hasPhoto = conversation.profilePhotoUrl != null && !conversation.profilePhotoUrl.trim().isEmpty();
+        row.avatar.setOnClickListener(hasPhoto ? clicked -> photoClick.accept(conversation) : null);
+        row.avatar.setImportantForAccessibility(hasPhoto ? View.IMPORTANT_FOR_ACCESSIBILITY_YES : View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        row.name.setText(!contacts && conversation.manager ? Html.fromHtml(row.itemView.getContext()
                 .getString(R.string.human_conversation_manager_label, Html.escapeHtml(conversation.name)),
                 Html.FROM_HTML_MODE_LEGACY) : conversation.name);
         // Identificação nos contatos; prévia real na lista, com "Você" apenas para o remetente atual.
@@ -48,14 +54,15 @@ public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanCo
                 ? row.itemView.getContext().getString(R.string.human_conversation_sent_preview,
                         conversation.lastMessageText) : conversation.lastMessageText);
         Glide.with(row.avatar).clear(row.avatar);
-        boolean remote = conversation.conversationId != null;
-        row.initials.setVisibility(remote ? View.VISIBLE : View.GONE);
+        boolean remote = conversation.conversationId != null || hasPhoto;
+        row.initials.setVisibility(remote && !hasPhoto ? View.VISIBLE : View.GONE);
         if (remote) {
             row.initials.setText(conversation.avatarInitials);
             // A URL assinada é lida diretamente; não encaminha o token Firebase à imagem.
             Glide.with(row.avatar).load(conversation.profilePhotoUrl).circleCrop()
-                    .placeholder(android.R.color.transparent).fallback(android.R.color.transparent)
-                    .error(android.R.color.transparent).into(row.avatar);
+                    .placeholder(hasPhoto ? R.drawable.profile_avatar_placeholder : android.R.color.transparent)
+                    .fallback(android.R.color.transparent)
+                    .error(hasPhoto ? R.drawable.profile_avatar_placeholder : android.R.color.transparent).into(row.avatar);
         } else {
             row.avatar.setImageResource(R.drawable.profile_avatar_placeholder);
         }

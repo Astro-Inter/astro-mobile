@@ -34,10 +34,6 @@
             android:layout_marginHorizontal="@dimen/astro_content_margin" android:layout_marginTop="10dp" android:layout_marginBottom="10dp"
             android:contentDescription="@string/ai_sessions_new">
             <TextView style="@style/AstroPrimaryActionLabel" android:text="@string/ai_sessions_new" />
-            <ImageView android:layout_width="@dimen/astro_control_icon_size" android:layout_height="@dimen/astro_control_icon_size"
-                android:layout_gravity="start|center_vertical" android:layout_marginStart="@dimen/astro_control_icon_inset"
-                android:src="@drawable/chat_add" android:scaleType="fitCenter"
-                android:contentDescription="@null" android:importantForAccessibility="no" />
         </FrameLayout>
         <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/list_ai_sessions"

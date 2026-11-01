@@ -42,12 +42,13 @@
                 android:src="@drawable/ic_login_back" />
 
             <ImageView
+                android:id="@+id/image_chat_header_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/bg_conversations_ai_avatar"
-                android:contentDescription="@null"
-                android:importantForAccessibility="no"
+                android:contentDescription="@string/profile_view_photo"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:padding="7dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/chat_mascot" />

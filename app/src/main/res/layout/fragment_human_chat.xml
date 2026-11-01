@@ -16,11 +16,14 @@
                 android:src="@drawable/ic_login_back" android:contentDescription="@string/conversations_back" />
             <ImageView android:id="@+id/image_human_chat_peer" android:layout_width="48dp" android:layout_height="48dp"
                 android:layout_marginEnd="20dp" android:src="@drawable/participant_avatar_1"
-                android:scaleType="fitCenter" android:contentDescription="@null" android:importantForAccessibility="no" />
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical">
+                android:scaleType="fitCenter" android:contentDescription="@string/profile_view_photo"
+                android:foreground="?attr/selectableItemBackgroundBorderless" />
+            <LinearLayout android:id="@+id/container_human_chat_peer_identity"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical"
+                android:background="?attr/selectableItemBackground" android:paddingVertical="6dp">
                 <TextView android:id="@+id/text_human_chat_name" style="@style/ManagerEventsText"
-                    tools:text="Kevin Parker" />
+                    android:maxLines="2" android:ellipsize="end" tools:text="Kevin Parker" />
                 <TextView android:id="@+id/text_human_chat_role" style="@style/ManagerEventsCaption"
                     tools:text="Eletricista" />
             </LinearLayout>

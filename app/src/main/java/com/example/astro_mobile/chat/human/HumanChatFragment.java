@@ -20,8 +20,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.bumptech.glide.Glide;
 import com.example.astro_mobile.data.local.FlowPreferences;
+import com.example.astro_mobile.shared.profile.PhotoViewerDialog;
+import com.example.astro_mobile.manager.staff.StaffDetailsFragment;
+import com.example.astro_mobile.auth.AuthArgs;
 
 public final class HumanChatFragment extends Fragment {
     public static final String PEER_NAME = "human_peer_name";
@@ -29,6 +33,7 @@ public final class HumanChatFragment extends Fragment {
     public static final String PEER_AVATAR_INDEX = "human_peer_avatar_index";
     public static final String PEER_IS_MANAGER = "human_peer_is_manager";
     public static final String PEER_ID = "human_peer_id";
+    public static final String PEER_PHOTO_URL = "human_peer_photo_url";
     public static final String CONVERSATION_ID = "human_conversation_id";
     private HumanConversationsViewModel state;
     private HumanConversation conversation;
@@ -59,10 +64,29 @@ public final class HumanChatFragment extends Fragment {
             NavHostFragment.findNavController(this).popBackStack();
             return;
         }
+        if (conversation.profilePhotoUrl == null) conversation.profilePhotoUrl = args.getString(PEER_PHOTO_URL);
         ((TextView) view.findViewById(R.id.text_human_chat_name)).setText(conversation.name);
         ((TextView) view.findViewById(R.id.text_human_chat_role)).setText(conversation.role);
+        View peerIdentity = view.findViewById(R.id.container_human_chat_peer_identity);
+        String authenticatedUserType = args.getString(AuthArgs.USER_TYPE);
+        boolean managerAccount = "GESTOR".equals(authenticatedUserType)
+                || "GESTOR_WORKSPACE".equals(authenticatedUserType);
+        boolean canOpenCollaboratorProfile = managerAccount && conversation.participantId != null;
+        peerIdentity.setContentDescription(getString(R.string.human_chat_open_collaborator_profile, conversation.name));
+        peerIdentity.setClickable(canOpenCollaboratorProfile);
+        peerIdentity.setFocusable(canOpenCollaboratorProfile);
+        peerIdentity.setOnClickListener(canOpenCollaboratorProfile ? clicked -> {
+            Bundle profileArgs = AuthArgs.copy(getArguments());
+            profileArgs.putLong(StaffDetailsFragment.ARG_COLLABORATOR_ID, conversation.participantId);
+            profileArgs.putString(StaffDetailsFragment.ARG_NAME, conversation.name);
+            profileArgs.putString(StaffDetailsFragment.ARG_ROLE, conversation.role);
+            profileArgs.putString(StaffDetailsFragment.ARG_PHOTO_URL, conversation.profilePhotoUrl);
+            profileArgs.putBoolean(StaffDetailsFragment.ARG_OPENED_FROM_CHAT, true);
+            NavHostFragment.findNavController(this).navigate(R.id.action_human_chat_to_staff_details, profileArgs);
+        } : null);
         int avatar = R.drawable.profile_avatar_placeholder;
         ImageView peer = view.findViewById(R.id.image_human_chat_peer);
+        peer.setOnClickListener(clicked -> PhotoViewerDialog.show(this, conversation.profilePhotoUrl, R.drawable.profile_avatar_placeholder));
         peer.setImageResource(avatar);
         Glide.with(this).load(conversation.profilePhotoUrl).circleCrop()
                     .placeholder(R.drawable.profile_avatar_placeholder)
@@ -77,6 +101,10 @@ public final class HumanChatFragment extends Fragment {
 
         RecyclerView messages = view.findViewById(R.id.list_human_chat_messages);
         HumanMessagesAdapter adapter = new HumanMessagesAdapter(conversation, new HumanMessagesAdapter.Listener() {
+            @Override public void onAvatar() {
+                PhotoViewerDialog.show(HumanChatFragment.this, conversation.profilePhotoUrl,
+                        R.drawable.profile_avatar_placeholder);
+            }
             @Override public void onQuote(String id) {
                 HumanMessage target = conversation.findMessage(id);
                 if (target != null) messages.smoothScrollToPosition(conversation.messages.indexOf(target));
@@ -89,6 +117,10 @@ public final class HumanChatFragment extends Fragment {
         messages.setAdapter(new androidx.recyclerview.widget.ConcatAdapter(adapter, typingAdapter));
         swipeToReply = new HumanMessageSwipeToReply(conversation, message -> selectReply(view, message));
         swipeToReply.attach(messages);
+        PullToRefresh.attach(this, messages, messages, () -> {
+            if (conversation.conversationId != null && conversation.pending == null && !conversation.loadingOlder)
+                startHistoryLoad(view, messages, adapter);
+        });
         LinearLayoutManager layoutManager = (LinearLayoutManager) messages.getLayoutManager();
         messages.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {

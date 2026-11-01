@@ -20,8 +20,9 @@ import io.noties.markwon.Markwon;
 
 public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessageAdapter.Holder> {
     private final Markwon markdown;
+    private final Runnable viewAvatar;
 
-    public ChatMessageAdapter(Markwon markdown) {
+    public ChatMessageAdapter(Markwon markdown, Runnable viewAvatar) {
         super(new DiffUtil.ItemCallback<ChatMessage>() {
             @Override public boolean areItemsTheSame(@NonNull ChatMessage old, @NonNull ChatMessage next) {
                 return old == next;
@@ -33,6 +34,7 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
             }
         });
         this.markdown = markdown;
+        this.viewAvatar = viewAvatar;
     }
 
     @NonNull @Override public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -43,6 +45,7 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         ChatMessage message = getItem(position);
         boolean user = message.isFromUser();
         holder.avatar.setVisibility(user ? View.GONE : View.VISIBLE);
+        holder.avatar.setOnClickListener(clicked -> viewAvatar.run());
         holder.bubble.setBackgroundResource(user ? R.drawable.bg_chat_user : R.drawable.bg_chat_assistant);
         // O autor é identificado pela posição e pelo avatar; só falhas recebem legenda.
         holder.sender.setVisibility(message.hasFailed() ? View.VISIBLE : View.GONE);
