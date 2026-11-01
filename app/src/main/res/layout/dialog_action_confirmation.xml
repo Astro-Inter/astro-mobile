@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@drawable/bg_profile_dialog" android:orientation="vertical" android:padding="24dp">
+    <ImageButton android:id="@+id/button_action_confirmation_close" style="@style/PopupCloseButton"
+        android:layout_gravity="end"
+        android:contentDescription="@string/profile_logout_cancel" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@drawable/bg_profile_panel" android:orientation="vertical" android:padding="24dp">
+        <TextView android:id="@+id/text_action_confirmation_title" style="@style/ProfileText" />
+        <TextView style="@style/ProfileText" android:layout_marginTop="5dp"
+            android:text="@string/action_confirmation_irreversible" android:textColor="@color/astro_input_hint" />
+    </LinearLayout>
+    <TextView android:id="@+id/button_action_confirmation_accept" style="@style/ProfileButton"
+        android:background="@drawable/bg_primary_button" android:text="@string/action_confirmation_yes" />
+    <TextView android:id="@+id/button_action_confirmation_cancel" style="@style/ProfileButton"
+        android:layout_marginTop="12dp" android:text="@string/profile_logout_cancel" />
+</LinearLayout>

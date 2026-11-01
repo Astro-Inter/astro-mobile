@@ -431,14 +431,13 @@
             app:destination="@id/employeeEventDetailsFragment"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
-        <action android:id="@+id/action_notifications_to_manager_event"
-            app:destination="@id/managerEventDetailsFragment"
-            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
-            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
     </fragment>
 
     <fragment android:id="@+id/managerHomeFragment"
         android:name="com.example.astro_mobile.manager.home.ManagerHomeFragment" android:label="Home do Gestor">
+        <action android:id="@+id/action_manager_home_to_validation" app:destination="@id/eventValidationFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
         <action android:id="@+id/action_manager_home_to_forms" app:destination="@id/managerFormsFragment"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
@@ -472,6 +471,9 @@
         <argument android:name="event_title" app:argType="string" />
         <argument android:name="participant_name" app:argType="string" />
         <argument android:name="participant_avatar_index" app:argType="integer" android:defaultValue="0" />
+        <action android:id="@+id/action_validation_to_event_details" app:destination="@id/managerEventDetailsFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
         <action android:id="@+id/action_event_validation_to_evidence" app:destination="@id/eventEvidenceFragment"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
@@ -540,7 +542,11 @@
     </fragment>
     <fragment android:id="@+id/humanChatFragment"
         android:name="com.example.astro_mobile.chat.human.HumanChatFragment"
-        android:label="Conversa" />
+        android:label="Conversa">
+        <action android:id="@+id/action_human_chat_to_staff_details" app:destination="@id/staffDetailsFragment"
+            app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
+            app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
+    </fragment>
 
     <fragment android:id="@+id/aiSessionsFragment"
         android:name="com.example.astro_mobile.chat.AiSessionsFragment"
