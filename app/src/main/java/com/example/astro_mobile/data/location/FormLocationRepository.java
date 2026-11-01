@@ -6,8 +6,9 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.location.LocationRequest;
 import android.os.CancellationSignal;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.core.content.ContextCompat;
 
@@ -22,6 +23,8 @@ public final class FormLocationRepository {
     private final Context context;
     private final LocationManager manager;
     private CancellationSignal pending;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable timeout;
 
     public FormLocationRepository(Context context) {
         this.context = context.getApplicationContext();
@@ -41,37 +44,46 @@ public final class FormLocationRepository {
             callback.onFailure(Failure.LOCATION_DISABLED);
             return;
         }
-        String provider = manager.hasProvider(LocationManager.FUSED_PROVIDER)
-                && manager.isProviderEnabled(LocationManager.FUSED_PROVIDER)
-                ? LocationManager.FUSED_PROVIDER : LocationManager.GPS_PROVIDER;
-        if (!manager.hasProvider(provider) || !manager.isProviderEnabled(provider)) {
+        String provider = availableProvider(LocationManager.FUSED_PROVIDER);
+        if (provider == null) provider = availableProvider(LocationManager.NETWORK_PROVIDER);
+        if (provider == null) provider = availableProvider(LocationManager.GPS_PROVIDER);
+        if (provider == null) {
             callback.onFailure(Failure.LOCATION_DISABLED);
             return;
         }
         CancellationSignal signal = new CancellationSignal();
         pending = signal;
         // Uma leitura atual tem prazo próprio e pode ser cancelada ao sair da tela.
-        LocationRequest request = new LocationRequest.Builder(0L)
-                .setQuality(LocationRequest.QUALITY_HIGH_ACCURACY)
-                .setDurationMillis(15_000L).setMaxUpdates(1).build();
+        timeout = () -> {
+            cancel();
+            callback.onFailure(Failure.UNAVAILABLE);
+        };
+        handler.postDelayed(timeout, 15_000L);
         try {
-            manager.getCurrentLocation(provider, request, signal, context.getMainExecutor(), location -> {
+            manager.getCurrentLocation(provider, signal, context.getMainExecutor(), location -> {
                 if (signal.isCanceled()) return;
-                pending = null;
+                cancel();
                 if (location == null) callback.onFailure(Failure.UNAVAILABLE);
                 else callback.onLocation(new Location(location));
             });
         } catch (SecurityException error) {
-            pending = null;
+            cancel();
             callback.onFailure(Failure.PERMISSION_REQUIRED);
         } catch (IllegalArgumentException error) {
-            pending = null;
+            cancel();
             callback.onFailure(Failure.UNAVAILABLE);
         }
+    }
+
+    private String availableProvider(String provider) {
+        return manager.getAllProviders().contains(provider) && manager.isProviderEnabled(provider)
+                ? provider : null;
     }
 
     public void cancel() {
         if (pending != null) pending.cancel();
         pending = null;
+        if (timeout != null) handler.removeCallbacks(timeout);
+        timeout = null;
     }
 }

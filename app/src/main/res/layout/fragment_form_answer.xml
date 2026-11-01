@@ -62,7 +62,7 @@
                 <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp">
                     <TextView android:id="@+id/button_form_answer_complete" style="@style/EmployeeEventDetailsButton"
-                        android:enabled="false" android:background="@drawable/bg_form_details_button"
+                        android:enabled="false" android:background="@drawable/bg_primary_button"
                         android:textColor="@color/form_details_button_text" android:text="@string/form_answer_complete" />
                     <ImageView android:layout_width="20dp" android:layout_height="20dp"
                         android:layout_gravity="end|center_vertical" android:layout_marginEnd="15dp"

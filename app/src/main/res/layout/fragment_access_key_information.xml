@@ -66,7 +66,7 @@
             android:textAllCaps="false"
             android:textColor="@color/astro_light_background"
             android:textSize="16sp"
-            app:backgroundTint="@color/astro_primary_purple"
+            app:backgroundTint="@color/astro_primary_button_tint"
             app:cornerRadius="10dp"
             app:rippleColor="@color/astro_button_ripple"
             app:strokeWidth="0dp" />

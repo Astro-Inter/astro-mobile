@@ -23,6 +23,7 @@
     <string name="form_answer_photo_invalid">A foto excede o limite permitido ou não está em um formato válido. Tente novamente.</string>
     <string name="form_answer_photo_unavailable">Não foi possível abrir a câmera neste dispositivo.</string>
     <string name="form_answer_photo_title">Foto enviada</string>
+    <string name="form_answer_photo_open">Ver foto: %1$s</string>
     <string name="form_answer_unknown_question">Este tipo de pergunta ainda não é suportado.</string>
     <string name="form_answer_no_questions">Não há perguntas disponíveis neste formulário.</string>
     <string name="form_answer_check_submission">Conferir situação do envio</string>
