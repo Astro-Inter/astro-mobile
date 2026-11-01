@@ -26,6 +26,7 @@ android {
     buildFeatures {
         buildConfig = true
     }
+    sourceSets.getByName("androidTest").assets.srcDir("src/test/resources")
 
     buildTypes {
         release {

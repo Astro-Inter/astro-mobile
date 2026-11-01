@@ -16,7 +16,7 @@ public final class ChatMessage {
     }
 
     private ChatMessage(String text, boolean fromUser, boolean failed, long createdAt, com.google.gson.JsonElement blocks) {
-        this.text = text;
+        this.text = text == null ? "" : text;
         this.blocks = blocks == null ? null : blocks.deepCopy();
         this.fromUser = fromUser;
         this.failed = failed;

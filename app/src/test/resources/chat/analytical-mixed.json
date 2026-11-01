@@ -1,0 +1,11 @@
+[
+  {"tipo":"texto","conteudo":"Dados de exemplo para validar a interface."},
+  {"tipo":"indicadores","versao":1,"titulo":"Resumo dos dados","abrangencia":"conjunto_autorizado","universo":"Exigências pessoa/NR no conjunto autorizado, independentemente das linhas exibidas.","indicadores":[
+    {"chave":"pares_aplicaveis","rotulo":"Exigências pessoa/NR","valor":120,"unidade":"pares_pessoa_nr","numerador":null,"denominador":null,"criterio":"Exigências do cargo e unidade no escopo autorizado."},
+    {"chave":"percentual_vigentes","rotulo":"Vigência cadastral","valor":75.0,"unidade":"%","numerador":90,"denominador":120,"criterio":"Pares vigentes / pares exigidos. Não certifica aptidão legal."}
+  ]},
+  {"tipo":"matriz_conformidade","versao":1,"titulo":"Matriz de conformidade da equipe","chave_pessoa":"referencia_pessoa","chave_categoria":"nr","chave_situacao":"situacao","colunas":[{"chave":"referencia_pessoa","titulo":"Referência da pessoa"},{"chave":"nome","titulo":"Nome"},{"chave":"nr","titulo":"NR"},{"chave":"situacao","titulo":"Situação"}],"linhas":[{"referencia_pessoa":42,"nome":"Pessoa de exemplo","nr":10,"situacao":"VIGENTE"},{"referencia_pessoa":43,"nome":"Pessoa de exemplo","nr":10,"situacao":"SEM_REGISTRO"}],"pagina":1,"total_paginas":1,"total":273,"solicitada":2,"retornada":2,"limitado":false,"tem_mais":true,"motivo_limite":null,"paginacao":"local"},
+  {"tipo":"texto","conteudo":"A distribuição abaixo representa o conjunto autorizado completo."},
+  {"tipo":"grafico_rosca","versao":1,"titulo":"Distribuição de exemplo","dados":[{"categoria":"Vigentes","valor":90},{"categoria":"Sem vigência","valor":30},{"categoria":"Sem base","valor":0}],"unidade":"registros","fonte":"Dados fictícios de homologação"},
+  {"tipo":"contexto_dados","versao":1,"fonte":"Dados fictícios de homologação","referencia":"2026-10-31","inicio":null,"fim":null,"escopo":"Equipe autorizada de exemplo","filtros":{"nr":10,"status":["ATIVO"]},"criterios":["Métricas globais independentes da página visual."],"avisos":["Célula ausente não comprova vigência."],"conjunto":{"solicitada":2,"retornada":2,"total":273,"limitado":false,"tem_mais":true,"motivo_limite":null,"unidade_total":"pares pessoa/NR"}}
+]

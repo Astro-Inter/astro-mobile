@@ -28,7 +28,8 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
             }
             @Override public boolean areContentsTheSame(@NonNull ChatMessage old, @NonNull ChatMessage next) {
                 return old.isFromUser() == next.isFromUser() && old.hasFailed() == next.hasFailed()
-                        && old.getText().equals(next.getText());
+                        && java.util.Objects.equals(old.getText(), next.getText())
+                        && java.util.Objects.equals(old.getBlocks(), next.getBlocks());
             }
         });
         this.markdown = markdown;

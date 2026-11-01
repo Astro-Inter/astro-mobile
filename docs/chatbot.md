@@ -104,9 +104,23 @@ Os commits correspondem às subtarefas `SCRUM-419` (conexão), `SCRUM-420` (envi
 
 O chatbot interpreta `blocos` do envio e do histórico, preservando a ordem de
 texto, gráficos de barras/linhas/setores, tabela e galeria. O texto `resposta`
-continua sendo o fallback quando a lista está vazia, inválida ou contém um tipo ou
-versão desconhecidos. Os gráficos incluem valores textuais para acessibilidade;
+continua sendo o fallback quando não há blocos suportados. Um bloco de tipo ou
+versão desconhecidos recebe um aviso local, preservando os demais blocos e sua
+ordem. Os gráficos incluem valores textuais para acessibilidade;
 as tabelas têm rolagem horizontal. As imagens aceitam somente HTTPS R2 e exibem
 um ícone se estiverem ausentes ou indisponíveis; o aplicativo não grava a URL
 assinada no cache de imagens. O backend controla autenticação e escopo das fotos.
 O suporte depende da API de IA que retorna o novo contrato.
+
+Os contratos analíticos da PR #33, incluindo indicadores, matriz longa,
+contexto e gráfico de rosca, estão descritos em
+[chatbot-contratos-analiticos.md](chatbot-contratos-analiticos.md).
+
+## Contrato da API de IA #30 — tabelas locais e perfil
+
+- Tabelas v2 aceitam até 200 linhas e metadados de paginação local. O mobile mostra 10 linhas por página, sem novas chamadas HTTP ou mensagens. O histórico reconstrói a primeira página a partir do bloco completo em memória.
+- A interface distingue recebidos/total, resultado parcial por quantidade solicitada e corte por limite de resultados/tamanho. Tabelas v1 mantêm a paginação de servidor original e até 50 linhas; não carregam páginas automaticamente.
+- `ficha_usuario` v1 aceita nome e demais campos opcionais, exibe modalidade e omite rótulos vazios. Para `origem=usuario_autenticado`, não mostra situação. Conformidade ausente permanece ausente.
+- Fotos usam a URL autorizada recebida, sem cache durável. O fallback usa o nome da linha/ficha para iniciais; sem nome, usa avatar neutro.
+- Os gráficos continuam usando exclusivamente os blocos agregados da API, sem calcular população a partir da tabela.
+- A PR da API #30 ainda estava aberta na consulta desta implementação; `/version` do ambiente `https://ia.astro-app.solutions` respondeu `commit: unknown`. Publicação do novo backend exige disponibilizar os clientes compatíveis antes.
