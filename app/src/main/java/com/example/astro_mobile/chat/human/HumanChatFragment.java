@@ -85,7 +85,7 @@ public final class HumanChatFragment extends Fragment {
             @Override public void onCopy(HumanMessage message) { copyMessage(message); }
         });
         messagesAdapter = adapter;
-        typingAdapter = new HumanTypingAdapter();
+        typingAdapter = new HumanTypingAdapter(conversation);
         messages.setAdapter(new androidx.recyclerview.widget.ConcatAdapter(adapter, typingAdapter));
         swipeToReply = new HumanMessageSwipeToReply(conversation, message -> selectReply(view, message));
         swipeToReply.attach(messages);
