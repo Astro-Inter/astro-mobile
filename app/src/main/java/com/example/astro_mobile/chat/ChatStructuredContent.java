@@ -3,7 +3,6 @@ package com.example.astro_mobile.chat;
 import android.content.Context;
 import android.app.Dialog;
 import android.widget.ImageButton;
-import android.widget.Button;
 import android.widget.ScrollView;
 import android.view.Window;
 import java.text.Normalizer;
@@ -18,6 +17,7 @@ import androidx.core.content.res.ResourcesCompat;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.data.ai.ChatAnalyticalContract;
 import com.example.astro_mobile.data.ai.ChatMatrixBlock;
+import com.example.astro_mobile.data.ai.ChatFileBlock;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.ByteArrayOutputStream;
@@ -56,6 +56,7 @@ final class ChatStructuredContent {
             for (JsonElement e : blocks) {
                 JsonObject b = e.getAsJsonObject(); String type = str(b, "tipo");
                 if ("texto".equals(type)) { if (!bounded(str(b,"conteudo"),6000)) return false; continue; }
+                if ("arquivo".equals(type)) { if (!ChatFileBlock.valid(b)) return false; continue; }
                 if ("indicadores".equals(type) || "matriz_conformidade".equals(type) || "contexto_dados".equals(type)) {
                     if (!ChatAnalyticalContract.valid(b)) return false;
                     continue;
@@ -123,7 +124,7 @@ final class ChatStructuredContent {
             LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             if (root.getChildCount() > 0) cardParams.topMargin = dp(context, 12);
             root.addView(card, cardParams);
-            if (!"contexto_dados".equals(type)) {
+            if (!"contexto_dados".equals(type) && !"arquivo".equals(type)) {
                 TextView title = label(card, str(b, "titulo"), true);
                 title.setAccessibilityHeading(true);
                 if (expanded) {
@@ -131,7 +132,9 @@ final class ChatStructuredContent {
                 title.setPadding(0, 0, 0, dp(context, 12));
                 }
             }
-            if ("indicadores".equals(type)) {
+            if ("arquivo".equals(type)) {
+                ChatFileContent.render(card, ChatFileBlock.fromJson(b));
+            } else if ("indicadores".equals(type)) {
                 ChatAnalyticalContent.indicators(card, ChatAnalyticalContract.indicators(b));
             } else if ("contexto_dados".equals(type)) {
                 ChatAnalyticalContent.context(card, ChatAnalyticalContract.context(b));
@@ -144,8 +147,11 @@ final class ChatStructuredContent {
                 if (!radial && data.size() > 6) {
                     HorizontalScrollView viewport = new HorizontalScrollView(context);
                     viewport.setHorizontalScrollBarEnabled(true);
+                    // HorizontalScrollView mede a largura do filho com UNSPECIFIED.
+                    chart.setMinimumWidth(dp(context, data.size() * 56 + 72));
                     viewport.addView(chart, new HorizontalScrollView.LayoutParams(dp(context, data.size() * 56 + 72), dp(context, expanded ? 260 : 190)));
-                    card.addView(viewport);
+                    card.addView(viewport, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            dp(context, expanded ? 260 : 190)));
                 } else card.addView(chart, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(context, radial && !hasValues ? 0 : expanded ? 260 : 190)));
                 if (radial && !hasValues) label(card, context.getString(R.string.chat_chart_no_values), false);
                 int index = 0;
@@ -367,24 +373,16 @@ final class ChatStructuredContent {
         LinearLayout controls = row(context);
         controls.setGravity(Gravity.CENTER_VERTICAL);
         card.addView(controls);
-        Button previous = new Button(context);
-        previous.setText(R.string.chat_table_previous);
-        controls.addView(previous);
+        ImageButton previous = chartIcon(context, R.drawable.chat_table_chevron_left,
+                context.getString(R.string.chat_table_previous));
+        controls.addView(previous, new LinearLayout.LayoutParams(dp(context, 48), dp(context, 48)));
         TextView position = label(controls, "", false);
         position.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         position.setGravity(Gravity.CENTER);
         position.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1));
-        Button next = new Button(context);
-        next.setText(R.string.chat_table_next);
-        controls.addView(next);
-        for (Button button : new Button[]{previous, next}) {
-            button.setTextColor(context.getColor(R.color.chat_link));
-            button.setTextSize(12);
-            button.setAllCaps(false);
-            button.setMinWidth(0);
-            button.setMinimumWidth(0);
-            button.setBackgroundResource(R.drawable.bg_home_icon_ripple);
-        }
+        ImageButton next = chartIcon(context, R.drawable.chat_table_chevron_right,
+                context.getString(R.string.chat_table_next));
+        controls.addView(next, new LinearLayout.LayoutParams(dp(context, 48), dp(context, 48)));
         int[] page = {0};
         int pages = (rows.size() + 9) / 10;
         Runnable update = () -> {
@@ -393,6 +391,8 @@ final class ChatStructuredContent {
             position.setText(context.getString(R.string.chat_table_local_page, page[0] + 1, pages));
             previous.setEnabled(page[0] > 0);
             next.setEnabled(page[0] + 1 < pages);
+            previous.setAlpha(previous.isEnabled() ? 1f : .35f);
+            next.setAlpha(next.isEnabled() ? 1f : .35f);
         };
         previous.setOnClickListener(view -> { if (page[0] > 0) { page[0]--; update.run(); } });
         next.setOnClickListener(view -> { if (page[0] + 1 < pages) { page[0]++; update.run(); } });
@@ -557,7 +557,8 @@ final class ChatStructuredContent {
         Context context = row.getContext();
         TextView text = label(row, value, bold);
         text.setPadding(dp(context, 12), dp(context, 11), dp(context, 12), dp(context, 11));
-        text.setLayoutParams(new LinearLayout.LayoutParams(dp(context, 160), ViewGroup.LayoutParams.MATCH_PARENT));
+        // O texto mede todas as linhas antes de a linha se ajustar à altura do avatar.
+        text.setLayoutParams(new LinearLayout.LayoutParams(dp(context, 160), ViewGroup.LayoutParams.WRAP_CONTENT));
         text.setTextSize(bold ? 13 : 14);
         if (bold) text.setTextColor(context.getColor(R.color.chat_link));
         return text;

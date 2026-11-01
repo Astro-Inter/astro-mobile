@@ -58,4 +58,14 @@
     <string name="chat_dataset_received">Recebidos %1$d de %2$s %3$s · solicitados %4$s</string>
     <string name="chat_dataset_empty">Nenhum registro encontrado para os filtros consultados.</string>
     <string name="chat_dataset_no_rows">Há registros disponíveis, mas nenhuma linha foi incluída neste conjunto.</string>
+    <string name="chat_file_pdf">Documento PDF</string>
+    <string name="chat_file_size">PDF · %1$s bytes</string>
+    <string name="chat_file_download">Baixar PDF</string>
+    <string name="chat_file_download_named">Baixar PDF: %1$s</string>
+    <string name="chat_file_expired">Link expirado; solicite a geração novamente.</string>
+    <string name="chat_file_unavailable">Arquivo indisponível.</string>
+    <string name="chat_file_downloading">Baixando PDF…</string>
+    <string name="chat_file_already_downloading">Este arquivo já está sendo baixado.</string>
+    <string name="chat_file_saved">PDF salvo em Downloads/Astro.</string>
+    <string name="chat_file_failed">Não foi possível baixar o PDF. Tente novamente enquanto o link estiver válido.</string>
 </resources>
