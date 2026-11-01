@@ -8,11 +8,11 @@ import java.util.List;
 
 public final class CollaboratorHomeData {
     private String username;
-    @SerializedName("workspace_name") private String workspaceName;
-    @SerializedName("events_metrics") private EventsMetrics eventsMetrics;
-    @SerializedName("status_message") private String statusMessage;
-    @SerializedName("pending_events") private List<PendingEvent> pendingEvents;
-    @SerializedName("last_notifications") private List<HomeNotification> lastNotifications;
+    @SerializedName(value = "workspaceName", alternate = {"workspace_name"}) private String workspaceName;
+    @SerializedName(value = "eventsMetrics", alternate = {"events_metrics"}) private EventsMetrics eventsMetrics;
+    @SerializedName(value = "statusMessage", alternate = {"status_message"}) private String statusMessage;
+    @SerializedName(value = "pendingEvents", alternate = {"pending_events"}) private List<PendingEvent> pendingEvents;
+    @SerializedName(value = "lastNotifications", alternate = {"last_notifications"}) private List<HomeNotification> lastNotifications;
     private transient boolean hasUnreadNotifications;
 
     public String getUsername() { return username; }
@@ -53,7 +53,7 @@ public final class CollaboratorHomeData {
 
     public static final class EventsMetrics {
         private Integer pending;
-        @SerializedName("under_analysis") private Integer underAnalysis;
+        @SerializedName(value = "underAnalysis", alternate = {"under_analysis"}) private Integer underAnalysis;
         private Integer done;
 
         public int getPending() { return pending; }
@@ -64,7 +64,7 @@ public final class CollaboratorHomeData {
     public static final class PendingEvent {
         private Long id;
         private String title;
-        @SerializedName("limit_date") private String limitDate;
+        @SerializedName(value = "limitDate", alternate = {"limit_date"}) private String limitDate;
         private boolean viewed;
         private transient CollaboratorEventData eventData;
 
@@ -79,7 +79,7 @@ public final class CollaboratorHomeData {
     public static final class HomeNotification {
         private String id;
         private String title;
-        @SerializedName("sent_at_in_hours") private long sentAtInHours;
+        @SerializedName(value = "sentAtInHours", alternate = {"sent_at_in_hours"}) private long sentAtInHours;
         private boolean viewed;
 
         public HomeNotification() { }

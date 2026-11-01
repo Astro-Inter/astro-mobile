@@ -2,12 +2,13 @@ package com.example.astro_mobile.data.api.dto;
 
 import java.util.Collections;
 import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 public final class UserProfileData {
-    private String nome;
-    private String cargo;
-    private String unidade;
-    private String modalidade;
+    @SerializedName(value = "name", alternate = {"nome"}) private String nome;
+    @SerializedName(value = "role", alternate = {"cargo"}) private String cargo;
+    @SerializedName(value = "unit", alternate = {"unidade"}) private String unidade;
+    @SerializedName(value = "workModel", alternate = {"modalidade"}) private String modalidade;
     private String email;
     private String profilePhotoUrl;
     private List<Nr> nrs;
@@ -25,10 +26,10 @@ public final class UserProfileData {
 
     public static final class Nr {
         private int code;
-        private String validade;
-        private String descricao;
-        private String objetivo;
-        private String aplicabilidade;
+        @SerializedName(value = "expiresAt", alternate = {"validade"}) private String validade;
+        @SerializedName(value = "description", alternate = {"descricao"}) private String descricao;
+        @SerializedName(value = "objective", alternate = {"objetivo"}) private String objetivo;
+        @SerializedName(value = "applicable", alternate = {"aplicabilidade"}) private String aplicabilidade;
 
         public int getCode() { return code; }
         public String getValidade() { return validade; }
