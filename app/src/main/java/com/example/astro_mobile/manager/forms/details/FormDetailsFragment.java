@@ -147,6 +147,10 @@ public final class FormDetailsFragment extends Fragment {
                     return;
                 }
                 requiresUnitLocation = details.form.unitId != null;
+                int unitVisibility = requiresUnitLocation ? View.VISIBLE : View.GONE;
+                view.findViewById(R.id.divider_form_details_unit_top).setVisibility(unitVisibility);
+                view.findViewById(R.id.container_form_details_unit_row).setVisibility(unitVisibility);
+                view.findViewById(R.id.divider_form_details_unit_bottom).setVisibility(unitVisibility);
                 ((TextView) view.findViewById(R.id.text_form_details_location_explanation)).setText(requiresUnitLocation
                         ? R.string.form_details_location_explanation : R.string.form_details_anywhere_explanation);
                 ReceivedFormDetails.UnitLocation location = details.form.unitLocation;

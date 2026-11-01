@@ -35,13 +35,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class CollaboratorHomeRepositoryTest {
-    private static final String DATA = "{\"username\":\"Ana Lima\",\"workspace_name\":\"Astro\","
-            + "\"events_metrics\":{\"pending\":3,\"under_analysis\":2,\"done\":21},"
-            + "\"status_message\":\"URGENT\","
-            + "\"pending_events\":[{\"id\":101,\"title\":\"Treinamento de EPI\","
-            + "\"limit_date\":\"2026-10-19\",\"viewed\":false}],"
-            + "\"last_notifications\":[{\"id\":\"mongo-id\",\"title\":\"Lembrete\","
-            + "\"sent_at_in_hours\":2,\"viewed\":true}]}";
+    private static final String DATA = "{\"username\":\"Ana Lima\",\"workspaceName\":\"Astro\","
+            + "\"eventsMetrics\":{\"pending\":3,\"underAnalysis\":2,\"done\":21},"
+            + "\"statusMessage\":\"URGENT\","
+            + "\"pendingEvents\":[{\"id\":101,\"title\":\"Treinamento de EPI\","
+            + "\"limitDate\":\"2026-10-19\",\"viewed\":false}],"
+            + "\"lastNotifications\":[{\"id\":\"mongo-id\",\"title\":\"Lembrete\","
+            + "\"sentAtInHours\":2,\"viewed\":true}]}";
     private static final String SUCCESS = "{\"success\":true,\"data\":" + DATA + "}";
 
     @Test
@@ -74,9 +74,9 @@ public final class CollaboratorHomeRepositoryTest {
     @Test
     public void acceptsAllFourStatusCodesAndEmptyFeeds() throws Exception {
         for (String status : new String[] {"URGENT", "PENDENT", "ANALYSIS", "OK"}) {
-            String data = "{\"username\":\"Ana\",\"workspace_name\":\"Astro\","
-                    + "\"events_metrics\":{\"pending\":0,\"under_analysis\":0,\"done\":0},"
-                    + "\"status_message\":\"" + status + "\",\"pending_events\":[],\"last_notifications\":[]}";
+            String data = "{\"username\":\"Ana\",\"workspaceName\":\"Astro\","
+                    + "\"eventsMetrics\":{\"pending\":0,\"underAnalysis\":0,\"done\":0},"
+                    + "\"statusMessage\":\"" + status + "\",\"pendingEvents\":[],\"lastNotifications\":[]}";
             Result result = load(repository(chain -> response(chain, 200,
                     "{\"success\":true,\"data\":" + data + "}"), tokenProvider()));
             assertNull(result.failure);
@@ -88,8 +88,8 @@ public final class CollaboratorHomeRepositoryTest {
 
     @Test
     public void nullFeedsAreEmptyWithoutLosingMetrics() throws Exception {
-        String json = SUCCESS.replaceFirst("\\\"pending_events\\\":\\[.*?\\]", "\"pending_events\":null")
-                .replaceFirst("\\\"last_notifications\\\":\\[.*?\\]", "\"last_notifications\":null");
+        String json = SUCCESS.replaceFirst("\\\"pendingEvents\\\":\\[.*?\\]", "\"pendingEvents\":null")
+                .replaceFirst("\\\"lastNotifications\\\":\\[.*?\\]", "\"lastNotifications\":null");
         Result result = load(repository(chain -> response(chain, 200, json), tokenProvider()));
         assertNull(result.failure);
         assertTrue(result.home.getPendingEvents().isEmpty());
@@ -148,10 +148,10 @@ public final class CollaboratorHomeRepositoryTest {
                 SUCCESS.replace("URGENT", "UNKNOWN"),
                 SUCCESS.replace("\"pending\":3", "\"pending\":-1"),
                 SUCCESS.replace("\"username\":\"Ana Lima\"", "\"username\":null"),
-                SUCCESS.replace("\"events_metrics\":{\"pending\":3,\"under_analysis\":2,\"done\":21}",
-                        "\"events_metrics\":null"),
-                SUCCESS.replace("\"events_metrics\":{\"pending\":3,\"under_analysis\":2,\"done\":21}",
-                        "\"events_metrics\":{}"), "<html>unavailable</html>"}) {
+                SUCCESS.replace("\"eventsMetrics\":{\"pending\":3,\"underAnalysis\":2,\"done\":21}",
+                        "\"eventsMetrics\":null"),
+                SUCCESS.replace("\"eventsMetrics\":{\"pending\":3,\"underAnalysis\":2,\"done\":21}",
+                        "\"eventsMetrics\":{}"), "<html>unavailable</html>"}) {
             assertEquals(FailureKind.INTERNAL,
                     load(repository(chain -> response(chain, 200, json), tokenProvider())).failure);
         }

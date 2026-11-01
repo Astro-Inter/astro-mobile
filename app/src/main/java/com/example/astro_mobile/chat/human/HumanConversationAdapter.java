@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.chat.ConversationTitlePopup;
 import com.bumptech.glide.Glide;
 
 import java.util.Collections;
@@ -71,6 +72,7 @@ public final class HumanConversationAdapter extends RecyclerView.Adapter<HumanCo
         row.unread.setContentDescription(row.itemView.getResources().getQuantityString(
                 R.plurals.human_conversation_unread, conversation.unreadCount, conversation.unreadCount));
         row.button.setOnClickListener(clicked -> listener.open(conversation));
+        if (!contacts) ConversationTitlePopup.attach(row.button, row.name);
     }
 
     @Override public void onViewRecycled(@NonNull Row row) {

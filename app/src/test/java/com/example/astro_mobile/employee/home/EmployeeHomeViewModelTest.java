@@ -31,8 +31,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class EmployeeHomeViewModelTest {
     private static final String SUCCESS = "{\"success\":true,\"data\":{\"username\":\"Ana\","
-            + "\"workspace_name\":\"Astro\",\"events_metrics\":{\"pending\":0,"
-            + "\"under_analysis\":0,\"done\":1},\"status_message\":\"OK\"}}";
+            + "\"workspaceName\":\"Astro\",\"eventsMetrics\":{\"pending\":0,"
+            + "\"underAnalysis\":0,\"done\":1},\"statusMessage\":\"OK\"}}";
 
     @Test
     public void ownsLoadingAndDataAndPreventsConcurrentLoads() throws Exception {

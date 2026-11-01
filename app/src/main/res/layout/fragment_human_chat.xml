@@ -57,9 +57,9 @@
                 android:contentDescription="@string/human_reply_cancel" android:tooltipText="@string/human_reply_cancel" />
         </LinearLayout>
         <LinearLayout android:id="@+id/container_human_chat_composer" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:minHeight="100dp" android:orientation="horizontal"
+            android:layout_height="wrap_content" android:minHeight="76dp" android:orientation="horizontal"
             android:gravity="center_vertical" android:baselineAligned="false" android:paddingStart="30dp"
-            android:paddingEnd="30dp" android:paddingVertical="20dp" android:layout_marginBottom="20dp">
+            android:paddingEnd="30dp" android:paddingVertical="8dp" android:layout_marginBottom="4dp">
             <FrameLayout android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:background="@drawable/bg_chat_input">
                 <EditText android:id="@+id/input_human_chat_message" android:layout_width="match_parent"

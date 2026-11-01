@@ -7,7 +7,7 @@
     <string name="chat_suggestion_dashboards">Quais NRs preciso cumprir?</string>
     <string name="chat_input_hint">Mensagem</string>
     <string name="chat_send">Enviar mensagem</string>
-    <string name="chat_loading">Astro está preparando a resposta…</string>
+    <string name="chat_loading">O Astrinho está preparando a resposta…</string>
     <string name="chat_generic_error">Não foi possível receber a resposta. Tente novamente.</string>
     <string name="chat_link_unavailable">Não foi possível abrir esse link.</string>
     <string name="chat_calendar_loading">Preparando a conexão com o Google Calendar…</string>

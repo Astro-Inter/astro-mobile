@@ -7,9 +7,9 @@ import java.util.List;
 
 public final class ManagerHomeData {
     private String username;
-    @SerializedName("workspace_name") private String workspaceName;
-    @SerializedName("pending_validations") private List<PendingValidation> pendingValidations;
-    @SerializedName("pending_forms") private List<PendingForm> pendingForms;
+    @SerializedName(value = "workspaceName", alternate = {"workspace_name"}) private String workspaceName;
+    @SerializedName(value = "pendingValidations", alternate = {"pending_validations"}) private List<PendingValidation> pendingValidations;
+    @SerializedName(value = "pendingForms", alternate = {"pending_forms"}) private List<PendingForm> pendingForms;
     private Indicators indicators;
 
     public String getUsername() { return username; }
@@ -32,9 +32,9 @@ public final class ManagerHomeData {
     }
 
     public static final class Indicators {
-        @SerializedName("current_events") private Long currentEvents;
-        @SerializedName("pending_validations") private Long pendingValidations;
-        @SerializedName("collaborators_with_pending_events") private Long collaboratorsWithPendingEvents;
+        @SerializedName(value = "currentEvents", alternate = {"current_events"}) private Long currentEvents;
+        @SerializedName(value = "pendingValidations", alternate = {"pending_validations"}) private Long pendingValidations;
+        @SerializedName(value = "collaboratorsWithPendingEvents", alternate = {"collaborators_with_pending_events"}) private Long collaboratorsWithPendingEvents;
 
         public long getCurrentEvents() { return currentEvents; }
         public long getPendingValidations() { return pendingValidations; }
@@ -45,8 +45,8 @@ public final class ManagerHomeData {
         private Long id;
         private Long eventId;
         private Long participantId;
-        @SerializedName("collaborator_name") private String collaboratorName;
-        @SerializedName("event_title") private String eventTitle;
+        @SerializedName(value = "collaboratorName", alternate = {"collaborator_name"}) private String collaboratorName;
+        @SerializedName(value = "eventTitle", alternate = {"event_title"}) private String eventTitle;
         private boolean viewed;
 
         public Long getId() { return id; }
@@ -60,7 +60,7 @@ public final class ManagerHomeData {
     public static final class PendingForm {
         private String id;
         private String title;
-        @SerializedName("days_left") private Long daysLeft;
+        @SerializedName(value = "daysLeft", alternate = {"days_left"}) private Long daysLeft;
         private boolean viewed;
 
         public String getId() { return id; }

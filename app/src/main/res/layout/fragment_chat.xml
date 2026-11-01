@@ -82,7 +82,7 @@
             <ImageButton android:id="@+id/button_chat_sessions"
                 android:layout_width="48dp" android:layout_height="48dp"
                 android:background="@drawable/bg_login_icon_button" android:padding="14dp" android:scaleType="fitCenter"
-                android:src="@drawable/ai_sessions_menu" android:contentDescription="@string/ai_sessions_open" />
+                android:src="@drawable/ic_chat_history" android:contentDescription="@string/ai_sessions_open" />
         </LinearLayout>
 
         <FrameLayout
@@ -185,14 +185,14 @@
             android:id="@+id/container_chat_composer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="100dp"
+            android:minHeight="76dp"
             android:baselineAligned="false"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingStart="30dp"
             android:paddingEnd="30dp"
-            android:paddingVertical="20dp"
-            android:layout_marginBottom="8dp">
+            android:paddingVertical="8dp"
+            android:layout_marginBottom="4dp">
 
             <FrameLayout
                 android:layout_width="0dp"

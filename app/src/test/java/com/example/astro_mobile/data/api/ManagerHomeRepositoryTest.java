@@ -33,13 +33,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class ManagerHomeRepositoryTest {
-    private static final String DATA = "{\"username\":\"Ana Lima\",\"workspace_name\":\"Astro\","
-            + "\"indicators\":{\"current_events\":3,\"pending_validations\":15,"
-            + "\"collaborators_with_pending_events\":34},"
-            + "\"pending_validations\":[{\"id\":101,\"collaborator_name\":\"Kevin\","
-            + "\"event_title\":\"Treinamento de EPI\",\"viewed\":false}],"
-            + "\"pending_forms\":[{\"id\":\"mongo-form-id\",\"title\":\"Inspeção\","
-            + "\"days_left\":2,\"viewed\":true}]}";
+    private static final String DATA = "{\"username\":\"Ana Lima\",\"workspaceName\":\"Astro\","
+            + "\"indicators\":{\"currentEvents\":3,\"pendingValidations\":15,"
+            + "\"collaboratorsWithPendingEvents\":34},"
+            + "\"pendingValidations\":[{\"id\":101,\"collaboratorName\":\"Kevin\","
+            + "\"eventTitle\":\"Treinamento de EPI\",\"viewed\":false}],"
+            + "\"pendingForms\":[{\"id\":\"mongo-form-id\",\"title\":\"Inspeção\","
+            + "\"daysLeft\":2,\"viewed\":true}]}";
     private static final String SUCCESS = "{\"success\":true,\"data\":" + DATA + "}";
 
     @Test
@@ -73,10 +73,10 @@ public final class ManagerHomeRepositoryTest {
     @Test
     public void emptyAndNullFeedsPreserveIndependentIndicators() throws Exception {
         for (String feeds : new String[] {"[]", "null"}) {
-            String json = "{\"success\":true,\"data\":{\"username\":\"Ana\",\"workspace_name\":\"Astro\","
-                    + "\"indicators\":{\"current_events\":0,\"pending_validations\":15,"
-                    + "\"collaborators_with_pending_events\":0},\"pending_validations\":" + feeds
-                    + ",\"pending_forms\":" + feeds + "}}";
+            String json = "{\"success\":true,\"data\":{\"username\":\"Ana\",\"workspaceName\":\"Astro\","
+                    + "\"indicators\":{\"currentEvents\":0,\"pendingValidations\":15,"
+                    + "\"collaboratorsWithPendingEvents\":0},\"pendingValidations\":" + feeds
+                    + ",\"pendingForms\":" + feeds + "}}";
             Result result = load(repository(chain -> response(chain, 200, json), tokenProvider()));
             assertNull(result.failure);
             assertTrue(result.home.getPendingValidations().isEmpty());
@@ -88,8 +88,8 @@ public final class ManagerHomeRepositoryTest {
     @Test
     public void acceptsAbsentAndExpiredDeadlinesAndLongIndicators() throws Exception {
         for (String days : new String[] {"null", "-1", "0", "1", "2"}) {
-            String json = SUCCESS.replace("\"days_left\":2", "\"days_left\":" + days)
-                    .replace("\"current_events\":3", "\"current_events\":3000000000");
+            String json = SUCCESS.replace("\"daysLeft\":2", "\"daysLeft\":" + days)
+                    .replace("\"currentEvents\":3", "\"currentEvents\":3000000000");
             Result result = load(repository(chain -> response(chain, 200, json), tokenProvider()));
             assertNull(result.failure);
             assertEquals(3000000000L, result.home.getIndicators().getCurrentEvents());
@@ -157,12 +157,12 @@ public final class ManagerHomeRepositoryTest {
     public void missingOrNegativeIndicatorsAndMissingIdentityAreErrors() throws Exception {
         Gson gson = new Gson();
         List<String> invalid = new ArrayList<>();
-        for (String field : new String[] {"username", "workspace_name", "indicators"}) {
+        for (String field : new String[] {"username", "workspaceName", "indicators"}) {
             JsonObject envelope = gson.fromJson(SUCCESS, JsonObject.class);
             envelope.getAsJsonObject("data").remove(field);
             invalid.add(envelope.toString());
         }
-        for (String field : new String[] {"current_events", "pending_validations", "collaborators_with_pending_events"}) {
+        for (String field : new String[] {"currentEvents", "pendingValidations", "collaboratorsWithPendingEvents"}) {
             JsonObject envelope = gson.fromJson(SUCCESS, JsonObject.class);
             envelope.getAsJsonObject("data").getAsJsonObject("indicators").remove(field);
             invalid.add(envelope.toString());
@@ -170,7 +170,7 @@ public final class ManagerHomeRepositoryTest {
             invalid.add(envelope.toString());
         }
         invalid.add(SUCCESS.replace("Ana Lima", " "));
-        invalid.add(SUCCESS.replace("\"workspace_name\":\"Astro\"", "\"workspace_name\":\"\""));
+        invalid.add(SUCCESS.replace("\"workspaceName\":\"Astro\"", "\"workspaceName\":\"\""));
         for (String json : invalid) {
             assertEquals(FailureKind.INTERNAL,
                     load(repository(chain -> response(chain, 200, json), tokenProvider())).failure);

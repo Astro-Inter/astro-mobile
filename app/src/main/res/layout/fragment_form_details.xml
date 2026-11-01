@@ -57,14 +57,14 @@
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/employee_event_sender_label" />
                     <TextView android:id="@+id/text_form_details_sender" style="@style/ManagerEventDetailsValue" tools:text="@string/form_details_sender_mock" />
                 </LinearLayout>
-                <View style="@style/ManagerEventDetailsDivider" />
-                <LinearLayout style="@style/ManagerEventDetailsRow">
+                <View android:id="@+id/divider_form_details_unit_top" style="@style/ManagerEventDetailsDivider" />
+                <LinearLayout android:id="@+id/container_form_details_unit_row" style="@style/ManagerEventDetailsRow">
                     <androidx.appcompat.widget.AppCompatImageView style="@style/ManagerEventDetailsIcon"
                         android:layout_width="20dp" android:src="@drawable/home_building" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/form_details_unit_label" />
                     <TextView android:id="@+id/text_form_details_unit" style="@style/ManagerEventDetailsValue" tools:text="@string/form_details_unit_mock" />
                 </LinearLayout>
-                <View style="@style/ManagerEventDetailsDivider" />
+                <View android:id="@+id/divider_form_details_unit_bottom" style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout android:id="@+id/container_form_details_location_notice" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp"
                     android:orientation="vertical" android:paddingHorizontal="30dp" android:paddingVertical="20dp"

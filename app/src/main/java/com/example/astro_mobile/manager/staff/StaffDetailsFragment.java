@@ -21,7 +21,6 @@ import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.chat.human.HumanChatFragment;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.CollaboratorProfileData;
-import com.example.astro_mobile.data.api.dto.UserProfileData;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -127,12 +126,12 @@ public final class StaffDetailsFragment extends Fragment {
         // Cada NR expande seus próprios dados e acompanha a rolagem da tela.
         container.removeAllViews();
         if (data.nrs == null) return;
-        for (UserProfileData.Nr nr : data.nrs) {
+        for (CollaboratorProfileData.Nr nr : data.nrs) {
             if (nr == null) continue;
             View item = getLayoutInflater().inflate(R.layout.item_profile_nr, container, false);
-            String title = getString(R.string.profile_nr_code, nr.getCode());
-            if (nr.getValidade() != null && !nr.getValidade().isEmpty()) {
-                String date = nr.getValidade();
+            String title = getString(R.string.profile_nr_code, nr.code);
+            if (nr.expiresAt != null && !nr.expiresAt.isEmpty()) {
+                String date = nr.expiresAt;
                 try { date = LocalDate.parse(date).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")); }
                 catch (DateTimeParseException ignored) { }
                 title = getString(R.string.profile_nr_validity, title, date);
@@ -140,9 +139,9 @@ public final class StaffDetailsFragment extends Fragment {
                 title = getString(R.string.profile_nr_without_validity, title);
             }
             ((TextView) item.findViewById(R.id.text_profile_nr_title)).setText(title);
-            ((TextView) item.findViewById(R.id.text_profile_nr_description)).setText(text(nr.getDescricao()));
-            ((TextView) item.findViewById(R.id.text_profile_nr_objective)).setText(text(nr.getObjetivo()));
-            ((TextView) item.findViewById(R.id.text_profile_nr_applicability)).setText(text(nr.getAplicabilidade()));
+            ((TextView) item.findViewById(R.id.text_profile_nr_description)).setText(text(nr.description));
+            ((TextView) item.findViewById(R.id.text_profile_nr_objective)).setText(text(nr.objective));
+            ((TextView) item.findViewById(R.id.text_profile_nr_applicability)).setText(text(nr.applicable));
             View details = item.findViewById(R.id.container_profile_nr_details);
             ImageView chevron = item.findViewById(R.id.image_profile_nr_chevron);
             item.findViewById(R.id.button_profile_nr).setOnClickListener(v -> {

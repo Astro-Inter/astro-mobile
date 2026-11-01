@@ -1,86 +1,108 @@
-# astro-mobile
+# Astro Mobile
 
-## Lembrete de eventos pendentes — SCRUM-617
+O Astro é um aplicativo Android para colaboradores e gestores acompanharem atividades de trabalho em um só lugar. Ele reúne eventos, formulários, informações da equipe e conversas, ajudando as pessoas a identificar pendências e acompanhar suas atividades.
 
-O aplicativo registra os dispositivos autenticados em
-`fcm_tokens/{firebaseUid}/devices/{installationId}` no Firestore. Cada documento
-contém somente `token` e `updated_at` (timestamp do servidor). Um UUID local
-identifica a instalação; ele não usa identificadores físicos do aparelho.
+## Conheça o aplicativo
 
-O app suporta Android 12 (API 31) ou superior. Em Android 13+, solicita a permissão
-`POST_NOTIFICATIONS` depois da autenticação; no Android 12, respeita a habilitação
-das notificações nos ajustes do sistema sem solicitar uma permissão inexistente.
+Colaboradores podem consultar eventos e seus materiais, enviar conclusões e evidências, preencher formulários, receber alertas e conversar com gestores ou com o Astrinho, assistente de IA do Astro.
 
-A implementação segue as camadas existentes:
+Gestores podem acompanhar eventos e participantes, atribuir ou validar conclusões, consultar colaboradores e usar as conversas. As opções disponíveis dependem do perfil e das permissões da conta.
 
-- `data/local/PushPreferences` e `PushSyncPolicy`: cache de UID, token e último ACK,
-  identificação da instalação, deduplicação visual e bloqueio persistente de logout.
-- `data/firebase/PushTokenRepository`: SDKs oficiais, sincronização após autenticação,
-  renovação de token, heartbeat de sete dias e remoção do vínculo no logout.
-- `shared/notifications/PushRegistrationViewModel`: contrato da Activity com a camada de dados.
-- `AstroMessagingService` e `shared/notifications`: recebimento FCM, canal, apresentação
-  e filtragem pelo UID atual e pelo ciclo do lembrete.
-- `AstroApplication`: composição dos componentes; `MainActivity`: permissão Android
-  e navegação para os eventos somente depois da autenticação.
+O desenho das telas e os fluxos podem ser consultados no [Figma do Astro](https://www.figma.com/design/qdCrRXAVuiNhNkBuim95zz/Astro-2%C2%B0-ano).
 
-O cache é atualizado somente após confirmação da escrita no Firestore. Sessões
-com o mesmo UID/token não provocam leitura nem escrita no Firestore até o heartbeat.
-Tokens renovados sem sessão são mantidos pelo SDK e sincronizados após login.
-As preferências de push são excluídas do backup e da transferência entre aparelhos.
+## Antes de começar
 
-Ao sair, a apresentação de push é bloqueada imediatamente. A identidade Firebase
-é preservada apenas para remover o próprio dispositivo e invalidar seu token; uma
-nova autenticação aguarda essa limpeza. Se estiver offline, o logout fica pendente
-e a próxima tentativa retoma a limpeza antes de associar outra conta. Se a sessão
-já tiver sido revogada, a rotação do token protege a instalação; registros órfãos
-com tokens inválidos podem ser removidos pelo remetente. Outros dispositivos do
-mesmo usuário não são removidos.
+Para compilar e executar o projeto, você precisa de:
 
-O serviço envia **mensagens data-only** do tipo `pending_events`. O app verifica o
-UID e exibe a notificação no próprio serviço, inclusive em segundo plano; isso
-evita a apresentação automática de mensagens da conta anterior. Um ciclo já
-exibido não aparece novamente. Tocar no aviso abre os eventos do fluxo atual.
-O título é “Eventos pendentes” e o texto é “Você tem eventos pendentes. Abra o
-Astro para conferir.”. Não são incluídos detalhes pessoais no texto.
-O aviso usa o planeta do Astro em versão monocromática na barra de status,
-o ícone colorido já existente no aplicativo como imagem e a cor roxa da marca.
+- Android Studio e Android SDK com a plataforma API 37 instalada.
+- JDK 25 para o processo do Gradle, conforme `gradle/gradle-daemon-jvm.properties`. O código Java do app usa compatibilidade Java 11.
+- Um aparelho Android com API 30 ou superior, com depuração USB autorizada, ou um dispositivo virtual Android.
+- Acesso à configuração Firebase do projeto e uma conta autorizada para entrar no aplicativo.
+- Conexão com os serviços do Astro para utilizar as funcionalidades integradas.
 
-## Configuração Firebase e validação
+O Gradle Wrapper baixa a versão configurada no repositório e pode provisionar o toolchain definido para o projeto.
 
-1. Manter o `app/google-services.json` do projeto existente, ignorado pelo Git.
-2. Habilitar Cloud Firestore e FCM HTTP v1 no mesmo projeto da autenticação.
-3. Revisar `firestore.rules` e incorporar esse bloco às regras existentes antes de
-   publicar. Não substituir regras de outras funcionalidades indiscriminadamente.
-   Os clientes só podem ler/escrever seus próprios dispositivos; campos extras,
-   token vazio e timestamps arbitrários são rejeitados.
-4. Compilar com o toolchain existente: `./gradlew test assembleDebug`. A configuração
-   Firebase fictícia do CI permite validar a compilação sem credenciais administrativas.
-5. Em Android com Google Play Services, autenticar, conceder a permissão e conferir
-   o documento do dispositivo; repetir o login sem alterar token e conferir o cache.
-6. Validar dois dispositivos, renovação de token, logout offline, retomada da limpeza,
-   troca de conta e rejeição de mensagens cujo UID seja da conta anterior.
-7. Validar recebimento aberto/em segundo plano e ao abrir após o processo terminar.
-   Aplicativo forçado a parar, permissão negada, ausência de rede ou restrições do
-   sistema podem impedir a entrega; aceite do FCM não comprova exibição no aparelho.
+## Executar o projeto
 
-As dependências Messaging e Firestore usam a mesma Firebase BoM já adotada pelo app.
-Os testes de regras ficam em `firebase-tests`: executar `npm ci` e `npm test` nesse
-diretório com Java instalado. O CI executa esse emulador isolado, além do build e
-dos testes Android. As ferramentas JavaScript são somente de desenvolvimento e
-não entram no APK; não fornecer a elas credenciais administrativas de produção.
-Nenhuma chave administrativa ou conta de serviço é incluída no Android. O remetente
-vive no [astro-notification-service](https://github.com/Astro-Inter/astro-notification-service),
-na mesma SCRUM-617; não é necessário criar uma API de cadastro de tokens.
+1. Clone o repositório:
 
-## Teste físico em 24/10/2026
+   ```bash
+   git clone https://github.com/Astro-Inter/astro-mobile.git
+   cd astro-mobile
+   ```
 
-A atualização foi instalada por USB em um Samsung Galaxy M31 com Android 12,
-preservando os dados. Foram confirmados o login, o ACK do registro no Firestore,
-o envio pelo Worker, a apresentação do aviso e a persistência do ciclo no aparelho.
-A repetição do mesmo ciclo no remetente não criou outro aviso no Mongo nem
-reenviou pelo FCM. A versão com o planeta do Astro também foi instalada, usando
-o ícone monocromático na barra de status e a imagem colorida no aviso.
+2. Obtenha a configuração Firebase apropriada com a equipe e coloque o arquivo `google-services.json` dentro de `app/`. O arquivo é ignorado pelo Git.
 
-O CI compilou o aplicativo, executou os testes Java e validou as regras Firestore.
-Testes com duas instalações, logout offline e os demais cenários acima continuam
-necessários antes de considerar toda a matriz de dispositivos validada.
+3. Abra o projeto no Android Studio, aguarde a sincronização do Gradle, selecione um dispositivo e execute a configuração do módulo `app`.
+
+Para compilar e instalar pelo terminal, com um dispositivo conectado:
+
+```powershell
+# Windows
+.\gradlew.bat :app:installDebug
+```
+
+```bash
+# macOS ou Linux
+./gradlew :app:installDebug
+```
+
+## Configuração dos serviços
+
+As bases dos serviços são definidas em `app/build.gradle.kts` e disponibilizadas ao app pelo `BuildConfig`:
+
+| Campo | Serviço |
+| --- | --- |
+| `API_BASE_URL` | API principal do Astro |
+| `CHAT_WEBSOCKET_URL` | WebSocket do chat humano |
+| `AI_API_BASE_URL` | Serviço do Astrinho |
+| `PASSWORD_RESET_API_BASE_URL` | Serviço de recuperação de senha |
+
+O projeto não carrega arquivos `.env`: alterar um arquivo desse tipo não muda as configurações do aplicativo. Para usar outro ambiente, ajuste as bases na configuração do Gradle e forneça o `google-services.json` correspondente. URLs Retrofit precisam terminar com `/`.
+
+Não adicione ao aplicativo chaves privadas, credenciais SMTP ou tokens administrativos.
+
+## Tecnologias e organização
+
+O app é desenvolvido em **Java e XML**, com uma Activity e navegação entre Fragments. A organização usa **MVVM**: Fragments apresentam as telas, ViewModels coordenam o estado e Repositories concentram o acesso aos dados.
+
+As principais bibliotecas são Android Navigation e ViewModel, Retrofit com Gson para HTTP, Firebase Authentication, Cloud Firestore e Firebase Cloud Messaging, Glide para imagens e WorkManager para trabalhos em segundo plano. O chat humano usa WebSocket com STOMP.
+
+```text
+app/src/main/java/com/example/astro_mobile/
+├── auth/           autenticação e acesso
+├── chat/           conversas e Astrinho
+├── data/           APIs, Firebase e dados locais
+├── employee/       telas do colaborador
+├── manager/        telas do gestor
+├── navigation/     entrada e navegação
+├── notifications/  alertas
+└── shared/         recursos compartilhados
+
+app/src/main/res/   layouts, imagens, textos e temas
+docs/               documentação das funcionalidades
+```
+
+## Gerar APK
+
+Para gerar uma versão debug sem instalá-la:
+
+```powershell
+# Windows
+.\gradlew.bat :app:assembleDebug
+```
+
+```bash
+# macOS ou Linux
+./gradlew :app:assembleDebug
+```
+
+O arquivo gerado fica em `app/build/outputs/apk/debug/app-debug.apk`. A distribuição de uma versão release requer configurar uma assinatura apropriada.
+
+## Contribuição
+
+Crie uma branch para a alteração, descreva o que mudou e abra um pull request para revisão. A documentação das funcionalidades está na pasta [docs](docs/).
+
+## Projeto e licença
+
+Desenvolvido pela equipe [Astro Inter](https://github.com/Astro-Inter). O projeto está sob a [licença MIT](LICENSE).

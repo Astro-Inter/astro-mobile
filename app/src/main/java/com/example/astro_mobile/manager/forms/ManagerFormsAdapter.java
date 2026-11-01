@@ -67,7 +67,7 @@ public final class ManagerFormsAdapter extends RecyclerView.Adapter<ManagerForms
             case NEW: return R.drawable.ic_employee_event_new;
             case ANALYSIS: return R.drawable.home_clock;
             case APPROVED: return R.drawable.ic_employee_event_done;
-            case REJECTED: return R.drawable.ic_status_reload;
+            case REJECTED: return R.drawable.ic_dialog_close;
             default: return 0;
         }
     }
