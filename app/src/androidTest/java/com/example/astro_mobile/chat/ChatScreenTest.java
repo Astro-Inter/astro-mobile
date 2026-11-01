@@ -60,6 +60,55 @@ public class ChatScreenTest {
             + "| **NR 6** | EPI | OK | Equipe de segurança |\n| NR 10 | Eletricidade | Revisar | Manutenção |\n\n"
             + "Acesse [a plataforma](https://example.com). Use `Astro`.";
 
+    @Test public void analyticalPagingMakesNoRequestsAndKeyboardKeepsReplyVisible() throws Exception {
+        Fixture f = new Fixture(200);
+        com.google.gson.JsonArray blocks = ChatAnalyticalContentDeviceTest.withRows(ChatAnalyticalContentDeviceTest.fixture(), 100);
+        com.google.gson.JsonObject response = new com.google.gson.JsonObject();
+        response.addProperty("session_id", "c4dd8100-1122-3344-5566-77889900aabb");
+        response.add("blocos", blocks);
+        f.responseBody = response.toString();
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            AtomicReference<ChatViewModel> model = open(scenario, f.repository());
+            onView(withId(R.id.input_chat_message)).perform(click(), replaceText("Mostre os dados de exemplo"));
+            onView(withId(R.id.button_chat_send)).perform(click());
+            f.gate.countDown(); awaitFinished(model);
+            SystemClock.sleep(500);
+            scenario.onActivity(activity -> {
+                android.view.View root = activity.findViewById(R.id.chat_root);
+                androidx.core.view.WindowInsetsCompat insets = androidx.core.view.ViewCompat.getRootWindowInsets(root);
+                assertNotNull(insets); assertTrue(insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()));
+                androidx.recyclerview.widget.RecyclerView list = activity.findViewById(R.id.list_chat_messages);
+                assertFalse("Fim da resposta deve acompanhar o teclado", list.canScrollVertically(1));
+                ChatMessageAdapter.Holder holder = (ChatMessageAdapter.Holder) list.findViewHolderForAdapterPosition(1);
+                assertNotNull(holder);
+                android.widget.LinearLayout matrix = (android.widget.LinearLayout) holder.content.getChildAt(2);
+                android.widget.LinearLayout controls = (android.widget.LinearLayout) matrix.getChildAt(matrix.getChildCount() - 1);
+                java.util.List<String> graph = ChatAnalyticalContentDeviceTest.texts(holder.content.getChildAt(4));
+                controls.getChildAt(2).performClick();
+                assertEquals("2 / 10", ((android.widget.TextView) controls.getChildAt(1)).getText().toString());
+                assertEquals(graph, ChatAnalyticalContentDeviceTest.texts(holder.content.getChildAt(4)));
+                assertEquals(1, f.calls.get());
+            });
+            screenshot("analytical-keyboard-simulated");
+            onView(withId(R.id.input_chat_message)).perform(closeSoftKeyboard());
+            SystemClock.sleep(300);
+            scenario.onActivity(activity -> {
+                androidx.recyclerview.widget.RecyclerView list = activity.findViewById(R.id.list_chat_messages);
+                ChatMessageAdapter.Holder holder = (ChatMessageAdapter.Holder) list.findViewHolderForAdapterPosition(1);
+                assertNotNull(holder);
+                int[] target = new int[2], viewport = new int[2];
+                holder.content.getChildAt(4).getLocationOnScreen(target); list.getLocationOnScreen(viewport);
+                list.scrollBy(0, target[1] - viewport[1]);
+            });
+            screenshot("analytical-donut-simulated");
+            scenario.onActivity(activity -> {
+                androidx.recyclerview.widget.RecyclerView list = activity.findViewById(R.id.list_chat_messages);
+                list.scrollBy(0, -Integer.MAX_VALUE);
+            });
+            screenshot("analytical-indicators-simulated");
+        }
+    }
+
     @Test public void markdownLoadingDraftAndRecreation() throws Exception {
         Fixture f = new Fixture(200);
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
@@ -203,16 +252,17 @@ public class ChatScreenTest {
         scenario.onActivity(activity -> {
             NavHostFragment host = (NavHostFragment) activity.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
             NavController navigation = host.getNavController();
+            int home = com.example.astro_mobile.shared.navigation.HomeNavigation.destination(activity);
             androidx.navigation.NavGraph graph = navigation.getNavInflater().inflate(R.navigation.nav_graph);
-            graph.setStartDestination(R.id.employeeHomeFragment);
+            graph.setStartDestination(home);
             navigation.setGraph(graph);
-            model.set(new ViewModelProvider(navigation.getBackStackEntry(R.id.employeeHomeFragment),
+            model.set(new ViewModelProvider(navigation.getBackStackEntry(home),
                     new ViewModelProvider.Factory() {
                         @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> cls) {
                             return cls.cast(new ChatViewModel(repository));
                         }
                     }).get(ChatViewModel.class));
-            navigation.navigate(R.id.action_employee_home_to_chat);
+            navigation.navigate(home == R.id.managerHomeFragment ? R.id.action_manager_home_to_chat : R.id.action_employee_home_to_chat);
         });
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         return model;
@@ -250,6 +300,7 @@ public class ChatScreenTest {
         final AtomicInteger calls = new AtomicInteger();
         final AiChatApi api;
         volatile int code;
+        volatile String responseBody;
 
         Fixture(int code) {
             this.code = code;
@@ -260,7 +311,7 @@ public class ChatScreenTest {
                 java.util.Map<String, String> payload = new java.util.HashMap<>();
                 payload.put("session_id", "c4dd8100-1122-3344-5566-77889900aabb");
                 payload.put("resposta", MARKDOWN);
-                String body = new com.google.gson.Gson().toJson(payload);
+                String body = responseBody == null ? new com.google.gson.Gson().toJson(payload) : responseBody;
                 return new Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
                         .code(this.code).message("test")
                         .body(ResponseBody.create(MediaType.get("application/json"), body)).build();

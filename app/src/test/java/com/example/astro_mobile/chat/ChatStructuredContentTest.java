@@ -49,4 +49,36 @@ public class ChatStructuredContentTest {
         assertEquals("AE", ChatStructuredContent.initials("Ana Exemplo"));
         assertEquals("A", ChatStructuredContent.initials("Ana"));
     }
+    @Test public void validityColorsStayConsistentAcrossOrderAndChartType() {
+        assertEquals(ChatStructuredContent.chartColor("grafico_barras", "Vencidas", 0),
+                ChatStructuredContent.chartColor("grafico_setores", "Vencidas", 4));
+        assertNotEquals(ChatStructuredContent.chartColor("grafico_setores", "Vencidas", 0),
+                ChatStructuredContent.chartColor("grafico_setores", "Sem validade", 0));
+    }
+    static com.google.gson.JsonArray localTable(int count, int total, boolean limited) {
+        com.google.gson.JsonObject table = new com.google.gson.JsonObject();
+        table.addProperty("tipo", "tabela"); table.addProperty("versao", 2); table.addProperty("titulo", "Usuários");
+        table.addProperty("paginacao", "local"); table.addProperty("solicitada", limited ? 500 : count);
+        table.addProperty("retornada", count); table.addProperty("total", total);
+        table.addProperty("tem_mais", total > count); table.addProperty("limitado", limited);
+        table.add("motivo_limite", limited ? new com.google.gson.JsonPrimitive("maximo_resultados") : com.google.gson.JsonNull.INSTANCE);
+        table.add("colunas", JsonParser.parseString("[{\"chave\":\"nome\",\"titulo\":\"Nome\"}]"));
+        com.google.gson.JsonArray rows = new com.google.gson.JsonArray();
+        for (int n=0; n<count; n++) { com.google.gson.JsonObject row = new com.google.gson.JsonObject(); row.addProperty("nome", "Pessoa " + n); rows.add(row); }
+        table.add("linhas", rows); com.google.gson.JsonArray blocks = new com.google.gson.JsonArray(); blocks.add(table); return blocks;
+    }
+    @Test public void acceptsLocalTablesUpTo200AndRejectsBrokenMetadata() {
+        assertTrue(ChatStructuredContent.valid(localTable(100,143,false)));
+        assertTrue(ChatStructuredContent.valid(localTable(200,300,true)));
+        assertFalse(ChatStructuredContent.valid(localTable(201,300,true)));
+        com.google.gson.JsonArray blocks = localTable(100,143,false);
+        blocks.get(0).getAsJsonObject().addProperty("retornada", 99);
+        assertFalse(ChatStructuredContent.valid(blocks));
+        blocks = localTable(100,143,false); blocks.get(0).getAsJsonObject().addProperty("versao",1);
+        assertFalse(ChatStructuredContent.valid(blocks));
+    }
+    @Test public void acceptsOwnProfileWithAbsentOptionalFields() {
+        assertTrue(ChatStructuredContent.valid(JsonParser.parseString("[{\"tipo\":\"ficha_usuario\",\"versao\":1,\"titulo\":\"Meu perfil\",\"origem\":\"usuario_autenticado\",\"nome\":null,\"modalidade\":\"HIBRIDO\",\"foto\":{\"tipo\":\"imagem\",\"url\":null,\"descricao\":\"Foto do usuário autenticado\"}}]").getAsJsonArray()));
+        assertEquals("●", ChatStructuredContent.initials(null));
+    }
 }
