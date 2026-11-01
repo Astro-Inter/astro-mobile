@@ -12,11 +12,12 @@ public final class NotificationPreferences {
     }
 
     public static boolean isEnabled(Context context, String userId) {
-        // Esta referência local não solicita permissão nem entrega notificações.
-        return preferences(context).getBoolean(userId, false);
+        // Contas sem escolha explícita mantêm o comportamento de push já existente.
+        return userId != null && preferences(context).getBoolean(userId, true);
     }
 
     public static void save(Context context, String userId, boolean enabled) {
+        if (userId == null) return;
         // Cada conta conserva sua escolha neste aparelho, inclusive após sair.
         preferences(context).edit().putBoolean(userId, enabled).apply();
     }

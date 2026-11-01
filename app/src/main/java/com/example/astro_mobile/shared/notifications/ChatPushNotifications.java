@@ -45,7 +45,7 @@ public final class ChatPushNotifications {
         PushTokenRepository repository = PushTokenRepository.getInstance();
         boolean displayed = false;
         synchronized (LOCK) {
-            if (!repository.isCurrentUser(message.uid)) return;
+            if (!repository.canNotify(message.uid)) return;
             android.content.SharedPreferences preferences = context.getSharedPreferences(RECEIPTS, Context.MODE_PRIVATE);
             JSONArray receipts;
             try { receipts = new JSONArray(preferences.getString("messages", "[]")); }
@@ -96,7 +96,7 @@ public final class ChatPushNotifications {
 
     static boolean canUpdateAvatar(Context context, String uid, String conversationId, String messageId) {
         synchronized (LOCK) {
-            return !foreground && PushTokenRepository.getInstance().isCurrentUser(uid)
+            return !foreground && PushTokenRepository.getInstance().canNotify(uid)
                     && ChatNotificationFactory.isLatest(active(context, conversationId), uid, conversationId, messageId);
         }
     }

@@ -10,7 +10,10 @@ public final class PushRegistrationViewModel extends ViewModel {
     private final PushTokenRepository repository;
     public PushRegistrationViewModel(PushTokenRepository repository) { this.repository = repository; }
     public void synchronize() { repository.synchronize(); }
-    public boolean mayAskPermission() { return !repository.permissionAsked(); }
+    public boolean mayAskPermission() { return repository.notificationsWanted() && !repository.permissionAsked(); }
+    public boolean permissionWasAsked() { return repository.permissionAsked(); }
+    public boolean notificationsWanted() { return repository.notificationsWanted(); }
+    public void setNotificationsEnabled(boolean enabled) { repository.setNotificationsEnabled(enabled); }
     public void permissionRequested() { repository.markPermissionAsked(); }
     public boolean isCurrentUser(String uid) { return repository.isCurrentUser(uid); }
     public static final class Factory implements ViewModelProvider.Factory {

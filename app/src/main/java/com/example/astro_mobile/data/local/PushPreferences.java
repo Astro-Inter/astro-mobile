@@ -32,6 +32,9 @@ public final class PushPreferences {
         preferences.edit().remove("firebase_uid").remove("fcm_token").remove("last_sync")
                 .remove("logout_uid").remove("logout_pending").apply();
     }
+    public void forgetSynchronizedToken() {
+        preferences.edit().remove("firebase_uid").remove("fcm_token").remove("last_sync").apply();
+    }
     public long lastCycle(String uid) { return preferences.getLong("cycle:" + uid, 0); }
     public void displayed(String uid, long cycle) { preferences.edit().putLong("cycle:" + uid, cycle).commit(); }
     public boolean permissionAsked() { return preferences.getBoolean("permission_asked", false); }

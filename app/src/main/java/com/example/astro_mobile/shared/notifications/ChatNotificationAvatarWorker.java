@@ -40,6 +40,7 @@ public final class ChatNotificationAvatarWorker extends Worker {
                 .putString("conversation", message.conversationId).putString("message", message.messageId)
                 .putLong("sender", message.senderId).build();
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(ChatNotificationAvatarWorker.class)
+                .addTag("astro-chat-avatar")
                 .setInputData(identifiers)
                 .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
