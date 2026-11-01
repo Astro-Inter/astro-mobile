@@ -4,6 +4,8 @@ Este arquivo registra somente telas cuja implementação já começou. A ausênc
 
 Estados: `NÃO INICIADO`, `EM ANDAMENTO`, `CONCLUÍDO`, `BLOQUEADO` e `NÃO SE APLICA`.
 
+Recuperação de senha (2026-11-01): serviço Astro com timeout de 70 segundos, erros com referência de atendimento e prevenção de envios duplicados. Build debug e sete testes com API simulada aprovados; confirmação dos códigos em falhas reais e validação visual pendentes.
+
 Filtros horizontais (2026-11-01): ajuste compartilhado mantém cada rótulo em uma linha e todos os filtros com a mesma largura, usando rolagem quando necessário. Build/lint/teste unitário aprovados, versão instalada e filtros visuais conferidos no Samsung SM-A566E; filtro Prazo encerrado seleciona e mostra estado vazio corretamente. No backend atual, QA — Prazo encerrado tem prazo 21/10/2026, mas segue como “Atribuir conclusões” porque GET /events/my-events não retorna lastClassLimitDate. O detalhe real abre pelo item e mostra a data; classificação integrada depende do campo no backend.
 
 Filtros de eventos (2026-11-01): telas do colaborador e dos eventos de um colaborador no fluxo do gestor usam opções horizontais com rolagem e largura responsiva; build debug aprovado e instalação no celular e no tablet virtual concluída. No tablet virtual 800×1340, conferidas as duas telas e a seleção de Cancelado e Pendente, respectivamente.

@@ -24,6 +24,7 @@ import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.FirstLoginPasswordViewModel;
 import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.PasswordResetViewModel;
+import com.example.astro_mobile.auth.PasswordResetMessages;
 import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -169,7 +170,10 @@ public class ErrorFragment extends Fragment {
                     } else if (kind == AuthFailureKind.RATE_LIMIT) {
                         Toast.makeText(requireContext(), getString(R.string.password_reset_rate_limit,
                                 resetViewModel.getRetrySeconds()), Toast.LENGTH_LONG).show();
-                    } else showCopy(title, body, kind == AuthFailureKind.CONNECTION);
+                    } else {
+                        showCopy(title, body, kind == AuthFailureKind.CONNECTION);
+                        PasswordResetMessages.show(requireContext(), kind, resetViewModel.getLastRequestId());
+                    }
                 }
             };
             ((TextView) view.findViewById(R.id.button_email_error_start))
@@ -374,6 +378,7 @@ public class ErrorFragment extends Fragment {
                     }
                     showCopy(view.findViewById(R.id.text_email_error_title),
                             view.findViewById(R.id.text_email_error_body), kind == AuthFailureKind.CONNECTION);
+                    PasswordResetMessages.show(requireContext(), kind, resetViewModel.getLastRequestId());
                 }
             });
         });
