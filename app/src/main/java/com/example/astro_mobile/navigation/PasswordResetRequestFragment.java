@@ -14,12 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.PasswordResetViewModel;
+import com.example.astro_mobile.auth.PasswordResetMessages;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 
 public class PasswordResetRequestFragment extends Fragment {
@@ -121,11 +121,7 @@ public class PasswordResetRequestFragment extends Fragment {
                             resetViewModel.getRetrySeconds()), Toast.LENGTH_LONG).show();
                     return;
                 }
-                NavController navController = NavHostFragment.findNavController(
-                        PasswordResetRequestFragment.this);
-                navController.navigate(kind == AuthFailureKind.CONNECTION
-                                ? R.id.action_password_reset_request_to_connection_error
-                                : R.id.action_password_reset_request_to_generic_error);
+                PasswordResetMessages.show(requireContext(), kind, resetViewModel.getLastRequestId());
             }
 
             private void showConfirmation(View sourceView) {
@@ -137,6 +133,7 @@ public class PasswordResetRequestFragment extends Fragment {
                         AuthArgs.of(resetViewModel.getLastEmail(), null));
             }
         };
+        resetViewModel.attachCallback(resultCallback);
     }
 
     @Override

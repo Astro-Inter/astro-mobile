@@ -36,11 +36,16 @@
     <string name="password_reset_description">Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.</string>
     <string name="password_reset_email_empty_error">Informe seu e-mail.</string>
     <string name="password_reset_rate_limit">Aguarde %1$d segundos antes de tentar novamente.</string>
+    <string name="password_reset_support">Não foi possível solicitar o link. Entre em contato com o suporte.</string>
+    <string name="password_reset_uncertain">Não foi possível confirmar o envio. Confira seu e-mail antes de tentar novamente.</string>
+    <string name="password_reset_connection">Sem conexão. Verifique sua internet e tente novamente.</string>
+    <string name="password_reset_unavailable">O serviço está indisponível. Tente novamente mais tarde.</string>
+    <string name="password_reset_request_id">Informe ao suporte o código: %1$s</string>
     <string name="password_reset_account_email_invalid">O e-mail da sua conta é inválido. Verifique seus dados.</string>
     <string name="password_reset_send">Enviar link</string>
     <string name="password_reset_back_description">Voltar</string>
     <string name="password_reset_confirmation_title">Confira seu e-mail</string>
-    <string name="password_reset_confirmation_body">Se houver uma conta vinculada a este endereço de e-mail, você receberá um link para redefinir sua senha.</string>
+    <string name="password_reset_confirmation_body">Se o e-mail informado estiver cadastrado, você receberá instruções para redefinir sua senha.</string>
     <string name="password_reset_back_to_login">Voltar ao login</string>
     <string name="password_reset_back_to_email">Voltar à identificação de e-mail</string>
     <string name="first_login_access_key_title">Insira sua chave de acesso para entrar pela primeira vez.</string>

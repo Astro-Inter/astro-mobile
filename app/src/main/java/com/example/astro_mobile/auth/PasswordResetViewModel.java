@@ -21,6 +21,7 @@ public class PasswordResetViewModel extends ViewModel {
     private boolean loading;
     private int requestId;
     private String lastEmail;
+    private String lastRequestId;
     private ResultCallback callback;
 
     public PasswordResetViewModel(FirebaseAuthRepository auth, PasswordResetRepository repository) {
@@ -42,12 +43,18 @@ public class PasswordResetViewModel extends ViewModel {
     }
 
     public long getRetrySeconds() { return repository.getRetrySeconds(); }
+    public String getLastRequestId() { return lastRequestId; }
+
+    public void attachCallback(ResultCallback callback) {
+        if (loading) this.callback = callback;
+    }
 
     public void sendPasswordResetEmail(String email, ResultCallback callback) {
         if (loading) {
             return;
         }
         lastEmail = email;
+        lastRequestId = null;
         loading = true;
         this.callback = callback;
         int id = ++requestId;
@@ -59,6 +66,12 @@ public class PasswordResetViewModel extends ViewModel {
 
             @Override
             public void onFailure(AuthFailureKind kind) {
+                finish(id, kind);
+            }
+
+            @Override
+            public void onFailure(AuthFailureKind kind, String requestId) {
+                lastRequestId = requestId;
                 finish(id, kind);
             }
         });
@@ -82,15 +95,14 @@ public class PasswordResetViewModel extends ViewModel {
     }
 
     public void clearRequest() {
-        // Uma tela fechada não recebe o retorno da solicitação em andamento.
-        ++requestId;
+        // Desanexa a tela, mas mantém a operação em andamento para evitar envio duplicado.
         callback = null;
-        loading = false;
     }
 
     @Override
     protected void onCleared() {
         clearRequest();
+        ++requestId;
     }
 
     public static class Factory implements ViewModelProvider.Factory {
