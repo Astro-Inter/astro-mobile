@@ -62,7 +62,7 @@ public final class ChatMessageAdapter extends ListAdapter<ChatMessage, ChatMessa
         params.constrainedWidth = user;
         params.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_SPREAD;
         params.horizontalBias = user ? 1f : 0f;
-        params.setMarginStart(Math.round((user ? 52 : 53) * density));
+        params.setMarginStart(Math.round((user ? 72 : 53) * density));
         params.setMarginEnd(user ? 0 : Math.round(12 * density));
         holder.bubble.setLayoutParams(params);
         // Horário local da mensagem, preservado ao tentar enviar novamente.

@@ -50,7 +50,7 @@ public final class HumanMessagesAdapter extends RecyclerView.Adapter<HumanMessag
         params.constrainedWidth = !hasQuote;
         params.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_SPREAD;
         params.horizontalBias = message.sent ? 1f : 0f;
-        params.setMarginStart(Math.round((message.sent ? 52 : 45) * density));
+        params.setMarginStart(Math.round((message.sent ? 72 : 45) * density));
         params.setMarginEnd(Math.round((message.sent ? 0 : 12) * density));
         row.bubble.setLayoutParams(params);
         HumanMessage quoted = conversation.findMessage(message.replyToMessageId);

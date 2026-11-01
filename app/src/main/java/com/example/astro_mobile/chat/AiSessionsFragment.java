@@ -215,6 +215,7 @@ public final class AiSessionsFragment extends Fragment {
             // Compartilha o card humano; somente o avatar e os dados vêm da sessão da IA.
             holder.button.setEnabled(enabled);
             holder.button.setOnClickListener(clicked -> open.open(conversation));
+            ConversationTitlePopup.attach(holder.button, holder.title);
             holder.avatar.setOnClickListener(clicked -> viewAvatar.run());
         }
 
