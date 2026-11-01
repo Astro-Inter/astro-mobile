@@ -7,18 +7,17 @@
     <string name="employee_event_attachments">Material do evento</string>
     <string name="employee_event_view_attachment">Visualizar material</string>
     <string name="employee_event_deadline_label">Prazo limite:</string>
-    <string name="employee_event_validity_label">Validade:</string>
     <string name="employee_event_completion_mode_label">Modo de conclusão:</string>
     <string name="employee_event_self_declaration">Autodeclaração</string>
     <string name="employee_event_sender_label">Enviado por:</string>
     <string name="employee_event_evidence_filename">print_certificado.pdf</string>
     <string name="employee_event_add_evidence">Anexar evidência</string>
+    <string name="employee_event_add_evidence_optional">(Esse campo é opcional)</string>
     <string name="employee_event_remove_evidence">Remover evidência selecionada</string>
     <string name="employee_event_complete">Marcar como concluído</string>
     <string name="employee_event_conclusion">Conclusão enviada para análise!</string>
     <string name="employee_event_attachment_mock">O material é apenas uma referência visual neste protótipo.</string>
     <string name="employee_event_manager_completion">Atribuição pelo gestor</string>
-    <string name="employee_event_no_validity">Não informada</string>
     <string name="employee_event_file_limit">Você pode anexar até 3 evidências.</string>
     <string name="employee_event_file_invalid">Selecione um arquivo disponível, não vazio e com até 50 MB.</string>
     <string name="employee_event_evidence_required">Anexe pelo menos uma evidência para enviar a conclusão.</string>
@@ -60,7 +59,7 @@
         <item name="android:contentDescription">@null</item>
         <item name="android:importantForAccessibility">no</item>
         <item name="android:scaleType">fitCenter</item>
-        <item name="tint">@color/astro_primary_purple</item>
+        <item name="tint">@color/astro_light_background</item>
     </style>
     <style name="EmployeeEventDetailsDivider">
         <item name="android:layout_width">match_parent</item>

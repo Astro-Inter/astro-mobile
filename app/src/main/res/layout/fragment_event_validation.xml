@@ -116,7 +116,7 @@
                     android:layout_marginTop="4dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
                     android:orientation="vertical">
                     <TextView android:id="@+id/button_validation_confirm" style="@style/EmployeeEventDetailsButton"
-                        android:background="@drawable/bg_login_password_button" android:text="@string/event_validation_confirm" />
+                        android:background="@drawable/bg_primary_button" android:text="@string/event_validation_confirm" />
                     <TextView android:id="@+id/button_validation_reject" style="@style/EmployeeEventDetailsButton"
                         android:layout_marginTop="10dp" android:background="@drawable/bg_event_validation_reject"
                         android:text="@string/event_validation_reject" />

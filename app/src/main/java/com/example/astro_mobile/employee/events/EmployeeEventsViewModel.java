@@ -67,16 +67,17 @@ public final class EmployeeEventsViewModel extends ViewModel {
     }
 
     public List<EmployeeEvent> visibleEvents() {
-        // Recalcula os prazos ao renderizar; trocar o mês nunca cria dados fictícios.
+        // A lista considera todos os meses e respeita apenas a pesquisa e o filtro escolhidos.
         List<EmployeeEvent> result = new ArrayList<>();
         Instant now = Instant.now();
         ZoneId zone = ZoneId.systemDefault();
         String search = normalize(query);
         for (CollaboratorEventData item : events) {
-            LocalDate date = item.getDeadline().toLocalDate();
-            if (!YearMonth.from(date).equals(month) || !normalize(item.getEventTitle()).contains(search)) continue;
+            if (!normalize(item.getEventTitle()).contains(search)) continue;
             EmployeeEvent event = EmployeeEvent.fromApi(item, zone, now);
-            if (filter == null || event.status == filter) result.add(event);
+            if (filter == null || event.status == filter
+                    || (filter == EmployeeEvent.Status.PENDING
+                    && event.status == EmployeeEvent.Status.REJECTED)) result.add(event);
         }
         return result;
     }
@@ -88,7 +89,13 @@ public final class EmployeeEventsViewModel extends ViewModel {
 
     public List<EmployeeEvent> eventsOn(LocalDate day) {
         List<EmployeeEvent> result = new ArrayList<>();
-        for (EmployeeEvent event : visibleEvents()) if (event.date.equals(day)) result.add(event);
+        Instant now = Instant.now();
+        ZoneId zone = ZoneId.systemDefault();
+        for (CollaboratorEventData item : events) {
+            if (item.getDeadline().toLocalDate().equals(day)) {
+                result.add(EmployeeEvent.fromApi(item, zone, now));
+            }
+        }
         return result;
     }
 

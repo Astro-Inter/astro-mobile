@@ -63,13 +63,16 @@ public final class EmployeeEventsAdapter extends RecyclerView.Adapter<EmployeeEv
                 description = R.string.employee_events_review;
                 row.icon.setImageResource(R.drawable.home_clock);
                 break;
-            case CANCELLED:
             case REJECTED:
+                description = R.string.employee_events_rejected;
+                row.icon.setImageResource(R.drawable.ic_status_reload);
+                row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext()
+                        .getColor(R.color.employee_event_status_red)));
+                break;
+            case CANCELLED:
             case EXPIRED:
                 description = event.displayStatus == EventStatusClassifier.DisplayStatus.CANCELLED
-                        ? R.string.employee_events_cancelled
-                        : event.displayStatus == EventStatusClassifier.DisplayStatus.REJECTED
-                        ? R.string.employee_events_rejected : R.string.employee_events_expired;
+                        ? R.string.employee_events_cancelled : R.string.employee_events_expired;
                 row.icon.setImageResource(R.drawable.conversations_close);
                 row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext()
                         .getColor(R.color.employee_event_status_red)));

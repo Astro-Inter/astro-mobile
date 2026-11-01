@@ -20,6 +20,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ResponsiveFilters;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -34,10 +36,12 @@ import java.util.List;
 import java.util.Locale;
 
 public class EmployeeEventsFragment extends Fragment {
+    public static final String INITIAL_FILTER = "employee_events_initial_filter";
     private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private final int[] filterIds = { R.id.filter_employee_events_all, R.id.filter_employee_events_pending,
-            R.id.filter_employee_events_review, R.id.filter_employee_events_done };
+    private final int[] filterIds = {R.id.filter_employee_events_0, R.id.filter_employee_events_1,
+            R.id.filter_employee_events_2, R.id.filter_employee_events_3, R.id.filter_employee_events_4,
+            R.id.filter_employee_events_5, R.id.filter_employee_events_6};
     private EmployeeEventsViewModel state;
     private BottomSheetDialog daySheet;
 
@@ -46,7 +50,14 @@ public class EmployeeEventsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ResponsiveFilters.bind(view.findViewById(R.id.container_employee_events_filters));
+        PullToRefresh.attach(this, view.findViewById(R.id.scroll_employee_events),
+                view.findViewById(R.id.scroll_employee_events), () -> loadEvents());
         state = new ViewModelProvider(this, new EmployeeEventsViewModel.Factory()).get(EmployeeEventsViewModel.class);
+        if (savedInstanceState == null && getArguments() != null) {
+            String filter = getArguments().getString(INITIAL_FILTER);
+            if (filter != null) state.setFilter(EmployeeEvent.Status.valueOf(filter));
+        }
         GridLayout calendarGrid = view.findViewById(R.id.grid_employee_events_calendar);
         calendarGrid.addOnLayoutChangeListener((changedView, left, top, right, bottom,
                                                 oldLeft, oldTop, oldRight, oldBottom) -> {
@@ -54,7 +65,7 @@ public class EmployeeEventsFragment extends Fragment {
                 renderCalendar(view, state.getMonth());
             }
         });
-        // A lista e o calendário filtram a mesma resposta real, sem novas chamadas ao pesquisar.
+        // A pesquisa e os filtros atualizam apenas a lista, sem novas chamadas.
         for (int index = 0; index < filterIds.length; index++) {
             final int selected = index;
             view.findViewById(filterIds[index]).setOnClickListener(clicked -> {
@@ -115,12 +126,13 @@ public class EmployeeEventsFragment extends Fragment {
     }
 
     private void render(View view) {
-        // Atualiza os filtros, os dias marcados e as linhas, inclusive o estado vazio.
+        // Atualiza o filtro selecionado, os dias marcados e as linhas, inclusive o estado vazio.
         int selected = state.getFilter() == null ? 0 : state.getFilter().ordinal() + 1;
-        for (int index = 0; index < filterIds.length; index++) view.findViewById(filterIds[index]).setSelected(index == selected);
+        for (int index = 0; index < filterIds.length; index++)
+            view.findViewById(filterIds[index]).setSelected(index == selected);
         YearMonth month = state.getMonth();
         TextView monthButton = view.findViewById(R.id.button_employee_events_month);
-        monthButton.setText(month.getMonth().getDisplayName(TextStyle.SHORT, PT_BR));
+        monthButton.setText(capitalizeMonth(month.getMonth().getDisplayName(TextStyle.SHORT, PT_BR)));
         TextView yearButton = view.findViewById(R.id.button_employee_events_year);
         yearButton.setText(String.valueOf(month.getYear()));
         renderCalendar(view, month);
@@ -145,6 +157,7 @@ public class EmployeeEventsFragment extends Fragment {
         }
         int offset = month.atDay(1).getDayOfWeek().getValue() % 7;
         int cells = ((offset + month.lengthOfMonth() + 6) / 7) * 7;
+        LocalDate today = LocalDate.now();
         for (int index = 0; index < cells; index++) {
             LocalDate day = month.atDay(1).plusDays(index - offset);
             TextView cell = addCell(grid, dayCellHeight(grid));
@@ -164,7 +177,11 @@ public class EmployeeEventsFragment extends Fragment {
             }
             boolean hasEvents = !state.eventsOn(day).isEmpty();
             cell.setSelected(hasEvents);
-            cell.setActivated(day.equals(LocalDate.now()));
+            cell.setActivated(day.equals(today));
+            if (hasEvents && day.isBefore(today)) {
+                cell.setBackgroundResource(R.drawable.bg_events_day_past);
+                cell.setTextColor(requireContext().getColor(R.color.astro_tertiary_light_text));
+            }
             if (cell.isActivated()) cell.setTextColor(requireContext().getColor(R.color.astro_dark_background));
             cell.setOnClickListener(clicked -> showDay(day));
         }
@@ -197,13 +214,17 @@ public class EmployeeEventsFragment extends Fragment {
         // Os seletores permitem navegar para meses e anos sem trocar de tela.
         PopupMenu menu = new PopupMenu(requireContext(), anchor);
         for (int month = 1; month <= 12; month++) menu.getMenu().add(0, month, month,
-                java.time.Month.of(month).getDisplayName(TextStyle.FULL, PT_BR));
+                capitalizeMonth(java.time.Month.of(month).getDisplayName(TextStyle.FULL, PT_BR)));
         menu.setOnMenuItemClickListener(item -> {
             state.setMonth(YearMonth.of(state.getMonth().getYear(), item.getItemId()));
             render(view);
             return true;
         });
         menu.show();
+    }
+
+    private String capitalizeMonth(String month) {
+        return month.isEmpty() ? month : month.substring(0, 1).toUpperCase(PT_BR) + month.substring(1);
     }
 
     private void showYearMenu(View view, View anchor) {
@@ -221,7 +242,7 @@ public class EmployeeEventsFragment extends Fragment {
     private void showDay(LocalDate day) {
         // O resumo usa as mesmas linhas e abre o mesmo detalhe da lista principal.
         List<EmployeeEvent> events = state.eventsOn(day);
-        daySheet = new BottomSheetDialog(requireContext());
+        daySheet = new BottomSheetDialog(requireContext(), R.style.AstroEventsBottomSheetDialog);
         View sheet = getLayoutInflater().inflate(R.layout.sheet_employee_events, null);
         ((TextView) sheet.findViewById(R.id.text_employee_events_sheet_date)).setText(getString(R.string.employee_events_day, DATE.format(day)));
         ((TextView) sheet.findViewById(R.id.text_employee_events_sheet_count)).setText(
@@ -231,9 +252,11 @@ public class EmployeeEventsFragment extends Fragment {
         sheet.findViewById(R.id.button_employee_events_sheet_close).setOnClickListener(clicked -> daySheet.dismiss());
         daySheet.setContentView(sheet);
         daySheet.getBehavior().setMaxWidth(getResources().getDimensionPixelSize(R.dimen.employee_home_content_max_width));
+        daySheet.getBehavior().setMaxHeight((int) (getResources().getDisplayMetrics().heightPixels * 0.85f));
         daySheet.show();
         View parent = (View) sheet.getParent();
-        parent.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        parent.setBackgroundTintList(null);
+        parent.setBackgroundResource(R.drawable.bg_events_sheet);
         if (daySheet.getWindow() != null) daySheet.getWindow().setDimAmount(0.7f);
     }
 

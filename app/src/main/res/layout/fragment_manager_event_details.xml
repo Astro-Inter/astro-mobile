@@ -122,14 +122,8 @@
                     <TextView style="@style/ManagerEventDetailsValue" android:id="@+id/text_manager_event_deadline" android:text="@string/manager_event_deadline_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
-                <LinearLayout style="@style/ManagerEventDetailsRow">
-                    <ImageView style="@style/ManagerEventDetailsIcon" android:src="@drawable/home_clock" android:contentDescription="@null" />
-                    <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/employee_event_validity_label" />
-                    <TextView style="@style/ManagerEventDetailsValue" android:id="@+id/text_manager_event_validity" android:text="@string/manager_event_validity_mock" />
-                </LinearLayout>
-                <View style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout style="@style/ManagerEventDetailsRow" android:minHeight="80dp">
-                    <ImageView style="@style/ManagerEventDetailsIcon" android:src="@drawable/employee_event_notes" android:contentDescription="@null" />
+                    <ImageView style="@style/ManagerEventDetailsIcon" android:src="@drawable/manager_notes" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/employee_event_completion_mode_label" />
                     <TextView android:id="@+id/text_manager_event_mode" style="@style/ManagerEventDetailsValue"
                         android:text="@string/employee_event_self_declaration" />
@@ -142,11 +136,10 @@
                     <TextView style="@style/ManagerEventDetailsValue" android:id="@+id/text_manager_event_sender" android:text="@string/manager_event_sender_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
-                <View style="@style/ManagerEventDetailsDivider" />
                 <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp" android:layout_marginVertical="10dp">
                     <TextView android:id="@+id/button_manager_event_participants" style="@style/EmployeeEventDetailsButton"
-                        android:background="@drawable/bg_login_password_button" android:text="@string/manager_event_view_participants" />
+                        android:background="@drawable/bg_primary_button" android:text="@string/manager_event_view_participants" />
                     <ImageView android:layout_width="20dp" android:layout_height="20dp"
                         android:layout_gravity="end|center_vertical" android:layout_marginEnd="14dp"
                         android:src="@drawable/chat_send_arrow" android:scaleType="fitCenter"

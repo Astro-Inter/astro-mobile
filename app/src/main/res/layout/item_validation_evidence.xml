@@ -7,5 +7,6 @@
         android:layout_marginStart="15dp" android:src="@drawable/event_evidence_open" android:scaleType="fitCenter"
         android:contentDescription="@null" android:importantForAccessibility="no" />
     <TextView android:id="@+id/text_validation_evidence_name" style="@style/EmployeeEventDetailsButton"
-        android:background="@null" android:clickable="false" android:focusable="false" />
+        android:background="@null" android:clickable="false" android:focusable="false"
+        android:maxLines="1" android:ellipsize="end" />
 </FrameLayout>

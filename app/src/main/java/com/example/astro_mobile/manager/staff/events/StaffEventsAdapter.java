@@ -60,15 +60,19 @@ public final class StaffEventsAdapter extends RecyclerView.Adapter<StaffEventsAd
                         .getColor(R.color.astro_light_background)));
                 break;
             case REJECTED:
+                row.status.setText(R.string.employee_events_rejected);
+                row.icon.setImageResource(R.drawable.ic_status_reload);
+                row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext()
+                        .getColor(R.color.employee_event_status_red)));
+                break;
             case CANCELLED:
-                row.status.setText(event.status == StaffEvent.Status.REJECTED
-                        ? R.string.employee_events_rejected : R.string.employee_events_cancelled);
+                row.status.setText(R.string.employee_events_cancelled);
                 row.icon.setImageResource(R.drawable.conversations_close);
                 row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext()
                         .getColor(R.color.employee_event_status_red)));
                 break;
         }
-        // O check tem raiz 18.2×18; o X preserva a raiz quadrada de 18dp.
+        // Mantém o slot de status consistente para check, reload, X e relógio.
         ViewGroup.LayoutParams params = row.icon.getLayoutParams();
         float density = row.itemView.getResources().getDisplayMetrics().density;
         params.width = Math.round((event.status == StaffEvent.Status.DONE ? 18.2f : 18f) * density);

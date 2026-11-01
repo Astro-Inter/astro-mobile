@@ -16,6 +16,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ResponsiveFilters;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
+import com.example.astro_mobile.shared.profile.PhotoViewerDialog;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -30,6 +33,9 @@ public final class StaffFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ResponsiveFilters.bind(view.findViewById(R.id.container_staff_filters));
+        PullToRefresh.attach(this, view.findViewById(R.id.container_staff_content),
+                view.findViewById(R.id.list_staff), () -> loadCollaborators(view));
         state = new ViewModelProvider(this, StaffViewModel.Factory.createDefault())
                 .get(StaffViewModel.class);
 
@@ -126,7 +132,7 @@ public final class StaffFragment extends Fragment {
             args.putString(StaffDetailsFragment.ARG_UNIT, member.unit);
             args.putString(StaffDetailsFragment.ARG_PHOTO_URL, member.photoUrl);
             NavHostFragment.findNavController(this).navigate(R.id.action_staff_to_details, args);
-        }));
+        }, member -> PhotoViewerDialog.show(this, member.photoUrl, R.drawable.profile_avatar_placeholder)));
         list.setVisibility(members.isEmpty() ? View.GONE : View.VISIBLE);
         android.widget.TextView empty = view.findViewById(R.id.text_staff_empty);
         empty.setVisibility(members.isEmpty() ? View.VISIBLE : View.GONE);

@@ -17,10 +17,9 @@ public final class EventStatusClassifier {
         if (cancelled) return DisplayStatus.CANCELLED;
         if (participation == Participation.APPROVED) return DisplayStatus.DONE;
         if (participation == Participation.AWAITING_APPROVAL) return DisplayStatus.ANALYSIS;
-        if (participation == Participation.REJECTED) return DisplayStatus.REJECTED;
-
         // A hora vem do chamador: a regra não consulta relógio, Android nem API.
         if (!deadline.isAfter(now)) return DisplayStatus.EXPIRED;
+        if (participation == Participation.REJECTED) return DisplayStatus.REJECTED;
         if (!deadline.isAfter(now.plus(URGENCY_WINDOW))) return DisplayStatus.URGENT;
         return viewed ? DisplayStatus.PENDING : DisplayStatus.NEW;
     }

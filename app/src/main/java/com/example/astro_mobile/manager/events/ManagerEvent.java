@@ -1,7 +1,7 @@
 package com.example.astro_mobile.manager.events;
 
 public final class ManagerEvent {
-    public enum Status { VALIDATION_PENDING, ASSIGNMENT_PENDING, NO_ACTION, FINISHED, CANCELLED }
+    public enum Status { VALIDATION_PENDING, ASSIGNMENT_PENDING, NO_ACTION, FINISHED, CANCELLED, EXPIRED }
     public enum CompletionMode { SELF_DECLARATION, MANAGER_ASSIGNMENT }
 
     public final long id;

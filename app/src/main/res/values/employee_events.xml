@@ -20,6 +20,7 @@
     <string name="employee_events_month">Selecionar mês</string>
     <string name="employee_events_year">Selecionar ano</string>
     <string name="employee_events_day">Dia %1$s</string>
+    <color name="employee_events_past_day_background">#494757</color>
     <string name="employee_events_due">Data limite: %1$s</string>
     <plurals name="employee_events_count">
         <item quantity="one">%d evento</item>

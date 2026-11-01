@@ -1,0 +1,8 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/astro_button_ripple">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/employee_events_past_day_background" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
+</ripple>

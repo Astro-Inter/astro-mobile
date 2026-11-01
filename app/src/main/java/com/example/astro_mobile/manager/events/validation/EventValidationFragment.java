@@ -27,32 +27,53 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import com.bumptech.glide.Glide;
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ActionConfirmationDialog;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.EventValidationData;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
+import com.example.astro_mobile.manager.events.ManagerEvent;
+import com.example.astro_mobile.manager.events.ManagerEventDetailsFragment;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public final class EventValidationFragment extends Fragment {
+    public static final String FROM_HOME = "validation_from_home";
     private Dialog rejectDialog;
     private EventValidationViewModel state;
     public EventValidationFragment() { super(R.layout.fragment_event_validation); }
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        PullToRefresh.attach(this, view.findViewById(R.id.container_validation_content),
+                view.findViewById(R.id.container_validation_content), () -> { if (!state.isLoading()) load(view); });
         state = new ViewModelProvider(this).get(EventValidationViewModel.class);
         view.findViewById(R.id.button_validation_back).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack());
-        view.findViewById(R.id.button_validation_event).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack(R.id.managerEventDetailsFragment, false));
+        view.findViewById(R.id.button_validation_event).setOnClickListener(clicked -> openEvent());
         view.findViewById(R.id.button_validation_close).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack(HomeNavigation.destination(requireContext()), false));
-        view.findViewById(R.id.button_validation_confirm).setOnClickListener(clicked -> decide(view, false));
+        view.findViewById(R.id.button_validation_confirm).setOnClickListener(clicked ->
+                ActionConfirmationDialog.show(this,
+                        R.string.action_confirmation_validate_event, () -> decide(view, false)));
         view.findViewById(R.id.button_validation_reject).setOnClickListener(clicked -> showRejection(view));
         if (state.getDetails() != null) render(view);
         else {
             String retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry().getSavedStateHandle().get("retry_event_validation");
             if (retry == null) load(view);
         }
+    }
+
+    private void openEvent() {
+        NavController nav = NavHostFragment.findNavController(this);
+        if (!requireArguments().getBoolean(FROM_HOME)) {
+            nav.popBackStack(R.id.managerEventDetailsFragment, false);
+            return;
+        }
+        Bundle args = new Bundle(requireArguments());
+        args.remove(FROM_HOME);
+        args.putString(ManagerEventDetailsFragment.COMPLETION_MODE, ManagerEvent.CompletionMode.SELF_DECLARATION.name());
+        nav.navigate(R.id.action_validation_to_event_details, args);
     }
 
     // Substitui os exemplos da tela pelos dados e arquivos enviados.
@@ -149,7 +170,8 @@ public final class EventValidationFragment extends Fragment {
         });
         rejectDialog.findViewById(R.id.button_validation_rejection_close).setOnClickListener(clicked -> { state.setReason(""); rejectDialog.dismiss(); });
         rejectDialog.setOnCancelListener(dialog -> state.setReason(""));
-        submit.setOnClickListener(clicked -> decide(view, true));
+        submit.setOnClickListener(clicked -> ActionConfirmationDialog.show(this,
+                R.string.action_confirmation_reject_event, () -> decide(view, true)));
         rejectDialog.show();
         Window window = rejectDialog.getWindow();
         if (window != null) {
@@ -181,7 +203,9 @@ public final class EventValidationFragment extends Fragment {
                 if (rejectDialog != null) rejectDialog.dismiss();
                 state.setReason("");
                 NavController nav = NavHostFragment.findNavController(EventValidationFragment.this);
-                nav.getBackStackEntry(R.id.eventParticipantsFragment).getSavedStateHandle().set("retry_event_participants", true);
+                if (!requireArguments().getBoolean(FROM_HOME)) {
+                    nav.getBackStackEntry(R.id.eventParticipantsFragment).getSavedStateHandle().set("retry_event_participants", true);
+                }
                 // Ao voltar, reflete a decisão na lista do funcionário, caso esteja na pilha.
                 try {
                     nav.getBackStackEntry(R.id.staffEventsFragment).getSavedStateHandle()
@@ -190,6 +214,7 @@ public final class EventValidationFragment extends Fragment {
                     // A validação também pode ter sido aberta pela lista geral de eventos.
                 }
                 Bundle args = new Bundle(); args.putBoolean("validation_rejected", reject);
+                args.putBoolean(FROM_HOME, requireArguments().getBoolean(FROM_HOME));
                 nav.navigate(R.id.action_event_validation_to_confirmation, args);
             }
             @Override public void onFailure(FailureKind failure) {
@@ -201,7 +226,7 @@ public final class EventValidationFragment extends Fragment {
     }
     private void showFailure(FailureKind failure, String operation) {
         if (failure == FailureKind.SESSION) { SessionNavigation.signOut(this); return; }
-        if (!"load".equals(operation)) NavHostFragment.findNavController(this)
+        if (!"load".equals(operation) && !requireArguments().getBoolean(FROM_HOME)) NavHostFragment.findNavController(this)
                 .getBackStackEntry(R.id.eventParticipantsFragment).getSavedStateHandle().set("retry_event_participants", true);
         Bundle args = new Bundle(); args.putString("retry_event_validation", operation);
         NavHostFragment.findNavController(this).navigate(failure == FailureKind.CONNECTION ? R.id.connectionErrorFragment : R.id.genericErrorFragment, args);

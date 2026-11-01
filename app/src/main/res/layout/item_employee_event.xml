@@ -11,7 +11,7 @@
             <TextView android:id="@+id/text_employee_event_title" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:fontFamily="@font/montserrat_family"
                 android:includeFontPadding="false" android:textColor="@color/astro_light_background"
-                android:textSize="16sp" tools:text="Treinamento de EPI" />
+                android:textSize="16sp" android:maxLines="2" android:ellipsize="end" tools:text="Treinamento de EPI" />
             <TextView android:id="@+id/text_employee_event_due" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:fontFamily="@font/montserrat_family"
                 android:includeFontPadding="false" android:textColor="@color/astro_input_hint"

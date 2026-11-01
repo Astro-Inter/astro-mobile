@@ -35,9 +35,11 @@ public final class ManagerEventsAdapter extends RecyclerView.Adapter<ManagerEven
         // Cada estado usa o texto e o ícone do seu exemplo no Figma.
         ManagerEvent event = events.get(position);
         row.title.setText(event.title);
-        row.subtitle.setVisibility(event.status == ManagerEvent.Status.CANCELLED ? View.GONE : View.VISIBLE);
+        row.subtitle.setVisibility(event.status == ManagerEvent.Status.CANCELLED
+                || event.status == ManagerEvent.Status.EXPIRED ? View.GONE : View.VISIBLE);
         row.icon.setVisibility(View.VISIBLE);
         row.icon.setImageTintList(event.status == ManagerEvent.Status.CANCELLED
+                || event.status == ManagerEvent.Status.EXPIRED
                 ? ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red)) : null);
         switch (event.status) {
             case VALIDATION_PENDING:
@@ -49,7 +51,7 @@ public final class ManagerEventsAdapter extends RecyclerView.Adapter<ManagerEven
             case ASSIGNMENT_PENDING:
                 row.subtitle.setText(R.string.manager_events_assign_hint);
                 row.status.setText(R.string.manager_events_assign);
-                row.icon.setImageResource(R.drawable.manager_event_notebook);
+                row.icon.setImageResource(R.drawable.manager_notes);
                 break;
             case NO_ACTION:
                 row.subtitle.setText(R.string.manager_events_no_validation);
@@ -65,9 +67,13 @@ public final class ManagerEventsAdapter extends RecyclerView.Adapter<ManagerEven
                 row.status.setText(R.string.manager_events_cancelled);
                 row.icon.setImageResource(R.drawable.conversations_close);
                 break;
+            case EXPIRED:
+                row.status.setText(R.string.manager_events_expired);
+                row.icon.setImageResource(R.drawable.conversations_close);
+                break;
         }
-        // O caderno ocupa 20dp; os demais preservam a geometria de 18dp do design.
-        float size = event.status == ManagerEvent.Status.ASSIGNMENT_PENDING ? 20f : 18f;
+        // O ícone de atribuição segue as dimensões do componente no Figma.
+        float size = event.status == ManagerEvent.Status.ASSIGNMENT_PENDING ? 18.2f : 18f;
         float density = row.itemView.getResources().getDisplayMetrics().density;
         ViewGroup.LayoutParams params = row.icon.getLayoutParams();
         params.width = Math.round((event.status == ManagerEvent.Status.FINISHED ? 18.2f : size) * density);

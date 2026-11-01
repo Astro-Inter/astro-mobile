@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.shared.ui.ResponsiveFilters;
+import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
@@ -22,8 +23,9 @@ import com.example.astro_mobile.manager.staff.StaffDetailsFragment;
 import com.example.astro_mobile.manager.events.ManagerEventDetailsFragment;
 
 public final class StaffEventsFragment extends Fragment {
-    private final int[] filterLabels = {R.string.employee_events_all, R.string.employee_events_pending,
-            R.string.employee_events_done, R.string.staff_events_expired};
+    private final int[] filterIds = {R.id.filter_staff_events_0, R.id.filter_staff_events_1,
+            R.id.filter_staff_events_2, R.id.filter_staff_events_3, R.id.filter_staff_events_4,
+            R.id.filter_staff_events_5, R.id.filter_staff_events_6};
     private StaffEventsViewModel state;
 
     public StaffEventsFragment() { super(R.layout.fragment_staff_events); }
@@ -31,6 +33,9 @@ public final class StaffEventsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ResponsiveFilters.bind(view.findViewById(R.id.container_staff_events_dropdown));
+        PullToRefresh.attach(this, view.findViewById(R.id.container_staff_events_content),
+                view.findViewById(R.id.list_staff_events), () -> load(view));
         state = new ViewModelProvider(this, new StaffEventsViewModel.Factory())
                 .get(StaffEventsViewModel.class);
 
@@ -39,7 +44,13 @@ public final class StaffEventsFragment extends Fragment {
                 NavHostFragment.findNavController(this).popBackStack());
         view.findViewById(R.id.button_staff_events_close).setOnClickListener(clicked ->
                 NavHostFragment.findNavController(this).popBackStack(R.id.managerHomeFragment, false));
-        view.findViewById(R.id.button_staff_events_filter).setOnClickListener(clicked -> showFilters(view, clicked));
+        for (int index = 0; index < filterIds.length; index++) {
+            final StaffEventsViewModel.Filter filter = StaffEventsViewModel.Filter.values()[index];
+            view.findViewById(filterIds[index]).setOnClickListener(clicked -> {
+                state.setFilter(filter);
+                render(view);
+            });
+        }
         render(view);
         if (!state.isLoaded()) load(view);
         else showContent(view);
@@ -82,20 +93,6 @@ public final class StaffEventsFragment extends Fragment {
         view.findViewById(R.id.container_staff_events_content).setVisibility(View.VISIBLE);
     }
 
-    private void showFilters(View view, View anchor) {
-        // Usa os mesmos filtros da lista já desenhada para esta tela.
-        PopupMenu menu = new PopupMenu(requireContext(), anchor);
-        for (int index = 0; index < filterLabels.length; index++) {
-            menu.getMenu().add(0, index, index, filterLabels[index]);
-        }
-        menu.setOnMenuItemClickListener(item -> {
-            state.setFilter(StaffEventsViewModel.Filter.values()[item.getItemId()]);
-            render(view);
-            return true;
-        });
-        menu.show();
-    }
-
     private void render(View view) {
         String name = state.getCollaboratorName();
         if (name == null) name = requireArguments().getString(StaffDetailsFragment.ARG_NAME, "");
@@ -108,9 +105,8 @@ public final class StaffEventsFragment extends Fragment {
         list.setVisibility(visibleEvents.isEmpty() ? View.GONE : View.VISIBLE);
         view.findViewById(R.id.text_staff_events_empty).setVisibility(
                 visibleEvents.isEmpty() ? View.VISIBLE : View.GONE);
-        ((TextView) view.findViewById(R.id.button_staff_events_filter)).setText(
-                state.getFilter() == StaffEventsViewModel.Filter.ALL
-                        ? R.string.manager_events_filter : filterLabels[state.getFilter().ordinal()]);
+        for (int index = 0; index < filterIds.length; index++)
+            view.findViewById(filterIds[index]).setSelected(index == state.getFilter().ordinal());
     }
 
     private void openDetails(StaffEvent event) {
