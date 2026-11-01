@@ -6,6 +6,22 @@ segunda conexão WebSocket, nem acrescenta mensagens ao histórico a partir do p
 
 ## Comportamento
 
+- O botão Notificações no perfil controla os avisos desta conta neste aparelho.
+  Ao desligar, bloqueia imediatamente chat/eventos e atualização de avatar, limpa
+  os avisos ativos e cancela trabalhos de avatar. A preferência continua após
+  reabrir o app e após sair/entrar na conta; outras contas conservam suas escolhas.
+- A sincronização remove `fcm_tokens/{uid}/devices/{deviceId}` quando desativado
+  (ou quando o Android bloqueia notificações), sem apagar os dispositivos de
+  outras pessoas e sem encerrar a sessão. Ao religar, o registro é recriado.
+  Falha de rede não desativa o bloqueio local; a remoção é tentada novamente na
+  próxima sincronização. Um push já em trânsito é descartado pelo cliente.
+- Se o Android não permite notificações, ligar o botão solicita a permissão no
+  Android 13+ ou abre a configuração do sistema. O botão só indica ativo quando
+  a preferência e a permissão do sistema permitem avisos. Contas sem preferência
+  explícita mantêm o comportamento anterior de entrega; escolhas antigas salvas
+  pelo botão são respeitadas. Esse controle não desativa as mensagens por STOMP
+  nem a lista de notificações dentro do app.
+
 - Com o app aberto, não apresenta notificação do sistema. O chat recebe pelo STOMP.
 - Em segundo plano, mostra nome do remetente e prévia; na tela bloqueada oferece
   uma versão pública genérica, respeitando as configurações do Android.

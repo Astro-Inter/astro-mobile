@@ -3,6 +3,7 @@ package com.example.astro_mobile.data.firebase;
 import android.content.Context;
 import androidx.core.app.NotificationManagerCompat;
 import com.example.astro_mobile.data.local.PushPreferences;
+import com.example.astro_mobile.data.local.NotificationPreferences;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -53,21 +54,43 @@ public final class PushTokenRepository {
     public boolean permissionAsked() { return preferences.permissionAsked(); }
     public void markPermissionAsked() { preferences.permissionAsked(true); }
     public PushPreferences preferences() { return preferences; }
+    public boolean notificationsWanted() {
+        return auth.getCurrentUser() != null && NotificationPreferences.isEnabled(context, auth.getCurrentUser().getUid());
+    }
+    public boolean canNotify(String uid) {
+        return isCurrentUser(uid) && NotificationPreferences.isEnabled(context, uid)
+                && NotificationManagerCompat.from(context).areNotificationsEnabled();
+    }
+    public void setNotificationsEnabled(boolean enabled) {
+        if (auth.getCurrentUser() == null || preferences.logoutPending()) return;
+        NotificationPreferences.save(context, auth.getCurrentUser().getUid(), enabled);
+        if (!enabled) clearNotifications();
+        synchronize();
+    }
+    private void clearNotifications() {
+        com.example.astro_mobile.shared.notifications.ChatPushNotifications.clear(context);
+        com.example.astro_mobile.shared.notifications.PendingEventNotifications.clear(context);
+        androidx.work.WorkManager.getInstance(context).cancelAllWorkByTag("astro-chat-avatar");
+    }
 
     public synchronized Task<Void> synchronize() {
         if (!registration.isComplete()) { resyncRequested = true; return registration; }
         if (preferences.logoutPending() || auth.getCurrentUser() == null) return Tasks.forResult(null);
         String uid = auth.getCurrentUser().getUid();
-        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            return Tasks.forResult(null);
-        }
-        registration = messaging.getToken().onSuccessTask(token -> {
-            if (!isCurrentUser(uid) || !preferences.needsSync(uid, token, System.currentTimeMillis())) return Tasks.forResult(null);
+        if (!canNotify(uid)) {
+            clearNotifications();
+            registration = Tasks.withTimeout(firestore.collection("fcm_tokens").document(uid).collection("devices")
+                    .document(preferences.deviceId()).delete(), 10, TimeUnit.SECONDS).onSuccessTask(unused -> {
+                if (isCurrentUser(uid)) preferences.forgetSynchronizedToken();
+                return Tasks.forResult(null);
+            });
+        } else registration = messaging.getToken().onSuccessTask(token -> {
+            if (!canNotify(uid) || !preferences.needsSync(uid, token, System.currentTimeMillis())) return Tasks.forResult(null);
             Map<String, Object> fields = new HashMap<>();
             fields.put("token", token); fields.put("updated_at", FieldValue.serverTimestamp());
             return Tasks.withTimeout(firestore.collection("fcm_tokens").document(uid).collection("devices")
                     .document(preferences.deviceId()).set(fields), 10, TimeUnit.SECONDS).onSuccessTask(unused -> {
-                if (isCurrentUser(uid)) preferences.synchronizedToken(uid, token, System.currentTimeMillis());
+                if (canNotify(uid)) preferences.synchronizedToken(uid, token, System.currentTimeMillis());
                 return Tasks.forResult(null);
             });
         });

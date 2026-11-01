@@ -4,6 +4,10 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Build;
+import android.Manifest;
+import android.content.Intent;
+import android.provider.Settings;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +36,8 @@ import com.example.astro_mobile.data.api.AstroApiClient;
 import com.example.astro_mobile.data.api.UserProfileRepository;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.UserProfileData;
-import com.example.astro_mobile.data.local.NotificationPreferences;
+import com.example.astro_mobile.shared.notifications.PushRegistrationViewModel;
+import androidx.core.app.NotificationManagerCompat;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -44,6 +49,20 @@ public final class ProfileFragment extends Fragment {
     private ProfileViewModel model;
     private Dialog logoutDialog;
     private Uri pendingPhoto;
+    private PushRegistrationViewModel pushSettings;
+    private SwitchCompat notificationSwitch;
+    private boolean renderingNotificationSwitch;
+    private final ActivityResultLauncher<String> notificationPermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), granted -> {
+                if (pushSettings != null) pushSettings.setNotificationsEnabled(granted);
+                renderNotificationSwitch();
+            });
+    private final ActivityResultLauncher<Intent> systemNotifications = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (pushSettings != null && isAdded()) pushSettings.setNotificationsEnabled(
+                        NotificationManagerCompat.from(requireContext()).areNotificationsEnabled());
+                renderNotificationSwitch();
+            });
     private final ActivityResultLauncher<PickVisualMediaRequest> photoPicker = registerForActivityResult(
             new ActivityResultContracts.PickVisualMedia(), uri -> {
                 if (uri == null) return;
@@ -84,16 +103,36 @@ public final class ProfileFragment extends Fragment {
             navigation.navigate(R.id.action_profile_to_flow_choice, args);
         });
 
-        // A opção de notificações guarda somente uma preferência local por conta.
-        SwitchCompat notifications = view.findViewById(R.id.switch_profile_notifications);
+        pushSettings = new ViewModelProvider(requireActivity(), PushRegistrationViewModel.Factory.createDefault(requireContext()))
+                .get(PushRegistrationViewModel.class);
+        notificationSwitch = view.findViewById(R.id.switch_profile_notifications);
         String userId = model.getUserId();
         if (userId == null) {
             SessionNavigation.signOut(this);
             return;
         }
-        notifications.setChecked(NotificationPreferences.isEnabled(requireContext(), userId));
-        notifications.setOnCheckedChangeListener((button, enabled) ->
-                NotificationPreferences.save(requireContext(), userId, enabled));
+        renderNotificationSwitch();
+        notificationSwitch.setOnCheckedChangeListener((button, enabled) -> {
+            if (renderingNotificationSwitch) return;
+            if (!enabled) {
+                pushSettings.setNotificationsEnabled(false);
+                renderNotificationSwitch();
+            } else if (NotificationManagerCompat.from(requireContext()).areNotificationsEnabled()) {
+                pushSettings.setNotificationsEnabled(true);
+                renderNotificationSwitch();
+            } else {
+                // O botão só fica ativo depois de o Android permitir a entrega.
+                renderNotificationSwitch();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !pushSettings.permissionWasAsked()) {
+                    pushSettings.permissionRequested();
+                    notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+                } else {
+                    Intent settings = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                            .putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+                    systemNotifications.launch(settings);
+                }
+            }
+        });
         boolean hasCachedProfile = model.getProfile() != null;
         if (hasCachedProfile) showProfile(view, model.getProfile(), false);
         view.findViewById(R.id.button_profile_change_photo).setEnabled(false);
@@ -262,6 +301,8 @@ public final class ProfileFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (notificationSwitch != null) notificationSwitch.setOnCheckedChangeListener(null);
+        notificationSwitch = null;
         if (model != null) model.cancel();
         View view = getView();
         if (view != null) Glide.with(this).clear((ImageView) view.findViewById(R.id.image_profile_photo));
@@ -270,5 +311,17 @@ public final class ProfileFragment extends Fragment {
             logoutDialog = null;
         }
         super.onDestroyView();
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        renderNotificationSwitch();
+    }
+    private void renderNotificationSwitch() {
+        if (notificationSwitch == null || pushSettings == null || !isAdded()) return;
+        renderingNotificationSwitch = true;
+        notificationSwitch.setChecked(pushSettings.notificationsWanted()
+                && NotificationManagerCompat.from(requireContext()).areNotificationsEnabled());
+        renderingNotificationSwitch = false;
     }
 }

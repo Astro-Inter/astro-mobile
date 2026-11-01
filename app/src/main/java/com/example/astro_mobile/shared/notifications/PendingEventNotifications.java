@@ -24,12 +24,16 @@ public final class PendingEventNotifications {
         context.getSystemService(NotificationManager.class).createNotificationChannel(new NotificationChannel(
                 CHANNEL, context.getString(R.string.push_pending_title), NotificationManager.IMPORTANCE_DEFAULT));
     }
+    public static void clear(Context context) {
+        synchronized (LOCK) { NotificationManagerCompat.from(context).cancel(CHANNEL, 1001); }
+    }
     public static void show(Context context, Map<String, String> data) {
         PushTokenRepository repository = PushTokenRepository.getInstance();
         String uid = data.get("uid");
         long cycle;
         try { cycle = Long.parseLong(data.getOrDefault("cycle_id", "0")); } catch (NumberFormatException error) { return; }
         synchronized (LOCK) {
+            if (!repository.canNotify(uid)) return;
             PushPreferences preferences = repository.preferences();
             if (!PushMessagePolicy.shouldDisplay(data.get("type"), uid, repository.isCurrentUser(uid), cycle,
                     uid == null ? 0 : preferences.lastCycle(uid))) return;
