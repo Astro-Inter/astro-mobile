@@ -19,7 +19,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_BASE_URL", "\"https://api.astro-app.solutions/\"")
         buildConfigField("String", "CHAT_WEBSOCKET_URL", "\"wss://api.astro-app.solutions/ws\"")
-        buildConfigField("String", "PASSWORD_RESET_API_BASE_URL", "\"https://astro-password-reset.app-4str0.workers.dev/\"")
+        val resetBaseUrl = providers.gradleProperty("passwordResetApiBaseUrl")
+            .orElse("https://astro-password-reset.app-4str0.workers.dev/").get()
+        require(resetBaseUrl.startsWith("https://") && resetBaseUrl.endsWith("/") &&
+                !resetBaseUrl.contains('"') && !resetBaseUrl.contains('\\')) {
+            "passwordResetApiBaseUrl deve ser HTTPS e terminar em /"
+        }
+        buildConfigField("String", "PASSWORD_RESET_API_BASE_URL", "\"$resetBaseUrl\"")
         buildConfigField("String", "AI_API_BASE_URL", "\"https://ia.astro-app.solutions/\"")
     }
 

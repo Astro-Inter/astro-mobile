@@ -3,7 +3,6 @@ package com.example.astro_mobile.data.api;
 import com.example.astro_mobile.BuildConfig;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +21,7 @@ public final class PasswordResetRepository {
     public interface ResultCallback {
         void onSuccess();
         void onFailure(AuthFailureKind failure);
+        default void onFailure(AuthFailureKind failure, String requestId) { onFailure(failure); }
     }
 
     private static volatile long retryAt = monotonicMillis();
@@ -32,7 +32,13 @@ public final class PasswordResetRepository {
     public static PasswordResetRepository createDefault() {
         // O serviço de recuperação tem base e cliente próprios, sem token da API principal.
         OkHttpClient client = new OkHttpClient.Builder()
-                .callTimeout(AstroApiClient.REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS).build();
+                .callTimeout(70, TimeUnit.SECONDS)
+                .readTimeout(70, TimeUnit.SECONDS)
+                .writeTimeout(70, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(false)
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .build();
         PasswordResetApi api = new Retrofit.Builder().baseUrl(BuildConfig.PASSWORD_RESET_API_BASE_URL)
                 .client(client).addConverterFactory(GsonConverterFactory.create()).build()
                 .create(PasswordResetApi.class);
@@ -51,26 +57,51 @@ public final class PasswordResetRepository {
         api.requestReset(new PasswordResetApi.ResetRequest(email)).enqueue(new Callback<PasswordResetApi.ResetResponse>() {
             @Override public void onResponse(Call<PasswordResetApi.ResetResponse> call,
                                              Response<PasswordResetApi.ResetResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().success) {
+                if (response.code() == 200 && response.body() != null && response.body().success) {
                     callback.onSuccess();
                     return;
                 }
+                String requestId = safeRequestId(response.headers().get("X-Request-ID"));
                 if (response.code() == 429) {
                     retryAt = monotonicMillis() + retryDelayMillis(response.headers().get("Retry-After"));
                     close(response.errorBody());
-                    callback.onFailure(AuthFailureKind.RATE_LIMIT);
+                    callback.onFailure(AuthFailureKind.RATE_LIMIT, requestId);
                     return;
                 }
                 String code = errorCode(response.errorBody());
-                callback.onFailure(response.code() == 400 && "INVALID_EMAIL".equals(code)
-                        ? AuthFailureKind.INVALID_CREDENTIALS : AuthFailureKind.INTERNAL);
+                callback.onFailure(classify(response.code(), code), requestId);
             }
 
             @Override public void onFailure(Call<PasswordResetApi.ResetResponse> call, Throwable error) {
-                callback.onFailure(ApiFailures.transport(error) == FailureKind.CONNECTION
-                        ? AuthFailureKind.CONNECTION : AuthFailureKind.INTERNAL);
+                callback.onFailure(error instanceof java.io.InterruptedIOException
+                        ? AuthFailureKind.RESET_UNCERTAIN
+                        : ApiFailures.transport(error) == FailureKind.CONNECTION
+                        ? AuthFailureKind.CONNECTION : AuthFailureKind.RESET_UNCERTAIN);
             }
         });
+    }
+
+    private static AuthFailureKind classify(int status, String code) {
+        if (status == 400 && "INVALID_EMAIL".equals(code)) return AuthFailureKind.INVALID_CREDENTIALS;
+        if (status != 503 || code == null) return AuthFailureKind.RESET_UNAVAILABLE;
+        switch (code) {
+            case "FIREBASE_CONFIGURATION_ERROR":
+            case "FIREBASE_AUTH_UNAVAILABLE":
+            case "EMAIL_CONFIGURATION_ERROR":
+                return AuthFailureKind.RESET_SUPPORT;
+            case "EMAIL_DELIVERY_UNAVAILABLE":
+            case "PROVIDER_TIMEOUT":
+                return AuthFailureKind.RESET_UNCERTAIN;
+            case "FIREBASE_UNAVAILABLE":
+            case "PROVIDER_UNAVAILABLE":
+            case "SERVICE_UNAVAILABLE":
+            default:
+                return AuthFailureKind.RESET_UNAVAILABLE;
+        }
+    }
+
+    private static String safeRequestId(String id) {
+        return id != null && id.matches("[A-Za-z0-9_-]{1,80}") ? id : null;
     }
 
     private static long retryDelayMillis(String header) {
@@ -96,7 +127,7 @@ public final class PasswordResetRepository {
         try (ResponseBody error = body) {
             PasswordResetApi.ResetResponse parsed = new Gson().fromJson(error.charStream(), PasswordResetApi.ResetResponse.class);
             return parsed == null || parsed.error == null ? null : parsed.error.code;
-        } catch (JsonParseException exception) {
+        } catch (RuntimeException exception) {
             return null;
         }
     }

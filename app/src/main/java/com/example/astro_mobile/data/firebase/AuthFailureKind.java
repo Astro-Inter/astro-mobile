@@ -6,5 +6,8 @@ public enum AuthFailureKind {
     DISABLED,
     RATE_LIMIT,
     CONNECTION,
+    RESET_SUPPORT,
+    RESET_UNAVAILABLE,
+    RESET_UNCERTAIN,
     INTERNAL
 }

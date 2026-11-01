@@ -15,6 +15,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.PasswordResetViewModel;
+import com.example.astro_mobile.auth.PasswordResetMessages;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
 
@@ -39,11 +40,7 @@ public final class ChangePasswordFragment extends Fragment {
                 .setText(getString(R.string.profile_change_password_description, email));
         view.findViewById(R.id.button_profile_password_back).setOnClickListener(clicked -> navigation.navigateUp());
         View button = view.findViewById(R.id.button_profile_password_send);
-        button.setOnClickListener(clicked -> {
-            button.setEnabled(false);
-            view.findViewById(R.id.text_profile_password_send).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.progress_profile_password_send).setVisibility(View.VISIBLE);
-            model.sendPasswordResetEmail(email, new PasswordResetViewModel.ResultCallback() {
+        PasswordResetViewModel.ResultCallback callback = new PasswordResetViewModel.ResultCallback() {
                 @Override
                 public void onSuccess() {
                     if (getView() != view || !isAdded()) return;
@@ -54,20 +51,31 @@ public final class ChangePasswordFragment extends Fragment {
                 @Override
                 public void onFailure(AuthFailureKind kind) {
                     if (getView() != view || !isAdded()) return;
+                    button.setEnabled(true);
+                    view.findViewById(R.id.text_profile_password_send).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.progress_profile_password_send).setVisibility(View.GONE);
                     if (kind == AuthFailureKind.RATE_LIMIT || kind == AuthFailureKind.INVALID_CREDENTIALS) {
-                        button.setEnabled(true);
-                        view.findViewById(R.id.text_profile_password_send).setVisibility(View.VISIBLE);
-                        view.findViewById(R.id.progress_profile_password_send).setVisibility(View.GONE);
                         String message = kind == AuthFailureKind.RATE_LIMIT
                                 ? getString(R.string.password_reset_rate_limit, model.getRetrySeconds())
                                 : getString(R.string.password_reset_account_email_invalid);
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
                         return;
                     }
-                    navigation.navigate(kind == AuthFailureKind.CONNECTION
-                            ? R.id.connectionErrorFragment : R.id.action_change_password_to_generic_error);
+                    PasswordResetMessages.show(requireContext(), kind, model.getLastRequestId());
                 }
-            });
+            };
+        if (model.isLoading()) {
+            button.setEnabled(false);
+            view.findViewById(R.id.text_profile_password_send).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.progress_profile_password_send).setVisibility(View.VISIBLE);
+            model.attachCallback(callback);
+        }
+        button.setOnClickListener(clicked -> {
+            if (model.isLoading()) return;
+            button.setEnabled(false);
+            view.findViewById(R.id.text_profile_password_send).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.progress_profile_password_send).setVisibility(View.VISIBLE);
+            model.sendPasswordResetEmail(email, callback);
         });
     }
 
