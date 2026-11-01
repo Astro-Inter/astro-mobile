@@ -52,6 +52,58 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /** Usa respostas locais, sem tokens reais nem chamadas à API de IA. */
 @RunWith(AndroidJUnit4.class)
 public class ChatScreenTest {
+    @Test public void deniedEventDoesNotProduceSuccessComponents() throws Exception {
+        Fixture f=new Fixture(403);f.gate.countDown();
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
+            AtomicReference<ChatViewModel> model=open(scenario,f.repository());
+            onView(withId(R.id.input_chat_message)).perform(replaceText("Resuma o evento de referencia 71"),closeSoftKeyboard());
+            onView(withId(R.id.button_chat_send)).perform(click());awaitFinished(model);
+            onView(withId(R.id.text_chat_error)).check(matches(withText(R.string.chat_forbidden_error)));
+            scenario.onActivity(activity -> {
+                assertEquals(ChatFailure.FORBIDDEN,model.get().getState().getValue().failure);
+                assertEquals(1,model.get().getState().getValue().messages.size());
+            });
+        }
+    }
+    @Test public void pr34ConversationRendersIntentChangesAndReusesOriginalFile() throws Exception {
+        Fixture f = new Fixture(200); f.gate.countDown();
+        com.google.gson.JsonArray mixed=ChatAnalyticalContentDeviceTest.fixture();
+        com.google.gson.JsonArray coverage=new com.google.gson.JsonArray();coverage.add(mixed.get(1));coverage.add(mixed.get(5));
+        com.google.gson.JsonArray matrix=new com.google.gson.JsonArray();matrix.add(mixed.get(1));matrix.add(mixed.get(2));matrix.add(mixed.get(5));
+        com.google.gson.JsonArray comparison=new com.google.gson.JsonArray();comparison.add(mixed.get(4));comparison.add(mixed.get(5));
+        com.google.gson.JsonArray hundred=pr34Table(mixed,100,100,141),all=pr34Table(mixed,141,500,141);
+        com.google.gson.JsonArray bars=new com.google.gson.JsonArray();com.google.gson.JsonObject graph=mixed.get(4).getAsJsonObject().deepCopy();
+        graph.addProperty("tipo","grafico_barras");bars.add(graph);
+        com.google.gson.JsonArray lines=new com.google.gson.JsonArray();com.google.gson.JsonObject zero=graph.deepCopy();zero.addProperty("tipo","grafico_linhas");
+        com.google.gson.JsonArray months=new com.google.gson.JsonArray();for(int i=1;i<=12;i++){com.google.gson.JsonObject month=new com.google.gson.JsonObject();month.addProperty("categoria","2026-"+String.format(java.util.Locale.ROOT,"%02d",i));month.addProperty("valor",0);months.add(month);}zero.add("dados",months);lines.add(zero);
+        com.google.gson.JsonArray events=new com.google.gson.JsonArray();events.add(com.google.gson.JsonParser.parseString("{\"tipo\":\"tabela\",\"versao\":1,\"titulo\":\"Eventos de exemplo\",\"colunas\":[{\"chave\":\"evento_id\",\"titulo\":\"Referência\"},{\"chave\":\"titulo\",\"titulo\":\"Evento\"}],\"linhas\":[{\"evento_id\":71,\"titulo\":\"Evento fictício\"}]}"));
+        com.google.gson.JsonArray ambiguity=new com.google.gson.JsonArray();ambiguity.add(com.google.gson.JsonParser.parseString("{\"tipo\":\"texto\",\"conteudo\":\"Há mais de um evento com esse nome; informe a referência.\"}"));
+        com.google.gson.JsonArray pdf=new com.google.gson.JsonArray();pdf.add(ChatFileContentDeviceTest.file());
+        java.util.List<com.google.gson.JsonArray> turns=java.util.Arrays.asList(coverage,matrix,comparison,hundred,all,bars,lines,events,ambiguity,pdf,pdf.deepCopy());
+        String[] questions={"Mostre indicadores de cobertura","Mostre a matriz","Compare unidades","Liste 100 usuarios","Agora liste 500 usuarios","Gere barras com base nesses dados","Mostre minhas conclusoes mensais","Liste meus eventos","Resuma o evento ficticio","Gere o PDF","Cade o PDF?"};
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
+            AtomicReference<ChatViewModel> model=open(scenario,f.repository());
+            for(int i=0;i<turns.size();i++) {
+                com.google.gson.JsonArray expected=turns.get(i);assertTrue(ChatStructuredContent.valid(expected));
+                com.google.gson.JsonObject response=new com.google.gson.JsonObject();response.addProperty("session_id","c4dd8100-1122-3344-5566-77889900aabb");response.add("blocos",expected);f.responseBody=response.toString();
+                onView(withId(R.id.input_chat_message)).perform(replaceText(questions[i]),closeSoftKeyboard());onView(withId(R.id.button_chat_send)).perform(click());awaitFinished(model);
+                final int turn=i;
+                scenario.onActivity(activity -> {
+                    ChatViewModel.State state=model.get().getState().getValue();assertNull(state.failure);
+                    assertEquals(2*(turn+1),state.messages.size());
+                    assertEquals(expected,state.messages.get(state.messages.size()-1).getBlocks());
+                    assertEquals("c4dd8100-1122-3344-5566-77889900aabb",state.sessionId);
+                });
+            }
+            assertEquals(turns.size(),f.calls.get());
+        }
+    }
+    private static com.google.gson.JsonArray pr34Table(com.google.gson.JsonArray sample,int received,int requested,int total) {
+        com.google.gson.JsonObject table=ChatAnalyticalContentDeviceTest.withRows(sample,received).get(2).getAsJsonObject();
+        table.addProperty("tipo","tabela");table.addProperty("versao",2);table.remove("chave_pessoa");table.remove("chave_categoria");table.remove("chave_situacao");
+        table.addProperty("solicitada",requested);table.addProperty("total",total);table.addProperty("tem_mais",received<total);table.addProperty("limitado",false);
+        com.google.gson.JsonArray blocks=new com.google.gson.JsonArray();blocks.add(table);return blocks;
+    }
     private static final String MARKDOWN = "## Normas Regulamentadoras\n\n"
             + "As **NRs** orientam a segurança no trabalho.\n\n"
             + "- Proteção das pessoas\n- Prevenção de acidentes\n\n"
