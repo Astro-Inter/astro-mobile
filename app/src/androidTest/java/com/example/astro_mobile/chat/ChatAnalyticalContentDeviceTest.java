@@ -164,4 +164,22 @@ public class ChatAnalyticalContentDeviceTest {
             assertTrue(chart.isLongClickable());
         });
     }
+    @Test public void matrixImageWithoutUrlKeepsInitials() throws Exception {
+        JsonArray sample = fixture();
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            JsonObject matrix = sample.get(2).getAsJsonObject();
+            matrix.getAsJsonArray("colunas").add(JsonParser.parseString("{\"chave\":\"foto\",\"titulo\":\"Foto\"}"));
+            for (JsonElement row : matrix.getAsJsonArray("linhas")) row.getAsJsonObject().add("foto", JsonParser.parseString("{\"tipo\":\"imagem\",\"descricao\":\"Foto de exemplo\"}"));
+            assertTrue(ChatStructuredContent.validBlock(matrix));
+            LinearLayout root = render(sample);
+            assertTrue(texts(root).contains("PE"));
+            LinearLayout card = (LinearLayout) root.getChildAt(2);
+            LinearLayout grid = (LinearLayout) ((HorizontalScrollView) card.getChildAt(1)).getChildAt(0);
+            View heading = ((LinearLayout) grid.getChildAt(0)).getChildAt(4);
+            View avatar = ((LinearLayout) grid.getChildAt(1)).getChildAt(4);
+            assertEquals(ChatStructuredContent.dp(root.getContext(), 72), heading.getLayoutParams().width);
+            assertEquals(heading.getLayoutParams().width, avatar.getLayoutParams().width);
+            assertEquals(ChatStructuredContent.dp(root.getContext(), 160), ((LinearLayout) grid.getChildAt(1)).getChildAt(1).getLayoutParams().width);
+        });
+    }
 }

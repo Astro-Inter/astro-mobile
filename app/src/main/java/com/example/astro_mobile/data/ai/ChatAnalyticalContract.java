@@ -104,8 +104,9 @@ public final class ChatAnalyticalContract {
         if (value.isJsonPrimitive()) return !value.getAsJsonPrimitive().isString() || value.getAsString().length() <= 500;
         if (!value.isJsonObject()) return false;
         JsonObject image = value.getAsJsonObject();
+        JsonElement url = image.get("url");
         return "imagem".equals(image.get("tipo").getAsString()) && text(image.get("descricao"), 280)
-                && (absent(image.get("url")) || text(image.get("url"), 4096));
+                && (absent(url) || (url.isJsonPrimitive() && url.getAsJsonPrimitive().isString() && url.getAsString().length() <= 4096));
     }
 
     private static boolean validContext(JsonObject block) {

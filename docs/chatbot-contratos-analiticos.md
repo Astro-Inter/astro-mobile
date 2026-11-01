@@ -16,7 +16,7 @@ Texto pode aparecer em qualquer posição. POST sem `resposta` e histórico usam
 
 O paginador modifica somente as linhas da tabela/matriz. Não chama repository, chatbot ou outra página de backend e não altera o gráfico ou os cartões globais. Totais usam representação inteira sem truncamento para caber em `int`. O contexto diferencia total zero de coleta cortada que retornou zero com total positivo.
 
-Fotos e fichas legadas conservam o fallback de iniciais. As URLs R2 temporárias não são registradas nem persistidas no cache de imagens. Os tipos e campos antigos permanecem compatíveis.
+Fotos e fichas legadas conservam o fallback de iniciais. Colunas de imagens usam 72 dp, com avatares centralizados; colunas textuais mantêm 160 dp. Colunas que misturam texto e imagem preservam a largura de texto. URLs ausentes nas células da matriz mantêm o fallback. As URLs R2 temporárias não são registradas nem persistidas no cache de imagens, e o carregador desabilita o uso de caches HTTP. Os tipos e campos antigos permanecem compatíveis.
 
 ## Validação
 
@@ -28,10 +28,10 @@ Estado de publicação observado no início da implementação: PR #33 mesclada;
 
 ## Resultado da homologação de 31/10/2026
 
-- `testDebugUnitTest`: **179 testes**, sem falhas.
+- `testDebugUnitTest`: **180 testes**, sem falhas.
 - `lintDebug`: **zero erros**, 152 avisos. Builds debug e androidTest aprovadas.
-- Samsung M31 (SM-M315F), Astro debug 1.0, versionCode 1, atualizado com `adb install -r`, sem desinstalação ou perda de dados. APK SHA-256 `d8e47b7e4281d1a75d1ea62941828bae6b6f09168780ff9c88b7f4ecdca8921f`.
-- **18 testes únicos de interface aprovados**: cinco em `ChatAnalyticalContentDeviceTest`, seis em `ChatStructuredContentDeviceTest` e sete em `ChatScreenTest`. A primeira execução do fluxo encontrou uma incompatibilidade do auxiliar de teste, que forçava a Home do colaborador num aparelho em fluxo gestor; o auxiliar foi corrigido para usar `HomeNavigation.destination`, sem mudar as preferências da conta, e os sete testes foram repetidos com sucesso.
+- Samsung M31 (SM-M315F), Astro debug 1.0, versionCode 1, atualizado com `adb install -r`, sem desinstalação ou perda de dados. APK final SHA-256 `37d526f41529ac00f445e41e3c2e97717b77cbe40a9a350e393da0e90d78a3be`.
+- **19 testes únicos de interface aprovados**: seis em `ChatAnalyticalContentDeviceTest`, seis em `ChatStructuredContentDeviceTest` e sete em `ChatScreenTest`. A primeira execução do fluxo encontrou uma incompatibilidade do auxiliar de teste, que forçava a Home do colaborador num aparelho em fluxo gestor; o auxiliar foi corrigido para usar `HomeNavigation.destination`, sem mudar as preferências da conta, e os sete testes foram repetidos com sucesso. Após compactar a coluna de fotos e proteger a URL opcional ausente, os doze testes de componentes foram repetidos com sucesso, incluindo a igualdade da largura do cabeçalho/avatares (72 dp) e a manutenção das células de texto (160 dp).
 - Capturas simuladas de cartões, rosca e teclado foram conferidas no aparelho. Larguras de 240/600 dp foram verificadas com layout simulado; não representam homologação num tablet físico.
 
 Durante os testes, `/version` mudou para **`3ad06be7bf696bac04d954439e63fd8be5d66c79`**. A comparação no GitHub confirmou que essa revisão contém `f4e9135` (um commit à frente, nenhum atrás). A mudança de implantação não foi executada neste trabalho.

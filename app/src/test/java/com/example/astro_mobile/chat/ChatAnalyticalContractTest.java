@@ -104,4 +104,11 @@ public class ChatAnalyticalContractTest {
         chart.getAsJsonArray("dados").get(0).getAsJsonObject().addProperty("valor", .5);
         assertFalse(ChatStructuredContent.validBlock(chart));
     }
+    @Test public void optionalImageUrlMayBeAbsentNullOrEmpty() {
+        JsonObject image = JsonParser.parseString("{\"tipo\":\"imagem\",\"descricao\":\"Foto de exemplo\"}").getAsJsonObject();
+        assertTrue(ChatAnalyticalContract.validCell(image));
+        image.add("url", JsonNull.INSTANCE); assertTrue(ChatAnalyticalContract.validCell(image));
+        image.addProperty("url", ""); assertTrue(ChatAnalyticalContract.validCell(image));
+        image.addProperty("url", true); assertFalse(ChatAnalyticalContract.validCell(image));
+    }
 }

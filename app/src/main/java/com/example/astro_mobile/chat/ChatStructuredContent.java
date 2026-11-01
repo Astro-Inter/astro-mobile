@@ -280,8 +280,15 @@ final class ChatStructuredContent {
         header.setBackgroundColor(0x66362361);
         header.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
         table.addView(header);
-        for (JsonElement c : columns) cell(header, str(c.getAsJsonObject(), "titulo"), true);
         JsonArray rows = block.getAsJsonArray("linhas");
+        for (JsonElement c : columns) {
+            JsonObject column = c.getAsJsonObject();
+            TextView heading = cell(header, str(column, "titulo"), true);
+            if (imageColumn(column, rows)) {
+                heading.setLayoutParams(new LinearLayout.LayoutParams(dp(context, 72), ViewGroup.LayoutParams.MATCH_PARENT));
+                heading.setGravity(Gravity.CENTER);
+            }
+        }
         if (block.get("versao").getAsInt() == 2 || "matriz_conformidade".equals(str(block, "tipo"))) {
             renderLocalPages(card, table, columns, rows, block);
         } else {
@@ -301,11 +308,23 @@ final class ChatStructuredContent {
             } catch (RuntimeException ignored) { /* Metadados opcionais inválidos não ocultam a tabela. */ }
         }
     }
+    private static boolean imageColumn(JsonObject column, JsonArray rows) {
+        String key = str(column, "chave");
+        boolean photo = "foto".equals(key);
+        for (JsonElement row : rows) {
+            JsonElement value = row.getAsJsonObject().get(key);
+            if (value == null || value.isJsonNull()) continue;
+            if (!value.isJsonObject() || !"imagem".equals(optional(value.getAsJsonObject(), "tipo"))) return false;
+            photo = true;
+        }
+        return photo;
+    }
     private static void appendRows(LinearLayout table, JsonArray columns, JsonArray rows, JsonObject block, int start, int end) {
         Context context = table.getContext();
         for (int index = start; index < end; index++) {
             JsonElement entry = rows.get(index);
             LinearLayout line = row(context);
+            line.setGravity(Gravity.CENTER_VERTICAL);
             if ("matriz_conformidade".equals(str(block, "tipo"))) {
                 JsonObject matrixRow = entry.getAsJsonObject();
                 line.setTag(new ChatMatrixBlock.CellKey(matrixRow.get("referencia_pessoa").getAsBigInteger(), matrixRow.get("nr").getAsInt()));
@@ -319,10 +338,16 @@ final class ChatStructuredContent {
                 if (value != null && value.isJsonObject()) {
                     JsonObject photo = value.getAsJsonObject();
                     text = str(photo, "descricao");
-                    imageCell(line, photo, true, optional(entry.getAsJsonObject(), "nome"));
+                    FrameLayout avatar = imageCell(line, photo, true, optional(entry.getAsJsonObject(), "nome"));
+                    if (!imageColumn(column, rows)) avatar.getLayoutParams().width = dp(context, 160);
                 } else {
                     text = value == null || value.isJsonNull() ? "—" : ChatDisplayLabels.format(str(column, "chave"), value.getAsString());
-                    cell(line, text, false).setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+                    TextView field = cell(line, text, false);
+                    if (imageColumn(column, rows)) {
+                        field.setLayoutParams(new LinearLayout.LayoutParams(dp(context, 72), ViewGroup.LayoutParams.MATCH_PARENT));
+                        field.setGravity(Gravity.CENTER);
+                    }
+                    field.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
                 }
                 if (description.length() > 0) description.append(", ");
                 description.append(str(column, "titulo")).append(": ").append(text);
@@ -454,11 +479,11 @@ final class ChatStructuredContent {
             if (safeUrl(url)) loadAvatar(image, url);
         }
     }
-    private static void imageCell(LinearLayout line, JsonObject photo, boolean tableCell, String name) {
+    private static FrameLayout imageCell(LinearLayout line, JsonObject photo, boolean tableCell, String name) {
         Context context = line.getContext();
         FrameLayout frame = new FrameLayout(context);
         frame.setPadding(dp(context, 12), dp(context, 8), dp(context, 12), dp(context, 8));
-        line.addView(frame, new LinearLayout.LayoutParams(tableCell ? dp(context, 160) : dp(context, 64), dp(context, 64)));
+        line.addView(frame, new LinearLayout.LayoutParams(tableCell ? dp(context, 72) : dp(context, 64), dp(context, 64)));
         TextView initials = new TextView(context);
         initials.setText(initials(name));
         initials.setTextColor(context.getColor(R.color.chat_text));
@@ -467,7 +492,7 @@ final class ChatStructuredContent {
         background.setColor(context.getColor(R.color.chat_user));
         background.setShape(GradientDrawable.OVAL);
         initials.setBackground(background);
-        frame.addView(initials, new FrameLayout.LayoutParams(dp(context, 40), dp(context, 40)));
+        frame.addView(initials, new FrameLayout.LayoutParams(dp(context, 40), dp(context, 40), Gravity.CENTER));
         ImageView image = new ImageView(context);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         image.setClipToOutline(true);
@@ -475,11 +500,13 @@ final class ChatStructuredContent {
         mask.setColor(android.graphics.Color.TRANSPARENT);
         mask.setShape(GradientDrawable.OVAL);
         image.setBackground(mask);
-        frame.addView(image, new FrameLayout.LayoutParams(dp(context, 40), dp(context, 40)));
+        frame.addView(image, new FrameLayout.LayoutParams(dp(context, 40), dp(context, 40), Gravity.CENTER));
         frame.setContentDescription(str(photo, "descricao"));
         if (tableCell) frame.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
-        String url = photo.get("url").isJsonNull() ? null : photo.get("url").getAsString();
+        JsonElement receivedUrl = photo.get("url");
+        String url = receivedUrl == null || receivedUrl.isJsonNull() ? null : receivedUrl.getAsString();
         if (safeUrl(url)) loadAvatar(image, url);
+        return frame;
     }
     static String initials(String name) {
         if (name == null || name.trim().isEmpty()) return "●";
@@ -495,6 +522,7 @@ final class ChatStructuredContent {
             HttpURLConnection connection = null;
             try {
                 connection = (HttpURLConnection) new URL(value).openConnection();
+                connection.setUseCaches(false);
                 connection.setInstanceFollowRedirects(false);
                 connection.setConnectTimeout(5000);
                 connection.setReadTimeout(5000);
