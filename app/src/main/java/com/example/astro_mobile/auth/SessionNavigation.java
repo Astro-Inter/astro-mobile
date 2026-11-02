@@ -16,7 +16,7 @@ public final class SessionNavigation {
         new ViewModelProvider(fragment.requireActivity(), SessionViewModel.Factory.createDefault())
                 .get(SessionViewModel.class).signOut();
         FlowPreferences.clear(fragment.requireContext());
-        MockSession.clear(fragment.requireContext());
+
         new ViewModelProvider(fragment.requireActivity(), EmailVerificationViewModel.Factory.createDefault())
                 .get(EmailVerificationViewModel.class).clearForLogout();
         new ViewModelProvider(fragment.requireActivity(), new AccessKeyViewModel.Factory())

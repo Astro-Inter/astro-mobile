@@ -72,7 +72,7 @@ public class EmailVerificationViewModel extends ViewModel {
                 String status = data.getUserStatus();
                 if ("DESATIVADO".equals(status)) {
                     callback.onResult(Destination.DISABLED, null, null);
-                } else if (!MockSession.isKnownUserType(userType)) {
+                } else if (!UserRoles.isKnown(userType)) {
                     callback.onResult(Destination.INTERNAL_ERROR, null, null);
                 } else if ("PRE_CADASTRADO".equals(status)) {
                     callback.onResult(Destination.FIRST_ACCESS_KEY, null, userType);

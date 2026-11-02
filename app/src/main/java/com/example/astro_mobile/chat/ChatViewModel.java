@@ -8,7 +8,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.astro_mobile.data.ai.*;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.astro_mobile.data.firebase.SessionIdentity;
+import com.example.astro_mobile.data.firebase.FirebaseSessionIdentity;
 import java.time.Instant;
 import java.util.*;
 
@@ -75,8 +76,8 @@ public final class ChatViewModel extends ViewModel {
 
     private final AiChatRepository repository;
     private final AiSessionsRepository sessions;
-    private final FirebaseAuth auth;
-    private FirebaseAuth.AuthStateListener authListener;
+    private final SessionIdentity identity;
+    private Runnable stopObservingIdentity;
     private String owner;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<State> state = new MutableLiveData<>();
@@ -97,15 +98,12 @@ public final class ChatViewModel extends ViewModel {
     private Runnable slowResponse, deadline, listDeadline, sessionDeadline;
 
     public ChatViewModel(AiChatRepository repository) { this(repository, null, null); }
-    public ChatViewModel(AiChatRepository repository, AiSessionsRepository sessions, FirebaseAuth auth) {
-        this.repository = repository; this.sessions = sessions; this.auth = auth;
+    public ChatViewModel(AiChatRepository repository, AiSessionsRepository sessions, SessionIdentity identity) {
+        this.repository = repository; this.sessions = sessions; this.identity = identity;
         owner = uid();
         openState.setValue(new OpenState(null, false, false, null));
         publish(null);
-        if (auth != null) {
-            authListener = ignored -> checkAccount();
-            auth.addAuthStateListener(authListener);
-        }
+        if (identity != null) stopObservingIdentity = identity.observe(this::checkAccount);
     }
 
     public LiveData<State> getState() { return state; }
@@ -118,9 +116,9 @@ public final class ChatViewModel extends ViewModel {
     public boolean hasPendingMessage() { return pendingMessageIndex >= 0; }
     public boolean isBusy() { return sending || action != Action.NONE || openState.getValue().loading; }
 
-    private String uid() { return auth == null || auth.getCurrentUser() == null ? null : auth.getCurrentUser().getUid(); }
+    private String uid() { return identity == null ? null : identity.currentUserId(); }
     private boolean checkAccount() {
-        if (auth == null || Objects.equals(owner, uid())) return true;
+        if (identity == null || Objects.equals(owner, uid())) return true;
         owner = uid();
         reset();
         publish(owner == null ? ChatFailure.SESSION : null);
@@ -340,7 +338,7 @@ public final class ChatViewModel extends ViewModel {
         if (!checkAccount() || !state.getValue().canSend()) return;
         String message = text == null ? "" : text.trim();
         if (message.isEmpty()) return;
-        if (message.codePointCount(0, message.length()) > ChatRequest.MAX_MESSAGE_LENGTH) {
+        if (message.length() > ChatRequest.MAX_MESSAGE_LENGTH) {
             publish(ChatFailure.INVALID_MESSAGE); return;
         }
         messages.add(new ChatMessage(message, true)); pendingMessageIndex = messages.size() - 1;
@@ -455,7 +453,7 @@ public final class ChatViewModel extends ViewModel {
     }
 
     @Override protected void onCleared() {
-        if (auth != null && authListener != null) auth.removeAuthStateListener(authListener);
+        if (stopObservingIdentity != null) stopObservingIdentity.run();
         if (sessionOperation != null) sessionOperation.cancel();
         reset(); publish(null);
     }
@@ -463,7 +461,7 @@ public final class ChatViewModel extends ViewModel {
     public static final class Factory implements ViewModelProvider.Factory {
         @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> cls) {
             if (!cls.isAssignableFrom(ChatViewModel.class)) throw new IllegalArgumentException("Unknown ViewModel: " + cls.getName());
-            return cls.cast(new ChatViewModel(AiChatRepository.createDefault(), AiSessionsRepository.createDefault(), FirebaseAuth.getInstance()));
+            return cls.cast(new ChatViewModel(AiChatRepository.createDefault(), AiSessionsRepository.createDefault(), FirebaseSessionIdentity.createDefault()));
         }
     }
 }

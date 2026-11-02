@@ -26,7 +26,6 @@ import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.data.ai.ChatRequest;
 import com.example.astro_mobile.data.ai.ChatFailure;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
-import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
@@ -61,9 +60,12 @@ public final class ChatFragment extends Fragment {
         messages.setAdapter(adapter);
         messages.setItemAnimator(null);
         ChatScrollController scrolling = new ChatScrollController(messages);
-        input.setFilters(new InputFilter[]{new CodePointLengthFilter(ChatRequest.MAX_MESSAGE_LENGTH)});
+        input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(ChatRequest.MAX_MESSAGE_LENGTH)});
         input.setText(model.getDraft());
         input.setSelection(input.length());
+        TextView initialCount = view.findViewById(R.id.text_chat_character_count);
+        initialCount.setVisibility(input.length() >= 3600 ? View.VISIBLE : View.GONE);
+        initialCount.setText(getString(R.string.chat_character_count, input.length()));
         input.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -72,7 +74,7 @@ public final class ChatFragment extends Fragment {
                 boolean enabled = state != null && state.canSend() && !s.toString().trim().isEmpty();
                 sendButton.setEnabled(enabled);
                 sendButton.setAlpha(enabled ? 1f : 0.4f);
-                int length = Character.codePointCount(s, 0, s.length());
+                int length = s.length();
                 TextView countView = view.findViewById(R.id.text_chat_character_count);
                 countView.setVisibility(length >= 3600 ? View.VISIBLE : View.GONE);
                 countView.setText(getString(R.string.chat_character_count, length));
@@ -101,7 +103,6 @@ public final class ChatFragment extends Fragment {
             if (current != null && current.failure == ChatFailure.SESSION) {
                 new ViewModelProvider(requireActivity(), SessionViewModel.Factory.createDefault())
                         .get(SessionViewModel.class).signOut();
-                MockSession.clear(requireContext());
                 FlowPreferences.clear(requireContext());
                 new ViewModelProvider(requireActivity(), EmailVerificationViewModel.Factory.createDefault())
                         .get(EmailVerificationViewModel.class).clearForLogout();

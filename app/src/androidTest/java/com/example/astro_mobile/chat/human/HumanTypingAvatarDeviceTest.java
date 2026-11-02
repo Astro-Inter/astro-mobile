@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
@@ -30,7 +29,7 @@ public class HumanTypingAvatarDeviceTest {
         AtomicReference<RecyclerView> list=new AtomicReference<>();AtomicReference<HumanTypingAdapter> adapter=new AtomicReference<>();
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {
-                HumanConversation peer=new HumanConversation("Pessoa de exemplo","Gestor",true,0);peer.profilePhotoUrl=android.net.Uri.fromFile(fixture).toString();
+                HumanConversation peer=new HumanConversation("Pessoa de exemplo","Gestor",true);peer.profilePhotoUrl=android.net.Uri.fromFile(fixture).toString();
                 RecyclerView rows=new RecyclerView(activity);rows.setLayoutManager(new LinearLayoutManager(activity));rows.setBackgroundColor(activity.getColor(R.color.chat_surface));
                 HumanTypingAdapter typing=new HumanTypingAdapter(peer);rows.setAdapter(typing);activity.setContentView(rows);typing.setTyping(true);adapter.set(typing);list.set(rows);
             });
@@ -53,7 +52,7 @@ public class HumanTypingAvatarDeviceTest {
             try(FileOutputStream out=new FileOutputStream(output)){capture.compress(Bitmap.CompressFormat.PNG,100,out);}finally{capture.recycle();}
             scenario.onActivity(activity -> {
                 adapter.get().setTyping(false);assertEquals(0,adapter.get().getItemCount());
-                HumanConversation noPhoto=new HumanConversation("Sem foto","Gestor",true,0);
+                HumanConversation noPhoto=new HumanConversation("Sem foto","Gestor",true);
                 HumanTypingAdapter fallback=new HumanTypingAdapter(noPhoto);list.get().setAdapter(fallback);fallback.setTyping(true);
             });
             instrumentation.waitForIdleSync();

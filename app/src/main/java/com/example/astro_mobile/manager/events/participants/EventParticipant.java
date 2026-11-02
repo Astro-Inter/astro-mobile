@@ -5,7 +5,6 @@ public final class EventParticipant {
 
     public final String name;
     public final Status status;
-    public final int avatarIndex;
     public final Long id;
     public final String photoUrl;
 
@@ -13,7 +12,6 @@ public final class EventParticipant {
         id = data.participantId;
         name = data.participantName;
         photoUrl = data.profilePhotoUrl;
-        avatarIndex = 0;
         switch (data.participationStatus) {
             case "PENDENTE": status = Status.AWAITING_COMPLETION; break;
             case "EM_ANALISE": status = Status.VALIDATION_PENDING; break;

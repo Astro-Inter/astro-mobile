@@ -3,7 +3,6 @@ package com.example.astro_mobile.chat;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -139,7 +138,7 @@ public class ChatAvatarCacheCompatibilityTest {
     @Test public void ownershipChangeClearsPreviousMessagesDraftsAndSession() throws Exception {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             com.example.astro_mobile.data.ai.AiChatRepository repository=new com.example.astro_mobile.data.ai.AiChatRepository(null,(force,callback)->callback.onToken("fixture"));
-            ChatViewModel model=new ChatViewModel(repository,null,com.google.firebase.auth.FirebaseAuth.getInstance());
+            ChatViewModel model=new ChatViewModel(repository,null,com.example.astro_mobile.data.firebase.FirebaseSessionIdentity.createDefault());
             try {
                 java.lang.reflect.Field messages=ChatViewModel.class.getDeclaredField("messages");messages.setAccessible(true);
                 @SuppressWarnings("unchecked") java.util.List<ChatMessage> previous=(java.util.List<ChatMessage>)messages.get(model);

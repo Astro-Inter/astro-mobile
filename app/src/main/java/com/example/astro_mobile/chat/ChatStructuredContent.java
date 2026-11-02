@@ -8,8 +8,6 @@ import android.view.Window;
 import java.text.Normalizer;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.widget.FrameLayout;
@@ -18,15 +16,10 @@ import com.example.astro_mobile.R;
 import com.example.astro_mobile.data.ai.ChatAnalyticalContract;
 import com.example.astro_mobile.data.ai.ChatMatrixBlock;
 import com.example.astro_mobile.data.ai.ChatFileBlock;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import com.example.astro_mobile.data.ai.ChatAvatarRepository;
+import java.lang.ref.WeakReference;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
@@ -43,7 +36,6 @@ import java.util.List;
 /** Renderiza blocos válidos em ordem; um tipo desconhecido não oculta os demais. */
 final class ChatStructuredContent {
     private static final int[] COLORS = {0xffc4a1ff, 0xff59c9bc, 0xffffbe69, 0xff79b9f2, 0xfff38cae, 0xffb7d778, 0xffe49666, 0xffa3a6ef, 0xff67c9da, 0xffd9a2d9, 0xffc6bf89, 0xffaab4c8};
-    private static final ExecutorService AVATARS = Executors.newFixedThreadPool(3);
     private ChatStructuredContent() { }
     private static String str(JsonObject o, String key) { return o.get(key).getAsString(); }
     private static JsonArray arr(JsonObject o, String key, int limit) {
@@ -476,7 +468,7 @@ final class ChatStructuredContent {
             nameView.setPadding(dp(context, 12), dp(context, 4), 0, dp(context, 4));
             nameView.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1));
             String url = item.has("url") && !item.get("url").isJsonNull() ? item.get("url").getAsString() : null;
-            if (safeUrl(url)) loadAvatar(image, url);
+            loadAvatar(image, url);
         }
     }
     private static FrameLayout imageCell(LinearLayout line, JsonObject photo, boolean tableCell, String name) {
@@ -505,7 +497,7 @@ final class ChatStructuredContent {
         if (tableCell) frame.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
         JsonElement receivedUrl = photo.get("url");
         String url = receivedUrl == null || receivedUrl.isJsonNull() ? null : receivedUrl.getAsString();
-        if (safeUrl(url)) loadAvatar(image, url);
+        loadAvatar(image, url);
         return frame;
     }
     static String initials(String name) {
@@ -516,41 +508,20 @@ final class ChatStructuredContent {
         String last = parts.length > 1 ? parts[parts.length - 1].substring(0, parts[parts.length - 1].offsetByCodePoints(0, 1)) : "";
         return (first + last).toUpperCase(Locale.ROOT);
     }
-    private static void loadAvatar(ImageView image, String value) {
-        // A URL assinada nunca é registrada nem armazenada em cache.
-        AVATARS.execute(() -> {
-            HttpURLConnection connection = null;
-            try {
-                connection = (HttpURLConnection) new URL(value).openConnection();
-                connection.setUseCaches(false);
-                connection.setInstanceFollowRedirects(false);
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                if (connection.getResponseCode() != 200) return;
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                try (InputStream input = connection.getInputStream()) {
-                    byte[] buffer = new byte[8192]; int count;
-                    while ((count = input.read(buffer)) != -1) {
-                        if (bytes.size() + count > 2 * 1024 * 1024) return;
-                        bytes.write(buffer, 0, count);
-                    }
-                }
-                byte[] data = bytes.toByteArray();
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeByteArray(data, 0, data.length, options);
-                if (options.outWidth <= 0 || options.outHeight <= 0) return;
-                options.inJustDecodeBounds = false;
-                options.inSampleSize = 1;
-                while (options.outWidth / options.inSampleSize > 256 || options.outHeight / options.inSampleSize > 256)
-                    options.inSampleSize = Math.max(1, options.inSampleSize) * 2;
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
-                if (bitmap != null) image.post(() -> image.setImageBitmap(bitmap));
-            } catch (Exception ignored) { /* Mantém as iniciais também em caso de acesso negado. */ }
-            finally { if (connection != null) connection.disconnect(); }
+    private static void loadAvatar(ImageView image, String url) {
+        WeakReference<ImageView> target = new WeakReference<>(image);
+        ChatAvatarRepository.Operation operation = new ChatAvatarRepository().load(url, bitmap -> {
+            ImageView current = target.get();
+            if (current != null) current.setImageBitmap(bitmap);
+        });
+        image.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override public void onViewAttachedToWindow(View view) { }
+            @Override public void onViewDetachedFromWindow(View view) {
+                operation.cancel();
+                view.removeOnAttachStateChangeListener(this);
+            }
         });
     }
-    private static boolean safeUrl(String value) { try { Uri uri = Uri.parse(value); return "https".equals(uri.getScheme()) && uri.getHost() != null && uri.getHost().endsWith(".r2.cloudflarestorage.com") && uri.getUserInfo() == null; } catch (Exception e) { return false; } }
     static int dp(Context c,int n) { return Math.round(n*c.getResources().getDisplayMetrics().density); }
     private static LinearLayout row(Context c) { LinearLayout r = new LinearLayout(c); r.setOrientation(LinearLayout.HORIZONTAL); return r; }
     private static TextView cell(LinearLayout row, String value, boolean bold) {

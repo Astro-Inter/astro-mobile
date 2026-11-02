@@ -65,7 +65,6 @@ public final class ConversationsFragment extends Fragment {
             args.putString(HumanChatFragment.PEER_NAME, conversation.name);
             args.putString(HumanChatFragment.PEER_ROLE, conversation.role);
             args.putString(HumanChatFragment.PEER_PHOTO_URL, conversation.profilePhotoUrl);
-            args.putInt(HumanChatFragment.PEER_AVATAR_INDEX, conversation.avatarIndex);
             args.putBoolean(HumanChatFragment.PEER_IS_MANAGER, conversation.manager);
             if (conversation.participantId != null) args.putLong(HumanChatFragment.PEER_ID, conversation.participantId);
             if (conversation.conversationId != null) {

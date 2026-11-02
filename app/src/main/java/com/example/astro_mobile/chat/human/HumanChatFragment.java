@@ -30,7 +30,6 @@ import com.example.astro_mobile.auth.AuthArgs;
 public final class HumanChatFragment extends Fragment {
     public static final String PEER_NAME = "human_peer_name";
     public static final String PEER_ROLE = "human_peer_role";
-    public static final String PEER_AVATAR_INDEX = "human_peer_avatar_index";
     public static final String PEER_IS_MANAGER = "human_peer_is_manager";
     public static final String PEER_ID = "human_peer_id";
     public static final String PEER_PHOTO_URL = "human_peer_photo_url";
@@ -58,7 +57,7 @@ public final class HumanChatFragment extends Fragment {
         if (conversation == null) {
             conversation = state.open(args.containsKey(PEER_ID) ? args.getLong(PEER_ID) : null,
                 args.getString(PEER_NAME), args.getString(PEER_ROLE),
-                args.getBoolean(PEER_IS_MANAGER, !manager), args.getInt(PEER_AVATAR_INDEX));
+                args.getBoolean(PEER_IS_MANAGER, !manager));
             if (conversation != null && id != null) conversation.conversationId = id;
         }
         if (conversation == null) {
@@ -137,6 +136,10 @@ public final class HumanChatFragment extends Fragment {
             }
         });
         EditText input = view.findViewById(R.id.input_human_chat_message);
+        TextView characterCount = view.findViewById(R.id.text_human_chat_character_count);
+        int initialLength = conversation.draft.length();
+        characterCount.setVisibility(initialLength >= 3600 ? View.VISIBLE : View.GONE);
+        characterCount.setText(getString(R.string.chat_character_count, initialLength));
         input.setText(conversation.draft);
         view.findViewById(R.id.button_human_reply_cancel).setOnClickListener(clicked -> {
             if (conversation.pending != null) return;
@@ -148,6 +151,8 @@ public final class HumanChatFragment extends Fragment {
         input.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                characterCount.setVisibility(s.length() >= 3600 ? View.VISIBLE : View.GONE);
+                characterCount.setText(getString(R.string.chat_character_count, s.length()));
                 conversation.draft = s.toString();
                 state.draftChanged(conversation);
             }

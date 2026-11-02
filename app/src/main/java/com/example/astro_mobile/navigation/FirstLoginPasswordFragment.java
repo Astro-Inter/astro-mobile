@@ -26,7 +26,6 @@ import com.example.astro_mobile.auth.AccessKeyViewModel;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.FirstLoginPasswordViewModel;
-import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
@@ -82,7 +81,6 @@ public class FirstLoginPasswordFragment extends Fragment {
                         // Só 204 libera a home; a sessão permanece exclusivamente no Firebase.
                         passwordInput.setText(null);
                         confirmationInput.setText(null);
-                        MockSession.clear(requireContext());
                         FlowPreferences.saveEmployeeFlow(requireContext());
                         String userType = accessKeyViewModel.getUserType();
                         navController.navigate(R.id.action_first_login_password_to_employee_home,

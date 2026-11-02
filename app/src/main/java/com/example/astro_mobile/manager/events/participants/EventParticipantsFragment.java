@@ -155,7 +155,6 @@ public final class EventParticipantsFragment extends Fragment {
         args.putString("event_title", eventTitle);
         args.putString("participant_name", participant.name);
         if (participant.id != null) args.putLong("participant_id", participant.id);
-        args.putInt("participant_avatar_index", participant.avatarIndex);
         int action = completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT
                 ? R.id.action_event_participants_to_assignment : R.id.action_event_participants_to_validation;
         NavHostFragment.findNavController(this).navigate(action, args);
