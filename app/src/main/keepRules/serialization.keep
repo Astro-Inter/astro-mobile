@@ -1,0 +1,27 @@
+# Contratos lidos/escritos por reflexão pelo Gson. Não preservar Repositories ou a UI.
+-keepattributes Signature,*Annotation*
+-keep,allowoptimization class com.example.astro_mobile.data.api.dto.** { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatContextBlock { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatContextBlock$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatDatasetSummary { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatDatasetSummary$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatFileBlock { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatFileBlock$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatIndicatorsBlock { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatIndicatorsBlock$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatMatrixBlock { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatMatrixBlock$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatRequest { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatRequest$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatResponse { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.ChatResponse$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.GoogleCalendarConnectResponse { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.GoogleCalendarConnectResponse$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionHistory { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionHistory$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionResult { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionResult$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionsPage { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionsPage$* { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionSummary { *; }
+-keep,allowoptimization class com.example.astro_mobile.data.ai.SessionSummary$* { *; }

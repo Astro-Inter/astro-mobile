@@ -1,26 +1,16 @@
 <resources>
     <string name="ai_sessions_title">Seus chats</string>
-    <string name="ai_sessions_heading">Suas conversas</string>
-    <string name="ai_sessions_subtitle">Continue de onde parou com o Astrinho.</string>
     <string name="ai_sessions_new">Novo chat</string>
     <string name="ai_sessions_search">Buscar conversas carregadas</string>
-    <string name="ai_sessions_current_visit">Suas conversas</string>
-    <string name="ai_sessions_notice">Suas conversas são sincronizadas com sua conta.</string>
     <string name="ai_sessions_empty_title">Sua próxima conversa começa aqui</string>
     <string name="ai_sessions_empty_body">Converse sobre NRs, treinamentos ou sua rotina de trabalho. Os assuntos que abrir aparecerão nesta lista.</string>
     <string name="ai_sessions_no_results_title">Nenhuma conversa encontrada</string>
     <string name="ai_sessions_no_results_body">Tente buscar por outro assunto.</string>
-    <string name="ai_sessions_active">Conversa atual</string>
     <string name="ai_sessions_draft">Conversa em rascunho</string>
-    <string name="ai_sessions_responding">Astrinho está respondendo…</string>
     <string name="ai_sessions_wait">Aguarde a resposta para trocar ou iniciar outra conversa.</string>
     <string name="ai_sessions_open">Ver conversas com o Astrinho</string>
     <string name="ai_sessions_refresh">Atualizar</string>
-    <string name="ai_sessions_more">Carregar mais conversas</string>
     <string name="ai_sessions_not_found">Esta conversa não está mais disponível para sua conta.</string>
-    <string name="ai_sessions_closed">Encerrada</string>
-    <string name="ai_sessions_ending">Encerrando</string>
-    <string name="ai_sessions_status_active">Ativa</string>
     <string name="ai_sessions_cancel">Cancelar</string>
     <string name="ai_sessions_history_loading">Carregando histórico…</string>
     <string name="ai_sessions_resuming">Continuando conversa…</string>

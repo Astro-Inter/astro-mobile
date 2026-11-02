@@ -1,40 +1,11 @@
-# Fila local de Pull Requests
+# Fluxo de publicação do Astro Mobile
 
-Atualizada em 2026-10-16. PRs #35–42 integradas à main 911ab3d. A SCRUM-274 começa diretamente dessa main, sem empilhamento nas antigas branches de integração. Build/lint e 27 testes existentes aprovados; validação visual/GPS pendente devido ao erro de restauração da sessão no aparelho.
+O estado de PRs e merges deve ser conferido no GitHub. Este arquivo descreve o procedimento; não mantém uma fila histórica de branches ou stashes.
 
-## Colaboradores
+1. Partir da main atualizada ou declarar explicitamente a base quando a tarefa for empilhada.
+2. Revisar o diff e executar as verificações pertinentes antes de publicar.
+3. Conferir conflitos com a base e resolvê-los preservando os dois lados do trabalho.
+4. Publicar somente com autorização e informar dependências e QA pendente na descrição.
+5. Após o merge da base, atualizar a branch dependente e conferir novamente o diff e os conflitos.
 
-1. SCRUM-313 — lista de colaboradores: [PR #37](https://github.com/Astro-Inter/astro-mobile/pull/37), integrada à main em e2274d3.
-2. SCRUM-311 — detalhe do funcionário: [PR #38](https://github.com/Astro-Inter/astro-mobile/pull/38), integrada à main em f66cab2.
-3. SCRUM-309 — eventos do funcionário: [PR #39](https://github.com/Astro-Inter/astro-mobile/pull/39), integrada à main em fae427d.
-4. SCRUM-301 — conversa gestor-colaborador: [PR #40](https://github.com/Astro-Inter/astro-mobile/pull/40), integrada à main em 46757b8.
-
-As quatro PRs da sequência de colaboradores já estão na main. Manter os dois atalhos do detalhe do funcionário: Conversar e Ver pendências.
-
-## Eventos — fila independente
-
-1. SCRUM-307 — notificações: [PR #35](https://github.com/Astro-Inter/astro-mobile/pull/35), já integrada à `main`.
-2. SCRUM-285 — atribuição de conclusão: [PR #36](https://github.com/Astro-Inter/astro-mobile/pull/36), integrada à main no merge ad0f6b4.
-3. SCRUM-289 — validação de conclusão: recuperada seletivamente na branch `feat/SCRUM-289-validacao-evento-ui`, empilhada na SCRUM-274 em `dd4f522`. UI, rejeição e confirmação locais; build aprovado e instalada no Samsung. Sem testes/lint por pedido. Publicação empilhada com base na branch da PR #43; integrar a #43 antes de realinhar esta branch à main. Roteiro manual em `docs/validacao-conclusao.md`.
-4. SCRUM-287 — visualização da evidência: recuperada seletivamente na branch `feat/SCRUM-287-evidencia-evento-ui`, empilhada na SCRUM-289 em `6c5ff85` (PR #44). Tela local com imagem/paginação e skeleton de 1s, ligada ao comprovante. Build aprovado; sem testes/lint/instalação por pedido. Publicar em rascunho sobre a branch da #44, mantendo um commit próprio e a ordem #43 → #44 → evidência. Roteiro em `docs/evidencia-evento.md`.
-
-Backup completo de SCRUM-289/287, incluindo novos arquivos: stash `1aba05a51ef51483d1190bffb54c39e968625ecf`. Backup isolado da SCRUM-289: `d631bc459e4a0a8fc792116ee24853835d0b3abb`. Ambos preservados. As duas tarefas foram recuperadas seletivamente em branches/commits separados, mantendo a atribuição já presente na main. Não descartar os backups antes da conferência manual e integração das PRs correspondentes.
-
-## Pendência antiga a revisar
-
-Há um stash de SCRUM-307 (notificações) que precisa ser comparado à main antes de propor PR. Ele contém inclusive uma cópia de configuração Firebase; não aplicar nem publicar tudo indiscriminadamente. A existência do stash não prova que a tarefa ainda esteja ausente da main.
-
-## Formulários — sequência local posterior à integração
-
-- SCRUM-279: [PR #41](https://github.com/Astro-Inter/astro-mobile/pull/41), integrada à main em 60ab01b.
-- SCRUM-277: [PR #42](https://github.com/Astro-Inter/astro-mobile/pull/42), integrada à main em 911ab3d. Snapshot anterior à separação preservado no stash `9f17a50db93ad30eced055eedf53b44d6a6b657c` e nas branches de backup correspondentes.
-- SCRUM-274/276: branch `feat/SCRUM-274-responder-formulario-ui`, base main 911ab3d; [PR #43](https://github.com/Astro-Inter/astro-mobile/pull/43) em rascunho. UI/campos obrigatórios, câmera externa real com até três fotos temporárias, GPS real nos detalhes/ao iniciar/a cada minuto/ao concluir, raio provisório de 100 m sobre a primeira posição nos detalhes e pausa/retomada. Fora do raio: aviso Figma de 3s, retorno aos detalhes e respostas/fotos preservadas. Sem painel de registros, upload ou API; conclusão local. Build/lint e 27 testes existentes aprovados; sem físico conectado para validar esta atualização. SCRUM-274/276 continuam Em andamento até conferência manual e integrações correspondentes; não concluir upload/API só pela captura local.
-
-## Procedimento de publicação
-
-- Antes de cada PR, conferir estado remoto, commits já mergeados, diff próprio e dependências. Esta fila é um retrato local, não substitui a consulta ao GitHub.
-- Acompanhar uma PR por vez com o solicitante; não mergear uma filha antes da base.
-- Em stacks, registrar o SHA antigo da base antes de rebase. Após squash/merge da base, preferir rebase `--onto` para retirar somente os commits herdados, sem duplicar alterações.
-- Não reescrever branch de colega nem sobrescrever mudanças remotas. Push com histórico reescrito exige aprovação específica e conferência do remoto.
-- Após cada merge confirmado, atualizar os cards correspondentes e conferir a sprint atual.
-- O solicitante autorizou commits, push e abertura de PRs nesta sequência. Essa autorização não substitui as aprovações da equipe; não mergear nesta resolução.
+O estado de implementação das telas está em [SCREEN_STATUS.md](../SCREEN_STATUS.md). A fila de QA precisa distinguir código implementado de integração validada em aparelho.

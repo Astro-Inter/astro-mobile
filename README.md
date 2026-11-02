@@ -66,7 +66,9 @@ Não adicione ao aplicativo chaves privadas, credenciais SMTP ou tokens administ
 
 O app é desenvolvido em **Java e XML**, com uma Activity e navegação entre Fragments. A organização usa **MVVM**: Fragments apresentam as telas, ViewModels coordenam o estado e Repositories concentram o acesso aos dados.
 
-As principais bibliotecas são Android Navigation e ViewModel, Retrofit com Gson para HTTP, Firebase Authentication, Cloud Firestore e Firebase Cloud Messaging, Glide para imagens e WorkManager para trabalhos em segundo plano. O chat humano usa WebSocket com STOMP.
+As principais bibliotecas são Android Navigation e ViewModel, Retrofit com Gson para HTTP, Firebase Authentication, Cloud Firestore e Firebase Cloud Messaging, Glide para imagens e WorkManager para trabalhos em segundo plano. O chat humano usa WebSocket com STOMP. Os fluxos usam callbacks; os chats existentes também usam LiveData observado pelo ciclo de vida para compartilhar o estado de mensagens. Essa escolha é mantida para preservar o comportamento atual, sem estender o padrão às demais telas.
+
+Chamadas HTTP e Firebase ficam em `data/`, inclusive a obtenção de avatares assinados e a conexão do calendário do Astrinho. A tela de erro compartilha a apresentação e delega a recuperação ao fluxo de origem.
 
 ```text
 app/src/main/java/com/example/astro_mobile/
@@ -97,7 +99,7 @@ Para gerar uma versão debug sem instalá-la:
 ./gradlew :app:assembleDebug
 ```
 
-O arquivo gerado fica em `app/build/outputs/apk/debug/app-debug.apk`. A distribuição de uma versão release requer configurar uma assinatura apropriada.
+O arquivo gerado fica em `app/build/outputs/apk/debug/app-debug.apk`. A distribuição de uma versão release requer configurar uma assinatura apropriada. O build release habilita R8 e otimização de recursos; as regras de preservação dos contratos Gson ficam em `app/src/main/keepRules/serialization.keep`. A licença da fonte Montserrat é preservada no pacote.
 
 ## Contribuição
 

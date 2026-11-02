@@ -3,7 +3,6 @@
     <string name="manager_events_title">Meus eventos</string>
     <string name="manager_events_heading">Seus eventos</string>
     <string name="manager_events_description">Acesse aqui o estado de qualquer evento atribuído por você</string>
-    <string name="manager_events_filter">Filtrar por estado</string>
     <string name="manager_events_in_progress">Em andamento</string>
     <string name="manager_events_finished">Finalizados</string>
     <string name="manager_events_finished_status">Finalizado</string>

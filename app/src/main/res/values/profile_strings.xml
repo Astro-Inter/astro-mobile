@@ -8,8 +8,6 @@
     <string name="profile_photo_sending">Enviando foto…</string>
     <string name="profile_photo_updated">Foto atualizada.</string>
     <string name="profile_photo_invalid">Escolha uma foto JPEG, PNG ou WebP de até 5 MB.</string>
-    <string name="profile_photo_error">Não foi possível enviar a foto. Tente novamente.</string>
-    <string name="profile_photo_refresh_error">Foto enviada. Reabra o Perfil para atualizar a imagem.</string>
     <string name="profile_unit">Unidade:</string>
     <string name="profile_modality">Modalidade:</string>
     <string name="profile_email">E-mail:</string>
@@ -32,6 +30,5 @@
     <string name="profile_retry_back">Voltar</string>
     <string name="profile_change_password_description">Enviaremos um link para %1$s com as instruções para você criar uma nova senha.</string>
     <string name="profile_change_password_send">Enviar link</string>
-    <string name="profile_change_password_sent_description">Se houver uma conta ativa vinculada a %1$s, você receberá um link para alterar sua senha.</string>
     <string name="profile_back">Voltar ao perfil</string>
 </resources>
