@@ -293,9 +293,6 @@ public class ErrorFragment extends Fragment {
                         MockSession.clear(requireContext());
                         FlowPreferences.saveEmployeeFlow(requireContext());
                         String userType = accessKeyViewModel.getUserType();
-                        Toast.makeText(requireContext(),
-                                getString(R.string.auth_user_type_toast, userType),
-                                Toast.LENGTH_LONG).show();
                         navController.navigate(R.id.employeeHomeFragment,
                                 AuthArgs.of(email, userType),
                                 new NavOptions.Builder()

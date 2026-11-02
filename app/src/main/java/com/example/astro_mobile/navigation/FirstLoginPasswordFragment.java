@@ -12,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -86,9 +85,6 @@ public class FirstLoginPasswordFragment extends Fragment {
                         MockSession.clear(requireContext());
                         FlowPreferences.saveEmployeeFlow(requireContext());
                         String userType = accessKeyViewModel.getUserType();
-                        Toast.makeText(requireContext(),
-                                getString(R.string.auth_user_type_toast, userType),
-                                Toast.LENGTH_LONG).show();
                         navController.navigate(R.id.action_first_login_password_to_employee_home,
                                 AuthArgs.of(email, userType));
                     }

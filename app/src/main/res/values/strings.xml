@@ -18,7 +18,6 @@
     <string name="email_generic_error_body">Não foi possível concluir esta ação. Tente novamente em instantes.</string>
     <string name="email_error_retry">Tentar novamente</string>
     <string name="email_error_start">Voltar para o início</string>
-    <string name="auth_user_type_toast">Tipo retornado: %1$s</string>
     <string name="access_key_information_title">Chave de acesso</string>
     <string name="access_key_information_body">A chave de acesso é um código fornecido pela sua empresa para permitir seu primeiro acesso ao aplicativo <b>Astro</b>.\n\nDigite a chave recebida no campo indicado. Após a validação, você poderá cadastrar sua senha e acessar sua conta.\n\nA chave é individual e deve ser utilizada somente por você. Caso não tenha recebido a chave ou ela não esteja funcionando, entre em contato com o responsável pelo <b>Astro</b> na sua empresa.</string>
     <string name="access_key_information_action">Entendi</string>
