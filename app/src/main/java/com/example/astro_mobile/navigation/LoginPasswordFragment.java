@@ -12,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -147,9 +146,6 @@ public class LoginPasswordFragment extends Fragment {
                 // O Firebase é a sessão real; remove qualquer sessão mock anterior.
                 MockSession.clear(requireContext());
                 FlowPreferences.clear(requireContext());
-                Toast.makeText(requireContext(),
-                        getString(R.string.auth_user_type_toast, userType),
-                        Toast.LENGTH_LONG).show();
                 Navigation.findNavController(view)
                         .navigate("COLABORADOR".equals(userType)
                                         ? R.id.action_login_password_to_employee_home
