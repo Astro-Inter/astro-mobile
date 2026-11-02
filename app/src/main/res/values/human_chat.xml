@@ -15,7 +15,6 @@
     <string name="human_chat_disconnected">Sem conexão com o chat. Toque para tentar novamente.</string>
     <string name="human_chat_rejected">Conexão recusada pelo servidor. Verifique o acesso da conta e toque para tentar novamente.</string>
     <string name="human_chat_tls_failed">Não foi possível validar o certificado do chat. Verifique a rede ou a inspeção HTTPS e toque para tentar novamente.</string>
-    <string name="human_chat_sending">Aguardando confirmação do servidor…</string>
     <string name="human_chat_uncertain">Envio sem confirmação. Toque na seta para repetir a mesma operação.</string>
     <string name="human_chat_send_error">O servidor recusou o envio. Revise o destinatário e a mensagem antes de tentar novamente.</string>
     <plurals name="human_conversation_unread">

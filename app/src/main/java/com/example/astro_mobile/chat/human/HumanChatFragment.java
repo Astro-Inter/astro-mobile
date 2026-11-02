@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.astro_mobile.R;
-import com.example.astro_mobile.shared.ui.PullToRefresh;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.example.astro_mobile.data.local.FlowPreferences;
 import com.example.astro_mobile.shared.profile.PhotoViewerDialog;
@@ -40,6 +40,7 @@ public final class HumanChatFragment extends Fragment {
     private HumanMessageSwipeToReply swipeToReply;
     private HumanTypingAdapter typingAdapter;
     private HumanMessagesAdapter messagesAdapter;
+    private SwipeRefreshLayout historyRefresh;
 
     public HumanChatFragment() { super(R.layout.fragment_human_chat); }
 
@@ -117,11 +118,16 @@ public final class HumanChatFragment extends Fragment {
         messages.setAdapter(new androidx.recyclerview.widget.ConcatAdapter(adapter, typingAdapter));
         swipeToReply = new HumanMessageSwipeToReply(conversation, message -> selectReply(view, message));
         swipeToReply.attach(messages);
-        PullToRefresh.attach(this, messages, messages, () -> {
-            if (conversation.conversationId != null && conversation.pending == null && !conversation.loadingOlder)
-                startHistoryLoad(view, messages, adapter);
-        });
         LinearLayoutManager layoutManager = (LinearLayoutManager) messages.getLayoutManager();
+        historyRefresh = view.findViewById(R.id.refresh_human_chat_history);
+        historyRefresh.setColorSchemeResources(R.color.chat_link);
+        historyRefresh.setProgressBackgroundColorSchemeResource(R.color.chat_surface);
+        historyRefresh.setOnChildScrollUpCallback((layout, child) -> messages.canScrollVertically(-1));
+        historyRefresh.setEnabled(conversation.loaded && conversation.hasMore);
+        historyRefresh.setOnRefreshListener(() -> {
+            if (layoutManager != null) loadOlder(messages, layoutManager, adapter);
+            else historyRefresh.setRefreshing(false);
+        });
         messages.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (layoutManager != null && layoutManager.findFirstVisibleItemPosition() == 0
@@ -169,6 +175,7 @@ public final class HumanChatFragment extends Fragment {
                 view.findViewById(R.id.skeleton_human_chat).setVisibility(View.GONE);
                 messages.setVisibility(View.VISIBLE);
                 view.findViewById(R.id.container_human_chat_composer).setVisibility(View.VISIBLE);
+                if (historyRefresh != null) historyRefresh.setEnabled(conversation.hasMore);
             }
             renderConnection(view);
             renderReply(view);
@@ -200,6 +207,7 @@ public final class HumanChatFragment extends Fragment {
                 if (getView() != view) return;
                 adapter.notifyHistoryReplaced(previousCount);
                 renderReply(view);
+                if (historyRefresh != null) historyRefresh.setEnabled(conversation.hasMore);
                 view.findViewById(R.id.skeleton_human_chat).setVisibility(View.GONE);
                 messages.setVisibility(View.VISIBLE);
                 view.findViewById(R.id.container_human_chat_composer).setVisibility(View.VISIBLE);
@@ -214,21 +222,37 @@ public final class HumanChatFragment extends Fragment {
 
     private void loadOlder(RecyclerView messages, LinearLayoutManager layoutManager,
                            HumanMessagesAdapter adapter) {
-        int firstVisible = layoutManager.findFirstVisibleItemPosition();
-        View firstChild = layoutManager.findViewByPosition(firstVisible);
-        int offset = firstChild == null ? 0 : firstChild.getTop();
-        int previousCount = conversation.messages.size();
+        if (conversation.conversationId == null || conversation.historyLoading || conversation.loadingOlder || !conversation.loaded
+                || !conversation.hasMore || conversation.nextCursor == null) {
+            if (historyRefresh != null) historyRefresh.setRefreshing(conversation.loadingOlder);
+            return;
+        }
+        View currentView = getView();
+        String firstMessageId = conversation.messages.isEmpty() ? null : conversation.messages.get(0).id;
+        if (historyRefresh != null) historyRefresh.setRefreshing(true);
         state.loadOlder(conversation, new HumanConversationsViewModel.HistoryCallback() {
             @Override public void onChanged() {
-                if (getView() == null) return;
-                int inserted = conversation.messages.size() - previousCount;
+                if (getView() != currentView || currentView == null) return;
+                // Capture the viewport on completion: the user may keep scrolling during the request.
+                int firstVisible = layoutManager.findFirstVisibleItemPosition();
+                View firstChild = layoutManager.findViewByPosition(firstVisible);
+                int offset = firstChild == null ? 0 : firstChild.getTop() - messages.getPaddingTop();
+                HumanMessage firstMessage = conversation.findMessage(firstMessageId);
+                int inserted = firstMessage == null ? 0 : conversation.messages.indexOf(firstMessage);
                 adapter.notifyDataSetChanged();
-                renderReply(getView());
-                layoutManager.scrollToPositionWithOffset(firstVisible + inserted, offset);
+                renderReply(currentView);
+                if (firstVisible != RecyclerView.NO_POSITION)
+                    layoutManager.scrollToPositionWithOffset(firstVisible + inserted, offset);
+                if (historyRefresh != null) {
+                    historyRefresh.setRefreshing(false);
+                    historyRefresh.setEnabled(conversation.hasMore);
+                }
             }
 
             @Override public void onFailure(com.example.astro_mobile.data.api.FailureKind failure) {
-                showHistoryFailure(failure, getView());
+                if (getView() != currentView || currentView == null) return;
+                if (historyRefresh != null) historyRefresh.setRefreshing(false);
+                showHistoryFailure(failure, currentView);
             }
         });
     }
@@ -263,7 +287,7 @@ public final class HumanChatFragment extends Fragment {
         if (connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTED) {
             label = conversation.pending == null ? (conversation.sendErrorCode == null
                     ? 0 : R.string.human_chat_send_error)
-                    : conversation.pending.awaiting ? R.string.human_chat_sending : R.string.human_chat_uncertain;
+                    : conversation.pending.awaiting ? 0 : R.string.human_chat_uncertain;
         } else if (connection == com.example.astro_mobile.data.chat.ChatConnectionState.CONNECTING) {
             label = R.string.human_chat_connecting;
         } else if (connection == com.example.astro_mobile.data.chat.ChatConnectionState.RETRYING) {
@@ -330,6 +354,11 @@ public final class HumanChatFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if (historyRefresh != null) {
+            historyRefresh.setRefreshing(false);
+            historyRefresh.setOnRefreshListener(null);
+            historyRefresh = null;
+        }
         if (typingAdapter != null) { typingAdapter.setTyping(false); typingAdapter = null; }
         messagesAdapter = null;
         if (swipeToReply != null) {
