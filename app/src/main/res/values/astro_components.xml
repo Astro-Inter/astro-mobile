@@ -53,22 +53,4 @@
         <item name="android:importantForAccessibility">no</item>
     </style>
     <!-- O filtro mantém a altura visual de ConversationsFilter, com área de toque ampliada. -->
-    <style name="AstroFilterTouchTarget">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:minHeight">55dp</item>
-        <item name="android:paddingVertical">10dp</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-    </style>
-    <style name="AstroFilterLabel" parent="ConversationsFilter">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_weight">0</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:clickable">false</item>
-        <item name="android:focusable">false</item>
-        <item name="android:duplicateParentState">true</item>
-        <item name="android:importantForAccessibility">no</item>
-    </style>
 </resources>

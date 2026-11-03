@@ -15,7 +15,7 @@ public final class PullToRefresh {
         int index = parent.indexOfChild(content);
         ViewGroup.LayoutParams params = content.getLayoutParams();
         parent.removeViewAt(index);
-        SwipeRefreshLayout swipe = new SwipeRefreshLayout(fragment.requireContext());
+        SwipeRefreshLayout swipe = new DirectionalSwipeRefreshLayout(fragment.requireContext());
         swipe.setColorSchemeResources(R.color.astro_primary_purple);
         parent.addView(swipe, index, params);
         swipe.addView(content, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

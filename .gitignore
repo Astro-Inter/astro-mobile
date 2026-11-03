@@ -34,3 +34,6 @@ google-services.json
 *.hprof
 node_modules/
 *-debug.log
+
+# Local QA captures (never packaged)
+.qa-*

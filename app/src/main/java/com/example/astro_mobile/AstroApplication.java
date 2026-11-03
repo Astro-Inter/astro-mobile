@@ -7,6 +7,7 @@ import com.example.astro_mobile.shared.notifications.PendingEventNotifications;
 public final class AstroApplication extends Application {
     @Override public void onCreate() {
         super.onCreate();
+        com.example.astro_mobile.data.local.LegacySessionMigration.clear(this);
         PendingEventNotifications.createChannel(this);
         com.example.astro_mobile.shared.notifications.ChatPushNotifications.createChannel(this);
         PushTokenRepository.initialize(this);

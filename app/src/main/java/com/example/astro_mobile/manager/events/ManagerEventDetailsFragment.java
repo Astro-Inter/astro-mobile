@@ -60,6 +60,7 @@ public final class ManagerEventDetailsFragment extends Fragment {
             Bundle participantArgs = AuthArgs.copy(getArguments());
             if (state.getDetails() != null) {
                 participantArgs.putString(EVENT_TITLE, state.getDetails().eventTitle);
+                participantArgs.putString("event_last_class_limit_date", state.getDetails().lastClassLimitDate);
             }
             NavHostFragment.findNavController(this).navigate(R.id.action_manager_event_details_to_participants, participantArgs);
         });

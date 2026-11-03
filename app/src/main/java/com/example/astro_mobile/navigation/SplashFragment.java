@@ -24,7 +24,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.astro_mobile.R;
 import com.example.astro_mobile.auth.AuthArgs;
 import com.example.astro_mobile.auth.AccessKeyViewModel;
-import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.SessionViewModel;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
@@ -248,7 +247,6 @@ public class SplashFragment extends Fragment {
                 // Conta desativada ou sem estado ativo não conserva a sessão local.
                 sessionViewModel.signOut();
                 FlowPreferences.clear(requireContext());
-                MockSession.clear(requireContext());
                 if (destination == EmailVerificationViewModel.Destination.DISABLED) {
                     verificationViewModel.setPendingInlineError(
                             getString(R.string.email_identification_disabled_error));
@@ -262,8 +260,6 @@ public class SplashFragment extends Fragment {
     }
 
     private void navigateWithoutFirebaseSession() {
-        // Uma sessão mock antiga não pode pular o cadastro ou liberar a home.
-        MockSession.clear(requireContext());
         NavHostFragment.findNavController(this).navigate(R.id.action_splash_to_email_identification);
     }
 

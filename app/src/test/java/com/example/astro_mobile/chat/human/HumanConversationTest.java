@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public final class HumanConversationTest {
     @Test public void liveAndHistoryOverlapDeduplicateByServerIdInChronologicalOrder() {
-        HumanConversation conversation = new HumanConversation("Contato", "Gestor", true, 0);
+        HumanConversation conversation = new HumanConversation("Contato", "Gestor", true);
         HumanMessage recent = message("b", "2026-10-26T18:30:01Z");
         HumanMessage older = message("a", "2026-10-26T18:30:00Z");
         assertTrue(conversation.addMessage(recent));

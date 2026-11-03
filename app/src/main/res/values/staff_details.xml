@@ -10,8 +10,6 @@
     <string name="staff_detail_work_hybrid">Híbrido</string>
     <string name="staff_detail_work_remote">Remoto</string>
     <string name="staff_detail_value_unavailable">Não informado</string>
-    <string name="staff_detail_nr_mock">NR-06 - &lt;font color="#B3B1C1">Validade: 21/12/1002&lt;/font></string>
-    <string name="staff_detail_nr_content_pending">O conteúdo desta NR será definido na integração. Exemplo apenas visual.</string>
     <style name="StaffDetailField" parent="ProfileField">
         <item name="android:minHeight">60dp</item>
         <item name="android:paddingHorizontal">30dp</item>

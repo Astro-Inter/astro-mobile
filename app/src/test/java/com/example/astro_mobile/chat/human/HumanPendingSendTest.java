@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public final class HumanPendingSendTest {
     @Test public void replyKeepsOriginalReferenceAndContentOnManualRetry() {
-        HumanConversation conversation = new HumanConversation("Contato", "Gestor", true, 0);
+        HumanConversation conversation = new HumanConversation("Contato", "Gestor", true);
         conversation.participantId = 25L;
         conversation.conversationId = "11111111-2222-4333-8444-555555555555";
         conversation.replyToMessageId = "22222222-3333-4444-8555-666666666666";
@@ -19,7 +19,7 @@ public final class HumanPendingSendTest {
         assertTrue(new Gson().toJson(pending.request).contains("replyToMessageId"));
     }
     @Test public void firstMessageUsesInternalRecipientAndKeepsOperationAndOriginalContentOnRetry() {
-        HumanConversation conversation = new HumanConversation("Contato autorizado", "Gestor", true, 0);
+        HumanConversation conversation = new HumanConversation("Contato autorizado", "Gestor", true);
         conversation.participantId = 25L;
         conversation.draft = "  Olá!\nTudo bem?  ";
         HumanPendingSend pending = new HumanPendingSend(conversation);
@@ -34,7 +34,7 @@ public final class HumanPendingSendTest {
         assertNotNull(java.util.UUID.fromString(pending.request.clientMessageId));
     }
     @Test public void existingConversationUsesOnlyConversationId() {
-        HumanConversation conversation = new HumanConversation("Contato autorizado", "Colaborador", false, 0);
+        HumanConversation conversation = new HumanConversation("Contato autorizado", "Colaborador", false);
         conversation.participantId = 25L;
         conversation.conversationId = "11111111-2222-4333-8444-555555555555";
         conversation.draft = "Mensagem";

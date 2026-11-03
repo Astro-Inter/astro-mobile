@@ -164,7 +164,7 @@ public final class HumanConversationsViewModel extends ViewModel {
                     boolean manager = data.participant.role.startsWith("GESTOR");
                     HumanConversation conversation = previous.stream().filter(item -> data.participant.id.equals(item.participantId))
                             .findFirst().orElseGet(() -> new HumanConversation(data.participant.name,
-                                    manager ? "Gestor" : "Colaborador", manager, 0));
+                                    manager ? "Gestor" : "Colaborador", manager));
                     conversation.conversationId = data.id;
                     conversation.participantId = data.participant.id;
                     conversation.profilePhotoUrl = data.participant.profilePhotoUrl;
@@ -209,7 +209,7 @@ public final class HumanConversationsViewModel extends ViewModel {
                 for (ChatContactData data : result) {
                     HumanConversation conversation = previous.stream().filter(item -> data.id.equals(item.participantId))
                             .findFirst().orElseGet(() -> new HumanConversation(data.name,
-                                    data.role.startsWith("GESTOR") ? "Gestor" : "Colaborador", data.role.startsWith("GESTOR"), 0));
+                                    data.role.startsWith("GESTOR") ? "Gestor" : "Colaborador", data.role.startsWith("GESTOR")));
                     conversation.participantId = data.id;
                     if (data.profilePhotoUrl != null) conversation.profilePhotoUrl = data.profilePhotoUrl;
                     if (data.avatarInitials != null) conversation.avatarInitials = data.avatarInitials;
@@ -330,12 +330,12 @@ public final class HumanConversationsViewModel extends ViewModel {
         return result;
     }
 
-    public HumanConversation open(Long participantId, String name, String role, boolean manager, int avatarIndex) {
+    public HumanConversation open(Long participantId, String name, String role, boolean manager) {
         if (participantId == null || participantId <= 0) return null;
         for (HumanConversation conversation : allConversations()) {
             if (participantId.equals(conversation.participantId)) return conversation;
         }
-        HumanConversation conversation = new HumanConversation(name, role, manager, avatarIndex);
+        HumanConversation conversation = new HumanConversation(name, role, manager);
         conversation.participantId = participantId;
         contacts.add(conversation);
         return conversation;

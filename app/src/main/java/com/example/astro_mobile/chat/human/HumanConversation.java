@@ -14,7 +14,6 @@ public final class HumanConversation {
     public final String name;
     public final String role;
     public final boolean manager;
-    public final int avatarIndex;
     public final List<HumanMessage> messages = new ArrayList<>();
     public String draft = "";
     public String replyToMessageId;
@@ -33,11 +32,10 @@ public final class HumanConversation {
     public String sendErrorCode;
     public long revision;
 
-    public HumanConversation(String name, String role, boolean manager, int avatarIndex) {
+    public HumanConversation(String name, String role, boolean manager) {
         this.name = name;
         this.role = role;
         this.manager = manager;
-        this.avatarIndex = avatarIndex;
     }
 
     public boolean addMessage(HumanMessage message) {

@@ -32,7 +32,7 @@
                 android:orientation="vertical" android:paddingBottom="30dp">
                 <LinearLayout style="@style/ProfileField" android:minHeight="74dp" android:paddingHorizontal="30dp">
                     <ImageView android:id="@+id/image_staff_details_avatar" android:layout_width="56dp"
-                        android:layout_height="56dp" android:src="@drawable/participant_avatar_1"
+                        android:layout_height="56dp" tools:src="@drawable/participant_avatar_1"
                         android:contentDescription="@string/profile_view_photo" android:scaleType="fitCenter" android:layout_marginEnd="30dp"
                         android:foreground="?attr/selectableItemBackgroundBorderless" />
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"

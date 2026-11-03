@@ -31,6 +31,7 @@
         android:label="Participantes do evento">
         <argument android:name="event_title" app:argType="string" />
         <argument android:name="event_completion_mode" app:argType="string" />
+        <argument android:name="event_last_class_limit_date" app:argType="string" app:nullable="true" android:defaultValue="@null" />
         <action android:id="@+id/action_event_participants_to_assignment" app:destination="@id/eventAssignmentFragment"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />
@@ -44,7 +45,6 @@
         android:label="Atribuição de conclusão">
         <argument android:name="event_title" app:argType="string" />
         <argument android:name="participant_name" app:argType="string" />
-        <argument android:name="participant_avatar_index" app:argType="integer" android:defaultValue="0" />
         <action android:id="@+id/action_assignment_to_confirmation" app:destination="@id/eventAssignmentConfirmationFragment"
             app:popUpTo="@id/eventAssignmentFragment" app:popUpToInclusive="true"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
@@ -470,7 +470,6 @@
         android:label="Validação de conclusão">
         <argument android:name="event_title" app:argType="string" />
         <argument android:name="participant_name" app:argType="string" />
-        <argument android:name="participant_avatar_index" app:argType="integer" android:defaultValue="0" />
         <action android:id="@+id/action_validation_to_event_details" app:destination="@id/managerEventDetailsFragment"
             app:enterAnim="@anim/push_enter" app:exitAnim="@anim/push_exit"
             app:popEnterAnim="@anim/push_pop_enter" app:popExitAnim="@anim/push_pop_exit" />

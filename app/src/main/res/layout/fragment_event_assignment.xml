@@ -36,12 +36,12 @@
                     android:minHeight="74dp" android:orientation="horizontal" android:gravity="center_vertical"
                     android:baselineAligned="false" android:paddingHorizontal="30dp" android:paddingVertical="9dp">
                     <ImageView android:id="@+id/image_assignment_participant" android:layout_width="56dp"
-                        android:layout_height="56dp" android:src="@drawable/participant_avatar_1"
+                        android:layout_height="56dp" tools:src="@drawable/participant_avatar_1"
                         android:scaleType="fitCenter" android:contentDescription="@null" android:importantForAccessibility="no" />
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:layout_marginStart="30dp" android:orientation="vertical">
                         <TextView android:id="@+id/text_assignment_participant" style="@style/ManagerEventsText"
-                            android:textSize="24sp" android:textStyle="bold" android:text="@string/event_assignment_participant_mock" />
+                            android:textSize="24sp" android:textStyle="bold" tools:text="@string/event_assignment_participant_mock" />
                         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:layout_marginTop="5dp" android:orientation="horizontal"
                             android:baselineAligned="false" android:gravity="center_vertical">
@@ -51,7 +51,7 @@
                                 android:contentDescription="@null" android:importantForAccessibility="no" />
                             <TextView android:id="@+id/text_assignment_role" style="@style/ManagerEventsText" android:layout_width="0dp" android:layout_weight="1"
                                 android:textColor="@color/astro_input_hint" android:textStyle="bold"
-                                android:text="@string/event_assignment_job_mock" />
+                                tools:text="@string/event_assignment_job_mock" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -62,14 +62,14 @@
                         android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/event_assignment_event_label" />
                     <TextView android:id="@+id/text_assignment_event" style="@style/ManagerEventDetailsValue"
-                        android:text="@string/manager_event_title_mock" />
+                        tools:text="@string/manager_event_title_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
                 <LinearLayout style="@style/ManagerEventDetailsRow">
                     <ImageView style="@style/ManagerEventDetailsIcon" android:layout_width="20dp"
                         android:layout_height="18.2dp" android:src="@drawable/profile_building" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/profile_unit" />
-                    <TextView android:id="@+id/text_assignment_unit" style="@style/ManagerEventDetailsValue" android:text="@string/event_assignment_unit_mock" />
+                    <TextView android:id="@+id/text_assignment_unit" style="@style/ManagerEventDetailsValue" tools:text="@string/event_assignment_unit_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
                 <TextView style="@style/ManagerEventDetailsHeading" android:text="@string/manager_event_information" />
@@ -77,9 +77,13 @@
                     <ImageView style="@style/ManagerEventDetailsIcon" android:layout_width="20dp"
                         android:layout_height="18.2dp" android:src="@drawable/event_assignment_clock" android:contentDescription="@null" />
                     <TextView style="@style/ManagerEventDetailsLabel" android:text="@string/event_assignment_deadline_label" />
-                    <TextView android:id="@+id/text_assignment_deadline" style="@style/ManagerEventDetailsValue" android:text="@string/event_assignment_deadline_mock" />
+                    <TextView android:id="@+id/text_assignment_deadline" style="@style/ManagerEventDetailsValue" tools:text="@string/event_assignment_deadline_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
+                <TextView android:id="@+id/text_assignment_deadline_warning" style="@style/ManagerEventsText"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp" android:paddingTop="16dp"
+                    android:textColor="@color/astro_light_background" android:visibility="gone" />
                 <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:paddingHorizontal="30dp" android:paddingVertical="25dp">
                     <TextView android:id="@+id/button_assignment_submit" style="@style/EmployeeEventDetailsButton"

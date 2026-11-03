@@ -58,7 +58,7 @@ public final class AiChatRepository {
         Operation operation = new Operation();
         String normalized = message == null ? "" : message.trim();
         if (normalized.isEmpty()
-                || normalized.codePointCount(0, normalized.length()) > ChatRequest.MAX_MESSAGE_LENGTH) {
+                || normalized.length() > ChatRequest.MAX_MESSAGE_LENGTH) {
             fail(operation, callback, ChatFailure.INVALID_MESSAGE);
         } else {
             authenticate(operation, new ChatRequest(normalized, sessionId), false, callback);

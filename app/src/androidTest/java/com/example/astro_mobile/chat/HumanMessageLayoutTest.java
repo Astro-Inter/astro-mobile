@@ -35,7 +35,7 @@ public final class HumanMessageLayoutTest {
             AtomicReference<RecyclerView> list = new AtomicReference<>();
             AtomicReference<String> copied = new AtomicReference<>();
             scenario.onActivity(activity -> {
-                HumanConversation conversation = new HumanConversation("Contato", "Gestor", true, 0);
+                HumanConversation conversation = new HumanConversation("Contato", "Gestor", true);
                 HumanMessage original = new HumanMessage("Você concluiu o treinamento de segurança?", "09:41", false);
                 original.id = "original"; original.createdAt = "2026-10-30T12:41:00Z";
                 HumanMessage response = new HumanMessage("Sim! Finalizei o treinamento e já encaminhei o comprovante.", "09:42", true);
@@ -86,7 +86,8 @@ public final class HumanMessageLayoutTest {
                 float density = activity.getResources().getDisplayMetrics().density;
                 int timeGap = time.getTop() - text.getBottom();
                 assertTrue("Timestamp must stay close to the message", timeGap <= 12 * density);
-                assertTrue("Short replies must reserve readable space for the quote", quote.getWidth() >= 120 * density);
+                assertEquals("Short replies must give the quote the same space as long replies",
+                        sent.findViewById(R.id.text_human_quote_content).getWidth(), quote.getWidth());
                 View replyTime = reply.findViewById(R.id.text_human_message_time);
                 assertTrue(replyTime.getTop()
                         >= reply.findViewById(R.id.text_human_message_content).getBottom());

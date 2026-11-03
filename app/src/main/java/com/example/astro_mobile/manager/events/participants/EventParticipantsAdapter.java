@@ -10,11 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.manager.events.CompletionDeadline;
 import com.bumptech.glide.Glide;
 import android.content.res.ColorStateList;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.time.LocalDateTime;
 
 public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventParticipantsAdapter.Row> {
     public interface OnParticipantClickListener {
@@ -24,15 +26,17 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
     private final List<EventParticipant> participants;
     private final String eventTitle;
     private final boolean assignmentMode;
+    private final String lastClassDeadline;
     private final OnParticipantClickListener participantClick;
     private final Consumer<EventParticipant> photoClick;
 
     public EventParticipantsAdapter(List<EventParticipant> participants, String eventTitle,
-                                    boolean assignmentMode, OnParticipantClickListener participantClick,
+                                    boolean assignmentMode, String lastClassDeadline, OnParticipantClickListener participantClick,
                                     Consumer<EventParticipant> photoClick) {
         this.participants = participants;
         this.eventTitle = eventTitle;
         this.assignmentMode = assignmentMode;
+        this.lastClassDeadline = lastClassDeadline;
         this.participantClick = participantClick;
         this.photoClick = photoClick;
     }
@@ -56,6 +60,8 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
                 .error(R.drawable.profile_avatar_placeholder).into(row.avatar);
         row.icon.setImageTintList(null);
         boolean validationPending = participant.status == EventParticipant.Status.VALIDATION_PENDING;
+        boolean expired = assignmentMode && participant.status == EventParticipant.Status.AWAITING_COMPLETION
+                && CompletionDeadline.assignment(lastClassDeadline, LocalDateTime.now()) == CompletionDeadline.Result.EXPIRED;
         row.icon.setVisibility(View.VISIBLE);
         switch (participant.status) {
             case VALIDATION_PENDING:
@@ -75,6 +81,12 @@ public final class EventParticipantsAdapter extends RecyclerView.Adapter<EventPa
                 row.icon.setImageResource(R.drawable.ic_status_reload);
                 row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red)));
                 break;
+        }
+        if (expired) {
+            row.status.setText(R.string.employee_events_expired);
+            row.icon.setVisibility(View.VISIBLE);
+            row.icon.setImageResource(R.drawable.conversations_close);
+            row.icon.setImageTintList(ColorStateList.valueOf(row.itemView.getContext().getColor(R.color.employee_event_status_red)));
         }
         // Preserva o tamanho de raiz do ponto vermelho e do check dentro do slot de 38dp.
         float density = row.itemView.getResources().getDisplayMetrics().density;

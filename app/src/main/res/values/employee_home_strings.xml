@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="employee_home_greeting_api">Olá, %1$s</string>
-    <string name="employee_home_workspace_api">Workspace %1$s</string>
     <string name="employee_home_has_pending">Você tem pendências!</string>
     <string name="employee_home_under_analysis">Você tem eventos em análise!</string>
     <string name="employee_home_deadline">Data limite: %1$s</string>

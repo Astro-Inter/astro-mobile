@@ -44,7 +44,7 @@ public final class HumanMessageSwipeTest {
         AtomicInteger selections = new AtomicInteger();
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {
-                HumanConversation model = new HumanConversation("Contato", "Gestor", true, 0);
+                HumanConversation model = new HumanConversation("Contato", "Gestor", true);
                 model.participantId = 2L;
                 HumanMessage received = new HumanMessage("Mensagem recebida para responder", "09:41", false);
                 received.id = "received"; received.createdAt = "2026-10-30T12:41:00Z";

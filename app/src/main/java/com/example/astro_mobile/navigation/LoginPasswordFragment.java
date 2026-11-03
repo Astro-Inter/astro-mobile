@@ -21,8 +21,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.astro_mobile.R;
+import com.example.astro_mobile.auth.UserRoles;
 import com.example.astro_mobile.auth.AuthArgs;
-import com.example.astro_mobile.auth.MockSession;
 import com.example.astro_mobile.auth.EmailVerificationViewModel;
 import com.example.astro_mobile.auth.PasswordLoginViewModel;
 import com.example.astro_mobile.data.firebase.AuthFailureKind;
@@ -58,7 +58,7 @@ public class LoginPasswordFragment extends Fragment {
         Bundle args = getArguments();
         String email = args == null ? null : args.getString(AuthArgs.EMAIL);
         String userType = args == null ? null : args.getString(AuthArgs.USER_TYPE);
-        if (email == null || !MockSession.isKnownUserType(userType)) {
+        if (email == null || !UserRoles.isKnown(userType)) {
             Navigation.findNavController(view).navigate(R.id.action_login_password_to_generic_error);
             return;
         }
@@ -143,8 +143,6 @@ public class LoginPasswordFragment extends Fragment {
                 }
                 setLoading(enterButton, enterText, enterIcon, progress, forgotPassword, false);
                 passwordInput.setText(null);
-                // O Firebase é a sessão real; remove qualquer sessão mock anterior.
-                MockSession.clear(requireContext());
                 FlowPreferences.clear(requireContext());
                 Navigation.findNavController(view)
                         .navigate("COLABORADOR".equals(userType)
