@@ -132,6 +132,7 @@ public final class EventParticipantsFragment extends Fragment {
         Boolean retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry()
                 .getSavedStateHandle().remove("retry_event_participants");
         if (Boolean.TRUE.equals(retry) && getView() != null) loadParticipants(getView());
+        else if (getView() != null && state != null && state.isLoaded()) render(getView());
     }
 
     private void render(View view) {
@@ -139,7 +140,8 @@ public final class EventParticipantsFragment extends Fragment {
         List<EventParticipant> participants = state.visibleParticipants();
         RecyclerView list = view.findViewById(R.id.list_event_participants);
         list.setAdapter(new EventParticipantsAdapter(participants, eventTitle,
-                completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT, this::openParticipant,
+                completionMode == ManagerEvent.CompletionMode.MANAGER_ASSIGNMENT,
+                requireArguments().getString("event_last_class_limit_date"), this::openParticipant,
                 participant -> PhotoViewerDialog.show(this, participant.photoUrl, R.drawable.profile_avatar_placeholder)));
         boolean empty = participants.isEmpty();
         list.setVisibility(empty ? View.GONE : View.VISIBLE);

@@ -22,7 +22,7 @@ Refatoração de arquitetura e limpeza: **CONCLUÍDO** nesta branch. Recursos ó
 | Detalhes do formulário de inspeção | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Detalhe real; sem unidade oculta o campo; com unidade exige localização precisa e raio de 100 m. | 2026-11-02 |
 | Alertas | Gestor | NÃO SE APLICA | NÃO SE APLICA | NÃO SE APLICA | NÃO SE APLICA | Funcionalidade removida do fluxo de gestor por decisão de produto; preferência de push preservada no perfil. | 2026-11-02 |
 | Alertas | Colaborador | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Lista, detalhe e confirmação de leitura reais; acesso direto pela Home e indicação de não lidos. | 2026-11-02 |
-| Participantes do evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Participantes reais; estados conforme atribuição do gestor ou validação do colaborador. | 2026-11-02 |
+| Participantes do evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Participantes reais; na atribuição, mostra prazo encerrado quando a última turma terminou; envios pendentes de validação preservam seu estado. Build e testes aprovados; caso vencido conferido no Samsung. | 2026-11-02 |
 | Eventos do Gestor | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Lista por modo/status, contagem e filtros; prazo encerrado depende de lastClassLimitDate no retorno da API. | 2026-11-02 |
 | Detalhes do evento do Gestor | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Detalhe real e acesso aos participantes conforme modo de conclusão. | 2026-11-02 |
 | Detalhe de evento do Colaborador | Colaborador | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Detalhe real, material, evidência obrigatória/opcional e envio de conclusão. | 2026-11-02 |
