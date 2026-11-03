@@ -9,5 +9,9 @@
     <string name="event_assignment_deadline_mock">30/08/2026</string>
     <string name="event_assignment_submit">Atribuir conclusão</string>
     <string name="event_assignment_sending">Atribuindo...</string>
+    <string name="event_assignment_expired">O prazo desta turma terminou. Não é possível atribuir a conclusão.</string>
+    <string name="event_assignment_deadline_unavailable">Não foi possível verificar o prazo desta turma. Atualize a tela e tente novamente.</string>
+    <string name="event_validation_late">A conclusão foi enviada após o prazo da turma e não pode ser validada.</string>
+    <string name="event_validation_dates_unavailable">Não foi possível verificar as datas do envio e da turma. Atualize a tela e tente novamente.</string>
     <string name="event_assignment_success">Conclusão atribuída com sucesso!</string>
 </resources>

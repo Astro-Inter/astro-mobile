@@ -34,6 +34,7 @@ import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.EventValidationData;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import com.example.astro_mobile.manager.events.ManagerEvent;
+import com.example.astro_mobile.manager.events.CompletionDeadline;
 import com.example.astro_mobile.manager.events.ManagerEventDetailsFragment;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -110,9 +111,7 @@ public final class EventValidationFragment extends Fragment {
             list.addView(row);
         }
         view.findViewById(R.id.text_validation_evidence_empty).setVisibility(list.getChildCount() == 0 ? View.VISIBLE : View.GONE);
-        boolean pending = "PENDENTE".equals(data.status);
-        view.findViewById(R.id.button_validation_confirm).setEnabled(pending);
-        view.findViewById(R.id.button_validation_reject).setEnabled(pending);
+        updateActions(view);
         view.findViewById(R.id.skeleton_event_validation).setVisibility(View.GONE);
         view.findViewById(R.id.container_validation_content).setVisibility(View.VISIBLE);
     }
@@ -154,6 +153,7 @@ public final class EventValidationFragment extends Fragment {
     private void showFileError() { Toast.makeText(requireContext(), R.string.employee_event_open_error, Toast.LENGTH_SHORT).show(); }
 
     private void showRejection(View view) {
+        if (!updateActions(view)) return;
         if (rejectDialog != null && rejectDialog.isShowing()) return;
         rejectDialog = new Dialog(requireContext());
         rejectDialog.setContentView(R.layout.dialog_event_validation_reject);
@@ -187,7 +187,8 @@ public final class EventValidationFragment extends Fragment {
 
     // Uma decisão só é confirmada depois da resposta bem-sucedida do servidor.
     private void decide(View view, boolean reject) {
-        if (state.isLoading() || state.getDetails() == null || (reject && state.getReason().trim().isEmpty())) return;
+        if (state.isLoading() || state.getDetails() == null || !updateActions(view)
+                || (reject && state.getReason().trim().isEmpty())) return;
         view.findViewById(R.id.button_validation_confirm).setEnabled(false);
         view.findViewById(R.id.button_validation_reject).setEnabled(false);
         if (rejectDialog != null && rejectDialog.isShowing()) {
@@ -223,6 +224,24 @@ public final class EventValidationFragment extends Fragment {
                 showFailure(failure, reject ? "reject" : "approve");
             }
         });
+    }
+
+    private boolean updateActions(View view) {
+        EventValidationData data = state.getDetails();
+        boolean pending = data != null && "PENDENTE".equals(data.status);
+        CompletionDeadline.Result result = data == null ? CompletionDeadline.Result.UNAVAILABLE
+                : CompletionDeadline.validation(data.endDate, data.completionDate);
+        boolean allowed = pending && result == CompletionDeadline.Result.ALLOWED;
+        for (int id : new int[]{R.id.button_validation_confirm, R.id.button_validation_reject}) {
+            View button = view.findViewById(id);
+            button.setEnabled(allowed);
+            button.setAlpha(allowed ? 1f : 0.4f);
+        }
+        TextView warning = view.findViewById(R.id.text_validation_deadline_warning);
+        warning.setVisibility(pending && !allowed ? View.VISIBLE : View.GONE);
+        if (pending && !allowed) warning.setText(result == CompletionDeadline.Result.EXPIRED
+                ? R.string.event_validation_late : R.string.event_validation_dates_unavailable);
+        return allowed;
     }
     private void showFailure(FailureKind failure, String operation) {
         if (failure == FailureKind.SESSION) { SessionNavigation.signOut(this); return; }

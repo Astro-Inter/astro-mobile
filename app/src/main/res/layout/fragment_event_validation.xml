@@ -112,6 +112,10 @@
                     android:paddingHorizontal="30dp" android:paddingVertical="10dp"
                     android:text="@string/event_validation_no_evidence" android:visibility="gone" />
                 <View style="@style/EventValidationDivider" />
+                <TextView android:id="@+id/text_validation_deadline_warning" style="@style/ManagerEventsText"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp" android:paddingTop="16dp"
+                    android:textColor="@color/astro_light_background" android:visibility="gone" />
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="4dp" android:paddingHorizontal="30dp" android:paddingVertical="10dp"
                     android:orientation="vertical">

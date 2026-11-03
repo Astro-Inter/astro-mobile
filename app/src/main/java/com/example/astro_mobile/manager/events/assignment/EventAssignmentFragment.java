@@ -17,6 +17,7 @@ import com.example.astro_mobile.shared.ui.PullToRefresh;
 import com.example.astro_mobile.auth.SessionNavigation;
 import com.example.astro_mobile.data.api.FailureKind;
 import com.example.astro_mobile.data.api.dto.EventAssignmentData;
+import com.example.astro_mobile.manager.events.CompletionDeadline;
 import com.example.astro_mobile.shared.navigation.HomeNavigation;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,9 +35,11 @@ public final class EventAssignmentFragment extends Fragment {
         view.findViewById(R.id.button_assignment_back).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack());
         view.findViewById(R.id.button_assignment_event).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack(R.id.managerEventDetailsFragment, false));
         view.findViewById(R.id.button_assignment_close).setOnClickListener(clicked -> NavHostFragment.findNavController(this).popBackStack(HomeNavigation.destination(requireContext()), false));
-        view.findViewById(R.id.button_assignment_submit).setOnClickListener(clicked ->
-                ActionConfirmationDialog.show(this,
-                        R.string.action_confirmation_assign_event, () -> submit(view)));
+        view.findViewById(R.id.button_assignment_submit).setOnClickListener(clicked -> {
+            if (!updateDeadline(view)) return;
+            ActionConfirmationDialog.show(this,
+                    R.string.action_confirmation_assign_event, () -> submit(view));
+        });
         if (state.getDetails() == null) {
             String retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry().getSavedStateHandle().get("retry_event_assignment");
             if (retry == null) load(view);
@@ -65,6 +68,7 @@ public final class EventAssignmentFragment extends Fragment {
             catch (DateTimeParseException ignored) { deadline = null; }
         }
         setValue(view, R.id.text_assignment_deadline, deadline);
+        updateDeadline(view);
         Glide.with(view).load(data.profilePhotoUrl).circleCrop().placeholder(R.drawable.profile_avatar_placeholder)
                 .fallback(R.drawable.profile_avatar_placeholder).error(R.drawable.profile_avatar_placeholder)
                 .into((ImageView) view.findViewById(R.id.image_assignment_participant));
@@ -78,7 +82,7 @@ public final class EventAssignmentFragment extends Fragment {
 
     // Desativa o botão durante o POST e só confirma após o sucesso da API.
     private void submit(View view) {
-        if (state.isLoading() || state.getDetails() == null) return;
+        if (state.isLoading() || state.getDetails() == null || !updateDeadline(view)) return;
         View button = view.findViewById(R.id.button_assignment_submit);
         button.setEnabled(false);
         ((TextView) button).setText(R.string.event_assignment_sending);
@@ -104,6 +108,21 @@ public final class EventAssignmentFragment extends Fragment {
                         showFailure(failure, "submit");
                     }
                 });
+    }
+
+    private boolean updateDeadline(View view) {
+        EventAssignmentData details = state.getDetails();
+        CompletionDeadline.Result result = CompletionDeadline.assignment(
+                details == null ? null : details.endDate, LocalDateTime.now());
+        boolean allowed = result == CompletionDeadline.Result.ALLOWED;
+        View button = view.findViewById(R.id.button_assignment_submit);
+        button.setEnabled(allowed);
+        button.setAlpha(allowed ? 1f : 0.4f);
+        TextView warning = view.findViewById(R.id.text_assignment_deadline_warning);
+        warning.setVisibility(allowed ? View.GONE : View.VISIBLE);
+        if (!allowed) warning.setText(result == CompletionDeadline.Result.EXPIRED
+                ? R.string.event_assignment_expired : R.string.event_assignment_deadline_unavailable);
+        return allowed;
     }
     private void showFailure(FailureKind failure, String operation) {
         if (failure == FailureKind.SESSION) { SessionNavigation.signOut(this); return; }

@@ -80,6 +80,10 @@
                     <TextView android:id="@+id/text_assignment_deadline" style="@style/ManagerEventDetailsValue" tools:text="@string/event_assignment_deadline_mock" />
                 </LinearLayout>
                 <View style="@style/ManagerEventDetailsDivider" />
+                <TextView android:id="@+id/text_assignment_deadline_warning" style="@style/ManagerEventsText"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp" android:paddingTop="16dp"
+                    android:textColor="@color/astro_light_background" android:visibility="gone" />
                 <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:paddingHorizontal="30dp" android:paddingVertical="25dp">
                     <TextView android:id="@+id/button_assignment_submit" style="@style/EmployeeEventDetailsButton"
