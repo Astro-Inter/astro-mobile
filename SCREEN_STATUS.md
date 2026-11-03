@@ -9,7 +9,7 @@ Refatoração de arquitetura e limpeza: **CONCLUÍDO** nesta branch. Recursos ó
 | Tela | Fluxo | XML | Lógica | Navegação | Integração | Resumo atual | Atualizado em |
 |---|---|---|---|---|---|---|---|
 | Visualização de evidência de evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Evidências reais: imagens no Astro; demais arquivos em aplicativo compatível. | 2026-11-02 |
-| Validação de conclusão de evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Consulta e análise de envios feitos até o prazo da turma, inclusive após o encerramento; bloqueio local quando as datas não permitem confirmar o prazo. Status cancelado depende do backend. | 2026-11-02 |
+| Validação de conclusão de evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Consulta e análise de envios feitos até o prazo da turma, inclusive após o encerramento; bloqueio local quando as datas não permitem confirmar o prazo. Status cancelado é consultado pelo mobile; a garantia de bloqueio no servidor depende do backend. | 2026-11-02 |
 | Confirmação de validação de evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | NÃO SE APLICA | Confirmação da validação e retorno ao contexto do gestor. | 2026-11-02 |
 | Fora da localização do formulário | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Aviso de saída do raio de 100 m e retorno aos detalhes com respostas preservadas. | 2026-11-02 |
 | Resposta do formulário de inspeção | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Perguntas dinâmicas, Outros, câmera, multipart e revisão das fotos enviadas; GPS somente local. | 2026-11-02 |
@@ -17,7 +17,7 @@ Refatoração de arquitetura e limpeza: **CONCLUÍDO** nesta branch. Recursos ó
 | Eventos do funcionário selecionado | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Eventos reais do colaborador; filtros e detalhe conforme modo de conclusão. | 2026-11-02 |
 | Detalhes do funcionário | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Perfil real por ID, foto, NRs e acesso às pendências. | 2026-11-02 |
 | Lista de colaboradores | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Consulta mobile com contagem de pendências, busca e filtros locais. | 2026-11-02 |
-| Atribuição de conclusão de evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Detalhe e atribuição reais; bloqueio local quando a turma encerrou ou o prazo é indisponível. A garantia no servidor depende do backend. | 2026-11-02 |
+| Atribuição de conclusão de evento | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Detalhe e atribuição reais; bloqueio local quando a turma encerrou ou o prazo é indisponível. Status cancelado é consultado pelo mobile; a garantia no servidor depende do backend. | 2026-11-02 |
 | Lista de formulários | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Lista de recebidos real; reprovado com X e busca instantânea. | 2026-11-02 |
 | Detalhes do formulário de inspeção | Gestor | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | CONCLUÍDO | Detalhe real; sem unidade oculta o campo; com unidade exige localização precisa e raio de 100 m. | 2026-11-02 |
 | Alertas | Gestor | NÃO SE APLICA | NÃO SE APLICA | NÃO SE APLICA | NÃO SE APLICA | Funcionalidade removida do fluxo de gestor por decisão de produto; preferência de push preservada no perfil. | 2026-11-02 |

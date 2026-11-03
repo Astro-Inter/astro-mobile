@@ -13,5 +13,6 @@
     <string name="event_assignment_deadline_unavailable">Não foi possível verificar o prazo desta turma. Atualize a tela e tente novamente.</string>
     <string name="event_validation_late">A conclusão foi enviada após o prazo da turma e não pode ser validada.</string>
     <string name="event_validation_dates_unavailable">Não foi possível verificar as datas do envio e da turma. Atualize a tela e tente novamente.</string>
+    <string name="event_manager_cancelled">Este evento foi cancelado. Não é possível realizar esta ação.</string>
     <string name="event_assignment_success">Conclusão atribuída com sucesso!</string>
 </resources>

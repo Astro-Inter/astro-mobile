@@ -40,7 +40,7 @@ public final class EventAssignmentFragment extends Fragment {
             ActionConfirmationDialog.show(this,
                     R.string.action_confirmation_assign_event, () -> submit(view));
         });
-        if (state.getDetails() == null) {
+        if (state.getDetails() == null || state.getEventStatus() == null) {
             String retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry().getSavedStateHandle().get("retry_event_assignment");
             if (retry == null) load(view);
         } else render(view);
@@ -107,6 +107,18 @@ public final class EventAssignmentFragment extends Fragment {
                         ((TextView) button).setText(R.string.event_assignment_submit);
                         showFailure(failure, "submit");
                     }
+                    @Override public void onCancelled() {
+                        if (getView() == view && isAdded()) {
+                            ((TextView) button).setText(R.string.event_assignment_submit);
+                            updateDeadline(view);
+                        }
+                    }
+                    @Override public void onDeadlineChanged() {
+                        if (getView() == view && isAdded()) {
+                            ((TextView) button).setText(R.string.event_assignment_submit);
+                            updateDeadline(view);
+                        }
+                    }
                 });
     }
 
@@ -114,13 +126,16 @@ public final class EventAssignmentFragment extends Fragment {
         EventAssignmentData details = state.getDetails();
         CompletionDeadline.Result result = CompletionDeadline.assignment(
                 details == null ? null : details.endDate, LocalDateTime.now());
-        boolean allowed = result == CompletionDeadline.Result.ALLOWED;
+        boolean cancelled = "CANCELADO".equals(state.getEventStatus());
+        boolean allowed = state.getEventStatus() != null && !cancelled
+                && result == CompletionDeadline.Result.ALLOWED;
         View button = view.findViewById(R.id.button_assignment_submit);
         button.setEnabled(allowed);
         button.setAlpha(allowed ? 1f : 0.4f);
         TextView warning = view.findViewById(R.id.text_assignment_deadline_warning);
         warning.setVisibility(allowed ? View.GONE : View.VISIBLE);
-        if (!allowed) warning.setText(result == CompletionDeadline.Result.EXPIRED
+        if (!allowed) warning.setText(cancelled ? R.string.event_manager_cancelled
+                : result == CompletionDeadline.Result.EXPIRED
                 ? R.string.event_assignment_expired : R.string.event_assignment_deadline_unavailable);
         return allowed;
     }

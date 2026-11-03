@@ -58,7 +58,7 @@ public final class EventValidationFragment extends Fragment {
                 ActionConfirmationDialog.show(this,
                         R.string.action_confirmation_validate_event, () -> decide(view, false)));
         view.findViewById(R.id.button_validation_reject).setOnClickListener(clicked -> showRejection(view));
-        if (state.getDetails() != null) render(view);
+        if (state.getDetails() != null && state.getEventStatus() != null) render(view);
         else {
             String retry = NavHostFragment.findNavController(this).getCurrentBackStackEntry().getSavedStateHandle().get("retry_event_validation");
             if (retry == null) load(view);
@@ -223,6 +223,13 @@ public final class EventValidationFragment extends Fragment {
                 if (rejectDialog != null) rejectDialog.dismiss();
                 showFailure(failure, reject ? "reject" : "approve");
             }
+            @Override public void onCancelled() {
+                if (getView() != view || !isAdded()) return;
+                if (rejectDialog != null) rejectDialog.dismiss();
+                ((TextView) view.findViewById(R.id.button_validation_confirm)).setText(R.string.event_validation_confirm);
+                ((TextView) view.findViewById(R.id.button_validation_reject)).setText(R.string.event_validation_reject);
+                updateActions(view);
+            }
         });
     }
 
@@ -231,7 +238,9 @@ public final class EventValidationFragment extends Fragment {
         boolean pending = data != null && "PENDENTE".equals(data.status);
         CompletionDeadline.Result result = data == null ? CompletionDeadline.Result.UNAVAILABLE
                 : CompletionDeadline.validation(data.endDate, data.completionDate);
-        boolean allowed = pending && result == CompletionDeadline.Result.ALLOWED;
+        boolean cancelled = "CANCELADO".equals(state.getEventStatus());
+        boolean allowed = pending && state.getEventStatus() != null && !cancelled
+                && result == CompletionDeadline.Result.ALLOWED;
         for (int id : new int[]{R.id.button_validation_confirm, R.id.button_validation_reject}) {
             View button = view.findViewById(id);
             button.setEnabled(allowed);
@@ -239,7 +248,8 @@ public final class EventValidationFragment extends Fragment {
         }
         TextView warning = view.findViewById(R.id.text_validation_deadline_warning);
         warning.setVisibility(pending && !allowed ? View.VISIBLE : View.GONE);
-        if (pending && !allowed) warning.setText(result == CompletionDeadline.Result.EXPIRED
+        if (pending && !allowed) warning.setText(cancelled ? R.string.event_manager_cancelled
+                : result == CompletionDeadline.Result.EXPIRED
                 ? R.string.event_validation_late : R.string.event_validation_dates_unavailable);
         return allowed;
     }
